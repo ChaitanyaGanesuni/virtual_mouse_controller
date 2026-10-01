@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
+import 'package:flutter/foundation.dart' show mapEquals;
 import 'package:flutter/material.dart';
 
 import '../content/models.dart';
@@ -18,6 +21,7 @@ class AppSettings {
     this.textScale = 1.0,
     this.themeMode = ThemeMode.system,
     this.onboardingDone = false,
+    this.voicePrefs = const {},
   });
 
   static const supportedLanguages = ['en', 'te'];
@@ -33,6 +37,9 @@ class AppSettings {
   final ThemeMode themeMode;
   final bool onboardingDone;
 
+  /// Preferred TTS voice per language ('en', 'te', 'sa') → voice id.
+  final Map<String, String> voicePrefs;
+
   Locale get locale => Locale(uiLanguage);
 
   AppSettings copyWith({
@@ -44,6 +51,7 @@ class AppSettings {
     double? textScale,
     ThemeMode? themeMode,
     bool? onboardingDone,
+    Map<String, String>? voicePrefs,
   }) => AppSettings(
     uiLanguage: uiLanguage ?? this.uiLanguage,
     verseScript: verseScript ?? this.verseScript,
@@ -53,6 +61,7 @@ class AppSettings {
     textScale: (textScale ?? this.textScale).clamp(minTextScale, maxTextScale),
     themeMode: themeMode ?? this.themeMode,
     onboardingDone: onboardingDone ?? this.onboardingDone,
+    voicePrefs: voicePrefs ?? this.voicePrefs,
   );
 
   @override
@@ -65,7 +74,8 @@ class AppSettings {
       other.explanationLanguage == explanationLanguage &&
       other.textScale == textScale &&
       other.themeMode == themeMode &&
-      other.onboardingDone == onboardingDone;
+      other.onboardingDone == onboardingDone &&
+      mapEquals(other.voicePrefs, voicePrefs);
 
   @override
   int get hashCode => Object.hash(
@@ -77,6 +87,7 @@ class AppSettings {
     textScale,
     themeMode,
     onboardingDone,
+    Object.hashAllUnordered(voicePrefs.entries.map((e) => '${e.key}=${e.value}')),
   );
 }
 
@@ -102,6 +113,7 @@ class DriftSettingsRepository implements SettingsRepository {
       textScale: row.textScale.clamp(AppSettings.minTextScale, AppSettings.maxTextScale),
       themeMode: ThemeMode.values.firstWhere((m) => m.name == row.theme, orElse: () => ThemeMode.system),
       onboardingDone: row.onboardingDone,
+      voicePrefs: _decodeVoices(row.voicePrefs),
     );
   }
 
@@ -117,8 +129,19 @@ class DriftSettingsRepository implements SettingsRepository {
         textScale: Value(s.textScale),
         theme: Value(s.themeMode.name),
         onboardingDone: Value(s.onboardingDone),
+        voicePrefs: Value(jsonEncode(s.voicePrefs)),
         updatedAt: Value(DateTime.now()),
       ),
     );
   }
+}
+
+Map<String, String> _decodeVoices(String json) {
+  try {
+    final decoded = jsonDecode(json);
+    if (decoded is Map) return {for (final e in decoded.entries) e.key.toString(): e.value.toString()};
+  } on FormatException {
+    // fall through: corrupt preference means "no preference"
+  }
+  return const {};
 }

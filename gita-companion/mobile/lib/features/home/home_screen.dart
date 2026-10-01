@@ -7,6 +7,7 @@ import '../../core/content/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/lotus.dart';
 import '../../shared/verse_text_view.dart';
+import '../audio/continue_listening.dart';
 
 const _titles = {
   VerseScript.devanagari: 'श्रीमद्भगवद्गीता',
@@ -98,6 +99,7 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
+            ContinueListeningCard(header: _SectionLabel(l.continueListening)),
             Row(
               children: [
                 Expanded(child: _SectionLabel(l.chapters)),
@@ -118,7 +120,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 28),
             _SectionLabel(l.comingNext),
-            _ComingNext(items: [l.featureListen, l.featureTeacher, l.featureMyGita, l.featureDaily]),
+            _ComingNext(items: [l.featureTeacher, l.featureMyGita, l.featureDaily]),
           ],
         ),
       ),

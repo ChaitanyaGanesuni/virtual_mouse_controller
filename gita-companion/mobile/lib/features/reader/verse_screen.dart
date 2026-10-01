@@ -9,6 +9,7 @@ import '../../core/settings/app_settings.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/provenance.dart';
 import '../../shared/verse_text_view.dart';
+import '../audio/listen_actions.dart';
 
 /// The selected explanation mode stays the same while swiping between verses.
 class ExplanationModeController extends Notifier<ExplanationMode> {
@@ -162,6 +163,14 @@ class _VersePage extends ConsumerWidget {
         ? settings.explanationLanguage
         : verse.wordMeanings.firstOrNull?.language;
     final words = verse.wordMeanings.where((w) => w.language == wordLanguage).toList();
+    final mode = ref.watch(explanationModeProvider);
+    final shownExplanation = pickText(
+      verse.textsOfKind(mode.kind),
+      language: settings.explanationLanguage,
+      languageOf: (t) => t.language,
+      statusOf: (t) => t.reviewStatus,
+      isAi: (t) => repo.source(t.sourceId)?.kind == 'ai',
+    );
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
@@ -173,6 +182,8 @@ class _VersePage extends ConsumerWidget {
           reviewStatus: verse.reviewStatus,
           textAlign: TextAlign.center,
         ),
+        const SizedBox(height: 14),
+        VerseListenActions(verse: verse, explanation: shownExplanation),
         if (!verse.isCanonical) ...[
           const SizedBox(height: 16),
           Notice(text: l.nonCanonicalNote, icon: Icons.info_outline),
@@ -303,7 +314,14 @@ class _ExplanationCard extends ConsumerWidget {
             ..._terms(context, text.body)
           else
             Text(text.body, style: theme.textTheme.bodyLarge?.copyWith(height: 1.65)),
-          ProvenanceNote(sourceId: text.sourceId, reviewStatus: text.reviewStatus),
+          Row(
+            children: [
+              Expanded(
+                child: ProvenanceNote(sourceId: text.sourceId, reviewStatus: text.reviewStatus),
+              ),
+              ReadExplanationButton(verse: verse, text: text),
+            ],
+          ),
         ],
       ],
     );

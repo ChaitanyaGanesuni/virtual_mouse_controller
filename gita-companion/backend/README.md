@@ -49,6 +49,18 @@ A failing answer gets one repair attempt, then the next provider is tried.
 Output is imported as **AI-generated, unreviewed** text, labelled with its
 model in the app.
 
+## Sanskrit recitation (Indic Parler-TTS, GPU)
+
+```bash
+pip install -e ../content -e .
+pip install torch transformers git+https://github.com/huggingface/parler-tts.git
+python -m workers.generate_recitation --dataset ../content/data/gita.json --out recitation/ \
+    --voice sa:Aryan --chapters 2
+```
+
+It runs well on a free Kaggle or Colab GPU and is resumable. Every clip
+starts `unreviewed` in `recitation/review.csv`. See `docs/tts-matrix.md`.
+
 ## Tests
 
 ```bash

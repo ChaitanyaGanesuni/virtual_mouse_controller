@@ -8,6 +8,7 @@ import 'package:gita_companion/core/content/sqlite_content_repository.dart';
 import 'package:gita_companion/core/settings/app_settings.dart';
 import 'package:go_router/go_router.dart';
 
+import 'support/audio_fakes.dart';
 import 'support/pack.dart';
 
 class MemorySettingsRepository implements SettingsRepository {
@@ -35,6 +36,7 @@ void main() {
           contentRepositoryProvider.overrideWithValue(content),
           settingsRepositoryProvider.overrideWithValue(store),
           initialSettingsProvider.overrideWithValue(settings),
+          ...TestAudio().overrides,
           clockProvider.overrideWithValue(() => DateTime(2026, 10, 1)),
         ],
         child: const GitaApp(),
@@ -143,7 +145,11 @@ void main() {
     await tester.pumpAndSettle();
     expect(store.saved.verseScript, VerseScript.iast);
 
-    await tester.ensureVisible(find.text('Sources and licences'));
+    await tester.scrollUntilVisible(
+      find.text('Sources and licences'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
     await tester.pumpAndSettle();
     await tester.tap(find.text('Sources and licences'));
     await tester.pumpAndSettle();

@@ -9,6 +9,7 @@ import 'package:gita_companion/core/search/search_service.dart';
 import 'package:gita_companion/core/settings/app_settings.dart';
 import 'package:go_router/go_router.dart';
 
+import 'support/audio_fakes.dart';
 import 'support/pack.dart';
 import 'widgets_test.dart' show MemorySettingsRepository;
 
@@ -34,6 +35,7 @@ void main() {
           searchServiceProvider.overrideWithValue(search),
           settingsRepositoryProvider.overrideWithValue(store),
           initialSettingsProvider.overrideWithValue(s),
+          ...TestAudio().overrides,
           clockProvider.overrideWithValue(() => DateTime(2026, 10, 1)),
         ],
         child: const GitaApp(),

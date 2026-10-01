@@ -8,8 +8,8 @@ current state.
 | Directory | What | Status |
 |---|---|---|
 | `content/` | Content pipeline: canonical Sanskrit text, transliteration, licence register, mobile SQLite pack | Phase 2 ✅ |
-| `backend/` | Database layer, free-tier LLM providers, batch explanation generator | Phases 2 + 4 |
-| `mobile/` | Flutter app: reader, chapters, search (offline, APK built by CI) | Phase 4 ✅ |
+| `backend/` | Database layer, free-tier LLM providers, explanation and recitation generators | Phases 2, 4, 5 |
+| `mobile/` | Flutter app: reader, chapters, search, listening (offline, APK built by CI) | Phase 5 ✅ |
 | `infra/` | Local dev services (Postgres + pgvector) | ✅ |
 
 ## Quick start

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/audio/player_screen.dart';
 import '../features/chapters/chapter_screen.dart';
 import '../features/chapters/chapters_screen.dart';
 import '../features/home/home_screen.dart';
@@ -42,6 +43,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) => VerseScreen(verseId: state.pathParameters['id']!),
       ),
       GoRoute(path: '/search', builder: (_, _) => const SearchScreen()),
+      GoRoute(path: '/player', builder: (_, _) => const PlayerScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/settings/sources', builder: (_, _) => const SourcesScreen()),
     ],

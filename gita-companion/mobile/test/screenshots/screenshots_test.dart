@@ -18,6 +18,7 @@ import 'package:gita_companion/core/search/search_service.dart';
 import 'package:gita_companion/core/settings/app_settings.dart';
 import 'package:go_router/go_router.dart';
 
+import '../support/audio_fakes.dart';
 import '../support/pack.dart';
 import '../widgets_test.dart' show MemorySettingsRepository;
 
@@ -49,6 +50,8 @@ void main() {
     String? route,
     Finder? scrollTo,
     String? type,
+    String? tap,
+    bool back = false,
   }) async {
     tester.view.physicalSize = const Size(1080, 2280);
     tester.view.devicePixelRatio = 2.75;
@@ -60,6 +63,7 @@ void main() {
           searchServiceProvider.overrideWithValue(search),
           settingsRepositoryProvider.overrideWithValue(MemorySettingsRepository()..saved = settings),
           initialSettingsProvider.overrideWithValue(settings),
+          ...TestAudio().overrides,
           clockProvider.overrideWithValue(() => DateTime(2026, 10, 1)),
         ],
         child: const GitaApp(),
@@ -73,6 +77,18 @@ void main() {
     if (type != null) {
       await tester.enterText(find.byType(TextField), type);
       await tester.pumpAndSettle();
+    }
+    if (tap != null) {
+      await tester.tap(find.text(tap));
+      for (var i = 0; i < 6; i++) {
+        await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      await tester.pumpAndSettle();
+      if (back) {
+        await tester.pageBack();
+        await tester.pumpAndSettle();
+      }
     }
     if (scrollTo != null) {
       await tester.scrollUntilVisible(scrollTo, 300, scrollable: find.byType(Scrollable).last);
@@ -118,4 +134,19 @@ void main() {
   );
   testWidgets('search', (t) => shot(t, 'search_phaleshu', ready, route: '/search', type: 'phaleshu'));
   testWidgets('search english', (t) => shot(t, 'search_anxiety', ready, route: '/search', type: 'anxiety'));
+  testWidgets('player', (t) => shot(t, 'player_recitation', ready, route: '/verse/2.47', tap: 'Recite'));
+  testWidgets(
+    'player dark',
+    (t) => shot(
+      t,
+      'player_dark',
+      ready.copyWith(themeMode: ThemeMode.dark),
+      route: '/chapters/2',
+      tap: 'Start listening',
+    ),
+  );
+  testWidgets(
+    'mini player',
+    (t) => shot(t, 'mini_player', ready, route: '/verse/2.47', tap: 'Recite', back: true),
+  );
 }

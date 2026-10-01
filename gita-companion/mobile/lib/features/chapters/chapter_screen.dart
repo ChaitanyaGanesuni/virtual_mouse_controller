@@ -7,6 +7,7 @@ import '../../core/content/estimates.dart';
 import '../../core/content/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/provenance.dart';
+import '../audio/listen_actions.dart';
 
 class ChapterScreen extends ConsumerWidget {
   const ChapterScreen({super.key, required this.number});
@@ -103,13 +104,14 @@ class ChapterScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Tooltip(
-                          message: l.audioComingSoon,
-                          child: OutlinedButton.icon(
-                            onPressed: null,
-                            icon: const Icon(Icons.headphones),
-                            label: Text(l.startListening),
+                        child: OutlinedButton.icon(
+                          onPressed: () => startListening(
+                            context,
+                            ref,
+                            ref.read(manifestResolverProvider).chapter(number, settings.explanationLanguage),
                           ),
+                          icon: const Icon(Icons.headphones),
+                          label: Text(l.startListening),
                         ),
                       ),
                     ],

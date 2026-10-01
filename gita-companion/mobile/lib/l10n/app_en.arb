@@ -178,5 +178,68 @@
         "type": "int"
       }
     }
-  }
+  },
+  "recite": "Recite",
+  "reciteSlowly": "Recite slowly",
+  "repeatThree": "Repeat 3 times",
+  "repeatThreeSlowly": "Repeat 3 times, slowly",
+  "listenVerse": "Listen",
+  "listenOptions": "More listening options",
+  "listenExplanation": "Read this explanation aloud",
+  "nowPlaying": "Now playing",
+  "sectionRecitation": "Recitation",
+  "sectionExplanation": "Explanation",
+  "approximateSanskrit": "No Sanskrit voice is installed, so a Hindi voice reads the verse. The pronunciation is approximate.",
+  "noVoice": "No {language} voice is installed on this phone. Install one in Android Settings → Accessibility → Text-to-speech output, then try again.",
+  "@noVoice": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "chunkFailed": "One part could not be read aloud and was skipped.",
+  "speed": "Speed",
+  "voices": "Voices",
+  "voiceFor": "{language} voice",
+  "@voiceFor": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceAutomatic": "Automatic",
+  "voiceSanskritNote": "Sanskrit verses use a Sanskrit voice when one is installed; otherwise a Hindi voice reads them (approximate pronunciation).",
+  "preview": "Preview",
+  "previewSentence": "This is how explanations will sound.",
+  "continueListening": "Continue listening",
+  "listeningProgress": "Listening progress: {percent}%",
+  "@listeningProgress": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "languageSanskrit": "Sanskrit",
+  "skipBack": "Back 15 seconds",
+  "skipForward": "Forward 15 seconds",
+  "previousVerseAudio": "Previous verse",
+  "nextVerseAudio": "Next verse",
+  "play": "Play",
+  "pause": "Pause",
+  "closePlayer": "Stop and close",
+  "repetitionOf": "Repetition {round} of {total}",
+  "@repetitionOf": {
+    "placeholders": {
+      "round": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "noVoicesFound": "No text-to-speech voices were found on this phone."
 }

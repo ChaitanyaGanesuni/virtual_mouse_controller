@@ -1,5 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../core/audio/audio_cache.dart';
+import '../core/audio/listening_progress.dart';
+import '../core/audio/manifest_resolver.dart';
+import '../core/audio/playback_controller.dart';
+import '../core/audio/synthesizer.dart';
+import '../core/audio/tts_provider.dart';
 import '../core/content/content_repository.dart';
 import '../core/search/search_service.dart';
 import '../core/settings/app_settings.dart';
@@ -37,3 +43,45 @@ class SettingsController extends Notifier<AppSettings> {
 }
 
 final settingsProvider = NotifierProvider<SettingsController, AppSettings>(SettingsController.new);
+
+// ---- audio ----------------------------------------------------------------
+// The audio stack is assembled from small providers so tests can replace
+// any part (TTS engines, player backend, storage) with fakes.
+
+/// TTS engines in cost order (device first). Overridden in main.dart.
+final ttsProvidersProvider = Provider<List<TtsProvider>>((ref) => const []);
+
+final audioBackendProvider = Provider<AudioBackend>(
+  (ref) => throw UnimplementedError('audioBackendProvider must be overridden'),
+);
+
+final audioCacheProvider = Provider<AudioCache>(
+  (ref) => throw UnimplementedError('audioCacheProvider must be overridden'),
+);
+
+final listeningProgressProvider = Provider<ListeningProgressRepository>(
+  (ref) => throw UnimplementedError('listeningProgressProvider must be overridden'),
+);
+
+final synthesizerProvider = Provider<AudioSynthesizer>(
+  (ref) => AudioSynthesizer(
+    providers: ref.watch(ttsProvidersProvider),
+    cache: ref.watch(audioCacheProvider),
+    voicePrefs: () => ref.read(settingsProvider).voicePrefs,
+  ),
+);
+
+final playbackControllerProvider = Provider<PlaybackController>((ref) {
+  final controller = PlaybackController(
+    backend: ref.watch(audioBackendProvider),
+    synthesizer: ref.watch(synthesizerProvider),
+    cache: ref.watch(audioCacheProvider),
+    progress: ref.watch(listeningProgressProvider),
+  );
+  ref.onDispose(controller.dispose);
+  return controller;
+});
+
+final manifestResolverProvider = Provider<ManifestResolver>(
+  (ref) => ManifestResolver(ref.watch(contentRepositoryProvider)),
+);

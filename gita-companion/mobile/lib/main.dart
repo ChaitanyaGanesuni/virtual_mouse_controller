@@ -7,8 +7,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
+import 'package:audio_service/audio_service.dart';
+
 import 'app/app.dart';
 import 'app/providers.dart';
+import 'core/audio/audio_cache.dart';
+import 'core/audio/audio_handler.dart';
+import 'core/audio/device_tts_provider.dart';
+import 'core/audio/just_audio_backend.dart';
+import 'core/audio/listening_progress.dart';
 import 'core/content/content_pack.dart';
 import 'core/content/sqlite_content_repository.dart';
 import 'core/db/user_database.dart';
@@ -34,17 +41,37 @@ Future<void> main() async {
   final content = SqliteContentRepository(contentDb);
   final verseIds = content.readingOrder().toSet();
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        contentRepositoryProvider.overrideWithValue(content),
-        searchServiceProvider.overrideWithValue(
-          SqliteSearchService(contentDb, verseExists: verseIds.contains),
-        ),
-        settingsRepositoryProvider.overrideWithValue(settingsRepo),
-        initialSettingsProvider.overrideWithValue(settings),
-      ],
-      child: const GitaApp(),
-    ),
+  final container = ProviderContainer(
+    overrides: [
+      contentRepositoryProvider.overrideWithValue(content),
+      searchServiceProvider.overrideWithValue(SqliteSearchService(contentDb, verseExists: verseIds.contains)),
+      settingsRepositoryProvider.overrideWithValue(settingsRepo),
+      initialSettingsProvider.overrideWithValue(settings),
+      // Audio: device TTS first (free, offline); more engines plug in here.
+      ttsProvidersProvider.overrideWithValue([DeviceTtsProvider()]),
+      audioBackendProvider.overrideWithValue(JustAudioBackend()),
+      audioCacheProvider.overrideWithValue(
+        AudioCache(directory: Directory(p.join(support.path, 'audio')), db: userDb),
+      ),
+      listeningProgressProvider.overrideWithValue(ListeningProgressRepository(userDb)),
+    ],
   );
+
+  // Background playback, notification and lock-screen controls.
+  try {
+    await AudioService.init(
+      builder: () => GitaAudioHandler(container.read(playbackControllerProvider)),
+      config: const AudioServiceConfig(
+        androidNotificationChannelId: 'app.gitacompanion.audio',
+        androidNotificationChannelName: 'Gita Companion audio',
+        androidNotificationOngoing: true,
+        androidStopForegroundOnPause: true,
+      ),
+    );
+  } catch (e) {
+    // Playback still works in the foreground without the service.
+    debugPrint('AudioService unavailable: $e');
+  }
+
+  runApp(UncontrolledProviderScope(container: container, child: const GitaApp()));
 }

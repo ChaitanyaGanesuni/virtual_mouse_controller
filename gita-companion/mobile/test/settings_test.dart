@@ -48,4 +48,15 @@ void main() {
     await expectLater(db.customStatement('INSERT INTO user_settings (id) VALUES (2)'), throwsA(anything));
     await db.close();
   });
+
+  test('voice preferences survive copyWith and a save/load round trip', () async {
+    final db = UserDatabase.memory();
+    final repo = DriftSettingsRepository(db);
+    final s = const AppSettings().copyWith(voicePrefs: {'en': 'en-b', 'sa': 'hi-a'});
+    expect(s.voicePrefs, {'en': 'en-b', 'sa': 'hi-a'});
+    expect(s.copyWith(textScale: 1.2).voicePrefs, s.voicePrefs, reason: 'other changes keep voices');
+    await repo.save(s);
+    expect((await repo.load()).voicePrefs, {'en': 'en-b', 'sa': 'hi-a'});
+    await db.close();
+  });
 }

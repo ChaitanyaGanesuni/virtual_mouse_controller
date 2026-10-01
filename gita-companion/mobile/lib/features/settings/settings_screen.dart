@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../app/providers.dart';
 import '../../core/content/models.dart';
 import '../../l10n/app_localizations.dart';
+import '../audio/voice_settings.dart';
 import '../../shared/verse_text_view.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -84,6 +85,9 @@ class SettingsScreen extends ConsumerWidget {
             options: {'en': l.languageEnglish, 'te': l.languageTelugu},
             onChanged: (v) => ctrl.update((x) => x.copyWith(explanationLanguage: v)),
           ),
+          const Divider(height: 32),
+          _Header(l.voices),
+          const VoiceSettingsSection(),
           const Divider(height: 32),
           ListTile(
             leading: const Icon(Icons.menu_book_outlined),

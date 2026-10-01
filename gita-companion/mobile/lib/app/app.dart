@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/audio/mini_player.dart';
 import '../l10n/app_localizations.dart';
 import 'providers.dart';
 import 'router.dart';
@@ -28,6 +29,7 @@ class GitaApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       routerConfig: ref.watch(routerProvider),
+      builder: (context, child) => MiniPlayerShell(child: child ?? const SizedBox.shrink()),
     );
   }
 }
