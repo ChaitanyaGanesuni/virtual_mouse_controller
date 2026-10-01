@@ -55,12 +55,16 @@ class Source:
             "url": self.url,
             "retrieved_commit": self.retrieved_commit,
             "is_ai_generated": self.is_ai_generated,
+            "model_id": None,
+            "prompt_version": None,
         }
 
 
 class Registry:
-    def __init__(self, sources: dict[str, Source]):
+    def __init__(self, sources: dict[str, Source], ai_providers: dict[str, dict] | None = None):
         self.sources = sources
+        # LLM providers whose (labelled) output may be shipped.
+        self.ai_providers = ai_providers or {}
 
     @classmethod
     def load(cls, path: Path = SOURCES_PATH) -> Registry:
@@ -78,7 +82,7 @@ class Registry:
             if src.use not in ("ship", "verify"):
                 raise RegistryError(f"{src.id}: use must be 'ship' or 'verify'")
             sources[src.id] = src
-        return cls(sources)
+        return cls(sources, data.get("ai_providers") or {})
 
     def shippable(self, source_id: str) -> Source:
         src = self.sources.get(source_id)

@@ -54,6 +54,11 @@ class HomeScreen extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
+                  tooltip: l.search,
+                  icon: const Icon(Icons.search),
+                  onPressed: () => context.push('/search'),
+                ),
+                IconButton(
                   tooltip: l.settings,
                   icon: const Icon(Icons.tune),
                   onPressed: () => context.push('/settings'),
@@ -113,9 +118,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 28),
             _SectionLabel(l.comingNext),
-            _ComingNext(
-              items: [l.featureListen, l.featureTeacher, l.featureSearch, l.featureMyGita, l.featureDaily],
-            ),
+            _ComingNext(items: [l.featureListen, l.featureTeacher, l.featureMyGita, l.featureDaily]),
           ],
         ),
       ),

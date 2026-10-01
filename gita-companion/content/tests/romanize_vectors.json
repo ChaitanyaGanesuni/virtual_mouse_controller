@@ -1,0 +1,137 @@
+{
+ "comment": "Shared vectors for loose(): gita_content/romanize.py and the Dart port in mobile/lib/core/search/romanize.dart must both produce exactly these outputs.",
+ "vectors": [
+  {
+   "input": "phaleshu",
+   "loose": "phalesu"
+  },
+  {
+   "input": "phaleṣu",
+   "loose": "phalesu"
+  },
+  {
+   "input": "Kadachana",
+   "loose": "kadachana"
+  },
+  {
+   "input": "kadācana",
+   "loose": "kadachana"
+  },
+  {
+   "input": "krishna",
+   "loose": "krisna"
+  },
+  {
+   "input": "kṛṣṇa",
+   "loose": "krisna"
+  },
+  {
+   "input": "dharmakshetre",
+   "loose": "dharmaksetre"
+  },
+  {
+   "input": "dharmakṣetre",
+   "loose": "dharmaksetre"
+  },
+  {
+   "input": "shloka",
+   "loose": "sloka"
+  },
+  {
+   "input": "śloka",
+   "loose": "sloka"
+  },
+  {
+   "input": "sankhya",
+   "loose": "sankhya"
+  },
+  {
+   "input": "sāṅkhya",
+   "loose": "sankhya"
+  },
+  {
+   "input": "icchami",
+   "loose": "ichchami"
+  },
+  {
+   "input": "icchāmi",
+   "loose": "ichchami"
+  },
+  {
+   "input": "ichchhami",
+   "loose": "ichchami"
+  },
+  {
+   "input": "yogasthaḥ",
+   "loose": "yogasthah"
+  },
+  {
+   "input": "yogasthah",
+   "loose": "yogasthah"
+  },
+  {
+   "input": "Vishwaroopa",
+   "loose": "visvarupa"
+  },
+  {
+   "input": "viśvarūpa",
+   "loose": "visvarupa"
+  },
+  {
+   "input": "saṅgo'stvakarmaṇi ॥ mā",
+   "loose": "sangostvakarmani ma"
+  },
+  {
+   "input": "pitṝn",
+   "loose": "pitrin"
+  },
+  {
+   "input": "kḷpta",
+   "loose": "klipta"
+  },
+  {
+   "input": "oṃ tat sat",
+   "loose": "om tat sat"
+  },
+  {
+   "input": "saṁsāra",
+   "loose": "samsara"
+  },
+  {
+   "input": "Bhagavad-Gītā 2.47",
+   "loose": "bhagavad gita 2 47"
+  },
+  {
+   "input": "  many   spaces ",
+   "loose": "many spaches"
+  },
+  {
+   "input": "jñāna",
+   "loose": "jnana"
+  },
+  {
+   "input": "gyaan",
+   "loose": "gyan"
+  },
+  {
+   "input": "ṭīkā",
+   "loose": "tika"
+  },
+  {
+   "input": "ḍamaru",
+   "loose": "damaru"
+  },
+  {
+   "input": "rāja-vidyā",
+   "loose": "raja vidya"
+  },
+  {
+   "input": "x-ray",
+   "loose": "ks ray"
+  },
+  {
+   "input": "CAPS ŚRĪ",
+   "loose": "chaps sri"
+  }
+ ]
+}

@@ -12,6 +12,7 @@ import 'app/providers.dart';
 import 'core/content/content_pack.dart';
 import 'core/content/sqlite_content_repository.dart';
 import 'core/db/user_database.dart';
+import 'core/search/search_service.dart';
 import 'core/settings/app_settings.dart';
 
 Future<void> main() async {
@@ -30,11 +31,16 @@ Future<void> main() async {
   final userDb = UserDatabase.inDirectory(support);
   final settingsRepo = DriftSettingsRepository(userDb);
   final settings = await settingsRepo.load();
+  final content = SqliteContentRepository(contentDb);
+  final verseIds = content.readingOrder().toSet();
 
   runApp(
     ProviderScope(
       overrides: [
-        contentRepositoryProvider.overrideWithValue(SqliteContentRepository(contentDb)),
+        contentRepositoryProvider.overrideWithValue(content),
+        searchServiceProvider.overrideWithValue(
+          SqliteSearchService(contentDb, verseExists: verseIds.contains),
+        ),
         settingsRepositoryProvider.overrideWithValue(settingsRepo),
         initialSettingsProvider.overrideWithValue(settings),
       ],

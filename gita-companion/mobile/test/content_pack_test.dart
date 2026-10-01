@@ -60,7 +60,7 @@ void main() {
 
   test('rejects a pack that does not match its manifest', () async {
     final other = File(p.join(dir.path, 'other.json'))
-      ..writeAsStringSync('{"pack_schema_version": 1, "content_hash": "${'f' * 64}"}');
+      ..writeAsStringSync('{"pack_schema_version": 2, "content_hash": "${'f' * 64}"}');
     Future<ByteData> load(String key) =>
         loadAssetFromDisk(key == ContentPackInstaller.manifestAsset ? other.path : key);
     await expectLater(installer(load: load).install(), throwsStateError);

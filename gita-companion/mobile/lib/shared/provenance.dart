@@ -26,8 +26,14 @@ class ProvenanceNote extends ConsumerWidget {
     final source = ref.watch(contentRepositoryProvider).source(sourceId);
     final theme = Theme.of(context);
     final parts = [
-      l.sourceLabel(source?.title ?? sourceId),
-      if (source?.isAiGenerated ?? false) l.aiLabel,
+      // Model output names its model; editorial text drafted with AI help
+      // keeps its source title plus an "AI-assisted" flag.
+      if (source?.kind == 'ai')
+        l.aiGeneratedBy(source?.modelId ?? '?')
+      else ...[
+        l.sourceLabel(source?.title ?? sourceId),
+        if (source?.isAiGenerated ?? false) l.aiLabel,
+      ],
       reviewLabel(l, reviewStatus),
     ];
     return Padding(

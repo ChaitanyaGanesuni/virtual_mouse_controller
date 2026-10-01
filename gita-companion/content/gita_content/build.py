@@ -15,11 +15,20 @@ from pathlib import Path
 
 from .canon import EDITION_701, Canon, VerseRef
 from .devanagari import SPEAKER_LINES, ParsedVerse, orthographic_key, parse_verse, strict_key
+from .enrich import (
+    AI_DIR,
+    EDITORIAL_DIR,
+    ai_source_row,
+    load_ai_records,
+    load_editorial_overviews,
+    verse_ai_texts,
+)
 from .errata import Errata, apply_errata
 from .registry import Registry
 from .sources.readers import RawVerse, read_translation_jsonl
 from .transliterate import all_scripts, transliterate
 
+CONTENT_FORMAT = "gita-companion-content/2"
 SANSKRIT_SOURCE = "bg-sanskrit-gita-json"
 VERIFY_SOURCE = "bg-sanskrit-vedicscriptures"
 EDITORIAL_SOURCE = "gita-companion-editorial"
@@ -127,6 +136,8 @@ def build_dataset(
     errata: Errata,
     verify_rows: list[RawVerse] | None = None,
     translations: list[tuple[str, Path]] | None = None,
+    editorial_dir: Path = EDITORIAL_DIR,
+    ai_dir: Path = AI_DIR,
 ) -> tuple[dict, CrossCheck | None]:
     for sid in (SANSKRIT_SOURCE, EDITORIAL_SOURCE, *SCRIPT_SOURCES.values()):
         registry.shippable(sid)
@@ -182,6 +193,48 @@ def build_dataset(
             }
         )
 
+    # Editorial and AI-generated overviews (summary/theme) per chapter.
+    ai_records = load_ai_records(ai_dir)
+    ai_sources: dict[str, dict] = {}
+    chapter_extra = [
+        {**r, "review_status": "unreviewed"} for r in load_editorial_overviews(canon, editorial_dir)
+    ]
+    for rec in (r for r in ai_records if r["kind"] == "chapter"):
+        row = ai_source_row(rec, registry)
+        ai_sources[row["id"]] = row
+        for kind in ("summary", "theme"):
+            chapter_extra.append(
+                {
+                    "chapter": int(rec["ref"]),
+                    "kind": kind,
+                    "language": rec["language"],
+                    "source_id": row["id"],
+                    "body": rec["content"][kind],
+                    "review_status": "unreviewed",
+                }
+            )
+    by_chapter = {c["number"]: c for c in chapters}
+    for r in chapter_extra:
+        if r["source_id"] not in ai_sources:
+            registry.shippable(r["source_id"])
+        by_chapter[r["chapter"]]["texts"].append(
+            {
+                "id": text_id("chapter", r["chapter"], r["kind"], r["language"], r["source_id"]),
+                **{k: r[k] for k in ("kind", "language", "source_id", "body", "review_status")},
+            }
+        )
+
+    ai_verse: dict[str, tuple[list[dict], list[dict]]] = {}
+    for rec in (r for r in ai_records if r["kind"] == "verse"):
+        if not canon.exists(*map(int, rec["ref"].split("."))):
+            raise BuildError(f"AI record for unknown verse {rec['ref']}")
+        row = ai_source_row(rec, registry)
+        ai_sources[row["id"]] = row
+        texts, words = verse_ai_texts(rec, row["id"], text_id)
+        prev = ai_verse.setdefault(rec["ref"], ([], []))
+        prev[0].extend(texts)
+        prev[1].extend(words)
+
     speakers = [
         {
             "id": key,
@@ -213,6 +266,8 @@ def build_dataset(
             for tag, src in SCRIPT_SOURCES.items()
         ]
         texts += translation_rows.get(ref.id, [])
+        ai_texts, word_meanings = ai_verse.get(ref.id, ([], []))
+        texts += ai_texts
         verse_rows.append(
             {
                 "id": ref.id,
@@ -226,6 +281,7 @@ def build_dataset(
                 "corrections": corrections.get(ref.id, []),
                 "encoding_repairs": v.fixes,
                 "texts": texts,
+                "word_meanings": word_meanings,
             }
         )
 
@@ -244,13 +300,14 @@ def build_dataset(
     }
     body = {
         "numbering": "standard-700",
-        "sources": [registry.sources[s].as_row() for s in sorted(used)],
+        "sources": [registry.sources[s].as_row() for s in sorted(used)]
+        + [ai_sources[s] for s in sorted(ai_sources)],
         "chapters": chapters,
         "speakers": speakers,
         "verses": verse_rows,
         "aliases": aliases,
     }
-    dataset = {"format": "gita-companion-content/1", "content_hash": content_hash(body), **body}
+    dataset = {"format": CONTENT_FORMAT, "content_hash": content_hash(body), **body}
     return dataset, report
 
 

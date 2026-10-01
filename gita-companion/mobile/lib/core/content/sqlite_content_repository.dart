@@ -20,6 +20,8 @@ class SqliteContentRepository implements ContentRepository {
           isAiGenerated: (r['is_ai_generated'] as int) == 1,
           year: r['year'] as int?,
           url: r['url'] as String?,
+          modelId: r['model_id'] as String?,
+          promptVersion: r['prompt_version'] as String?,
         ),
     };
     _speakers = {
@@ -36,10 +38,25 @@ class SqliteContentRepository implements ContentRepository {
     };
     final names = <int, Map<String, String>>{};
     final titles = <int, String>{};
-    for (final r in _db.select('SELECT chapter, kind, language, body FROM chapter_text')) {
+    final overviews = <int, List<ChapterText>>{};
+    for (final r in _db.select('SELECT * FROM chapter_text')) {
       final n = r['chapter'] as int;
-      if (r['kind'] == 'name') names.putIfAbsent(n, () => {})[r['language'] as String] = r['body'] as String;
-      if (r['kind'] == 'title' && r['language'] == 'en') titles[n] = r['body'] as String;
+      final kind = r['kind'] as String;
+      if (kind == 'name') names.putIfAbsent(n, () => {})[r['language'] as String] = r['body'] as String;
+      if (kind == 'title' && r['language'] == 'en') titles[n] = r['body'] as String;
+      if (kind == 'summary' || kind == 'theme') {
+        overviews
+            .putIfAbsent(n, () => [])
+            .add(
+              ChapterText(
+                kind: kind,
+                language: r['language'] as String,
+                body: r['body'] as String,
+                sourceId: r['source_id'] as String,
+                reviewStatus: ReviewStatus.parse(r['review_status'] as String),
+              ),
+            );
+      }
     }
     _chapters = [
       for (final r in _db.select('SELECT * FROM chapter ORDER BY number'))
@@ -49,6 +66,7 @@ class SqliteContentRepository implements ContentRepository {
           verseCount: r['verse_count'] as int,
           names: names[r['number'] as int] ?? const {},
           titleEn: titles[r['number'] as int] ?? '',
+          texts: overviews[r['number'] as int] ?? const [],
         ),
     ];
     _order = [for (final r in _db.select('SELECT id FROM verse ORDER BY chapter, verse')) r['id'] as String];
@@ -83,7 +101,11 @@ class SqliteContentRepository implements ContentRepository {
       'SELECT vt.* FROM verse_text vt JOIN verse v ON v.id = vt.verse_id WHERE v.chapter = ?',
       [chapter],
     );
-    return [for (final r in rows) _verse(r, texts[r['id']] ?? const [])];
+    final words = _wordsFor(
+      'SELECT wm.* FROM word_meaning wm JOIN verse v ON v.id = wm.verse_id WHERE v.chapter = ?',
+      [chapter],
+    );
+    return [for (final r in rows) _verse(r, texts[r['id']] ?? const [], words[r['id']] ?? const [])];
   }
 
   @override
@@ -91,8 +113,12 @@ class SqliteContentRepository implements ContentRepository {
     final rows = _db.select('SELECT * FROM verse WHERE id = ?', [id]);
     if (rows.isEmpty) return null;
     final texts = _textsFor('SELECT * FROM verse_text WHERE verse_id = ?', [id]);
-    return _verse(rows.first, texts[id] ?? const []);
+    final words = _wordsFor('SELECT * FROM word_meaning WHERE verse_id = ?', [id]);
+    return _verse(rows.first, texts[id] ?? const [], words[id] ?? const []);
   }
+
+  @override
+  List<String> readingOrder() => _order;
 
   @override
   String? previousVerseId(String id) {
@@ -137,7 +163,24 @@ class SqliteContentRepository implements ContentRepository {
     return out;
   }
 
-  Verse _verse(Row r, List<VerseText> texts) => Verse(
+  Map<String, List<WordMeaning>> _wordsFor(String sql, List<Object?> args) {
+    final out = <String, List<WordMeaning>>{};
+    for (final r in _db.select('$sql ORDER BY verse_id, source_id, language, position', args)) {
+      out
+          .putIfAbsent(r['verse_id'] as String, () => [])
+          .add(
+            WordMeaning(
+              word: r['word_sa'] as String,
+              meaning: r['meaning'] as String,
+              language: r['language'] as String,
+              sourceId: r['source_id'] as String,
+            ),
+          );
+    }
+    return out;
+  }
+
+  Verse _verse(Row r, List<VerseText> texts, List<WordMeaning> words) => Verse(
     id: r['id'] as String,
     chapter: r['chapter'] as int,
     verse: r['verse'] as int,
@@ -147,6 +190,7 @@ class SqliteContentRepository implements ContentRepository {
     reviewStatus: ReviewStatus.parse(r['review_status'] as String),
     speaker: _speakers[r['speaker']],
     texts: texts,
+    wordMeanings: words,
   );
 }
 

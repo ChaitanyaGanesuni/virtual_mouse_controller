@@ -36,6 +36,8 @@ class Source {
     required this.isAiGenerated,
     this.year,
     this.url,
+    this.modelId,
+    this.promptVersion,
   });
 
   final String id;
@@ -46,6 +48,56 @@ class Source {
   final bool isAiGenerated;
   final int? year;
   final String? url;
+
+  /// For AI sources: the model and prompt version that produced the text.
+  final String? modelId;
+  final String? promptVersion;
+}
+
+/// Text attached to a chapter (summary or theme) with its provenance.
+class ChapterText {
+  const ChapterText({
+    required this.kind,
+    required this.language,
+    required this.body,
+    required this.sourceId,
+    required this.reviewStatus,
+  });
+
+  final String kind;
+  final String language;
+  final String body;
+  final String sourceId;
+  final ReviewStatus reviewStatus;
+}
+
+class WordMeaning {
+  const WordMeaning({
+    required this.word,
+    required this.meaning,
+    required this.language,
+    required this.sourceId,
+  });
+
+  /// The word as given by the source (IAST).
+  final String word;
+  final String meaning;
+  final String language;
+  final String sourceId;
+}
+
+/// Explanation modes shown on the verse screen, in display order. The value
+/// is the `verse_text.kind` in the content pack.
+enum ExplanationMode {
+  simple('simple'),
+  deep('deep'),
+  practical('practical'),
+  story('story'),
+  child('child'),
+  sanskritTerms('sanskrit_terms');
+
+  const ExplanationMode(this.kind);
+  final String kind;
 }
 
 class Chapter {
@@ -55,6 +107,7 @@ class Chapter {
     required this.verseCount,
     required this.names,
     required this.titleEn,
+    this.texts = const [],
   });
 
   final int number;
@@ -70,6 +123,9 @@ class Chapter {
 
   /// Plain-English gloss of the name (project editorial text).
   final String titleEn;
+
+  /// Summaries and themes from every available source and language.
+  final List<ChapterText> texts;
 
   String nameIn(VerseScript script) =>
       script == VerseScript.devanagari ? nameSa : (names[script.tag] ?? nameSa);
@@ -114,6 +170,7 @@ class Verse {
     required this.reviewStatus,
     this.speaker,
     this.texts = const [],
+    this.wordMeanings = const [],
   });
 
   /// '2.47'
@@ -130,6 +187,7 @@ class Verse {
   final ReviewStatus reviewStatus;
   final Speaker? speaker;
   final List<VerseText> texts;
+  final List<WordMeaning> wordMeanings;
 
   /// The verse text in the requested script (Devanagari or a transliteration).
   String textIn(VerseScript script) {
@@ -142,4 +200,24 @@ class Verse {
   }
 
   List<VerseText> textsOfKind(String kind) => texts.where((t) => t.kind == kind).toList();
+}
+
+/// Picks the text to show from several sources: the requested language
+/// first, then reviewed over unreviewed, then human-written over AI.
+/// Returns null if nothing is available in any language.
+T? pickText<T>(
+  List<T> candidates, {
+  required String language,
+  required String Function(T) languageOf,
+  required ReviewStatus Function(T) statusOf,
+  required bool Function(T) isAi,
+}) {
+  if (candidates.isEmpty) return null;
+  int score(T t) =>
+      (languageOf(t) == language ? 100 : 0) +
+      (statusOf(t) == ReviewStatus.reviewed ? 10 : 0) +
+      (statusOf(t) == ReviewStatus.rejected ? -1000 : 0) +
+      (isAi(t) ? 0 : 1);
+  final sorted = [...candidates]..sort((a, b) => score(b).compareTo(score(a)));
+  return score(sorted.first) < 0 ? null : sorted.first;
 }

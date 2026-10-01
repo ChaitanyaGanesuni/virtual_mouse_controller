@@ -25,6 +25,8 @@ raw source ──► normalise ──► renumber ──► errata ──► val
 | `schema/content_pack.sql` | Mobile SQLite schema (mirrors backend content tables) |
 | `data/gita.json` | Canonical dataset (committed). CI rebuilds it from pinned sources and requires an exact match |
 | `data/sanskrit-report.md` | Cross-check and corrections report |
+| `editorial/` | Project-written text (chapter overviews), labelled AI-assisted and unreviewed |
+| `ai/` | Output of the free-tier LLM generator (`backend/workers`), imported as AI-generated and unreviewed |
 
 ## Commands
 

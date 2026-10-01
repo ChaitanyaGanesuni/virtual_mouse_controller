@@ -13,6 +13,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gita_companion/app/app.dart';
 import 'package:gita_companion/app/providers.dart';
 import 'package:gita_companion/core/content/models.dart';
+import 'package:gita_companion/core/content/sqlite_content_repository.dart';
+import 'package:gita_companion/core/search/search_service.dart';
 import 'package:gita_companion/core/settings/app_settings.dart';
 import 'package:go_router/go_router.dart';
 
@@ -36,9 +38,18 @@ void main() {
     await _loadFont('Roboto', ['assets/fonts/NotoSerif.ttf']);
   });
 
-  final content = openRealRepository();
+  final aiDb = openPackWithSampleAi();
+  final content = SqliteContentRepository(aiDb);
+  final search = SqliteSearchService(aiDb, verseExists: content.readingOrder().toSet().contains);
 
-  Future<void> shot(WidgetTester tester, String name, AppSettings settings, {String? route}) async {
+  Future<void> shot(
+    WidgetTester tester,
+    String name,
+    AppSettings settings, {
+    String? route,
+    Finder? scrollTo,
+    String? type,
+  }) async {
     tester.view.physicalSize = const Size(1080, 2280);
     tester.view.devicePixelRatio = 2.75;
     addTearDown(tester.view.reset);
@@ -46,6 +57,7 @@ void main() {
       ProviderScope(
         overrides: [
           contentRepositoryProvider.overrideWithValue(content),
+          searchServiceProvider.overrideWithValue(search),
           settingsRepositoryProvider.overrideWithValue(MemorySettingsRepository()..saved = settings),
           initialSettingsProvider.overrideWithValue(settings),
           clockProvider.overrideWithValue(() => DateTime(2026, 10, 1)),
@@ -56,6 +68,15 @@ void main() {
     await tester.pumpAndSettle();
     if (route != null) {
       GoRouterHelper(tester.element(find.byType(Scaffold).first)).go(route);
+      await tester.pumpAndSettle();
+    }
+    if (type != null) {
+      await tester.enterText(find.byType(TextField), type);
+      await tester.pumpAndSettle();
+    }
+    if (scrollTo != null) {
+      await tester.scrollUntilVisible(scrollTo, 300, scrollable: find.byType(Scrollable).last);
+      await tester.drag(find.byType(Scrollable).last, const Offset(0, -500));
       await tester.pumpAndSettle();
     }
     await expectLater(find.byType(GitaApp), matchesGoldenFile('out/$name.png'));
@@ -81,4 +102,20 @@ void main() {
     (t) => shot(t, 'verse_1_28_dark', ready.copyWith(themeMode: ThemeMode.dark), route: '/verse/1.28'),
   );
   testWidgets('settings', (t) => shot(t, 'settings', ready, route: '/settings'));
+  testWidgets(
+    'reader understand',
+    (t) => shot(t, 'reader_2_47_understand', ready, route: '/verse/2.47', scrollTo: find.text('UNDERSTAND')),
+  );
+  testWidgets(
+    'reader telugu dark',
+    (t) => shot(
+      t,
+      'reader_2_47_telugu_dark',
+      ready.copyWith(themeMode: ThemeMode.dark, verseScript: VerseScript.telugu, explanationLanguage: 'te'),
+      route: '/verse/2.47',
+      scrollTo: find.text('UNDERSTAND'),
+    ),
+  );
+  testWidgets('search', (t) => shot(t, 'search_phaleshu', ready, route: '/search', type: 'phaleshu'));
+  testWidgets('search english', (t) => shot(t, 'search_anxiety', ready, route: '/search', type: 'anxiety'));
 }

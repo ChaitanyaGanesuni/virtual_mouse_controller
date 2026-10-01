@@ -70,7 +70,7 @@ void main() {
     await tester.tap(find.textContaining('Verse ${today.id}'));
     await tester.pumpAndSettle();
     expect(find.textContaining(today.sanskrit.split(' ').first), findsWidgets);
-    expect(find.textContaining('Translations and explanations are not installed yet'), findsOneWidget);
+    expect(find.textContaining('No translation is installed yet'), findsOneWidget);
   });
 
   testWidgets('Chapters list → chapter → verse → next verse', (tester) async {
@@ -83,17 +83,21 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Chapter 2'), findsOneWidget);
     expect(find.text('72 verses'), findsOneWidget);
-    expect(find.textContaining('AI-assisted'), findsOneWidget, reason: 'editorial gloss is labelled');
+    expect(
+      find.textContaining('AI-assisted'),
+      findsOneWidget,
+      reason: 'one label covers gloss, theme and summary',
+    );
 
     await tester.tap(find.text('2.1'));
     await tester.pumpAndSettle();
-    expect(find.text('Chapter 2 · Verse 2.1'), findsOneWidget);
+    expect(find.text('Verse 2.1'), findsOneWidget);
     expect(find.text('सञ्जय उवाच'), findsOneWidget);
     expect(find.textContaining('\u00A0॥'), findsWidgets, reason: 'danda stays with its word');
 
     await tester.tap(find.text('Next'));
     await tester.pumpAndSettle();
-    expect(find.text('Chapter 2 · Verse 2.2'), findsOneWidget);
+    expect(find.text('Verse 2.2'), findsOneWidget);
   });
 
   testWidgets('13.0 is explained as non-canonical', (tester) async {

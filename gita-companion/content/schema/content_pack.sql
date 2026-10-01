@@ -6,6 +6,7 @@
 -- in the app's own database, which references verse ids / verse_text ids.
 --
 -- Bump PACK_SCHEMA_VERSION in pack.py when this file changes.
+-- v2: source.model_id/prompt_version, word meanings, explanations in verse_fts.
 
 PRAGMA foreign_keys = ON;
 
@@ -26,7 +27,11 @@ CREATE TABLE source (
   license_note     TEXT NOT NULL DEFAULT '',
   url              TEXT,
   retrieved_commit TEXT,
-  is_ai_generated  INTEGER NOT NULL DEFAULT 0 CHECK (is_ai_generated IN (0,1))
+  is_ai_generated  INTEGER NOT NULL DEFAULT 0 CHECK (is_ai_generated IN (0,1)),
+  model_id         TEXT,                                -- AI sources: model that wrote the text
+  prompt_version   TEXT,                                -- AI sources: prompt it was written with
+  -- Model output must always say which model and prompt produced it.
+  CHECK (kind <> 'ai' OR (is_ai_generated = 1 AND model_id IS NOT NULL AND prompt_version IS NOT NULL))
 );
 
 CREATE TABLE chapter (
@@ -139,7 +144,7 @@ CREATE TABLE verse_relation (
 -- verse_fts_sub: trigram index for substrings inside long Sanskrit
 --   compounds ("धिकार" inside "कर्मण्येवाधिकारस्ते").
 CREATE VIRTUAL TABLE verse_fts USING fts5(
-  verse_id UNINDEXED, sanskrit, iast, roman_loose, telugu_script, translation,
+  verse_id UNINDEXED, sanskrit, iast, roman_loose, telugu_script, translation, explanation,
   tokenize = 'unicode61 remove_diacritics 2'
 );
 CREATE VIRTUAL TABLE verse_fts_sub USING fts5(

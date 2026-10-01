@@ -1,6 +1,6 @@
 {
- "format": "gita-companion-content/1",
- "content_hash": "b513d74cc6b6c31134e6ff2610b7b8d6c502ac9ca6ed6b1dcdda7ea69a0e0ecf",
+ "format": "gita-companion-content/2",
+ "content_hash": "b941ab27a0d1a5449d64ee45b4ccdc309fe2831b0524c17fa689f875130123b3",
  "numbering": "standard-700",
  "sources": [
   {
@@ -14,7 +14,9 @@
    "license_note": "The Sanskrit text is ancient and in the public domain. This digital transcription is taken from the gita/gita dataset, which is released under the Unlicense. Only the Devanagari `text` field is used; the dataset's transliteration, word meanings and translations are NOT used, because their provenance and copyright status are unclear.",
    "url": "https://github.com/gita/gita",
    "retrieved_commit": "c6fce39595445768876ddbb8d1268a9c935e1d2b",
-   "is_ai_generated": false
+   "is_ai_generated": false,
+   "model_id": null,
+   "prompt_version": null
   },
   {
    "id": "gc-transliteration-iast",
@@ -27,7 +29,9 @@
    "license_note": "Mechanical conversion of a public-domain text; no AI involved.",
    "url": "https://pypi.org/project/indic-transliteration/",
    "retrieved_commit": null,
-   "is_ai_generated": false
+   "is_ai_generated": false,
+   "model_id": null,
+   "prompt_version": null
   },
   {
    "id": "gc-transliteration-telugu",
@@ -40,7 +44,9 @@
    "license_note": "Mechanical conversion of a public-domain text; no AI involved.",
    "url": "https://pypi.org/project/indic-transliteration/",
    "retrieved_commit": null,
-   "is_ai_generated": false
+   "is_ai_generated": false,
+   "model_id": null,
+   "prompt_version": null
   },
   {
    "id": "gita-companion-editorial",
@@ -53,7 +59,9 @@
    "license_note": "Short project-authored text such as chapter-title glosses. Drafted with AI assistance, so it is flagged as AI-generated until a human reviewer marks it reviewed.",
    "url": null,
    "retrieved_commit": null,
-   "is_ai_generated": true
+   "is_ai_generated": true,
+   "model_id": null,
+   "prompt_version": null
   }
  ],
  "chapters": [
@@ -84,6 +92,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Arjuna's Despondency",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "a4bbe503-f85f-52c9-8f06-ebb4d33b4a30",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "On the field of Kurukṣetra the blind king Dhṛtarāṣṭra asks Sañjaya what is happening. Sañjaya describes the two armies, Duryodhana reviewing the great warriors, and the sounding of the conches. Arjuna asks Kṛṣṇa, his charioteer, to place the chariot between the armies. Seeing teachers, grandfathers, cousins and friends on both sides, he is overcome by grief and compassion. He argues that the war will destroy families and the order that sustains them, says he would rather be killed than kill his own people, and finally sets down his bow, unable to fight.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "f5bf3cce-2d5f-5ff2-9648-6841475037d1",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "A warrior's crisis of grief and moral confusion opens the way to the teaching.",
      "review_status": "unreviewed"
     }
    ]
@@ -116,6 +140,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Knowledge (Sāṅkhya)",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "0725938d-1da9-5486-b671-9302139f4885",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Arjuna admits his confusion and asks Kṛṣṇa to teach him as a disciple. Kṛṣṇa begins by teaching that the Self is eternal: it is not born and does not die when the body dies, so the wise do not grieve. He then speaks of Arjuna's own duty as a warrior. Next he introduces the discipline of acting without attachment to results, keeping the mind even in success and failure. When Arjuna asks how a person of steady wisdom lives, Kṛṣṇa describes someone who has withdrawn from cravings, is not shaken by pleasure or pain, has mastered the senses, and is at peace.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "a93f5760-b305-5ca4-ab7e-1f6bf95a1591",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "The eternal Self, one's duty, and acting with an even mind form an outline of the whole Gītā.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -146,6 +186,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Action",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "5bad1372-e3f7-522c-836b-68800969c4ae",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Arjuna asks why he should act at all if knowledge is higher than action. Kṛṣṇa answers that no one can remain without acting even for a moment, and that action done as an offering, without attachment, does not bind. He describes how the world is sustained by a cycle of mutual offering, and why the wise keep acting for the good of the world, since others follow their example. It is better to follow one's own duty, even imperfectly, than another's. When Arjuna asks what drives a person to wrongdoing, Kṛṣṇa names desire and anger, and teaches how to master them.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "dc2dee48-e75e-5ea5-b0d2-20efb5e3ceba",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Action offered without selfish attachment does not bind; desire and anger are the real enemies.",
      "review_status": "unreviewed"
     }
    ]
@@ -178,6 +234,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Knowledge, Action and Renunciation",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "5e24adc9-4e06-596c-acb1-d0b1a484c9c6",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Kṛṣṇa says this teaching is ancient and was handed down from teacher to teacher until it was lost. Questioned by Arjuna, he explains that he takes birth age after age to protect the good and re-establish dharma. He examines action, inaction and wrong action, and says the wise see inaction in action. Many kinds of sacrifice are described, and the sacrifice of knowledge is called the highest. Knowledge is learned from those who have realized the truth, through humility, inquiry and service. With faith and self-control it brings peace, while doubt destroys.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "825ec66e-8418-5050-b82e-1e914e82bd40",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Knowledge frees action from bondage; the Divine takes birth to restore righteousness.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -208,6 +280,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Renunciation of Action",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "8442c123-1fc3-56e6-9035-82563b1d96e3",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Arjuna asks whether renouncing action or performing it in yoga is better. Kṛṣṇa says both lead to the highest good, but the yoga of action is better, and the wise see them as one. Such a person acts with body and senses while knowing that the Self does nothing, and offers all actions, untouched by them as a lotus leaf is untouched by water. The wise look with an equal eye on all beings. Lasting happiness is found within, by mastering desire and anger. The chapter ends with a brief description of meditation and of knowing the Divine as the friend of all beings.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "15df1678-8417-5222-b0bb-e55618f62a00",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "True renunciation is inner freedom within action, which brings equal vision and peace.",
      "review_status": "unreviewed"
     }
    ]
@@ -240,6 +328,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Self-Mastery (Meditation)",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "19df76df-ed52-51a8-954d-e6f2438808bc",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "The true renunciant does what is to be done without depending on its fruits. One should raise oneself by oneself, for the mind can be one's friend or one's enemy. Kṛṣṇa describes meditation: a clean, steady seat, an upright posture, moderation in food, sleep and activity, and gently bringing the wandering mind back. The yogī comes to see the Self in all beings and all beings in the Self. Arjuna objects that the mind is as restless as the wind; Kṛṣṇa agrees, and says it is controlled by steady practice and detachment. One who strives but falls short is not lost, and continues in a later life.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "341226fb-fa76-5a0d-b5ce-e5aab6a5fa3c",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Mastering the mind through meditation, practice and detachment.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -270,6 +374,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Knowledge and Realisation",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "93cea227-1ae0-54dc-8893-857fdb00bc84",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Kṛṣṇa describes his lower nature, made of the elements, mind, intellect and ego, and his higher nature, the life that sustains the world; everything rests on him like pearls on a thread. He is the essential quality in things, such as the taste in water and the light of the sun and moon. The world is bewildered by the three qualities of nature, a divine power that is hard to cross, but those who take refuge in him cross it. Four kinds of people turn to him: the distressed, those who seek knowledge, those who seek gain, and the wise, who are dearest to him.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "30965f4a-894a-5038-9072-76f9273864bb",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Knowing the Divine as the source of nature and as what lies beyond it.",
      "review_status": "unreviewed"
     }
    ]
@@ -302,6 +422,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of the Imperishable Brahman",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "cbb47845-2d63-56ed-a881-5d26a5fee502",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Arjuna asks about Brahman, the Self, action, and the divine in matter, in the gods and in sacrifice, and how the Divine is known at the time of death. Kṛṣṇa answers each briefly and teaches that whatever a person remembers at the end, that they attain, so one should remember him at all times while doing one's duty. He describes meditation on Oṃ at the time of departure, the cosmic day and night in which worlds appear and dissolve, the unmanifest Imperishable beyond them, and two paths by which beings depart.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "d2d64bee-fef7-50d2-9b60-12c9652a2f3c",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Remembering the Imperishable, in life and at the time of death.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -332,6 +468,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of the Royal Knowledge and Royal Secret",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "a0018e99-8857-545b-9745-9d2903cc6c21",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Kṛṣṇa calls this the royal knowledge and the royal secret. All beings rest in him, yet he is not confined by them; he brings forth creation and draws it back without being bound by it. The deluded overlook him in human form, while great souls worship him with devotion. He is the ritual and the offering, the father and mother of the world, its support and its goal. Whatever is offered with love, even a leaf, a flower, a fruit or water, he accepts. Anyone who takes refuge in him with undivided devotion, whatever their past or station, reaches the highest goal.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "39a56f3e-14b2-5e8a-ac2b-d0f0618d9fee",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "The royal knowledge, in which devotion is open to everyone and all rests in the Divine.",
      "review_status": "unreviewed"
     }
    ]
@@ -364,6 +516,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Divine Manifestations",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "9fcb2ea7-0d23-584f-bb01-03faf2959942",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Kṛṣṇa speaks of himself as the origin of gods and sages and of every quality found in beings. Those who understand this worship him with love, and he gives them the understanding by which they reach him. Arjuna affirms him as the Supreme and asks to hear his divine manifestations. Kṛṣṇa names many of them, the foremost in each class of gods, sages, beings, rivers, mountains and powers, and concludes that whatever is glorious, beautiful or mighty comes from a spark of his splendour, while he sustains the whole universe with a single fraction of himself.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "3f3a607d-91ff-558b-9ca8-29cd95a14372",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Seeing the Divine in everything that is excellent and glorious.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -394,6 +562,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of the Vision of the Universal Form",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "dfe44ff5-e481-59e1-a7f3-92195f012b36",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Arjuna asks to see Kṛṣṇa's divine form, and Kṛṣṇa grants him divine sight. Sañjaya and Arjuna describe the universal form: countless faces, eyes and arms, the whole universe gathered in one place, blazing brighter than a thousand suns. Arjuna sees the warriors of both armies rushing into Kṛṣṇa's mouths. Kṛṣṇa declares that he is Time, the destroyer of worlds, that the warriors are already slain, and that Arjuna is only the instrument. Shaken, Arjuna praises him, asks forgiveness for his past familiarity, and asks to see the gentle form again. Kṛṣṇa returns to his human form and says this vision is reached through single-minded devotion.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "92969902-6aff-5424-9379-d899d1c40e66",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "The vision of the universal form, God as all-consuming Time, and the power of devotion.",
      "review_status": "unreviewed"
     }
    ]
@@ -426,6 +610,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Devotion",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "a2541079-4835-5f90-9729-79a497df3a94",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Arjuna asks who is better established in yoga: those who worship the Divine in personal form or those who meditate on the unmanifest Imperishable. Kṛṣṇa says those who worship him with steady faith are best, though seekers of the unmanifest also reach him by a harder path. He offers a ladder of practices: fix the mind on him; if that is not possible, practise; if not, work for his sake; if not, give up the fruits of action. He then describes the devotee who is dear to him: free of hatred, friendly and compassionate, without ego, even in pleasure and pain, content, and neither disturbing the world nor disturbed by it.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "2bd41185-4a9e-5494-a8b7-748a342ee3f3",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "The path of devotion and the qualities of the devotee.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -456,6 +656,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of the Field and the Knower of the Field",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "23239ad0-960f-54d7-998b-39ad331c86a0",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Kṛṣṇa calls the body the field and the one who knows it the knower of the field, and says he is the knower in every field. He lists what makes up the field and the qualities that amount to true knowledge, such as humility, non-violence, patience and steadiness. He describes the supreme Brahman that is to be known, beyond being and non-being, within and outside all beings. Nature and spirit are both without beginning; actions are done by nature, and one who sees the Self as the non-doer, present equally in all, truly sees. In some editions the chapter opens with Arjuna asking about these terms.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "8c97f268-4279-5405-8e69-605a5795648c",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Telling apart the field, the body and nature, from its knower, the conscious Self.",
      "review_status": "unreviewed"
     }
    ]
@@ -488,6 +704,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of the Three Guṇas",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "9edc482f-3f1f-5518-b7c1-13d9f1b4f24c",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Nature has three qualities, called guṇas: sattva, which is clarity and goodness, rajas, which is passion and restless activity, and tamas, which is inertia and darkness. Kṛṣṇa explains how each binds the embodied being, the signs by which each can be seen to prevail, and where each leads. One who rises above all three is freed from birth, old age, death and sorrow. Asked how such a person lives, Kṛṣṇa describes someone unmoved by the play of the qualities, the same in pleasure and pain, honour and dishonour, and devoted to him with unwavering devotion.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "d74c57f2-2e0b-513f-b315-746b02b75f70",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "The three qualities of nature, how they bind, and how one goes beyond them.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -518,6 +750,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of the Supreme Person",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "f716ae36-6aa0-5496-9b3f-20a1c78d3bb4",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Kṛṣṇa describes the world as an aśvattha tree with its roots above and branches below, which must be cut down with the axe of detachment while seeking the place from which there is no return. The individual being is an eternal part of him, carrying the senses from body to body; the deluded do not see this, while the wise do. He is the light in the sun and fire, the nourishment of plants, and the power of digestion, and he dwells in every heart. There are two kinds of being, the perishable and the imperishable, and beyond both is the Supreme Person.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "b7d45712-9dca-5693-97be-c2846ea7f557",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "The Supreme Person, beyond both the perishable and the imperishable.",
      "review_status": "unreviewed"
     }
    ]
@@ -550,6 +798,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of the Divine and Demonic Natures",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "23bdd783-043f-5ddd-8def-6b2b07615236",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Kṛṣṇa lists the divine qualities, among them fearlessness, purity, generosity, self-control, non-violence, truthfulness, compassion and humility, which lead to freedom, and the demonic qualities, among them hypocrisy, arrogance, anger, harshness and ignorance, which lead to bondage. He describes the outlook of those who deny any truth or moral order, live for endless desires and seek wealth by unjust means. Desire, anger and greed are three gates to ruin, and the guidance of scripture should shape what one does and avoids.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "85eaef43-5221-5ce6-8c38-1426b36768cf",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "The qualities that lead to freedom and those that lead to bondage.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -581,6 +845,22 @@
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of the Threefold Faith",
      "review_status": "unreviewed"
+    },
+    {
+     "id": "30f57d92-2891-54e5-8313-79c46a097498",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Arjuna asks about people who worship with faith but without following scripture. Kṛṣṇa says faith takes three forms according to the three qualities of nature, and that a person is what their faith is. He describes three kinds of food, of sacrifice, of austerity in body, speech and mind, and of giving, each shaped by sattva, rajas or tamas. The chapter closes with \"Oṃ tat sat\" as the threefold name of Brahman, and teaches that what is done without faith bears no true fruit.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "1a87e13f-cf4e-5280-a723-b8a941df607c",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Faith takes three forms, and it shapes food, worship, discipline and giving.",
+     "review_status": "unreviewed"
     }
    ]
   },
@@ -611,6 +891,22 @@
      "language": "en",
      "source_id": "gita-companion-editorial",
      "body": "The Yoga of Liberation through Renunciation",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "a8ac5eba-e2d5-52e6-a27a-12811ac94b0f",
+     "kind": "summary",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Arjuna asks the difference between renunciation and letting go. Kṛṣṇa explains that acts of sacrifice, giving and discipline should not be abandoned but performed without attachment to their fruits; true relinquishment is of the fruits. He analyses the factors of action, and how knowledge, action, the doer, understanding, resolve and happiness each take three forms according to the qualities of nature. Each person reaches perfection by doing their own work as worship. He gives his most intimate teaching, to take refuge in him alone, with the promise of freedom. Arjuna declares his confusion gone and says he will act as told, and Sañjaya closes the dialogue.",
+     "review_status": "unreviewed"
+    },
+    {
+     "id": "767ddbac-1934-51a8-9027-6b3afde8ac21",
+     "kind": "theme",
+     "language": "en",
+     "source_id": "gita-companion-editorial",
+     "body": "Renouncing attachment to results, surrendering to the Divine, and attaining freedom.",
      "review_status": "unreviewed"
     }
    ]
@@ -675,7 +971,8 @@
      "body": "ధర్మక్షేత్రే కురుక్షేత్రే సమవేతా యుయుత్సవః ।\nమామకాః పాణ్డవాశ్చైవ కిమకుర్వత సఞ్జయ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.2",
@@ -705,7 +1002,8 @@
      "body": "దృష్ట్వా తు పాణ్డవానీకం వ్యూఢం దుర్యోధనస్తదా ।\nఆచార్యముపసఙ్గమ్య రాజా వచనమబ్రవీత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.3",
@@ -735,7 +1033,8 @@
      "body": "పశ్యైతాం పాణ్డుపుత్రాణామాచార్య మహతీం చమూమ్ ।\nవ్యూఢాం ద్రుపదపుత్రేణ తవ శిష్యేణ ధీమతా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.4",
@@ -765,7 +1064,8 @@
      "body": "అత్ర శూరా మహేష్వాసా భీమార్జునసమా యుధి ।\nయుయుధానో విరాటశ్చ ద్రుపదశ్చ మహారథః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.5",
@@ -795,7 +1095,8 @@
      "body": "ధృష్టకేతుశ్చేకితానః కాశిరాజశ్చ వీర్యవాన్ ।\nపురుజిత్కున్తిభోజశ్చ శైబ్యశ్చ నరపుఙ్గవః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.6",
@@ -825,7 +1126,8 @@
      "body": "యుధామన్యుశ్చ విక్రాన్త ఉత్తమౌజాశ్చ వీర్యవాన్ ।\nసౌభద్రో ద్రౌపదేయాశ్చ సర్వ ఏవ మహారథాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.7",
@@ -855,7 +1157,8 @@
      "body": "అస్మాకం తు విశిష్టా యే తాన్నిబోధ ద్విజోత్తమ ।\nనాయకా మమ సైన్యస్య సంజ్ఞార్థం తాన్బ్రవీమి తే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.8",
@@ -885,7 +1188,8 @@
      "body": "భవాన్భీష్మశ్చ కర్ణశ్చ కృపశ్చ సమితిఞ్జయః ।\nఅశ్వత్థామా వికర్ణశ్చ సౌమదత్తిస్తథైవ చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.9",
@@ -915,7 +1219,8 @@
      "body": "అన్యే చ బహవః శూరా మదర్థే త్యక్తజీవితాః ।\nనానాశస్త్రప్రహరణాః సర్వే యుద్ధవిశారదాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.10",
@@ -945,7 +1250,8 @@
      "body": "అపర్యాప్తం తదస్మాకం బలం భీష్మాభిరక్షితమ్ ।\nపర్యాప్తం త్విదమేతేషాం బలం భీమాభిరక్షితమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.11",
@@ -975,7 +1281,8 @@
      "body": "అయనేషు చ సర్వేషు యథాభాగమవస్థితాః ।\nభీష్మమేవాభిరక్షన్తు భవన్తః సర్వ ఏవ హి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.12",
@@ -1005,7 +1312,8 @@
      "body": "తస్య సంజనయన్హర్షం కురువృద్ధః పితామహః ।\nసింహనాదం వినద్యోచ్చైః శఙ్ఖం దధ్మౌ ప్రతాపవాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.13",
@@ -1035,7 +1343,8 @@
      "body": "తతః శఙ్ఖాశ్చ భేర్యశ్చ పణవానకగోముఖాః ।\nసహసైవాభ్యహన్యన్త స శబ్దస్తుములోఽభవత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.14",
@@ -1065,7 +1374,8 @@
      "body": "తతః శ్వేతైర్హయైర్యుక్తే మహతి స్యన్దనే స్థితౌ ।\nమాధవః పాణ్డవశ్చైవ దివ్యౌ శఙ్ఖౌ ప్రదధ్మతుః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.15",
@@ -1095,7 +1405,8 @@
      "body": "పాఞ్చజన్యం హృషీకేశో దేవదత్తం ధనంజయః ।\nపౌణ్డ్రం దధ్మౌ మహాశఙ్ఖం భీమకర్మా వృకోదరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.16",
@@ -1125,7 +1436,8 @@
      "body": "అనన్తవిజయం రాజా కున్తీపుత్రో యుధిష్ఠిరః ।\nనకులః సహదేవశ్చ సుఘోషమణిపుష్పకౌ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.17",
@@ -1155,7 +1467,8 @@
      "body": "కాశ్యశ్చ పరమేష్వాసః శిఖణ్డీ చ మహారథః ।\nధృష్టద్యుమ్నో విరాటశ్చ సాత్యకిశ్చాపరాజితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.18",
@@ -1185,7 +1498,8 @@
      "body": "ద్రుపదో ద్రౌపదేయాశ్చ సర్వశః పృథివీపతే ।\nసౌభద్రశ్చ మహాబాహుః శఙ్ఖాన్దధ్ముః పృథక్పృథక్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.19",
@@ -1215,7 +1529,8 @@
      "body": "స ఘోషో ధార్తరాష్ట్రాణాం హృదయాని వ్యదారయత్ ।\nనభశ్చ పృథివీం చైవ తుములో వ్యనునాదయన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.20",
@@ -1247,7 +1562,8 @@
      "body": "అథ వ్యవస్థితాన్ దృష్ట్వా ధార్తరాష్ట్రాన్కపిధ్వజః ।\nప్రవృత్తే శస్త్రసంపాతే ధనురుద్యమ్య పాణ్డవః ।\nహృషీకేశం తదా వాక్యమిదమాహ మహీపతే ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.21",
@@ -1279,7 +1595,8 @@
      "body": "సేనయోరుభయోర్మధ్యే రథం స్థాపయ మేఽచ్యుత ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.22",
@@ -1309,7 +1626,8 @@
      "body": "యావదేతాన్నిరీక్షేఽహం యోద్ధుకామానవస్థితాన్ ।\nకైర్మయా సహ యోద్ధవ్యమస్మిన్రణసముద్యమే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.23",
@@ -1339,7 +1657,8 @@
      "body": "యోత్స్యమానానవేక్షేఽహం య ఏతేఽత్ర సమాగతాః ।\nధార్తరాష్ట్రస్య దుర్బుద్ధేర్యుద్ధే ప్రియచికీర్షవః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.24",
@@ -1369,7 +1688,8 @@
      "body": "ఏవముక్తో హృషీకేశో గుడాకేశేన భారత ।\nసేనయోరుభయోర్మధ్యే స్థాపయిత్వా రథోత్తమమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.25",
@@ -1399,7 +1719,8 @@
      "body": "భీష్మద్రోణప్రముఖతః సర్వేషాం చ మహీక్షితామ్ ।\nఉవాచ పార్థ పశ్యైతాన్సమవేతాన్కురూనితి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.26",
@@ -1431,7 +1752,8 @@
      "body": "తత్రాపశ్యత్స్థితాన్పార్థః పితౄనథ పితామహాన్ ।\nఆచార్యాన్మాతులాన్భ్రాతౄన్పుత్రాన్పౌత్రాన్సఖీంస్తథా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.27",
@@ -1461,7 +1783,8 @@
      "body": "శ్వశురాన్సుహృదశ్చైవ సేనయోరుభయోరపి ।\nతాన్సమీక్ష్య స కౌన్తేయః సర్వాన్బన్ధూనవస్థితాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.28",
@@ -1493,7 +1816,8 @@
      "body": "కృపయా పరయాఽఽవిష్టో విషీదన్నిదమబ్రవీత్ ।\nఅర్జున ఉవాచ\nదృష్ట్వేమం స్వజనం కృష్ణ యుయుత్సుం సముపస్థితమ్ ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.29",
@@ -1523,7 +1847,8 @@
      "body": "సీదన్తి మమ గాత్రాణి ముఖం చ పరిశుష్యతి ।\nవేపథుశ్చ శరీరే మే రోమహర్షశ్చ జాయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.30",
@@ -1553,7 +1878,8 @@
      "body": "గాణ్డీవం స్రంసతే హస్తాత్త్వక్చైవ పరిదహ్యతే ।\nన చ శక్నోమ్యవస్థాతుం భ్రమతీవ చ మే మనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.31",
@@ -1583,7 +1909,8 @@
      "body": "నిమిత్తాని చ పశ్యామి విపరీతాని కేశవ ।\nన చ శ్రేయోఽనుపశ్యామి హత్వా స్వజనమాహవే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.32",
@@ -1613,7 +1940,8 @@
      "body": "న కాఙ్క్షే విజయం కృష్ణ న చ రాజ్యం సుఖాని చ ।\nకిం నో రాజ్యేన గోవిన్ద కిం భోగైర్జీవితేన వా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.33",
@@ -1643,7 +1971,8 @@
      "body": "యేషామర్థే కాఙ్క్షితం నో రాజ్యం భోగాః సుఖాని చ ।\nత ఇమేఽవస్థితా యుద్ధే ప్రాణాంస్త్యక్త్వా ధనాని చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.34",
@@ -1675,7 +2004,8 @@
      "body": "ఆచార్యాః పితరః పుత్రాస్తథైవ చ పితామహాః ।\nమాతులాః శ్వశురాః పౌత్రాః శ్యాలాః సమ్బన్ధినస్తథా ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.35",
@@ -1705,7 +2035,8 @@
      "body": "ఏతాన్న హన్తుమిచ్ఛామి ఘ్నతోఽపి మధుసూదన ।\nఅపి త్రైలోక్యరాజ్యస్య హేతోః కిం ను మహీకృతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.36",
@@ -1735,7 +2066,8 @@
      "body": "నిహత్య ధార్తరాష్ట్రాన్నః కా ప్రీతిః స్యాజ్జనార్దన ।\nపాపమేవాశ్రయేదస్మాన్హత్వైతానాతతాయినః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.37",
@@ -1765,7 +2097,8 @@
      "body": "తస్మాన్నార్హా వయం హన్తుం ధార్తరాష్ట్రాన్స్వబాన్ధవాన్ ।\nస్వజనం హి కథం హత్వా సుఖినః స్యామ మాధవ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.38",
@@ -1795,7 +2128,8 @@
      "body": "యద్యప్యేతే న పశ్యన్తి లోభోపహతచేతసః ।\nకులక్షయకృతం దోషం మిత్రద్రోహే చ పాతకమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.39",
@@ -1825,7 +2159,8 @@
      "body": "కథం న జ్ఞేయమస్మాభిః పాపాదస్మాన్నివర్తితుమ్ ।\nకులక్షయకృతం దోషం ప్రపశ్యద్భిర్జనార్దన ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.40",
@@ -1855,7 +2190,8 @@
      "body": "కులక్షయే ప్రణశ్యన్తి కులధర్మాః సనాతనాః ।\nధర్మే నష్టే కులం కృత్స్నమధర్మోఽభిభవత్యుత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.41",
@@ -1885,7 +2221,8 @@
      "body": "అధర్మాభిభవాత్కృష్ణ ప్రదుష్యన్తి కులస్త్రియః ।\nస్త్రీషు దుష్టాసు వార్ష్ణేయ జాయతే వర్ణసఙ్కరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.42",
@@ -1915,7 +2252,8 @@
      "body": "సఙ్కరో నరకాయైవ కులఘ్నానాం కులస్య చ ।\nపతన్తి పితరో హ్యేషాం లుప్తపిణ్డోదకక్రియాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.43",
@@ -1945,7 +2283,8 @@
      "body": "దోషైరేతైః కులఘ్నానాం వర్ణసఙ్కరకారకైః ।\nఉత్సాద్యన్తే జాతిధర్మాః కులధర్మాశ్చ శాశ్వతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.44",
@@ -1975,7 +2314,8 @@
      "body": "ఉత్సన్నకులధర్మాణాం మనుష్యాణాం జనార్దన ।\nనరకేఽనియతం వాసో భవతీత్యనుశుశ్రుమ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.45",
@@ -2005,7 +2345,8 @@
      "body": "అహో బత మహత్పాపం కర్తుం వ్యవసితా వయమ్ ।\nయద్రాజ్యసుఖలోభేన హన్తుం స్వజనముద్యతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.46",
@@ -2035,7 +2376,8 @@
      "body": "యది మామప్రతీకారమశస్త్రం శస్త్రపాణయః ।\nధార్తరాష్ట్రా రణే హన్యుస్తన్మే క్షేమతరం భవేత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "1.47",
@@ -2065,7 +2407,8 @@
      "body": "ఏవముక్త్వాఽర్జునః సంఖ్యే రథోపస్థ ఉపావిశత్ ।\nవిసృజ్య సశరం చాపం శోకసంవిగ్నమానసః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.1",
@@ -2095,7 +2438,8 @@
      "body": "తం తథా కృపయాఽవిష్టమశ్రుపూర్ణాకులేక్షణమ్ ।\nవిషీదన్తమిదం వాక్యమువాచ మధుసూదనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.2",
@@ -2125,7 +2469,8 @@
      "body": "కుతస్త్వా కశ్మలమిదం విషమే సముపస్థితమ్ ।\nఅనార్యజుష్టమస్వర్గ్యమకీర్తికరమర్జున ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.3",
@@ -2155,7 +2500,8 @@
      "body": "క్లైబ్యం మా స్మ గమః పార్థ నైతత్త్వయ్యుపపద్యతే ।\nక్షుద్రం హృదయదౌర్బల్యం త్యక్త్వోత్తిష్ఠ పరన్తప ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.4",
@@ -2185,7 +2531,8 @@
      "body": "కథం భీష్మమహం సంఖ్యే ద్రోణం చ మధుసూదన ।\nఇషుభిః ప్రతియోత్స్యామి పూజార్హావరిసూదన ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.5",
@@ -2215,7 +2562,8 @@
      "body": "గురూనహత్వా హి మహానుభావాన్ శ్రేయో భోక్తుం భైక్ష్యమపీహ లోకే ।\nహత్వార్థకామాంస్తు గురూనిహైవ భుఞ్జీయ భోగాన్ రుధిరప్రదిగ్ధాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.6",
@@ -2245,7 +2593,8 @@
      "body": "న చైతద్విద్మః కతరన్నో గరీయో యద్వా జయేమ యది వా నో జయేయుః ।\nయానేవ హత్వా న జిజీవిషామ స్తేఽవస్థితాః ప్రముఖే ధార్తరాష్ట్రాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.7",
@@ -2277,7 +2626,8 @@
      "body": "కార్పణ్యదోషోపహతస్వభావః పృచ్ఛామి త్వాం ధర్మసంమూఢచేతాః ।\nయచ్ఛ్రేయః స్యాన్నిశ్చితం బ్రూహి తన్మే శిష్యస్తేఽహం శాధి మాం త్వాం ప్రపన్నమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.8",
@@ -2307,7 +2657,8 @@
      "body": "న హి ప్రపశ్యామి మమాపనుద్యా ద్యచ్ఛోకముచ్ఛోషణమిన్ద్రియాణామ్ ।\nఅవాప్య భూమావసపత్నమృద్ధమ్ రాజ్యం సురాణామపి చాధిపత్యమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.9",
@@ -2337,7 +2688,8 @@
      "body": "ఏవముక్త్వా హృషీకేశం గుడాకేశః పరన్తప ।\nన యోత్స్య ఇతి గోవిన్దముక్త్వా తూష్ణీం బభూవ హ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.10",
@@ -2367,7 +2719,8 @@
      "body": "తమువాచ హృషీకేశః ప్రహసన్నివ భారత ।\nసేనయోరుభయోర్మధ్యే విషీదన్తమిదం వచః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.11",
@@ -2397,7 +2750,8 @@
      "body": "అశోచ్యానన్వశోచస్త్వం ప్రజ్ఞావాదాంశ్చ భాషసే ।\nగతాసూనగతాసూంశ్చ నానుశోచన్తి పణ్డితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.12",
@@ -2427,7 +2781,8 @@
      "body": "న త్వేవాహం జాతు నాసం న త్వం నేమే జనాధిపాః ।\nన చైవ న భవిష్యామః సర్వే వయమతః పరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.13",
@@ -2457,7 +2812,8 @@
      "body": "దేహినోఽస్మిన్యథా దేహే కౌమారం యౌవనం జరా ।\nతథా దేహాన్తరప్రాప్తిర్ధీరస్తత్ర న ముహ్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.14",
@@ -2487,7 +2843,8 @@
      "body": "మాత్రాస్పర్శాస్తు కౌన్తేయ శీతోష్ణసుఖదుఃఖదాః ।\nఆగమాపాయినోఽనిత్యాస్తాంస్తితిక్షస్వ భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.15",
@@ -2517,7 +2874,8 @@
      "body": "యం హి న వ్యథయన్త్యేతే పురుషం పురుషర్షభ ।\nసమదుఃఖసుఖం ధీరం సోఽమృతత్వాయ కల్పతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.16",
@@ -2547,7 +2905,8 @@
      "body": "నాసతో విద్యతే భావో నాభావో విద్యతే సతః ।\nఉభయోరపి దృష్టోఽన్తస్త్వనయోస్తత్త్వదర్శిభిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.17",
@@ -2577,7 +2936,8 @@
      "body": "అవినాశి తు తద్విద్ధి యేన సర్వమిదం తతమ్ ।\nవినాశమవ్యయస్యాస్య న కశ్చిత్ కర్తుమర్హతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.18",
@@ -2607,7 +2967,8 @@
      "body": "అన్తవన్త ఇమే దేహా నిత్యస్యోక్తాః శరీరిణః ।\nఅనాశినోఽప్రమేయస్య తస్మాద్యుధ్యస్వ భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.19",
@@ -2637,7 +2998,8 @@
      "body": "య ఏనం వేత్తి హన్తారం యశ్చైనం మన్యతే హతమ్ ।\nఉభౌ తౌ న విజానీతో నాయం హన్తి న హన్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.20",
@@ -2667,7 +3029,8 @@
      "body": "న జాయతే మ్రియతే వా కదాచి న్నాయం భూత్వా భవితా వా న భూయః ।\nఅజో నిత్యః శాశ్వతోఽయం పురాణో న హన్యతే హన్యమానే శరీరే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.21",
@@ -2697,7 +3060,8 @@
      "body": "వేదావినాశినం నిత్యం య ఏనమజమవ్యయమ్ ।\nకథం స పురుషః పార్థ కం ఘాతయతి హన్తి కమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.22",
@@ -2727,7 +3091,8 @@
      "body": "వాసాంసి జీర్ణాని యథా విహాయ నవాని గృహ్ణాతి నరోఽపరాణి ।\nతథా శరీరాణి విహాయ జీర్ణా న్యన్యాని సంయాతి నవాని దేహీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.23",
@@ -2757,7 +3122,8 @@
      "body": "నైనం ఛిన్దన్తి శస్త్రాణి నైనం దహతి పావకః ।\nన చైనం క్లేదయన్త్యాపో న శోషయతి మారుతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.24",
@@ -2787,7 +3153,8 @@
      "body": "అచ్ఛేద్యోఽయమదాహ్యోఽయమక్లేద్యోఽశోష్య ఏవ చ ।\nనిత్యః సర్వగతః స్థాణురచలోఽయం సనాతనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.25",
@@ -2817,7 +3184,8 @@
      "body": "అవ్యక్తోఽయమచిన్త్యోఽయమవికార్యోఽయముచ్యతే ।\nతస్మాదేవం విదిత్వైనం నానుశోచితుమర్హసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.26",
@@ -2847,7 +3215,8 @@
      "body": "అథ చైనం నిత్యజాతం నిత్యం వా మన్యసే మృతమ్ ।\nతథాపి త్వం మహాబాహో నైవం శోచితుమర్హసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.27",
@@ -2877,7 +3246,8 @@
      "body": "జాతస్య హి ధ్రువో మృత్యుర్ధ్రువం జన్మ మృతస్య చ ।\nతస్మాదపరిహార్యేఽర్థే న త్వం శోచితుమర్హసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.28",
@@ -2907,7 +3277,8 @@
      "body": "అవ్యక్తాదీని భూతాని వ్యక్తమధ్యాని భారత ।\nఅవ్యక్తనిధనాన్యేవ తత్ర కా పరిదేవనా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.29",
@@ -2939,7 +3310,8 @@
      "body": "ఆశ్చర్యవత్పశ్యతి కశ్చిదేన మాశ్చర్యవద్వదతి తథైవ చాన్యః ।\nఆశ్చర్యవచ్చైనమన్యః శృణోతి శ్రుత్వాప్యేనం వేద న చైవ కశ్చిత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.30",
@@ -2969,7 +3341,8 @@
      "body": "దేహీ నిత్యమవధ్యోఽయం దేహే సర్వస్య భారత ।\nతస్మాత్సర్వాణి భూతాని న త్వం శోచితుమర్హసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.31",
@@ -3001,7 +3374,8 @@
      "body": "స్వధర్మమపి చావేక్ష్య న వికమ్పితుమర్హసి ।\nధర్మ్యాద్ధి యుద్ధాచ్ఛ్రేయోఽన్యత్క్షత్రియస్య న విద్యతే ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.32",
@@ -3031,7 +3405,8 @@
      "body": "యదృచ్ఛయా చోపపన్నం స్వర్గద్వారమపావృతమ్ ।\nసుఖినః క్షత్రియాః పార్థ లభన్తే యుద్ధమీదృశమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.33",
@@ -3063,7 +3438,8 @@
      "body": "అథ చేత్త్వమిమం ధర్మ్యం సంగ్రామం న కరిష్యసి ।\nతతః స్వధర్మం కీర్తిం చ హిత్వా పాపమవాప్స్యసి ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.34",
@@ -3093,7 +3469,8 @@
      "body": "అకీర్తిం చాపి భూతాని కథయిష్యన్తి తేఽవ్యయామ్ ।\nసంభావితస్య చాకీర్తిర్మరణాదతిరిచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.35",
@@ -3123,7 +3500,8 @@
      "body": "భయాద్రణాదుపరతం మంస్యన్తే త్వాం మహారథాః ।\nయేషాం చ త్వం బహుమతో భూత్వా యాస్యసి లాఘవమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.36",
@@ -3153,7 +3531,8 @@
      "body": "అవాచ్యవాదాంశ్చ బహూన్ వదిష్యన్తి తవాహితాః ।\nనిన్దన్తస్తవ సామర్థ్యం తతో దుఃఖతరం ను కిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.37",
@@ -3183,7 +3562,8 @@
      "body": "హతో వా ప్రాప్స్యసి స్వర్గం జిత్వా వా భోక్ష్యసే మహీమ్ ।\nతస్మాదుత్తిష్ఠ కౌన్తేయ యుద్ధాయ కృతనిశ్చయః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.38",
@@ -3213,7 +3593,8 @@
      "body": "సుఖదుఃఖే సమే కృత్వా లాభాలాభౌ జయాజయౌ ।\nతతో యుద్ధాయ యుజ్యస్వ నైవం పాపమవాప్స్యసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.39",
@@ -3245,7 +3626,8 @@
      "body": "ఏషా తేఽభిహితా సాంఖ్యే బుద్ధిర్యోగే త్విమాం శృణు ।\nబుద్ధ్యాయుక్తో యయా పార్థ కర్మబన్ధం ప్రహాస్యసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.40",
@@ -3275,7 +3657,8 @@
      "body": "నేహాభిక్రమనాశోఽస్తి ప్రత్యవాయో న విద్యతే ।\nస్వల్పమప్యస్య ధర్మస్య త్రాయతే మహతో భయాత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.41",
@@ -3305,7 +3688,8 @@
      "body": "వ్యవసాయాత్మికా బుద్ధిరేకేహ కురునన్దన ।\nబహుశాఖా హ్యనన్తాశ్చ బుద్ధయోఽవ్యవసాయినామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.42",
@@ -3335,7 +3719,8 @@
      "body": "యామిమాం పుష్పితాం వాచం ప్రవదన్త్యవిపశ్చితః ।\nవేదవాదరతాః పార్థ నాన్యదస్తీతి వాదినః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.43",
@@ -3365,7 +3750,8 @@
      "body": "కామాత్మానః స్వర్గపరా జన్మకర్మఫలప్రదామ్ ।\nక్రియావిశేషబహులాం భోగైశ్వర్యగతిం ప్రతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.44",
@@ -3395,7 +3781,8 @@
      "body": "భోగైశ్వర్యప్రసక్తానాం తయాపహృతచేతసామ్ ।\nవ్యవసాయాత్మికా బుద్ధిః సమాధౌ న విధీయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.45",
@@ -3425,7 +3812,8 @@
      "body": "త్రైగుణ్యవిషయా వేదా నిస్త్రైగుణ్యో భవార్జున ।\nనిర్ద్వన్ద్వో నిత్యసత్త్వస్థో నిర్యోగక్షేమ ఆత్మవాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.46",
@@ -3455,7 +3843,8 @@
      "body": "యావానర్థ ఉదపానే సర్వతః సంప్లుతోదకే ।\nతావాన్సర్వేషు వేదేషు బ్రాహ్మణస్య విజానతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.47",
@@ -3485,7 +3874,8 @@
      "body": "కర్మణ్యేవాధికారస్తే మా ఫలేషు కదాచన ।\nమా కర్మఫలహేతుర్భూర్మా తే సఙ్గోఽస్త్వకర్మణి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.48",
@@ -3515,7 +3905,8 @@
      "body": "యోగస్థః కురు కర్మాణి సఙ్గం త్యక్త్వా ధనఞ్జయ ।\nసిద్ధ్యసిద్ధ్యోః సమో భూత్వా సమత్వం యోగ ఉచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.49",
@@ -3545,7 +3936,8 @@
      "body": "దూరేణ హ్యవరం కర్మ బుద్ధియోగాద్ధనఞ్జయ ।\nబుద్ధౌ శరణమన్విచ్ఛ కృపణాః ఫలహేతవః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.50",
@@ -3575,7 +3967,8 @@
      "body": "బుద్ధియుక్తో జహాతీహ ఉభే సుకృతదుష్కృతే ।\nతస్మాద్యోగాయ యుజ్యస్వ యోగః కర్మసు కౌశలమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.51",
@@ -3605,7 +3998,8 @@
      "body": "కర్మజం బుద్ధియుక్తా హి ఫలం త్యక్త్వా మనీషిణః ।\nజన్మబన్ధవినిర్ముక్తాః పదం గచ్ఛన్త్యనామయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.52",
@@ -3635,7 +4029,8 @@
      "body": "యదా తే మోహకలిలం బుద్ధిర్వ్యతితరిష్యతి ।\nతదా గన్తాసి నిర్వేదం శ్రోతవ్యస్య శ్రుతస్య చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.53",
@@ -3665,7 +4060,8 @@
      "body": "శ్రుతివిప్రతిపన్నా తే యదా స్థాస్యతి నిశ్చలా ।\nసమాధావచలా బుద్ధిస్తదా యోగమవాప్స్యసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.54",
@@ -3695,7 +4091,8 @@
      "body": "స్థితప్రజ్ఞస్య కా భాషా సమాధిస్థస్య కేశవ ।\nస్థితధీః కిం ప్రభాషేత కిమాసీత వ్రజేత కిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.55",
@@ -3725,7 +4122,8 @@
      "body": "ప్రజహాతి యదా కామాన్ సర్వాన్ పార్థ మనోగతాన్ ।\nఆత్మన్యేవాత్మనా తుష్టః స్థితప్రజ్ఞస్తదోచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.56",
@@ -3755,7 +4153,8 @@
      "body": "దుఃఖేష్వనుద్విగ్నమనాః సుఖేషు విగతస్పృహః ।\nవీతరాగభయక్రోధః స్థితధీర్మునిరుచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.57",
@@ -3785,7 +4184,8 @@
      "body": "యః సర్వత్రానభిస్నేహస్తత్తత్ప్రాప్య శుభాశుభమ్ ।\nనాభినన్దతి న ద్వేష్టి తస్య ప్రజ్ఞా ప్రతిష్ఠితా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.58",
@@ -3815,7 +4215,8 @@
      "body": "యదా సంహరతే చాయం కూర్మోఽఙ్గానీవ సర్వశః ।\nఇన్ద్రియాణీన్ద్రియార్థేభ్యస్తస్య ప్రజ్ఞా ప్రతిష్ఠితా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.59",
@@ -3845,7 +4246,8 @@
      "body": "విషయా వినివర్తన్తే నిరాహారస్య దేహినః ।\nరసవర్జం రసోఽప్యస్య పరం దృష్ట్వా నివర్తతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.60",
@@ -3875,7 +4277,8 @@
      "body": "యతతో హ్యపి కౌన్తేయ పురుషస్య విపశ్చితః ।\nఇన్ద్రియాణి ప్రమాథీని హరన్తి ప్రసభం మనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.61",
@@ -3905,7 +4308,8 @@
      "body": "తాని సర్వాణి సంయమ్య యుక్త ఆసీత మత్పరః ।\nవశే హి యస్యేన్ద్రియాణి తస్య ప్రజ్ఞా ప్రతిష్ఠితా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.62",
@@ -3935,7 +4339,8 @@
      "body": "ధ్యాయతో విషయాన్పుంసః సఙ్గస్తేషూపజాయతే ।\nసఙ్గాత్ సంజాయతే కామః కామాత్క్రోధోఽభిజాయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.63",
@@ -3965,7 +4370,8 @@
      "body": "క్రోధాద్భవతి సంమోహః సంమోహాత్స్మృతివిభ్రమః ।\nస్మృతిభ్రంశాద్ బుద్ధినాశో బుద్ధినాశాత్ప్రణశ్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.64",
@@ -3995,7 +4401,8 @@
      "body": "రాగద్వేషవియుక్తైస్తు విషయానిన్ద్రియైశ్చరన్ ।\nఆత్మవశ్యైర్విధేయాత్మా ప్రసాదమధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.65",
@@ -4025,7 +4432,8 @@
      "body": "ప్రసాదే సర్వదుఃఖానాం హానిరస్యోపజాయతే ।\nప్రసన్నచేతసో హ్యాశు బుద్ధిః పర్యవతిష్ఠతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.66",
@@ -4055,7 +4463,8 @@
      "body": "నాస్తి బుద్ధిరయుక్తస్య న చాయుక్తస్య భావనా ।\nన చాభావయతః శాన్తిరశాన్తస్య కుతః సుఖమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.67",
@@ -4085,7 +4494,8 @@
      "body": "ఇన్ద్రియాణాం హి చరతాం యన్మనోఽనువిధీయతే ।\nతదస్య హరతి ప్రజ్ఞాం వాయుర్నావమివామ్భసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.68",
@@ -4115,7 +4525,8 @@
      "body": "తస్మాద్యస్య మహాబాహో నిగృహీతాని సర్వశః ।\nఇన్ద్రియాణీన్ద్రియార్థేభ్యస్తస్య ప్రజ్ఞా ప్రతిష్ఠితా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.69",
@@ -4145,7 +4556,8 @@
      "body": "యా నిశా సర్వభూతానాం తస్యాం జాగర్తి సంయమీ ।\nయస్యాం జాగ్రతి భూతాని సా నిశా పశ్యతో మునేః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.70",
@@ -4175,7 +4587,8 @@
      "body": "ఆపూర్యమాణమచలప్రతిష్ఠం సముద్రమాపః ప్రవిశన్తి యద్వత్ ।\nతద్వత్కామా యం ప్రవిశన్తి సర్వే స శాన్తిమాప్నోతి న కామకామీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.71",
@@ -4205,7 +4618,8 @@
      "body": "విహాయ కామాన్యః సర్వాన్పుమాంశ్చరతి నిఃస్పృహః ।\nనిర్మమో నిరహంకారః స శాంతిమధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "2.72",
@@ -4235,7 +4649,8 @@
      "body": "ఏషా బ్రాహ్మీ స్థితిః పార్థ నైనాం ప్రాప్య విముహ్యతి ।\nస్థిత్వాఽస్యామన్తకాలేఽపి బ్రహ్మనిర్వాణమృచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.1",
@@ -4265,7 +4680,8 @@
      "body": "జ్యాయసీ చేత్కర్మణస్తే మతా బుద్ధిర్జనార్దన ।\nతత్కిం కర్మణి ఘోరే మాం నియోజయసి కేశవ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.2",
@@ -4297,7 +4713,8 @@
      "body": "వ్యామిశ్రేణేవ వాక్యేన బుద్ధిం మోహయసీవ మే ।\nతదేకం వద నిశ్చిత్య యేన శ్రేయోఽహమాప్నుయామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.3",
@@ -4327,7 +4744,8 @@
      "body": "లోకేఽస్మిన్ద్వివిధా నిష్ఠా పురా ప్రోక్తా మయానఘ ।\nజ్ఞానయోగేన సాంఖ్యానాం కర్మయోగేన యోగినామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.4",
@@ -4357,7 +4775,8 @@
      "body": "న కర్మణామనారమ్భాన్నైష్కర్మ్యం పురుషోఽశ్నుతే ।\nన చ సంన్యసనాదేవ సిద్ధిం సమధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.5",
@@ -4389,7 +4808,8 @@
      "body": "న హి కశ్చిత్క్షణమపి జాతు తిష్ఠత్యకర్మకృత్ ।\nకార్యతే హ్యవశః కర్మ సర్వః ప్రకృతిజైర్గుణైః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.6",
@@ -4419,7 +4839,8 @@
      "body": "కర్మేన్ద్రియాణి సంయమ్య య ఆస్తే మనసా స్మరన్ ।\nఇన్ద్రియార్థాన్విమూఢాత్మా మిథ్యాచారః స ఉచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.7",
@@ -4449,7 +4870,8 @@
      "body": "యస్త్విన్ద్రియాణి మనసా నియమ్యారభతేఽర్జున ।\nకర్మేన్ద్రియైః కర్మయోగమసక్తః స విశిష్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.8",
@@ -4479,7 +4901,8 @@
      "body": "నియతం కురు కర్మ త్వం కర్మ జ్యాయో హ్యకర్మణః ।\nశరీరయాత్రాపి చ తే న ప్రసిద్ధ్యేదకర్మణః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.9",
@@ -4509,7 +4932,8 @@
      "body": "యజ్ఞార్థాత్కర్మణోఽన్యత్ర లోకోఽయం కర్మబన్ధనః ।\nతదర్థం కర్మ కౌన్తేయ ముక్తసంగః సమాచర ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.10",
@@ -4539,7 +4963,8 @@
      "body": "సహయజ్ఞాః ప్రజాః సృష్ట్వా పురోవాచ ప్రజాపతిః ।\nఅనేన ప్రసవిష్యధ్వమేష వోఽస్త్విష్టకామధుక్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.11",
@@ -4569,7 +4994,8 @@
      "body": "దేవాన్భావయతానేన తే దేవా భావయన్తు వః ।\nపరస్పరం భావయన్తః శ్రేయః పరమవాప్స్యథ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.12",
@@ -4599,7 +5025,8 @@
      "body": "ఇష్టాన్భోగాన్హి వో దేవా దాస్యన్తే యజ్ఞభావితాః ।\nతైర్దత్తానప్రదాయైభ్యో యో భుఙ్క్తే స్తేన ఏవ సః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.13",
@@ -4629,7 +5056,8 @@
      "body": "యజ్ఞశిష్టాశినః సన్తో ముచ్యన్తే సర్వకిల్బిషైః ।\nభుఞ్జతే తే త్వఘం పాపా యే పచన్త్యాత్మకారణాత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.14",
@@ -4659,7 +5087,8 @@
      "body": "అన్నాద్భవన్తి భూతాని పర్జన్యాదన్నసమ్భవః ।\nయజ్ఞాద్భవతి పర్జన్యో యజ్ఞః కర్మసముద్భవః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.15",
@@ -4689,7 +5118,8 @@
      "body": "కర్మ బ్రహ్మోద్భవం విద్ధి బ్రహ్మాక్షరసముద్భవమ్ ।\nతస్మాత్సర్వగతం బ్రహ్మ నిత్యం యజ్ఞే ప్రతిష్ఠితమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.16",
@@ -4719,7 +5149,8 @@
      "body": "ఏవం ప్రవర్తితం చక్రం నానువర్తయతీహ యః ।\nఅఘాయురిన్ద్రియారామో మోఘం పార్థ స జీవతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.17",
@@ -4749,7 +5180,8 @@
      "body": "యస్త్వాత్మరతిరేవ స్యాదాత్మతృప్తశ్చ మానవః ।\nఆత్మన్యేవ చ సన్తుష్టస్తస్య కార్యం న విద్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.18",
@@ -4781,7 +5213,8 @@
      "body": "నైవ తస్య కృతేనార్థో నాకృతేనేహ కశ్చన ।\nన చాస్య సర్వభూతేషు కశ్చిదర్థవ్యపాశ్రయః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.19",
@@ -4811,7 +5244,8 @@
      "body": "తస్మాదసక్తః సతతం కార్యం కర్మ సమాచర ।\nఅసక్తో హ్యాచరన్కర్మ పరమాప్నోతి పూరుషః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.20",
@@ -4841,7 +5275,8 @@
      "body": "కర్మణైవ హి సంసిద్ధిమాస్థితా జనకాదయః ।\nలోకసంగ్రహమేవాపి సంపశ్యన్కర్తుమర్హసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.21",
@@ -4871,7 +5306,8 @@
      "body": "యద్యదాచరతి శ్రేష్ఠస్తత్తదేవేతరో జనః ।\nస యత్ప్రమాణం కురుతే లోకస్తదనువర్తతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.22",
@@ -4901,7 +5337,8 @@
      "body": "న మే పార్థాస్తి కర్తవ్యం త్రిషు లోకేషు కిఞ్చన ।\nనానవాప్తమవాప్తవ్యం వర్త ఏవ చ కర్మణి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.23",
@@ -4931,7 +5368,8 @@
      "body": "యది హ్యహం న వర్తేయం జాతు కర్మణ్యతన్ద్రితః ।\nమమ వర్త్మానువర్తన్తే మనుష్యాః పార్థ సర్వశః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.24",
@@ -4961,7 +5399,8 @@
      "body": "ఉత్సీదేయురిమే లోకా న కుర్యాం కర్మ చేదహమ్ ।\nసఙ్కరస్య చ కర్తా స్యాముపహన్యామిమాః ప్రజాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.25",
@@ -4993,7 +5432,8 @@
      "body": "సక్తాః కర్మణ్యవిద్వాంసో యథా కుర్వన్తి భారత ।\nకుర్యాద్విద్వాంస్తథాసక్తశ్చికీర్షుర్లోకసంగ్రహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.26",
@@ -5023,7 +5463,8 @@
      "body": "న బుద్ధిభేదం జనయేదజ్ఞానాం కర్మసఙ్గినామ్ ।\nజోషయేత్సర్వకర్మాణి విద్వాన్ యుక్తః సమాచరన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.27",
@@ -5053,7 +5494,8 @@
      "body": "ప్రకృతేః క్రియమాణాని గుణైః కర్మాణి సర్వశః ।\nఅహఙ్కారవిమూఢాత్మా కర్తాఽహమితి మన్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.28",
@@ -5083,7 +5525,8 @@
      "body": "తత్త్వవిత్తు మహాబాహో గుణకర్మవిభాగయోః ।\nగుణా గుణేషు వర్తన్త ఇతి మత్వా న సజ్జతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.29",
@@ -5113,7 +5556,8 @@
      "body": "ప్రకృతేర్గుణసమ్మూఢాః సజ్జన్తే గుణకర్మసు ।\nతానకృత్స్నవిదో మన్దాన్కృత్స్నవిన్న విచాలయేత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.30",
@@ -5143,7 +5587,8 @@
      "body": "మయి సర్వాణి కర్మాణి సంన్యస్యాధ్యాత్మచేతసా ।\nనిరాశీర్నిర్మమో భూత్వా యుధ్యస్వ విగతజ్వరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.31",
@@ -5173,7 +5618,8 @@
      "body": "యే మే మతమిదం నిత్యమనుతిష్ఠన్తి మానవాః ।\nశ్రద్ధావన్తోఽనసూయన్తో ముచ్యన్తే తేఽపి కర్మభిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.32",
@@ -5203,7 +5649,8 @@
      "body": "యే త్వేతదభ్యసూయన్తో నానుతిష్ఠన్తి మే మతమ్ ।\nసర్వజ్ఞానవిమూఢాంస్తాన్విద్ధి నష్టానచేతసః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.33",
@@ -5233,7 +5680,8 @@
      "body": "సదృశం చేష్టతే స్వస్యాః ప్రకృతేర్జ్ఞానవానపి ।\nప్రకృతిం యాన్తి భూతాని నిగ్రహః కిం కరిష్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.34",
@@ -5263,7 +5711,8 @@
      "body": "ఇన్ద్రియస్యేన్ద్రియస్యార్థే రాగద్వేషౌ వ్యవస్థితౌ ।\nతయోర్న వశమాగచ్ఛేత్తౌ హ్యస్య పరిపన్థినౌ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.35",
@@ -5293,7 +5742,8 @@
      "body": "శ్రేయాన్స్వధర్మో విగుణః పరధర్మాత్స్వనుష్ఠితాత్ ।\nస్వధర్మే నిధనం శ్రేయః పరధర్మో భయావహః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.36",
@@ -5323,7 +5773,8 @@
      "body": "అథ కేన ప్రయుక్తోఽయం పాపం చరతి పూరుషః ।\nఅనిచ్ఛన్నపి వార్ష్ణేయ బలాదివ నియోజితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.37",
@@ -5353,7 +5804,8 @@
      "body": "కామ ఏష క్రోధ ఏష రజోగుణసముద్భవః ।\nమహాశనో మహాపాప్మా విద్ధ్యేనమిహ వైరిణమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.38",
@@ -5383,7 +5835,8 @@
      "body": "ధూమేనావ్రియతే వహ్నిర్యథాఽఽదర్శో మలేన చ ।\nయథోల్బేనావృతో గర్భస్తథా తేనేదమావృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.39",
@@ -5413,7 +5866,8 @@
      "body": "ఆవృతం జ్ఞానమేతేన జ్ఞానినో నిత్యవైరిణా ।\nకామరూపేణ కౌన్తేయ దుష్పూరేణానలేన చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.40",
@@ -5443,7 +5897,8 @@
      "body": "ఇన్ద్రియాణి మనో బుద్ధిరస్యాధిష్ఠానముచ్యతే ।\nఏతైర్విమోహయత్యేష జ్ఞానమావృత్య దేహినమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.41",
@@ -5473,7 +5928,8 @@
      "body": "తస్మాత్త్వమిన్ద్రియాణ్యాదౌ నియమ్య భరతర్షభ ।\nపాప్మానం ప్రజహి హ్యేనం జ్ఞానవిజ్ఞాననాశనమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.42",
@@ -5503,7 +5959,8 @@
      "body": "ఇన్ద్రియాణి పరాణ్యాహురిన్ద్రియేభ్యః పరం మనః ।\nమనసస్తు పరా బుద్ధిర్యో బుద్ధేః పరతస్తు సః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "3.43",
@@ -5533,7 +5990,8 @@
      "body": "ఏవం బుద్ధేః పరం బుద్ధ్వా సంస్తభ్యాత్మానమాత్మనా ।\nజహి శత్రుం మహాబాహో కామరూపం దురాసదమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.1",
@@ -5563,7 +6021,8 @@
      "body": "ఇమం వివస్వతే యోగం ప్రోక్తవానహమవ్యయమ్ ।\nవివస్వాన్ మనవే ప్రాహ మనురిక్ష్వాకవేఽబ్రవీత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.2",
@@ -5593,7 +6052,8 @@
      "body": "ఏవం పరమ్పరాప్రాప్తమిమం రాజర్షయో విదుః ।\nస కాలేనేహ మహతా యోగో నష్టః పరన్తప ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.3",
@@ -5623,7 +6083,8 @@
      "body": "స ఏవాయం మయా తేఽద్య యోగః ప్రోక్తః పురాతనః ।\nభక్తోఽసి మే సఖా చేతి రహస్యం హ్యేతదుత్తమమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.4",
@@ -5653,7 +6114,8 @@
      "body": "అపరం భవతో జన్మ పరం జన్మ వివస్వతః ।\nకథమేతద్విజానీయాం త్వమాదౌ ప్రోక్తవానితి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.5",
@@ -5683,7 +6145,8 @@
      "body": "బహూని మే వ్యతీతాని జన్మాని తవ చార్జున ।\nతాన్యహం వేద సర్వాణి న త్వం వేత్థ పరన్తప ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.6",
@@ -5713,7 +6176,8 @@
      "body": "అజోఽపి సన్నవ్యయాత్మా భూతానామీశ్వరోఽపి సన్ ।\nప్రకృతిం స్వామధిష్ఠాయ సంభవామ్యాత్మమాయయా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.7",
@@ -5743,7 +6207,8 @@
      "body": "యదా యదా హి ధర్మస్య గ్లానిర్భవతి భారత ।\nఅభ్యుత్థానమధర్మస్య తదాఽఽత్మానం సృజామ్యహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.8",
@@ -5773,7 +6238,8 @@
      "body": "పరిత్రాణాయ సాధూనాం వినాశాయ చ దుష్కృతామ్ ।\nధర్మసంస్థాపనార్థాయ సంభవామి యుగే యుగే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.9",
@@ -5803,7 +6269,8 @@
      "body": "జన్మ కర్మ చ మే దివ్యమేవం యో వేత్తి తత్త్వతః ।\nత్యక్త్వా దేహం పునర్జన్మ నైతి మామేతి సోఽర్జున ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.10",
@@ -5833,7 +6300,8 @@
      "body": "వీతరాగభయక్రోధా మన్మయా మాముపాశ్రితాః ।\nబహవో జ్ఞానతపసా పూతా మద్భావమాగతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.11",
@@ -5863,7 +6331,8 @@
      "body": "యే యథా మాం ప్రపద్యన్తే తాంస్తథైవ భజామ్యహమ్ ।\nమమ వర్త్మానువర్తన్తే మనుష్యాః పార్థ సర్వశః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.12",
@@ -5893,7 +6362,8 @@
      "body": "కాఙ్క్షన్తః కర్మణాం సిద్ధిం యజన్త ఇహ దేవతాః ।\nక్షిప్రం హి మానుషే లోకే సిద్ధిర్భవతి కర్మజా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.13",
@@ -5923,7 +6393,8 @@
      "body": "చాతుర్వర్ణ్యం మయా సృష్టం గుణకర్మవిభాగశః ।\nతస్య కర్తారమపి మాం విద్ధ్యకర్తారమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.14",
@@ -5953,7 +6424,8 @@
      "body": "న మాం కర్మాణి లిమ్పన్తి న మే కర్మఫలే స్పృహా ।\nఇతి మాం యోఽభిజానాతి కర్మభిర్న స బధ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.15",
@@ -5983,7 +6455,8 @@
      "body": "ఏవం జ్ఞాత్వా కృతం కర్మ పూర్వైరపి ముముక్షుభిః ।\nకురు కర్మైవ తస్మాత్త్వం పూర్వైః పూర్వతరం కృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.16",
@@ -6013,7 +6486,8 @@
      "body": "కిం కర్మ కిమకర్మేతి కవయోఽప్యత్ర మోహితాః ।\nతత్తే కర్మ ప్రవక్ష్యామి యజ్జ్ఞాత్వా మోక్ష్యసేఽశుభాత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.17",
@@ -6043,7 +6517,8 @@
      "body": "కర్మణో హ్యపి బోద్ధవ్యం బోద్ధవ్యం చ వికర్మణః ।\nఅకర్మణశ్చ బోద్ధవ్యం గహనా కర్మణో గతిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.18",
@@ -6073,7 +6548,8 @@
      "body": "కర్మణ్యకర్మ యః పశ్యేదకర్మణి చ కర్మ యః ।\nస బుద్ధిమాన్ మనుష్యేషు స యుక్తః కృత్స్నకర్మకృత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.19",
@@ -6103,7 +6579,8 @@
      "body": "యస్య సర్వే సమారమ్భాః కామసఙ్కల్పవర్జితాః ।\nజ్ఞానాగ్నిదగ్ధకర్మాణం తమాహుః పణ్డితం బుధాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.20",
@@ -6133,7 +6610,8 @@
      "body": "త్యక్త్వా కర్మఫలాసఙ్గం నిత్యతృప్తో నిరాశ్రయః ।\nకర్మణ్యభిప్రవృత్తోఽపి నైవ కిఞ్చిత్కరోతి సః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.21",
@@ -6163,7 +6641,8 @@
      "body": "నిరాశీర్యతచిత్తాత్మా త్యక్తసర్వపరిగ్రహః ।\nశారీరం కేవలం కర్మ కుర్వన్నాప్నోతి కిల్బిషమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.22",
@@ -6193,7 +6672,8 @@
      "body": "యదృచ్ఛాలాభసన్తుష్టో ద్వన్ద్వాతీతో విమత్సరః ।\nసమః సిద్ధావసిద్ధౌ చ కృత్వాపి న నిబధ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.23",
@@ -6223,7 +6703,8 @@
      "body": "గతసఙ్గస్య ముక్తస్య జ్ఞానావస్థితచేతసః ।\nయజ్ఞాయాచరతః కర్మ సమగ్రం ప్రవిలీయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.24",
@@ -6253,7 +6734,8 @@
      "body": "బ్రహ్మార్పణం బ్రహ్మహవిర్బ్రహ్మాగ్నౌ బ్రహ్మణా హుతమ్ ।\nబ్రహ్మైవ తేన గన్తవ్యం బ్రహ్మకర్మసమాధినా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.25",
@@ -6283,7 +6765,8 @@
      "body": "దైవమేవాపరే యజ్ఞం యోగినః పర్యుపాసతే ।\nబ్రహ్మాగ్నావపరే యజ్ఞం యజ్ఞేనైవోపజుహ్వతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.26",
@@ -6313,7 +6796,8 @@
      "body": "శ్రోత్రాదీనీన్ద్రియాణ్యన్యే సంయమాగ్నిషు జుహ్వతి ।\nశబ్దాదీన్విషయానన్య ఇన్ద్రియాగ్నిషు జుహ్వతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.27",
@@ -6343,7 +6827,8 @@
      "body": "సర్వాణీన్ద్రియకర్మాణి ప్రాణకర్మాణి చాపరే ।\nఆత్మసంయమయోగాగ్నౌ జుహ్వతి జ్ఞానదీపితే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.28",
@@ -6373,7 +6858,8 @@
      "body": "ద్రవ్యయజ్ఞాస్తపోయజ్ఞా యోగయజ్ఞాస్తథాపరే ।\nస్వాధ్యాయజ్ఞానయజ్ఞాశ్చ యతయః సంశితవ్రతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.29",
@@ -6405,7 +6891,8 @@
      "body": "అపానే జుహ్వతి ప్రాణం ప్రాణేఽపానం తథాఽపరే ।\nప్రాణాపానగతీ రుద్ధ్వా ప్రాణాయామపరాయణాః ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.30",
@@ -6435,7 +6922,8 @@
      "body": "అపరే నియతాహారాః ప్రాణాన్ప్రాణేషు జుహ్వతి ।\nసర్వేఽప్యేతే యజ్ఞవిదో యజ్ఞక్షపితకల్మషాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.31",
@@ -6467,7 +6955,8 @@
      "body": "యజ్ఞశిష్టామృతభుజో యాన్తి బ్రహ్మ సనాతనమ్ ।\nనాయం లోకోఽస్త్యయజ్ఞస్య కుతోఽన్యః కురుసత్తమ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.32",
@@ -6497,7 +6986,8 @@
      "body": "ఏవం బహువిధా యజ్ఞా వితతా బ్రహ్మణో ముఖే ।\nకర్మజాన్విద్ధి తాన్సర్వానేవం జ్ఞాత్వా విమోక్ష్యసే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.33",
@@ -6527,7 +7017,8 @@
      "body": "శ్రేయాన్ద్రవ్యమయాద్యజ్ఞాజ్జ్ఞానయజ్ఞః పరన్తప ।\nసర్వం కర్మాఖిలం పార్థ జ్ఞానే పరిసమాప్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.34",
@@ -6557,7 +7048,8 @@
      "body": "తద్విద్ధి ప్రణిపాతేన పరిప్రశ్నేన సేవయా ।\nఉపదేక్ష్యన్తి తే జ్ఞానం జ్ఞానినస్తత్త్వదర్శినః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.35",
@@ -6587,7 +7079,8 @@
      "body": "యజ్జ్ఞాత్వా న పునర్మోహమేవం యాస్యసి పాణ్డవ ।\nయేన భూతాన్యశేషేణ ద్రక్ష్యస్యాత్మన్యథో మయి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.36",
@@ -6617,7 +7110,8 @@
      "body": "అపి చేదసి పాపేభ్యః సర్వేభ్యః పాపకృత్తమః ।\nసర్వం జ్ఞానప్లవేనైవ వృజినం సన్తరిష్యసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.37",
@@ -6647,7 +7141,8 @@
      "body": "యథైధాంసి సమిద్ధోఽగ్నిర్భస్మసాత్కురుతేఽర్జున ।\nజ్ఞానాగ్నిః సర్వకర్మాణి భస్మసాత్కురుతే తథా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.38",
@@ -6677,7 +7172,8 @@
      "body": "న హి జ్ఞానేన సదృశం పవిత్రమిహ విద్యతే ।\nతత్స్వయం యోగసంసిద్ధః కాలేనాత్మని విన్దతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.39",
@@ -6707,7 +7203,8 @@
      "body": "శ్రద్ధావాఁల్లభతే జ్ఞానం తత్పరః సంయతేన్ద్రియః ।\nజ్ఞానం లబ్ధ్వా పరాం శాన్తిమచిరేణాధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.40",
@@ -6737,7 +7234,8 @@
      "body": "అజ్ఞశ్చాశ్రద్దధానశ్చ సంశయాత్మా వినశ్యతి ।\nనాయం లోకోఽస్తి న పరో న సుఖం సంశయాత్మనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.41",
@@ -6767,7 +7265,8 @@
      "body": "యోగసంన్యస్తకర్మాణం జ్ఞానసంఛిన్నసంశయమ్ ।\nఆత్మవన్తం న కర్మాణి నిబధ్నన్తి ధనఞ్జయ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "4.42",
@@ -6797,7 +7296,8 @@
      "body": "తస్మాదజ్ఞానసంభూతం హృత్స్థం జ్ఞానాసినాఽఽత్మనః ।\nఛిత్త్వైనం సంశయం యోగమాతిష్ఠోత్తిష్ఠ భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.1",
@@ -6829,7 +7329,8 @@
      "body": "సంన్యాసం కర్మణాం కృష్ణ పునర్యోగం చ శంససి ।\nయచ్ఛ్రేయ ఏతయోరేకం తన్మే బ్రూహి సునిశ్చితమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.2",
@@ -6859,7 +7360,8 @@
      "body": "సంన్యాసః కర్మయోగశ్చ నిఃశ్రేయసకరావుభౌ ।\nతయోస్తు కర్మసంన్యాసాత్కర్మయోగో విశిష్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.3",
@@ -6889,7 +7391,8 @@
      "body": "జ్ఞేయః స నిత్యసంన్యాసీ యో న ద్వేష్టి న కాఙ్క్షతి ।\nనిర్ద్వన్ద్వో హి మహాబాహో సుఖం బన్ధాత్ప్రముచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.4",
@@ -6919,7 +7422,8 @@
      "body": "సాంఖ్యయోగౌ పృథగ్బాలాః ప్రవదన్తి న పణ్డితాః ।\nఏకమప్యాస్థితః సమ్యగుభయోర్విన్దతే ఫలమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.5",
@@ -6949,7 +7453,8 @@
      "body": "యత్సాంఖ్యైః ప్రాప్యతే స్థానం తద్యోగైరపి గమ్యతే ।\nఏకం సాంఖ్యం చ యోగం చ యః పశ్యతి స పశ్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.6",
@@ -6979,7 +7484,8 @@
      "body": "సంన్యాసస్తు మహాబాహో దుఃఖమాప్తుమయోగతః ।\nయోగయుక్తో మునిర్బ్రహ్మ నచిరేణాధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.7",
@@ -7009,7 +7515,8 @@
      "body": "యోగయుక్తో విశుద్ధాత్మా విజితాత్మా జితేన్ద్రియః ।\nసర్వభూతాత్మభూతాత్మా కుర్వన్నపి న లిప్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.8",
@@ -7043,7 +7550,8 @@
      "body": "నైవ కించిత్కరోమీతి యుక్తో మన్యేత తత్త్వవిత్ ।\nపశ్యన్ శృణ్వన్స్పృశఞ్జిఘ్రన్నశ్నన్గచ్ఛన్స్వపన్ శ్వసన్ ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.9",
@@ -7073,7 +7581,8 @@
      "body": "ప్రలపన్విసృజన్గృహ్ణన్నున్మిషన్నిమిషన్నపి ।\nఇన్ద్రియాణీన్ద్రియార్థేషు వర్తన్త ఇతి ధారయన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.10",
@@ -7103,7 +7612,8 @@
      "body": "బ్రహ్మణ్యాధాయ కర్మాణి సఙ్గం త్యక్త్వా కరోతి యః ।\nలిప్యతే న స పాపేన పద్మపత్రమివామ్భసా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.11",
@@ -7133,7 +7643,8 @@
      "body": "కాయేన మనసా బుద్ధ్యా కేవలైరిన్ద్రియైరపి ।\nయోగినః కర్మ కుర్వన్తి సఙ్గం త్యక్త్వాఽఽత్మశుద్ధయే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.12",
@@ -7163,7 +7674,8 @@
      "body": "యుక్తః కర్మఫలం త్యక్త్వా శాన్తిమాప్నోతి నైష్ఠికీమ్ ।\nఅయుక్తః కామకారేణ ఫలే సక్తో నిబధ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.13",
@@ -7193,7 +7705,8 @@
      "body": "సర్వకర్మాణి మనసా సంన్యస్యాస్తే సుఖం వశీ ।\nనవద్వారే పురే దేహీ నైవ కుర్వన్న కారయన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.14",
@@ -7223,7 +7736,8 @@
      "body": "న కర్తృత్వం న కర్మాణి లోకస్య సృజతి ప్రభుః ।\nన కర్మఫలసంయోగం స్వభావస్తు ప్రవర్తతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.15",
@@ -7253,7 +7767,8 @@
      "body": "నాదత్తే కస్యచిత్పాపం న చైవ సుకృతం విభుః ।\nఅజ్ఞానేనావృతం జ్ఞానం తేన ముహ్యన్తి జన్తవః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.16",
@@ -7283,7 +7798,8 @@
      "body": "జ్ఞానేన తు తదజ్ఞానం యేషాం నాశితమాత్మనః ।\nతేషామాదిత్యవజ్జ్ఞానం ప్రకాశయతి తత్పరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.17",
@@ -7313,7 +7829,8 @@
      "body": "తద్బుద్ధయస్తదాత్మానస్తన్నిష్ఠాస్తత్పరాయణాః ।\nగచ్ఛన్త్యపునరావృత్తిం జ్ఞాననిర్ధూతకల్మషాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.18",
@@ -7343,7 +7860,8 @@
      "body": "విద్యావినయసంపన్నే బ్రాహ్మణే గవి హస్తిని ।\nశుని చైవ శ్వపాకే చ పణ్డితాః సమదర్శినః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.19",
@@ -7373,7 +7891,8 @@
      "body": "ఇహైవ తైర్జితః సర్గో యేషాం సామ్యే స్థితం మనః ।\nనిర్దోషం హి సమం బ్రహ్మ తస్మాద్బ్రహ్మణి తే స్థితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.20",
@@ -7403,7 +7922,8 @@
      "body": "న ప్రహృష్యేత్ప్రియం ప్రాప్య నోద్విజేత్ప్రాప్య చాప్రియమ్ ।\nస్థిరబుద్ధిరసమ్మూఢో బ్రహ్మవిద్బ్రహ్మణి స్థితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.21",
@@ -7433,7 +7953,8 @@
      "body": "బాహ్యస్పర్శేష్వసక్తాత్మా విన్దత్యాత్మని యత్సుఖమ్ ।\nస బ్రహ్మయోగయుక్తాత్మా సుఖమక్షయమశ్నుతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.22",
@@ -7463,7 +7984,8 @@
      "body": "యే హి సంస్పర్శజా భోగా దుఃఖయోనయ ఏవ తే ।\nఆద్యన్తవన్తః కౌన్తేయ న తేషు రమతే బుధః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.23",
@@ -7493,7 +8015,8 @@
      "body": "శక్నోతీహైవ యః సోఢుం ప్రాక్శరీరవిమోక్షణాత్ ।\nకామక్రోధోద్భవం వేగం స యుక్తః స సుఖీ నరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.24",
@@ -7523,7 +8046,8 @@
      "body": "యోఽన్తఃసుఖోఽన్తరారామస్తథాన్తర్జ్యోతిరేవ యః ।\nస యోగీ బ్రహ్మనిర్వాణం బ్రహ్మభూతోఽధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.25",
@@ -7553,7 +8077,8 @@
      "body": "లభన్తే బ్రహ్మనిర్వాణమృషయః క్షీణకల్మషాః ।\nఛిన్నద్వైధా యతాత్మానః సర్వభూతహితే రతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.26",
@@ -7583,7 +8108,8 @@
      "body": "కామక్రోధవియుక్తానాం యతీనాం యతచేతసామ్ ।\nఅభితో బ్రహ్మనిర్వాణం వర్తతే విదితాత్మనామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.27",
@@ -7613,7 +8139,8 @@
      "body": "స్పర్శాన్కృత్వా బహిర్బాహ్యాంశ్చక్షుశ్చైవాన్తరే భ్రువోః ।\nప్రాణాపానౌ సమౌ కృత్వా నాసాభ్యన్తరచారిణౌ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.28",
@@ -7643,7 +8170,8 @@
      "body": "యతేన్ద్రియమనోబుద్ధిర్మునిర్మోక్షపరాయణః ।\nవిగతేచ్ఛాభయక్రోధో యః సదా ముక్త ఏవ సః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "5.29",
@@ -7673,7 +8201,8 @@
      "body": "భోక్తారం యజ్ఞతపసాం సర్వలోకమహేశ్వరమ్ ।\nసుహృదం సర్వభూతానాం జ్ఞాత్వా మాం శాన్తిమృచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.1",
@@ -7703,7 +8232,8 @@
      "body": "అనాశ్రితః కర్మఫలం కార్యం కర్మ కరోతి యః ।\nస సంన్యాసీ చ యోగీ చ న నిరగ్నిర్న చాక్రియః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.2",
@@ -7733,7 +8263,8 @@
      "body": "యం సంన్యాసమితి ప్రాహుర్యోగం తం విద్ధి పాణ్డవ ।\nన హ్యసంన్యస్తసఙ్కల్పో యోగీ భవతి కశ్చన ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.3",
@@ -7763,7 +8294,8 @@
      "body": "ఆరురుక్షోర్మునేర్యోగం కర్మ కారణముచ్యతే ।\nయోగారూఢస్య తస్యైవ శమః కారణముచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.4",
@@ -7793,7 +8325,8 @@
      "body": "యదా హి నేన్ద్రియార్థేషు న కర్మస్వనుషజ్జతే ।\nసర్వసఙ్కల్పసంన్యాసీ యోగారూఢస్తదోచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.5",
@@ -7823,7 +8356,8 @@
      "body": "ఉద్ధరేదాత్మనాఽఽత్మానం నాత్మానమవసాదయేత్ ।\nఆత్మైవ హ్యాత్మనో బన్ధురాత్మైవ రిపురాత్మనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.6",
@@ -7853,7 +8387,8 @@
      "body": "బన్ధురాత్మాఽఽత్మనస్తస్య యేనాత్మైవాత్మనా జితః ।\nఅనాత్మనస్తు శత్రుత్వే వర్తేతాత్మైవ శత్రువత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.7",
@@ -7883,7 +8418,8 @@
      "body": "జితాత్మనః ప్రశాన్తస్య పరమాత్మా సమాహితః ।\nశీతోష్ణసుఖదుఃఖేషు తథా మానాపమానయోః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.8",
@@ -7913,7 +8449,8 @@
      "body": "జ్ఞానవిజ్ఞానతృప్తాత్మా కూటస్థో విజితేన్ద్రియః ।\nయుక్త ఇత్యుచ్యతే యోగీ సమలోష్టాశ్మకాఞ్చనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.9",
@@ -7943,7 +8480,8 @@
      "body": "సుహృన్మిత్రార్యుదాసీనమధ్యస్థద్వేష్యబన్ధుషు ।\nసాధుష్వపి చ పాపేషు సమబుద్ధిర్విశిష్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.10",
@@ -7973,7 +8511,8 @@
      "body": "యోగీ యుఞ్జీత సతతమాత్మానం రహసి స్థితః ।\nఏకాకీ యతచిత్తాత్మా నిరాశీరపరిగ్రహః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.11",
@@ -8003,7 +8542,8 @@
      "body": "శుచౌ దేశే ప్రతిష్ఠాప్య స్థిరమాసనమాత్మనః ।\nనాత్యుచ్ఛ్రితం నాతినీచం చైలాజినకుశోత్తరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.12",
@@ -8033,7 +8573,8 @@
      "body": "తత్రైకాగ్రం మనః కృత్వా యతచిత్తేన్ద్రియక్రియః ।\nఉపవిశ్యాసనే యుఞ్జ్యాద్యోగమాత్మవిశుద్ధయే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.13",
@@ -8063,7 +8604,8 @@
      "body": "సమం కాయశిరోగ్రీవం ధారయన్నచలం స్థిరః ।\nసంప్రేక్ష్య నాసికాగ్రం స్వం దిశశ్చానవలోకయన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.14",
@@ -8093,7 +8635,8 @@
      "body": "ప్రశాన్తాత్మా విగతభీర్బ్రహ్మచారివ్రతే స్థితః ।\nమనః సంయమ్య మచ్చిత్తో యుక్త ఆసీత మత్పరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.15",
@@ -8123,7 +8666,8 @@
      "body": "యుఞ్జన్నేవం సదాఽఽత్మానం యోగీ నియతమానసః ।\nశాన్తిం నిర్వాణపరమాం మత్సంస్థామధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.16",
@@ -8153,7 +8697,8 @@
      "body": "నాత్యశ్నతస్తు యోగోఽస్తి న చైకాన్తమనశ్నతః ।\nన చాతిస్వప్నశీలస్య జాగ్రతో నైవ చార్జున ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.17",
@@ -8183,7 +8728,8 @@
      "body": "యుక్తాహారవిహారస్య యుక్తచేష్టస్య కర్మసు ।\nయుక్తస్వప్నావబోధస్య యోగో భవతి దుఃఖహా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.18",
@@ -8213,7 +8759,8 @@
      "body": "యదా వినియతం చిత్తమాత్మన్యేవావతిష్ఠతే ।\nనిఃస్పృహః సర్వకామేభ్యో యుక్త ఇత్యుచ్యతే తదా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.19",
@@ -8243,7 +8790,8 @@
      "body": "యథా దీపో నివాతస్థో నేఙ్గతే సోపమా స్మృతా ।\nయోగినో యతచిత్తస్య యుఞ్జతో యోగమాత్మనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.20",
@@ -8273,7 +8821,8 @@
      "body": "యత్రోపరమతే చిత్తం నిరుద్ధం యోగసేవయా ।\nయత్ర చైవాత్మనాఽఽత్మానం పశ్యన్నాత్మని తుష్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.21",
@@ -8303,7 +8852,8 @@
      "body": "సుఖమాత్యన్తికం యత్తద్బుద్ధిగ్రాహ్యమతీన్ద్రియమ్ ।\nవేత్తి యత్ర న చైవాయం స్థితశ్చలతి తత్త్వతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.22",
@@ -8333,7 +8883,8 @@
      "body": "యం లబ్ధ్వా చాపరం లాభం మన్యతే నాధికం తతః ।\nయస్మిన్స్థితో న దుఃఖేన గురుణాపి విచాల్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.23",
@@ -8363,7 +8914,8 @@
      "body": "తం విద్యాద్ దుఃఖసంయోగవియోగం యోగసంజ్ఞితమ్ ।\nస నిశ్చయేన యోక్తవ్యో యోగోఽనిర్విణ్ణచేతసా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.24",
@@ -8393,7 +8945,8 @@
      "body": "సఙ్కల్పప్రభవాన్కామాంస్త్యక్త్వా సర్వానశేషతః ।\nమనసైవేన్ద్రియగ్రామం వినియమ్య సమన్తతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.25",
@@ -8423,7 +8976,8 @@
      "body": "శనైః శనైరుపరమేద్ బుద్ధ్యా ధృతిగృహీతయా ।\nఆత్మసంస్థం మనః కృత్వా న కిఞ్చిదపి చిన్తయేత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.26",
@@ -8453,7 +9007,8 @@
      "body": "యతో యతో నిశ్చరతి మనశ్చఞ్చలమస్థిరమ్ ।\nతతస్తతో నియమ్యైతదాత్మన్యేవ వశం నయేత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.27",
@@ -8483,7 +9038,8 @@
      "body": "ప్రశాన్తమనసం హ్యేనం యోగినం సుఖముత్తమమ్ ।\nఉపైతి శాన్తరజసం బ్రహ్మభూతమకల్మషమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.28",
@@ -8513,7 +9069,8 @@
      "body": "యుఞ్జన్నేవం సదాఽఽత్మానం యోగీ విగతకల్మషః ।\nసుఖేన బ్రహ్మసంస్పర్శమత్యన్తం సుఖమశ్నుతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.29",
@@ -8543,7 +9100,8 @@
      "body": "సర్వభూతస్థమాత్మానం సర్వభూతాని చాత్మని ।\nఈక్షతే యోగయుక్తాత్మా సర్వత్ర సమదర్శనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.30",
@@ -8573,7 +9131,8 @@
      "body": "యో మాం పశ్యతి సర్వత్ర సర్వం చ మయి పశ్యతి ।\nతస్యాహం న ప్రణశ్యామి స చ మే న ప్రణశ్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.31",
@@ -8603,7 +9162,8 @@
      "body": "సర్వభూతస్థితం యో మాం భజత్యేకత్వమాస్థితః ।\nసర్వథా వర్తమానోఽపి స యోగీ మయి వర్తతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.32",
@@ -8635,7 +9195,8 @@
      "body": "ఆత్మౌపమ్యేన సర్వత్ర సమం పశ్యతి యోఽర్జున ।\nసుఖం వా యది వా దుఃఖం స యోగీ పరమో మతః ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.33",
@@ -8665,7 +9226,8 @@
      "body": "యోఽయం యోగస్త్వయా ప్రోక్తః సామ్యేన మధుసూదన ।\nఏతస్యాహం న పశ్యామి చఞ్చలత్వాత్ స్థితిం స్థిరామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.34",
@@ -8695,7 +9257,8 @@
      "body": "చఞ్చలం హి మనః కృష్ణ ప్రమాథి బలవద్దృఢమ్ ।\nతస్యాహం నిగ్రహం మన్యే వాయోరివ సుదుష్కరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.35",
@@ -8725,7 +9288,8 @@
      "body": "అసంశయం మహాబాహో మనో దుర్నిగ్రహం చలం ।\nఅభ్యాసేన తు కౌన్తేయ వైరాగ్యేణ చ గృహ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.36",
@@ -8755,7 +9319,8 @@
      "body": "అసంయతాత్మనా యోగో దుష్ప్రాప ఇతి మే మతిః ।\nవశ్యాత్మనా తు యతతా శక్యోఽవాప్తుముపాయతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.37",
@@ -8785,7 +9350,8 @@
      "body": "అయతిః శ్రద్ధయోపేతో యోగాచ్చలితమానసః ।\nఅప్రాప్య యోగసంసిద్ధిం కాం గతిం కృష్ణ గచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.38",
@@ -8815,7 +9381,8 @@
      "body": "కచ్చిన్నోభయవిభ్రష్టశ్ఛిన్నాభ్రమివ నశ్యతి ।\nఅప్రతిష్ఠో మహాబాహో విమూఢో బ్రహ్మణః పథి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.39",
@@ -8845,7 +9412,8 @@
      "body": "ఏతన్మే సంశయం కృష్ణ ఛేత్తుమర్హస్యశేషతః ।\nత్వదన్యః సంశయస్యాస్య ఛేత్తా న హ్యుపపద్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.40",
@@ -8877,7 +9445,8 @@
      "body": "పార్థ నైవేహ నాముత్ర వినాశస్తస్య విద్యతే ।\nనహి కల్యాణకృత్కశ్చిద్దుర్గతిం తాత గచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.41",
@@ -8907,7 +9476,8 @@
      "body": "ప్రాప్య పుణ్యకృతాం లోకానుషిత్వా శాశ్వతీః సమాః ।\nశుచీనాం శ్రీమతాం గేహే యోగభ్రష్టోఽభిజాయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.42",
@@ -8937,7 +9507,8 @@
      "body": "అథవా యోగినామేవ కులే భవతి ధీమతామ్ ।\nఏతద్ధి దుర్లభతరం లోకే జన్మ యదీదృశమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.43",
@@ -8967,7 +9538,8 @@
      "body": "తత్ర తం బుద్ధిసంయోగం లభతే పౌర్వదేహికమ్ ।\nయతతే చ తతో భూయః సంసిద్ధౌ కురునన్దన ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.44",
@@ -8997,7 +9569,8 @@
      "body": "పూర్వాభ్యాసేన తేనైవ హ్రియతే హ్యవశోఽపి సః ।\nజిజ్ఞాసురపి యోగస్య శబ్దబ్రహ్మాతివర్తతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.45",
@@ -9027,7 +9600,8 @@
      "body": "ప్రయత్నాద్యతమానస్తు యోగీ సంశుద్ధకిల్బిషః ।\nఅనేకజన్మసంసిద్ధస్తతో యాతి పరాం గతిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.46",
@@ -9057,7 +9631,8 @@
      "body": "తపస్విభ్యోఽధికో యోగీ జ్ఞానిభ్యోఽపి మతోఽధికః ।\nకర్మిభ్యశ్చాధికో యోగీ తస్మాద్యోగీ భవార్జున ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "6.47",
@@ -9087,7 +9662,8 @@
      "body": "యోగినామపి సర్వేషాం మద్గతేనాన్తరాత్మనా ।\nశ్రద్ధావాన్భజతే యో మాం స మే యుక్తతమో మతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.1",
@@ -9117,7 +9693,8 @@
      "body": "మయ్యాసక్తమనాః పార్థ యోగం యుఞ్జన్మదాశ్రయః ।\nఅసంశయం సమగ్రం మాం యథా జ్ఞాస్యసి తచ్ఛృణు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.2",
@@ -9147,7 +9724,8 @@
      "body": "జ్ఞానం తేఽహం సవిజ్ఞానమిదం వక్ష్యామ్యశేషతః ।\nయజ్జ్ఞాత్వా నేహ భూయోఽన్యజ్జ్ఞాతవ్యమవశిష్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.3",
@@ -9179,7 +9757,8 @@
      "body": "మనుష్యాణాం సహస్రేషు కశ్చిద్యతతి సిద్ధయే ।\nయతతామపి సిద్ధానాం కశ్చిన్మాం వేత్తి తత్త్వతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.4",
@@ -9209,7 +9788,8 @@
      "body": "భూమిరాపోఽనలో వాయుః ఖం మనో బుద్ధిరేవ చ ।\nఅహఙ్కార ఇతీయం మే భిన్నా ప్రకృతిరష్టధా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.5",
@@ -9239,7 +9819,8 @@
      "body": "అపరేయమితస్త్వన్యాం ప్రకృతిం విద్ధి మే పరామ్ ।\nజీవభూతాం మహాబాహో యయేదం ధార్యతే జగత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.6",
@@ -9269,7 +9850,8 @@
      "body": "ఏతద్యోనీని భూతాని సర్వాణీత్యుపధారయ ।\nఅహం కృత్స్నస్య జగతః ప్రభవః ప్రలయస్తథా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.7",
@@ -9299,7 +9881,8 @@
      "body": "మత్తః పరతరం నాన్యత్కిఞ్చిదస్తి ధనఞ్జయ ।\nమయి సర్వమిదం ప్రోతం సూత్రే మణిగణా ఇవ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.8",
@@ -9329,7 +9912,8 @@
      "body": "రసోఽహమప్సు కౌన్తేయ ప్రభాస్మి శశిసూర్యయోః ।\nప్రణవః సర్వవేదేషు శబ్దః ఖే పౌరుషం నృషు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.9",
@@ -9359,7 +9943,8 @@
      "body": "పుణ్యో గన్ధః పృథివ్యాం చ తేజశ్చాస్మి విభావసౌ ।\nజీవనం సర్వభూతేషు తపశ్చాస్మి తపస్విషు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.10",
@@ -9389,7 +9974,8 @@
      "body": "బీజం మాం సర్వభూతానాం విద్ధి పార్థ సనాతనమ్ ।\nబుద్ధిర్బుద్ధిమతామస్మి తేజస్తేజస్వినామహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.11",
@@ -9419,7 +10005,8 @@
      "body": "బలం బలవతాం చాహం కామరాగవివర్జితమ్ ।\nధర్మావిరుద్ధో భూతేషు కామోఽస్మి భరతర్షభ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.12",
@@ -9449,7 +10036,8 @@
      "body": "యే చైవ సాత్త్వికా భావా రాజసాస్తామసాశ్చ యే ।\nమత్త ఏవేతి తాన్విద్ధి నత్వహం తేషు తే మయి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.13",
@@ -9479,7 +10067,8 @@
      "body": "త్రిభిర్గుణమయైర్భావైరేభిః సర్వమిదం జగత్ ।\nమోహితం నాభిజానాతి మామేభ్యః పరమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.14",
@@ -9509,7 +10098,8 @@
      "body": "దైవీ హ్యేషా గుణమయీ మమ మాయా దురత్యయా ।\nమామేవ యే ప్రపద్యన్తే మాయామేతాం తరన్తి తే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.15",
@@ -9539,7 +10129,8 @@
      "body": "న మాం దుష్కృతినో మూఢాః ప్రపద్యన్తే నరాధమాః ।\nమాయయాపహృతజ్ఞానా ఆసురం భావమాశ్రితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.16",
@@ -9569,7 +10160,8 @@
      "body": "చతుర్విధా భజన్తే మాం జనాః సుకృతినోఽర్జున ।\nఆర్తో జిజ్ఞాసురర్థార్థీ జ్ఞానీ చ భరతర్షభ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.17",
@@ -9601,7 +10193,8 @@
      "body": "తేషాం జ్ఞానీ నిత్యయుక్త ఏకభక్తిర్విశిష్యతే ।\nప్రియో హి జ్ఞానినోఽత్యర్థమహం స చ మమ ప్రియః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.18",
@@ -9631,7 +10224,8 @@
      "body": "ఉదారాః సర్వ ఏవైతే జ్ఞానీ త్వాత్మైవ మే మతమ్ ।\nఆస్థితః స హి యుక్తాత్మా మామేవానుత్తమాం గతిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.19",
@@ -9661,7 +10255,8 @@
      "body": "బహూనాం జన్మనామన్తే జ్ఞానవాన్మాం ప్రపద్యతే ।\nవాసుదేవః సర్వమితి స మహాత్మా సుదుర్లభః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.20",
@@ -9691,7 +10286,8 @@
      "body": "కామైస్తైస్తైర్హృతజ్ఞానాః ప్రపద్యన్తేఽన్యదేవతాః ।\nతం తం నియమమాస్థాయ ప్రకృత్యా నియతాః స్వయా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.21",
@@ -9721,7 +10317,8 @@
      "body": "యో యో యాం యాం తనుం భక్తః శ్రద్ధయార్చితుమిచ్ఛతి ।\nతస్య తస్యాచలాం శ్రద్ధాం తామేవ విదధామ్యహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.22",
@@ -9751,7 +10348,8 @@
      "body": "స తయా శ్రద్ధయా యుక్తస్తస్యారాధనమీహతే ।\nలభతే చ తతః కామాన్మయైవ విహితాన్ హి తాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.23",
@@ -9781,7 +10379,8 @@
      "body": "అన్తవత్తు ఫలం తేషాం తద్భవత్యల్పమేధసామ్ ।\nదేవాన్దేవయజో యాన్తి మద్భక్తా యాన్తి మామపి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.24",
@@ -9813,7 +10412,8 @@
      "body": "అవ్యక్తం వ్యక్తిమాపన్నం మన్యన్తే మామబుద్ధయః ।\nపరం భావమజానన్తో మమావ్యయమనుత్తమమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.25",
@@ -9843,7 +10443,8 @@
      "body": "నాహం ప్రకాశః సర్వస్య యోగమాయాసమావృతః ।\nమూఢోఽయం నాభిజానాతి లోకో మామజమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.26",
@@ -9873,7 +10474,8 @@
      "body": "వేదాహం సమతీతాని వర్తమానాని చార్జున ।\nభవిష్యాణి చ భూతాని మాం తు వేద న కశ్చన ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.27",
@@ -9903,7 +10505,8 @@
      "body": "ఇచ్ఛాద్వేషసముత్థేన ద్వన్ద్వమోహేన భారత ।\nసర్వభూతాని సంమోహం సర్గే యాన్తి పరన్తప ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.28",
@@ -9933,7 +10536,8 @@
      "body": "యేషాం త్వన్తగతం పాపం జనానాం పుణ్యకర్మణామ్ ।\nతే ద్వన్ద్వమోహనిర్ముక్తా భజన్తే మాం దృఢవ్రతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.29",
@@ -9963,7 +10567,8 @@
      "body": "జరామరణమోక్షాయ మామాశ్రిత్య యతన్తి యే ।\nతే బ్రహ్మ తద్విదుః కృత్స్నమధ్యాత్మం కర్మ చాఖిలమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "7.30",
@@ -9993,7 +10598,8 @@
      "body": "సాధిభూతాధిదైవం మాం సాధియజ్ఞం చ యే విదుః ।\nప్రయాణకాలేఽపి చ మాం తే విదుర్యుక్తచేతసః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.1",
@@ -10023,7 +10629,8 @@
      "body": "కిం తద్బ్రహ్మ కిమధ్యాత్మం కిం కర్మ పురుషోత్తమ ।\nఅధిభూతం చ కిం ప్రోక్తమధిదైవం కిముచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.2",
@@ -10053,7 +10660,8 @@
      "body": "అధియజ్ఞః కథం కోఽత్ర దేహేఽస్మిన్మధుసూదన ।\nప్రయాణకాలే చ కథం జ్ఞేయోఽసి నియతాత్మభిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.3",
@@ -10083,7 +10691,8 @@
      "body": "అక్షరం బ్రహ్మ పరమం స్వభావోఽధ్యాత్మముచ్యతే ।\nభూతభావోద్భవకరో విసర్గః కర్మసంజ్ఞితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.4",
@@ -10113,7 +10722,8 @@
      "body": "అధిభూతం క్షరో భావః పురుషశ్చాధిదైవతమ్ ।\nఅధియజ్ఞోఽహమేవాత్ర దేహే దేహభృతాం వర ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.5",
@@ -10143,7 +10753,8 @@
      "body": "అన్తకాలే చ మామేవ స్మరన్ముక్త్వా కలేవరమ్ ।\nయః ప్రయాతి స మద్భావం యాతి నాస్త్యత్ర సంశయః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.6",
@@ -10173,7 +10784,8 @@
      "body": "యం యం వాపి స్మరన్భావం త్యజత్యన్తే కలేవరమ్ ।\nతం తమేవైతి కౌన్తేయ సదా తద్భావభావితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.7",
@@ -10203,7 +10815,8 @@
      "body": "తస్మాత్సర్వేషు కాలేషు మామనుస్మర యుధ్య చ ।\nమయ్యర్పితమనోబుద్ధిర్మామేవైష్యస్యసంశయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.8",
@@ -10233,7 +10846,8 @@
      "body": "అభ్యాసయోగయుక్తేన చేతసా నాన్యగామినా ।\nపరమం పురుషం దివ్యం యాతి పార్థానుచిన్తయన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.9",
@@ -10263,7 +10877,8 @@
      "body": "కవిం పురాణమనుశాసితార మణోరణీయాంసమనుస్మరేద్యః ।\nసర్వస్య ధాతారమచిన్త్యరూప మాదిత్యవర్ణం తమసః పరస్తాత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.10",
@@ -10293,7 +10908,8 @@
      "body": "ప్రయాణకాలే మనసాఽచలేన భక్త్యా యుక్తో యోగబలేన చైవ ।\nభ్రువోర్మధ్యే ప్రాణమావేశ్య సమ్యక్ స తం పరం పురుషముపైతి దివ్యమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.11",
@@ -10323,7 +10939,8 @@
      "body": "యదక్షరం వేదవిదో వదన్తి విశన్తి యద్యతయో వీతరాగాః ।\nయదిచ్ఛన్తో బ్రహ్మచర్యం చరన్తి తత్తే పదం సంగ్రహేణ ప్రవక్ష్యే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.12",
@@ -10353,7 +10970,8 @@
      "body": "సర్వద్వారాణి సంయమ్య మనో హృది నిరుధ్య చ ।\nమూర్ధ్న్యాధాయాత్మనః ప్రాణమాస్థితో యోగధారణామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.13",
@@ -10383,7 +11001,8 @@
      "body": "ఓమిత్యేకాక్షరం బ్రహ్మ వ్యాహరన్మామనుస్మరన్ ।\nయః ప్రయాతి త్యజన్దేహం స యాతి పరమాం గతిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.14",
@@ -10413,7 +11032,8 @@
      "body": "అనన్యచేతాః సతతం యో మాం స్మరతి నిత్యశః ।\nతస్యాహం సులభః పార్థ నిత్యయుక్తస్య యోగినః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.15",
@@ -10443,7 +11063,8 @@
      "body": "మాముపేత్య పునర్జన్మ దుఃఖాలయమశాశ్వతమ్ ।\nనాప్నువన్తి మహాత్మానః సంసిద్ధిం పరమాం గతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.16",
@@ -10473,7 +11094,8 @@
      "body": "ఆబ్రహ్మభువనాల్లోకాః పునరావర్తినోఽర్జున ।\nమాముపేత్య తు కౌన్తేయ పునర్జన్మ న విద్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.17",
@@ -10503,7 +11125,8 @@
      "body": "సహస్రయుగపర్యన్తమహర్యద్బ్రహ్మణో విదుః ।\nరాత్రిం యుగసహస్రాన్తాం తేఽహోరాత్రవిదో జనాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.18",
@@ -10533,7 +11156,8 @@
      "body": "అవ్యక్తాద్వ్యక్తయః సర్వాః ప్రభవన్త్యహరాగమే ।\nరాత్ర్యాగమే ప్రలీయన్తే తత్రైవావ్యక్తసంజ్ఞకే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.19",
@@ -10563,7 +11187,8 @@
      "body": "భూతగ్రామః స ఏవాయం భూత్వా భూత్వా ప్రలీయతే ।\nరాత్ర్యాగమేఽవశః పార్థ ప్రభవత్యహరాగమే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.20",
@@ -10593,7 +11218,8 @@
      "body": "పరస్తస్మాత్తు భావోఽన్యోఽవ్యక్తోఽవ్యక్తాత్సనాతనః ।\nయః స సర్వేషు భూతేషు నశ్యత్సు న వినశ్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.21",
@@ -10623,7 +11249,8 @@
      "body": "అవ్యక్తోఽక్షర ఇత్యుక్తస్తమాహుః పరమాం గతిమ్ ।\nయం ప్రాప్య న నివర్తన్తే తద్ధామ పరమం మమ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.22",
@@ -10653,7 +11280,8 @@
      "body": "పురుషః స పరః పార్థ భక్త్యా లభ్యస్త్వనన్యయా ।\nయస్యాన్తఃస్థాని భూతాని యేన సర్వమిదం తతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.23",
@@ -10683,7 +11311,8 @@
      "body": "యత్ర కాలే త్వనావృత్తిమావృత్తిం చైవ యోగినః ।\nప్రయాతా యాన్తి తం కాలం వక్ష్యామి భరతర్షభ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.24",
@@ -10713,7 +11342,8 @@
      "body": "అగ్నిర్జ్యోతిరహః శుక్లః షణ్మాసా ఉత్తరాయణమ్ ।\nతత్ర ప్రయాతా గచ్ఛన్తి బ్రహ్మ బ్రహ్మవిదో జనాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.25",
@@ -10743,7 +11373,8 @@
      "body": "ధూమో రాత్రిస్తథా కృష్ణః షణ్మాసా దక్షిణాయనమ్ ।\nతత్ర చాన్ద్రమసం జ్యోతిర్యోగీ ప్రాప్య నివర్తతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.26",
@@ -10773,7 +11404,8 @@
      "body": "శుక్లకృష్ణే గతీ హ్యేతే జగతః శాశ్వతే మతే ।\nఏకయా యాత్యనావృత్తిమన్యయాఽఽవర్తతే పునః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.27",
@@ -10803,7 +11435,8 @@
      "body": "నైతే సృతీ పార్థ జానన్యోగీ ముహ్యతి కశ్చన ।\nతస్మాత్సర్వేషు కాలేషు యోగయుక్తో భవార్జున ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "8.28",
@@ -10833,7 +11466,8 @@
      "body": "వేదేషు యజ్ఞేషు తపఃసు చైవ దానేషు యత్పుణ్యఫలం ప్రదిష్టమ్ ।\nఅత్యేతి తత్సర్వమిదం విదిత్వా యోగీ పరం స్థానముపైతి చాద్యమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.1",
@@ -10863,7 +11497,8 @@
      "body": "ఇదం తు తే గుహ్యతమం ప్రవక్ష్యామ్యనసూయవే ।\nజ్ఞానం విజ్ఞానసహితం యజ్జ్ఞాత్వా మోక్ష్యసేఽశుభాత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.2",
@@ -10893,7 +11528,8 @@
      "body": "రాజవిద్యా రాజగుహ్యం పవిత్రమిదముత్తమమ్ ।\nప్రత్యక్షావగమం ధర్మ్యం సుసుఖం కర్తుమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.3",
@@ -10923,7 +11559,8 @@
      "body": "అశ్రద్దధానాః పురుషా ధర్మస్యాస్య పరన్తప ।\nఅప్రాప్య మాం నివర్తన్తే మృత్యుసంసారవర్త్మని ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.4",
@@ -10953,7 +11590,8 @@
      "body": "మయా తతమిదం సర్వం జగదవ్యక్తమూర్తినా ।\nమత్స్థాని సర్వభూతాని న చాహం తేష్వవస్థితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.5",
@@ -10983,7 +11621,8 @@
      "body": "న చ మత్స్థాని భూతాని పశ్య మే యోగమైశ్వరమ్ ।\nభూతభృన్న చ భూతస్థో మమాత్మా భూతభావనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.6",
@@ -11013,7 +11652,8 @@
      "body": "యథాఽఽకాశస్థితో నిత్యం వాయుః సర్వత్రగో మహాన్ ।\nతథా సర్వాణి భూతాని మత్స్థానీత్యుపధారయ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.7",
@@ -11043,7 +11683,8 @@
      "body": "సర్వభూతాని కౌన్తేయ ప్రకృతిం యాన్తి మామికామ్ ।\nకల్పక్షయే పునస్తాని కల్పాదౌ విసృజామ్యహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.8",
@@ -11073,7 +11714,8 @@
      "body": "ప్రకృతిం స్వామవష్టభ్య విసృజామి పునః పునః ।\nభూతగ్రామమిమం కృత్స్నమవశం ప్రకృతేర్వశాత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.9",
@@ -11103,7 +11745,8 @@
      "body": "న చ మాం తాని కర్మాణి నిబధ్నన్తి ధనఞ్జయ ।\nఉదాసీనవదాసీనమసక్తం తేషు కర్మసు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.10",
@@ -11133,7 +11776,8 @@
      "body": "మయాఽధ్యక్షేణ ప్రకృతిః సూయతే సచరాచరమ్ ।\nహేతునాఽనేన కౌన్తేయ జగద్విపరివర్తతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.11",
@@ -11163,7 +11807,8 @@
      "body": "అవజానన్తి మాం మూఢా మానుషీం తనుమాశ్రితమ్ ।\nపరం భావమజానన్తో మమ భూతమహేశ్వరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.12",
@@ -11193,7 +11838,8 @@
      "body": "మోఘాశా మోఘకర్మాణో మోఘజ్ఞానా విచేతసః ।\nరాక్షసీమాసురీం చైవ ప్రకృతిం మోహినీం శ్రితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.13",
@@ -11223,7 +11869,8 @@
      "body": "మహాత్మానస్తు మాం పార్థ దైవీం ప్రకృతిమాశ్రితాః ।\nభజన్త్యనన్యమనసో జ్ఞాత్వా భూతాదిమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.14",
@@ -11253,7 +11900,8 @@
      "body": "సతతం కీర్తయన్తో మాం యతన్తశ్చ దృఢవ్రతాః ।\nనమస్యన్తశ్చ మాం భక్త్యా నిత్యయుక్తా ఉపాసతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.15",
@@ -11283,7 +11931,8 @@
      "body": "జ్ఞానయజ్ఞేన చాప్యన్యే యజన్తో మాముపాసతే ।\nఏకత్వేన పృథక్త్వేన బహుధా విశ్వతోముఖమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.16",
@@ -11313,7 +11962,8 @@
      "body": "అహం క్రతురహం యజ్ఞః స్వధాఽహమహమౌషధమ్ ।\nమంత్రోఽహమహమేవాజ్యమహమగ్నిరహం హుతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.17",
@@ -11343,7 +11993,8 @@
      "body": "పితాఽహమస్య జగతో మాతా ధాతా పితామహః ।\nవేద్యం పవిత్రమోంకార ఋక్ సామ యజురేవ చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.18",
@@ -11373,7 +12024,8 @@
      "body": "గతిర్భర్తా ప్రభుః సాక్షీ నివాసః శరణం సుహృత్ ।\nప్రభవః ప్రలయః స్థానం నిధానం బీజమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.19",
@@ -11403,7 +12055,8 @@
      "body": "తపామ్యహమహం వర్షం నిగృహ్ణామ్యుత్సృజామి చ ।\nఅమృతం చైవ మృత్యుశ్చ సదసచ్చాహమర్జున ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.20",
@@ -11433,7 +12086,8 @@
      "body": "త్రైవిద్యా మాం సోమపాః పూతపాపా యజ్ఞైరిష్ట్వా స్వర్గతిం ప్రార్థయన్తే ।\nతే పుణ్యమాసాద్య సురేన్ద్రలోక మశ్నన్తి దివ్యాన్దివి దేవభోగాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.21",
@@ -11465,7 +12119,8 @@
      "body": "తే తం భుక్త్వా స్వర్గలోకం విశాలం క్షీణే పుణ్యే మర్త్యలోకం విశన్తి ।\nఏవం త్రయీధర్మమనుప్రపన్నా గతాగతం కామకామా లభన్తే ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.22",
@@ -11495,7 +12150,8 @@
      "body": "అనన్యాశ్చిన్తయన్తో మాం యే జనాః పర్యుపాసతే ।\nతేషాం నిత్యాభియుక్తానాం యోగక్షేమం వహామ్యహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.23",
@@ -11525,7 +12181,8 @@
      "body": "యేఽప్యన్యదేవతా భక్తా యజన్తే శ్రద్ధయాఽన్వితాః ।\nతేఽపి మామేవ కౌన్తేయ యజన్త్యవిధిపూర్వకమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.24",
@@ -11555,7 +12212,8 @@
      "body": "అహం హి సర్వయజ్ఞానాం భోక్తా చ ప్రభురేవ చ ।\nన తు మామభిజానన్తి తత్త్వేనాతశ్చ్యవన్తి తే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.25",
@@ -11587,7 +12245,8 @@
      "body": "యాన్తి దేవవ్రతా దేవాన్ పితౄన్యాన్తి పితృవ్రతాః ।\nభూతాని యాన్తి భూతేజ్యా యాన్తి మద్యాజినోఽపి మామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.26",
@@ -11617,7 +12276,8 @@
      "body": "పత్రం పుష్పం ఫలం తోయం యో మే భక్త్యా ప్రయచ్ఛతి ।\nతదహం భక్త్యుపహృతమశ్నామి ప్రయతాత్మనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.27",
@@ -11647,7 +12307,8 @@
      "body": "యత్కరోషి యదశ్నాసి యజ్జుహోషి దదాసి యత్ ।\nయత్తపస్యసి కౌన్తేయ తత్కురుష్వ మదర్పణమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.28",
@@ -11677,7 +12338,8 @@
      "body": "శుభాశుభఫలైరేవం మోక్ష్యసే కర్మబన్ధనైః ।\nసంన్యాసయోగయుక్తాత్మా విముక్తో మాముపైష్యసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.29",
@@ -11707,7 +12369,8 @@
      "body": "సమోఽహం సర్వభూతేషు న మే ద్వేష్యోఽస్తి న ప్రియః ।\nయే భజన్తి తు మాం భక్త్యా మయి తే తేషు చాప్యహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.30",
@@ -11737,7 +12400,8 @@
      "body": "అపి చేత్సుదురాచారో భజతే మామనన్యభాక్ ।\nసాధురేవ స మన్తవ్యః సమ్యగ్వ్యవసితో హి సః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.31",
@@ -11767,7 +12431,8 @@
      "body": "క్షిప్రం భవతి ధర్మాత్మా శశ్వచ్ఛాన్తిం నిగచ్ఛతి ।\nకౌన్తేయ ప్రతిజానీహి న మే భక్తః ప్రణశ్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.32",
@@ -11797,7 +12462,8 @@
      "body": "మాం హి పార్థ వ్యపాశ్రిత్య యేఽపి స్యుః పాపయోనయః ।\nస్త్రియో వైశ్యాస్తథా శూద్రాస్తేఽపి యాన్తి పరాం గతిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.33",
@@ -11827,7 +12493,8 @@
      "body": "కిం పునర్బ్రాహ్మణాః పుణ్యా భక్తా రాజర్షయస్తథా ।\nఅనిత్యమసుఖం లోకమిమం ప్రాప్య భజస్వ మామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "9.34",
@@ -11857,7 +12524,8 @@
      "body": "మన్మనా భవ మద్భక్తో మద్యాజీ మాం నమస్కురు ।\nమామేవైష్యసి యుక్త్వైవమాత్మానం మత్పరాయణః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.1",
@@ -11889,7 +12557,8 @@
      "body": "భూయ ఏవ మహాబాహో శృణు మే పరమం వచః ।\nయత్తేఽహం ప్రీయమాణాయ వక్ష్యామి హితకామ్యయా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.2",
@@ -11919,7 +12588,8 @@
      "body": "న మే విదుః సురగణాః ప్రభవం న మహర్షయః ।\nఅహమాదిర్హి దేవానాం మహర్షీణాం చ సర్వశః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.3",
@@ -11949,7 +12619,8 @@
      "body": "యో మామజమనాదిం చ వేత్తి లోకమహేశ్వరమ్ ।\nఅసమ్మూఢః స మర్త్యేషు సర్వపాపైః ప్రముచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.4",
@@ -11979,7 +12650,8 @@
      "body": "బుద్ధిర్జ్ఞానమసంమోహః క్షమా సత్యం దమః శమః ।\nసుఖం దుఃఖం భవోఽభావో భయం చాభయమేవ చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.5",
@@ -12009,7 +12681,8 @@
      "body": "అహింసా సమతా తుష్టిస్తపో దానం యశోఽయశః ।\nభవన్తి భావా భూతానాం మత్త ఏవ పృథగ్విధాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.6",
@@ -12039,7 +12712,8 @@
      "body": "మహర్షయః సప్త పూర్వే చత్వారో మనవస్తథా ।\nమద్భావా మానసా జాతా యేషాం లోక ఇమాః ప్రజాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.7",
@@ -12069,7 +12743,8 @@
      "body": "ఏతాం విభూతిం యోగం చ మమ యో వేత్తి తత్త్వతః ।\nసోఽవికమ్పేన యోగేన యుజ్యతే నాత్ర సంశయః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.8",
@@ -12099,7 +12774,8 @@
      "body": "అహం సర్వస్య ప్రభవో మత్తః సర్వం ప్రవర్తతే ।\nఇతి మత్వా భజన్తే మాం బుధా భావసమన్వితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.9",
@@ -12129,7 +12805,8 @@
      "body": "మచ్చిత్తా మద్గతప్రాణా బోధయన్తః పరస్పరమ్ ।\nకథయన్తశ్చ మాం నిత్యం తుష్యన్తి చ రమన్తి చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.10",
@@ -12159,7 +12836,8 @@
      "body": "తేషాం సతతయుక్తానాం భజతాం ప్రీతిపూర్వకమ్ ।\nదదామి బుద్ధియోగం తం యేన మాముపయాన్తి తే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.11",
@@ -12189,7 +12867,8 @@
      "body": "తేషామేవానుకమ్పార్థమహమజ్ఞానజం తమః ।\nనాశయామ్యాత్మభావస్థో జ్ఞానదీపేన భాస్వతా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.12",
@@ -12219,7 +12898,8 @@
      "body": "పరం బ్రహ్మ పరం ధామ పవిత్రం పరమం భవాన్ ।\nపురుషం శాశ్వతం దివ్యమాదిదేవమజం విభుమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.13",
@@ -12249,7 +12929,8 @@
      "body": "ఆహుస్త్వామృషయః సర్వే దేవర్షిర్నారదస్తథా ।\nఅసితో దేవలో వ్యాసః స్వయం చైవ బ్రవీషి మే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.14",
@@ -12281,7 +12962,8 @@
      "body": "సర్వమేతదృతం మన్యే యన్మాం వదసి కేశవ ।\nన హి తే భగవన్ వ్యక్తిం విదుర్దేవా న దానవాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.15",
@@ -12311,7 +12993,8 @@
      "body": "స్వయమేవాత్మనాఽత్మానం వేత్థ త్వం పురుషోత్తమ ।\nభూతభావన భూతేశ దేవదేవ జగత్పతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.16",
@@ -12341,7 +13024,8 @@
      "body": "వక్తుమర్హస్యశేషేణ దివ్యా హ్యాత్మవిభూతయః ।\nయాభిర్విభూతిభిర్లోకానిమాంస్త్వం వ్యాప్య తిష్ఠసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.17",
@@ -12371,7 +13055,8 @@
      "body": "కథం విద్యామహం యోగింస్త్వాం సదా పరిచిన్తయన్ ।\nకేషు కేషు చ భావేషు చిన్త్యోఽసి భగవన్మయా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.18",
@@ -12403,7 +13088,8 @@
      "body": "విస్తరేణాత్మనో యోగం విభూతిం చ జనార్దన ।\nభూయః కథయ తృప్తిర్హి శృణ్వతో నాస్తి మేఽమృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.19",
@@ -12433,7 +13119,8 @@
      "body": "హన్త తే కథయిష్యామి దివ్యా హ్యాత్మవిభూతయః ।\nప్రాధాన్యతః కురుశ్రేష్ఠ నాస్త్యన్తో విస్తరస్య మే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.20",
@@ -12463,7 +13150,8 @@
      "body": "అహమాత్మా గుడాకేశ సర్వభూతాశయస్థితః ।\nఅహమాదిశ్చ మధ్యం చ భూతానామన్త ఏవ చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.21",
@@ -12493,7 +13181,8 @@
      "body": "ఆదిత్యానామహం విష్ణుర్జ్యోతిషాం రవిరంశుమాన్ ।\nమరీచిర్మరుతామస్మి నక్షత్రాణామహం శశీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.22",
@@ -12523,7 +13212,8 @@
      "body": "వేదానాం సామవేదోఽస్మి దేవానామస్మి వాసవః ।\nఇన్ద్రియాణాం మనశ్చాస్మి భూతానామస్మి చేతనా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.23",
@@ -12553,7 +13243,8 @@
      "body": "రుద్రాణాం శఙ్కరశ్చాస్మి విత్తేశో యక్షరక్షసామ్ ।\nవసూనాం పావకశ్చాస్మి మేరుః శిఖరిణామహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.24",
@@ -12583,7 +13274,8 @@
      "body": "పురోధసాం చ ముఖ్యం మాం విద్ధి పార్థ బృహస్పతిమ్ ।\nసేనానీనామహం స్కన్దః సరసామస్మి సాగరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.25",
@@ -12613,7 +13305,8 @@
      "body": "మహర్షీణాం భృగురహం గిరామస్మ్యేకమక్షరమ్ ।\nయజ్ఞానాం జపయజ్ఞోఽస్మి స్థావరాణాం హిమాలయః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.26",
@@ -12643,7 +13336,8 @@
      "body": "అశ్వత్థః సర్వవృక్షాణాం దేవర్షీణాం చ నారదః ।\nగన్ధర్వాణాం చిత్రరథః సిద్ధానాం కపిలో మునిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.27",
@@ -12673,7 +13367,8 @@
      "body": "ఉచ్చైఃశ్రవసమశ్వానాం విద్ధి మామమృతోద్భవమ్ ।\nఐరావతం గజేన్ద్రాణాం నరాణాం చ నరాధిపమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.28",
@@ -12703,7 +13398,8 @@
      "body": "ఆయుధానామహం వజ్రం ధేనూనామస్మి కామధుక్ ।\nప్రజనశ్చాస్మి కన్దర్పః సర్పాణామస్మి వాసుకిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.29",
@@ -12735,7 +13431,8 @@
      "body": "అనన్తశ్చాస్మి నాగానాం వరుణో యాదసామహమ్ ।\nపితౄణామర్యమా చాస్మి యమః సంయమతామహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.30",
@@ -12765,7 +13462,8 @@
      "body": "ప్రహ్లాదశ్చాస్మి దైత్యానాం కాలః కలయతామహమ్ ।\nమృగాణాం చ మృగేన్ద్రోఽహం వైనతేయశ్చ పక్షిణామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.31",
@@ -12795,7 +13493,8 @@
      "body": "పవనః పవతామస్మి రామః శస్త్రభృతామహమ్ ।\nఝషాణాం మకరశ్చాస్మి స్రోతసామస్మి జాహ్నవీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.32",
@@ -12825,7 +13524,8 @@
      "body": "సర్గాణామాదిరన్తశ్చ మధ్యం చైవాహమర్జున ।\nఅధ్యాత్మవిద్యా విద్యానాం వాదః ప్రవదతామహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.33",
@@ -12855,7 +13555,8 @@
      "body": "అక్షరాణామకారోఽస్మి ద్వన్ద్వః సామాసికస్య చ ।\nఅహమేవాక్షయః కాలో ధాతాఽహం విశ్వతోముఖః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.34",
@@ -12885,7 +13586,8 @@
      "body": "మృత్యుః సర్వహరశ్చాహముద్భవశ్చ భవిష్యతామ్ ।\nకీర్తిః శ్రీర్వాక్చ నారీణాం స్మృతిర్మేధా ధృతిః క్షమా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.35",
@@ -12915,7 +13617,8 @@
      "body": "బృహత్సామ తథా సామ్నాం గాయత్రీ ఛన్దసామహమ్ ।\nమాసానాం మార్గశీర్షోఽహమృతూనాం కుసుమాకరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.36",
@@ -12945,7 +13648,8 @@
      "body": "ద్యూతం ఛలయతామస్మి తేజస్తేజస్వినామహమ్ ।\nజయోఽస్మి వ్యవసాయోఽస్మి సత్త్వం సత్త్వవతామహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.37",
@@ -12975,7 +13679,8 @@
      "body": "వృష్ణీనాం వాసుదేవోఽస్మి పాణ్డవానాం ధనంజయః ।\nమునీనామప్యహం వ్యాసః కవీనాముశనా కవిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.38",
@@ -13005,7 +13710,8 @@
      "body": "దణ్డో దమయతామస్మి నీతిరస్మి జిగీషతామ్ ।\nమౌనం చైవాస్మి గుహ్యానాం జ్ఞానం జ్ఞానవతామహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.39",
@@ -13035,7 +13741,8 @@
      "body": "యచ్చాపి సర్వభూతానాం బీజం తదహమర్జున ।\nన తదస్తి వినా యత్స్యాన్మయా భూతం చరాచరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.40",
@@ -13065,7 +13772,8 @@
      "body": "నాన్తోఽస్తి మమ దివ్యానాం విభూతీనాం పరంతప ।\nఏష తూద్దేశతః ప్రోక్తో విభూతేర్విస్తరో మయా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.41",
@@ -13095,7 +13803,8 @@
      "body": "యద్యద్విభూతిమత్సత్త్వం శ్రీమదూర్జితమేవ వా ।\nతత్తదేవావగచ్ఛ త్వం మమ తేజోంఽశసంభవమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "10.42",
@@ -13125,7 +13834,8 @@
      "body": "అథవా బహునైతేన కిం జ్ఞాతేన తవార్జున ।\nవిష్టభ్యాహమిదం కృత్స్నమేకాంశేన స్థితో జగత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.1",
@@ -13155,7 +13865,8 @@
      "body": "మదనుగ్రహాయ పరమం గుహ్యమధ్యాత్మసంజ్ఞితమ్ ।\nయత్త్వయోక్తం వచస్తేన మోహోఽయం విగతో మమ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.2",
@@ -13185,7 +13896,8 @@
      "body": "భవాప్యయౌ హి భూతానాం శ్రుతౌ విస్తరశో మయా ।\nత్వత్తః కమలపత్రాక్ష మాహాత్మ్యమపి చావ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.3",
@@ -13215,7 +13927,8 @@
      "body": "ఏవమేతద్యథాత్థ త్వమాత్మానం పరమేశ్వర ।\nద్రష్టుమిచ్ఛామి తే రూపమైశ్వరం పురుషోత్తమ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.4",
@@ -13245,7 +13958,8 @@
      "body": "మన్యసే యది తచ్ఛక్యం మయా ద్రష్టుమితి ప్రభో ।\nయోగేశ్వర తతో మే త్వం దర్శయాఽత్మానమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.5",
@@ -13275,7 +13989,8 @@
      "body": "పశ్య మే పార్థ రూపాణి శతశోఽథ సహస్రశః ।\nనానావిధాని దివ్యాని నానావర్ణాకృతీని చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.6",
@@ -13307,7 +14022,8 @@
      "body": "పశ్యాదిత్యాన్వసూన్రుద్రానశ్వినౌ మరుతస్తథా ।\nబహూన్యదృష్టపూర్వాణి పశ్యాఽశ్చర్యాణి భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.7",
@@ -13337,7 +14053,8 @@
      "body": "ఇహైకస్థం జగత్కృత్స్నం పశ్యాద్య సచరాచరమ్ ।\nమమ దేహే గుడాకేశ యచ్చాన్యద్ద్రష్టుమిచ్ఛసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.8",
@@ -13367,7 +14084,8 @@
      "body": "న తు మాం శక్యసే ద్రష్టుమనేనైవ స్వచక్షుషా ।\nదివ్యం దదామి తే చక్షుః పశ్య మే యోగమైశ్వరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.9",
@@ -13397,7 +14115,8 @@
      "body": "ఏవముక్త్వా తతో రాజన్మహాయోగేశ్వరో హరిః ।\nదర్శయామాస పార్థాయ పరమం రూపమైశ్వరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.10",
@@ -13427,7 +14146,8 @@
      "body": "అనేకవక్త్రనయనమనేకాద్భుతదర్శనమ్ ।\nఅనేకదివ్యాభరణం దివ్యానేకోద్యతాయుధమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.11",
@@ -13457,7 +14177,8 @@
      "body": "దివ్యమాల్యామ్బరధరం దివ్యగన్ధానులేపనమ్ ।\nసర్వాశ్చర్యమయం దేవమనన్తం విశ్వతోముఖమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.12",
@@ -13487,7 +14208,8 @@
      "body": "దివి సూర్యసహస్రస్య భవేద్యుగపదుత్థితా ।\nయది భాః సదృశీ సా స్యాద్భాసస్తస్య మహాత్మనః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.13",
@@ -13517,7 +14239,8 @@
      "body": "తత్రైకస్థం జగత్కృత్స్నం ప్రవిభక్తమనేకధా ।\nఅపశ్యద్దేవదేవస్య శరీరే పాణ్డవస్తదా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.14",
@@ -13547,7 +14270,8 @@
      "body": "తతః స విస్మయావిష్టో హృష్టరోమా ధనఞ్జయః ।\nప్రణమ్య శిరసా దేవం కృతాఞ్జలిరభాషత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.15",
@@ -13577,7 +14301,8 @@
      "body": "పశ్యామి దేవాంస్తవ దేవ దేహే సర్వాంస్తథా భూతవిశేషసఙ్ఘాన్ ।\nబ్రహ్మాణమీశం కమలాసనస్థ మృషీంశ్చ సర్వానురగాంశ్చ దివ్యాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.16",
@@ -13607,7 +14332,8 @@
      "body": "అనేకబాహూదరవక్త్రనేత్రం పశ్యామి త్వాం సర్వతోఽనన్తరూపమ్ ।\nనాన్తం న మధ్యం న పునస్తవాదిం పశ్యామి విశ్వేశ్వర విశ్వరూప ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.17",
@@ -13637,7 +14363,8 @@
      "body": "కిరీటినం గదినం చక్రిణం చ తేజోరాశిం సర్వతోదీప్తిమన్తమ్ ।\nపశ్యామి త్వాం దుర్నిరీక్ష్యం సమన్తా ద్దీప్తానలార్కద్యుతిమప్రమేయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.18",
@@ -13667,7 +14394,8 @@
      "body": "త్వమక్షరం పరమం వేదితవ్యం త్వమస్య విశ్వస్య పరం నిధానమ్ ।\nత్వమవ్యయః శాశ్వతధర్మగోప్తా సనాతనస్త్వం పురుషో మతో మే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.19",
@@ -13697,7 +14425,8 @@
      "body": "అనాదిమధ్యాన్తమనన్తవీర్య మనన్తబాహుం శశిసూర్యనేత్రమ్ ।\nపశ్యామి త్వాం దీప్తహుతాశవక్త్రమ్ స్వతేజసా విశ్వమిదం తపన్తమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.20",
@@ -13727,7 +14456,8 @@
      "body": "ద్యావాపృథివ్యోరిదమన్తరం హి వ్యాప్తం త్వయైకేన దిశశ్చ సర్వాః ।\nదృష్ట్వాఽద్భుతం రూపముగ్రం తవేదం లోకత్రయం ప్రవ్యథితం మహాత్మన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.21",
@@ -13759,7 +14489,8 @@
      "body": "అమీ హి త్వాం సురసఙ్ఘా విశన్తి కేచిద్భీతాః ప్రాఞ్జలయో గృణన్తి ।\nస్వస్తీత్యుక్త్వా మహర్షిసిద్ధసఙ్ఘాః స్తువన్తి త్వాం స్తుతిభిః పుష్కలాభిః ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.22",
@@ -13791,7 +14522,8 @@
      "body": "రుద్రాదిత్యా వసవో యే చ సాధ్యా విశ్వేఽశ్వినౌ మరుతశ్చోష్మపాశ్చ ।\nగన్ధర్వయక్షాసురసిద్ధసఙ్ఘా వీక్షన్తే త్వాం విస్మితాశ్చైవ సర్వే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.23",
@@ -13821,7 +14553,8 @@
      "body": "రూపం మహత్తే బహువక్త్రనేత్రం మహాబాహో బహుబాహూరుపాదమ్ ।\nబహూదరం బహుదంష్ట్రాకరాలం దృష్ట్వా లోకాః ప్రవ్యథితాస్తథాఽహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.24",
@@ -13851,7 +14584,8 @@
      "body": "నభఃస్పృశం దీప్తమనేకవర్ణం వ్యాత్తాననం దీప్తవిశాలనేత్రమ్ ।\nదృష్ట్వా హి త్వాం ప్రవ్యథితాన్తరాత్మా ధృతిం న విన్దామి శమం చ విష్ణో ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.25",
@@ -13881,7 +14615,8 @@
      "body": "దంష్ట్రాకరాలాని చ తే ముఖాని దృష్ట్వైవ కాలానలసన్నిభాని ।\nదిశో న జానే న లభే చ శర్మ ప్రసీద దేవేశ జగన్నివాస ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.26",
@@ -13911,7 +14646,8 @@
      "body": "అమీ చ త్వాం ధృతరాష్ట్రస్య పుత్రాః సర్వే సహైవావనిపాలసఙ్ఘైః ।\nభీష్మో ద్రోణః సూతపుత్రస్తథాఽసౌ సహాస్మదీయైరపి యోధముఖ్యైః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.27",
@@ -13941,7 +14677,8 @@
      "body": "వక్త్రాణి తే త్వరమాణా విశన్తి దంష్ట్రాకరాలాని భయానకాని ।\nకేచిద్విలగ్నా దశనాన్తరేషు సందృశ్యన్తే చూర్ణితైరుత్తమాఙ్గైః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.28",
@@ -13973,7 +14710,8 @@
      "body": "యథా నదీనాం బహవోఽమ్బువేగాః సముద్రమేవాభిముఖా ద్రవన్తి ।\nతథా తవామీ నరలోకవీరా విశన్తి వక్త్రాణ్యభివిజ్వలన్తి ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.29",
@@ -14003,7 +14741,8 @@
      "body": "యథా ప్రదీప్తం జ్వలనం పతఙ్గా విశన్తి నాశాయ సమృద్ధవేగాః ।\nతథైవ నాశాయ విశన్తి లోకా స్తవాపి వక్త్రాణి సమృద్ధవేగాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.30",
@@ -14033,7 +14772,8 @@
      "body": "లేలిహ్యసే గ్రసమానః సమన్తా ల్లోకాన్సమగ్రాన్వదనైర్జ్వలద్భిః ।\nతేజోభిరాపూర్య జగత్సమగ్రం భాసస్తవోగ్రాః ప్రతపన్తి విష్ణో ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.31",
@@ -14063,7 +14803,8 @@
      "body": "ఆఖ్యాహి మే కో భవానుగ్రరూపో నమోఽస్తు తే దేవవర ప్రసీద ।\nవిజ్ఞాతుమిచ్ఛామి భవన్తమాద్యం న హి ప్రజానామి తవ ప్రవృత్తిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.32",
@@ -14093,7 +14834,8 @@
      "body": "కాలోఽస్మి లోకక్షయకృత్ప్రవృద్ధో లోకాన్సమాహర్తుమిహ ప్రవృత్తః ।\nఋతేఽపి త్వాం న భవిష్యన్తి సర్వే యేఽవస్థితాః ప్రత్యనీకేషు యోధాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.33",
@@ -14123,7 +14865,8 @@
      "body": "తస్మాత్త్వముత్తిష్ఠ యశో లభస్వ జిత్వా శత్రూన్ భుఙ్క్ష్వ రాజ్యం సమృద్ధమ్ ।\nమయైవైతే నిహతాః పూర్వమేవ నిమిత్తమాత్రం భవ సవ్యసాచిన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.34",
@@ -14153,7 +14896,8 @@
      "body": "ద్రోణం చ భీష్మం చ జయద్రథం చ కర్ణం తథాఽన్యానపి యోధవీరాన్ ।\nమయా హతాంస్త్వం జహి మా వ్యథిష్ఠా యుధ్యస్వ జేతాసి రణే సపత్నాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.35",
@@ -14183,7 +14927,8 @@
      "body": "ఏతచ్ఛ్రుత్వా వచనం కేశవస్య కృతాఞ్జలిర్వేపమానః కిరీటీ ।\nనమస్కృత్వా భూయ ఏవాహ కృష్ణం సగద్గదం భీతభీతః ప్రణమ్య ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.36",
@@ -14213,7 +14958,8 @@
      "body": "స్థానే హృషీకేశ తవ ప్రకీర్త్యా జగత్ ప్రహృష్యత్యనురజ్యతే చ ।\nరక్షాంసి భీతాని దిశో ద్రవన్తి సర్వే నమస్యన్తి చ సిద్ధసఙ్ఘాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.37",
@@ -14243,7 +14989,8 @@
      "body": "కస్మాచ్చ తే న నమేరన్మహాత్మన్ గరీయసే బ్రహ్మణోఽప్యాదికర్త్రే ।\nఅనన్త దేవేశ జగన్నివాస త్వమక్షరం సదసత్తత్పరం యత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.38",
@@ -14273,7 +15020,8 @@
      "body": "త్వమాదిదేవః పురుషః పురాణ స్త్వమస్య విశ్వస్య పరం నిధానమ్ ।\nవేత్తాసి వేద్యం చ పరం చ ధామ త్వయా తతం విశ్వమనన్తరూప ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.39",
@@ -14303,7 +15051,8 @@
      "body": "వాయుర్యమోఽగ్నిర్వరుణః శశాఙ్కః ప్రజాపతిస్త్వం ప్రపితామహశ్చ ।\nనమో నమస్తేఽస్తు సహస్రకృత్వః పునశ్చ భూయోఽపి నమో నమస్తే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.40",
@@ -14333,7 +15082,8 @@
      "body": "నమః పురస్తాదథ పృష్ఠతస్తే నమోఽస్తు తే సర్వత ఏవ సర్వ ।\nఅనన్తవీర్యామితవిక్రమస్త్వం సర్వం సమాప్నోషి తతోఽసి సర్వః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.41",
@@ -14363,7 +15113,8 @@
      "body": "సఖేతి మత్వా ప్రసభం యదుక్తం హే కృష్ణ హే యాదవ హే సఖేతి ।\nఅజానతా మహిమానం తవేదం మయా ప్రమాదాత్ప్రణయేన వాపి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.42",
@@ -14393,7 +15144,8 @@
      "body": "యచ్చావహాసార్థమసత్కృతోఽసి విహారశయ్యాసనభోజనేషు ।\nఏకోఽథవాప్యచ్యుత తత్సమక్షం తత్క్షామయే త్వామహమప్రమేయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.43",
@@ -14423,7 +15175,8 @@
      "body": "పితాసి లోకస్య చరాచరస్య త్వమస్య పూజ్యశ్చ గురుర్గరీయాన్ ।\nన త్వత్సమోఽస్త్యభ్యధికః కుతోఽన్యో లోకత్రయేఽప్యప్రతిమప్రభావ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.44",
@@ -14453,7 +15206,8 @@
      "body": "తస్మాత్ప్రణమ్య ప్రణిధాయ కాయం ప్రసాదయే త్వామహమీశమీడ్యమ్ ।\nపితేవ పుత్రస్య సఖేవ సఖ్యుః ప్రియః ప్రియాయార్హసి దేవ సోఢుమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.45",
@@ -14483,7 +15237,8 @@
      "body": "అదృష్టపూర్వం హృషితోఽస్మి దృష్ట్వా భయేన చ ప్రవ్యథితం మనో మే ।\nతదేవ మే దర్శయ దేవ రూపం ప్రసీద దేవేశ జగన్నివాస ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.46",
@@ -14513,7 +15268,8 @@
      "body": "కిరీటినం గదినం చక్రహస్త మిచ్ఛామి త్వాం ద్రష్టుమహం తథైవ ।\nతేనైవ రూపేణ చతుర్భుజేన సహస్రబాహో భవ విశ్వమూర్తే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.47",
@@ -14543,7 +15299,8 @@
      "body": "మయా ప్రసన్నేన తవార్జునేదం రూపం పరం దర్శితమాత్మయోగాత్ ।\nతేజోమయం విశ్వమనన్తమాద్యం యన్మే త్వదన్యేన న దృష్టపూర్వమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.48",
@@ -14573,7 +15330,8 @@
      "body": "న వేదయజ్ఞాధ్యయనైర్న దానై ర్న చ క్రియాభిర్న తపోభిరుగ్రైః ।\nఏవంరూపః శక్య అహం నృలోకే ద్రష్టుం త్వదన్యేన కురుప్రవీర ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.49",
@@ -14603,7 +15361,8 @@
      "body": "మా తే వ్యథా మా చ విమూఢభావో దృష్ట్వా రూపం ఘోరమీదృఙ్మమేదమ్ ।\nవ్యపేతభీః ప్రీతమనాః పునస్త్వం తదేవ మే రూపమిదం ప్రపశ్య ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.50",
@@ -14633,7 +15392,8 @@
      "body": "ఇత్యర్జునం వాసుదేవస్తథోక్త్వా స్వకం రూపం దర్శయామాస భూయః ।\nఆశ్వాసయామాస చ భీతమేనం భూత్వా పునః సౌమ్యవపుర్మహాత్మా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.51",
@@ -14663,7 +15423,8 @@
      "body": "దృష్ట్వేదం మానుషం రూపం తవసౌమ్యం జనార్దన ।\nఇదానీమస్మి సంవృత్తః సచేతాః ప్రకృతిం గతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.52",
@@ -14693,7 +15454,8 @@
      "body": "సుదుర్దర్శమిదం రూపం దృష్టవానసి యన్మమ ।\nదేవా అప్యస్య రూపస్య నిత్యం దర్శనకాఙ్క్షిణః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.53",
@@ -14723,7 +15485,8 @@
      "body": "నాహం వేదైర్న తపసా న దానేన న చేజ్యయా ।\nశక్య ఏవంవిధో ద్రష్టుం దృష్టవానసి మాం యథా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.54",
@@ -14756,7 +15519,8 @@
      "body": "భక్త్యా త్వనన్యయా శక్య అహమేవంవిధోఽర్జున ।\nజ్ఞాతుం ద్రష్టుం చ తత్త్వేన ప్రవేష్టుం చ పరంతప ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "11.55",
@@ -14786,7 +15550,8 @@
      "body": "మత్కర్మకృన్మత్పరమో మద్భక్తః సఙ్గవర్జితః ।\nనిర్వైరః సర్వభూతేషు యః స మామేతి పాణ్డవ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.1",
@@ -14816,7 +15581,8 @@
      "body": "ఏవం సతతయుక్తా యే భక్తాస్త్వాం పర్యుపాసతే ।\nయేచాప్యక్షరమవ్యక్తం తేషాం కే యోగవిత్తమాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.2",
@@ -14846,7 +15612,8 @@
      "body": "మయ్యావేశ్య మనో యే మాం నిత్యయుక్తా ఉపాసతే ।\nశ్రద్ధయా పరయోపేతాస్తే మే యుక్తతమా మతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.3",
@@ -14876,7 +15643,8 @@
      "body": "యే త్వక్షరమనిర్దేశ్యమవ్యక్తం పర్యుపాసతే ।\nసర్వత్రగమచిన్త్యం చ కూటస్థమచలం ధ్రువమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.4",
@@ -14906,7 +15674,8 @@
      "body": "సంనియమ్యేన్ద్రియగ్రామం సర్వత్ర సమబుద్ధయః ।\nతే ప్రాప్నువన్తి మామేవ సర్వభూతహితే రతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.5",
@@ -14936,7 +15705,8 @@
      "body": "క్లేశోఽధికతరస్తేషామవ్యక్తాసక్తచేతసామ్ ।\nఅవ్యక్తా హి గతిర్దుఃఖం దేహవద్భిరవాప్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.6",
@@ -14966,7 +15736,8 @@
      "body": "యే తు సర్వాణి కర్మాణి మయి సంన్యస్య మత్పరాః ।\nఅనన్యేనైవ యోగేన మాం ధ్యాయన్త ఉపాసతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.7",
@@ -14996,7 +15767,8 @@
      "body": "తేషామహం సముద్ధర్తా మృత్యుసంసారసాగరాత్ ।\nభవామి నచిరాత్పార్థ మయ్యావేశితచేతసామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.8",
@@ -15026,7 +15798,8 @@
      "body": "మయ్యేవ మన ఆధత్స్వ మయి బుద్ధిం నివేశయ ।\nనివసిష్యసి మయ్యేవ అత ఊర్ధ్వం న సంశయః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.9",
@@ -15056,7 +15829,8 @@
      "body": "అథ చిత్తం సమాధాతుం న శక్నోషి మయి స్థిరమ్ ।\nఅభ్యాసయోగేన తతో మామిచ్ఛాప్తుం ధనఞ్జయ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.10",
@@ -15086,7 +15860,8 @@
      "body": "అభ్యాసేఽప్యసమర్థోఽసి మత్కర్మపరమో భవ ।\nమదర్థమపి కర్మాణి కుర్వన్ సిద్ధిమవాప్స్యసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.11",
@@ -15116,7 +15891,8 @@
      "body": "అథైతదప్యశక్తోఽసి కర్తుం మద్యోగమాశ్రితః ।\nసర్వకర్మఫలత్యాగం తతః కురు యతాత్మవాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.12",
@@ -15146,7 +15922,8 @@
      "body": "శ్రేయో హి జ్ఞానమభ్యాసాజ్జ్ఞానాద్ధ్యానం విశిష్యతే ।\nధ్యానాత్కర్మఫలత్యాగస్త్యాగాచ్ఛాన్తిరనన్తరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.13",
@@ -15176,7 +15953,8 @@
      "body": "అద్వేష్టా సర్వభూతానాం మైత్రః కరుణ ఏవ చ ।\nనిర్మమో నిరహఙ్కారః సమదుఃఖసుఖః క్షమీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.14",
@@ -15206,7 +15984,8 @@
      "body": "సన్తుష్టః సతతం యోగీ యతాత్మా దృఢనిశ్చయః ।\nమయ్యర్పితమనోబుద్ధిర్యో మద్భక్తః స మే ప్రియః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.15",
@@ -15236,7 +16015,8 @@
      "body": "యస్మాన్నోద్విజతే లోకో లోకాన్నోద్విజతే చ యః ।\nహర్షామర్షభయోద్వేగైర్ముక్తో యః స చ మే ప్రియః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.16",
@@ -15266,7 +16046,8 @@
      "body": "అనపేక్షః శుచిర్దక్ష ఉదాసీనో గతవ్యథః ।\nసర్వారమ్భపరిత్యాగీ యో మద్భక్తః స మే ప్రియః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.17",
@@ -15298,7 +16079,8 @@
      "body": "యో న హృష్యతి న ద్వేష్టి న శోచతి న కాఙ్క్షతి ।\nశుభాశుభపరిత్యాగీ భక్తిమాన్యః స మే ప్రియః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.18",
@@ -15328,7 +16110,8 @@
      "body": "సమః శత్రౌ చ మిత్రే చ తథా మానాపమానయోః ।\nశీతోష్ణసుఖదుఃఖేషు సమః సఙ్గవివర్జితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.19",
@@ -15360,7 +16143,8 @@
      "body": "తుల్యనిన్దాస్తుతిర్మౌనీ సన్తుష్టో యేనకేనచిత్ ।\nఅనికేతః స్థిరమతిర్భక్తిమాన్మే ప్రియో నరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "12.20",
@@ -15390,7 +16174,8 @@
      "body": "యే తు ధర్మ్యామృతమిదం యథోక్తం పర్యుపాసతే ।\nశ్రద్దధానా మత్పరమా భక్తాస్తేఽతీవ మే ప్రియాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.0",
@@ -15420,7 +16205,8 @@
      "body": "ప్రకృతిం పురుషం చైవ క్షేత్రం క్షేత్రజ్ఞమేవ చ ।\nఏతద్వేదితుమిచ్ఛామి జ్ఞానం జ్ఞేయం చ కేశవ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.1",
@@ -15450,7 +16236,8 @@
      "body": "ఇదం శరీరం కౌన్తేయ క్షేత్రమిత్యభిధీయతే ।\nఏతద్యో వేత్తి తం ప్రాహుః క్షేత్రజ్ఞ ఇతి తద్విదః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.2",
@@ -15480,7 +16267,8 @@
      "body": "క్షేత్రజ్ఞం చాపి మాం విద్ధి సర్వక్షేత్రేషు భారత ।\nక్షేత్రక్షేత్రజ్ఞయోర్జ్ఞానం యత్తజ్జ్ఞానం మతం మమ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.3",
@@ -15512,7 +16300,8 @@
      "body": "తత్క్షేత్రం యచ్చ యాదృక్ చ యద్వికారి యతశ్చ యత్ ।\nస చ యో యత్ప్రభావశ్చ తత్సమాసేన మే శృణు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.4",
@@ -15544,7 +16333,8 @@
      "body": "ఋషిభిర్బహుధా గీతం ఛన్దోభిర్వివిధైః పృథక్ ।\nబ్రహ్మసూత్రపదైశ్చైవ హేతుమద్భిర్వినిశ్చితైః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.5",
@@ -15574,7 +16364,8 @@
      "body": "మహాభూతాన్యహఙ్కారో బుద్ధిరవ్యక్తమేవ చ ।\nఇన్ద్రియాణి దశైకం చ పఞ్చ చేన్ద్రియగోచరాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.6",
@@ -15604,7 +16395,8 @@
      "body": "ఇచ్ఛా ద్వేషః సుఖం దుఃఖం సఙ్ఘాతశ్చేతనాధృతిః ।\nఏతత్క్షేత్రం సమాసేన సవికారముదాహృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.7",
@@ -15634,7 +16426,8 @@
      "body": "అమానిత్వమదమ్భిత్వమహింసా క్షాన్తిరార్జవమ్ ।\nఆచార్యోపాసనం శౌచం స్థైర్యమాత్మవినిగ్రహః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.8",
@@ -15664,7 +16457,8 @@
      "body": "ఇన్ద్రియార్థేషు వైరాగ్యమనహఙ్కార ఏవ చ ।\nజన్మమృత్యుజరావ్యాధిదుఃఖదోషానుదర్శనమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.9",
@@ -15696,7 +16490,8 @@
      "body": "అసక్తిరనభిష్వఙ్గః పుత్రదారగృహాదిషు ।\nనిత్యం చ సమచిత్తత్వమిష్టానిష్టోపపత్తిషు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.10",
@@ -15728,7 +16523,8 @@
      "body": "మయి చానన్యయోగేన భక్తిరవ్యభిచారిణీ ।\nవివిక్తదేశసేవిత్వమరతిర్జనసంసది ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.11",
@@ -15758,7 +16554,8 @@
      "body": "అధ్యాత్మజ్ఞాననిత్యత్వం తత్త్వజ్ఞానార్థదర్శనమ్ ।\nఏతజ్జ్ఞానమితి ప్రోక్తమజ్ఞానం యదతోన్యథా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.12",
@@ -15788,7 +16585,8 @@
      "body": "జ్ఞేయం యత్తత్ప్రవక్ష్యామి యజ్జ్ఞాత్వాఽమృతమశ్నుతే ।\nఅనాదిమత్పరం బ్రహ్మ న సత్తన్నాసదుచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.13",
@@ -15818,7 +16616,8 @@
      "body": "సర్వతః పాణిపాదం తత్సర్వతోఽక్షిశిరోముఖమ్ ।\nసర్వతః శ్రుతిమల్లోకే సర్వమావృత్య తిష్ఠతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.14",
@@ -15848,7 +16647,8 @@
      "body": "సర్వేన్ద్రియగుణాభాసం సర్వేన్ద్రియవివర్జితమ్ ।\nఅసక్తం సర్వభృచ్చైవ నిర్గుణం గుణభోక్తృ చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.15",
@@ -15878,7 +16678,8 @@
      "body": "బహిరన్తశ్చ భూతానామచరం చరమేవ చ ।\nసూక్ష్మత్వాత్తదవిజ్ఞేయం దూరస్థం చాన్తికే చ తత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.16",
@@ -15908,7 +16709,8 @@
      "body": "అవిభక్తం చ భూతేషు విభక్తమివ చ స్థితమ్ ।\nభూతభర్తృ చ తజ్జ్ఞేయం గ్రసిష్ణు ప్రభవిష్ణు చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.17",
@@ -15938,7 +16740,8 @@
      "body": "జ్యోతిషామపి తజ్జ్యోతిస్తమసః పరముచ్యతే ।\nజ్ఞానం జ్ఞేయం జ్ఞానగమ్యం హృది సర్వస్య విష్ఠితమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.18",
@@ -15968,7 +16771,8 @@
      "body": "ఇతి క్షేత్రం తథా జ్ఞానం జ్ఞేయం చోక్తం సమాసతః ।\nమద్భక్త ఏతద్విజ్ఞాయ మద్భావాయోపపద్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.19",
@@ -15998,7 +16802,8 @@
      "body": "ప్రకృతిం పురుషం చైవ విద్ధ్యనాదీ ఉభావపి ।\nవికారాంశ్చ గుణాంశ్చైవ విద్ధి ప్రకృతిసంభవాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.20",
@@ -16028,7 +16833,8 @@
      "body": "కార్యకారణకర్తృత్వే హేతుః ప్రకృతిరుచ్యతే ।\nపురుషః సుఖదుఃఖానాం భోక్తృత్వే హేతురుచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.21",
@@ -16058,7 +16864,8 @@
      "body": "పురుషః ప్రకృతిస్థో హి భుఙ్క్తే ప్రకృతిజాన్గుణాన్ ।\nకారణం గుణసఙ్గోఽస్య సదసద్యోనిజన్మసు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.22",
@@ -16088,7 +16895,8 @@
      "body": "ఉపద్రష్టాఽనుమన్తా చ భర్తా భోక్తా మహేశ్వరః ।\nపరమాత్మేతి చాప్యుక్తో దేహేఽస్మిన్పురుషః పరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.23",
@@ -16118,7 +16926,8 @@
      "body": "య ఏవం వేత్తి పురుషం ప్రకృతిం చ గుణైఃసహ ।\nసర్వథా వర్తమానోఽపి న స భూయోఽభిజాయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.24",
@@ -16148,7 +16957,8 @@
      "body": "ధ్యానేనాత్మని పశ్యన్తి కేచిదాత్మానమాత్మనా ।\nఅన్యే సాంఖ్యేన యోగేన కర్మయోగేన చాపరే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.25",
@@ -16178,7 +16988,8 @@
      "body": "అన్యే త్వేవమజానన్తః శ్రుత్వాఽన్యేభ్య ఉపాసతే ।\nతేఽపి చాతితరన్త్యేవ మృత్యుం శ్రుతిపరాయణాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.26",
@@ -16208,7 +17019,8 @@
      "body": "యావత్సఞ్జాయతే కిఞ్చిత్సత్త్వం స్థావరజఙ్గమమ్ ।\nక్షేత్రక్షేత్రజ్ఞసంయోగాత్తద్విద్ధి భరతర్షభ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.27",
@@ -16238,7 +17050,8 @@
      "body": "సమం సర్వేషు భూతేషు తిష్ఠన్తం పరమేశ్వరమ్ ।\nవినశ్యత్స్వవినశ్యన్తం యః పశ్యతి స పశ్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.28",
@@ -16268,7 +17081,8 @@
      "body": "సమం పశ్యన్హి సర్వత్ర సమవస్థితమీశ్వరమ్ ।\nన హినస్త్యాత్మనాఽఽత్మానం తతో యాతి పరాం గతిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.29",
@@ -16298,7 +17112,8 @@
      "body": "ప్రకృత్యైవ చ కర్మాణి క్రియమాణాని సర్వశః ।\nయః పశ్యతి తథాఽఽత్మానమకర్తారం స పశ్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.30",
@@ -16328,7 +17143,8 @@
      "body": "యదా భూతపృథగ్భావమేకస్థమనుపశ్యతి ।\nతత ఏవ చ విస్తారం బ్రహ్మ సమ్పద్యతే తదా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.31",
@@ -16358,7 +17174,8 @@
      "body": "అనాదిత్వాన్నిర్గుణత్వాత్పరమాత్మాయమవ్యయః ।\nశరీరస్థోఽపి కౌన్తేయ న కరోతి న లిప్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.32",
@@ -16388,7 +17205,8 @@
      "body": "యథా సర్వగతం సౌక్ష్మ్యాదాకాశం నోపలిప్యతే ।\nసర్వత్రావస్థితో దేహే తథాఽఽత్మా నోపలిప్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.33",
@@ -16418,7 +17236,8 @@
      "body": "యథా ప్రకాశయత్యేకః కృత్స్నం లోకమిమం రవిః ।\nక్షేత్రం క్షేత్రీ తథా కృత్స్నం ప్రకాశయతి భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "13.34",
@@ -16448,7 +17267,8 @@
      "body": "క్షేత్రక్షేత్రజ్ఞయోరేవమన్తరం జ్ఞానచక్షుషా ।\nభూతప్రకృతిమోక్షం చ యే విదుర్యాన్తి తే పరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.1",
@@ -16478,7 +17298,8 @@
      "body": "పరం భూయః ప్రవక్ష్యామి జ్ఞానానాం జ్ఞానముత్తమమ్ ।\nయజ్జ్ఞాత్వా మునయః సర్వే పరాం సిద్ధిమితో గతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.2",
@@ -16508,7 +17329,8 @@
      "body": "ఇదం జ్ఞానముపాశ్రిత్య మమ సాధర్మ్యమాగతాః ।\nసర్గేఽపి నోపజాయన్తే ప్రలయే న వ్యథన్తి చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.3",
@@ -16538,7 +17360,8 @@
      "body": "మమ యోనిర్మహద్బ్రహ్మ తస్మిన్ గర్భం దధామ్యహమ్ ।\nసంభవః సర్వభూతానాం తతో భవతి భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.4",
@@ -16568,7 +17391,8 @@
      "body": "సర్వయోనిషు కౌన్తేయ మూర్తయః సమ్భవన్తి యాః ।\nతాసాం బ్రహ్మ మహద్యోనిరహం బీజప్రదః పితా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.5",
@@ -16598,7 +17422,8 @@
      "body": "సత్త్వం రజస్తమ ఇతి గుణాః ప్రకృతిసంభవాః ।\nనిబధ్నన్తి మహాబాహో దేహే దేహినమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.6",
@@ -16628,7 +17453,8 @@
      "body": "తత్ర సత్త్వం నిర్మలత్వాత్ప్రకాశకమనామయమ్ ।\nసుఖసఙ్గేన బధ్నాతి జ్ఞానసఙ్గేన చానఘ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.7",
@@ -16658,7 +17484,8 @@
      "body": "రజో రాగాత్మకం విద్ధి తృష్ణాసఙ్గసముద్భవమ్ ।\nతన్నిబధ్నాతి కౌన్తేయ కర్మసఙ్గేన దేహినమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.8",
@@ -16688,7 +17515,8 @@
      "body": "తమస్త్వజ్ఞానజం విద్ధి మోహనం సర్వదేహినామ్ ।\nప్రమాదాలస్యనిద్రాభిస్తన్నిబధ్నాతి భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.9",
@@ -16718,7 +17546,8 @@
      "body": "సత్త్వం సుఖే సఞ్జయతి రజః కర్మణి భారత ।\nజ్ఞానమావృత్య తు తమః ప్రమాదే సఞ్జయత్యుత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.10",
@@ -16748,7 +17577,8 @@
      "body": "రజస్తమశ్చాభిభూయ సత్త్వం భవతి భారత ।\nరజః సత్త్వం తమశ్చైవ తమః సత్త్వం రజస్తథా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.11",
@@ -16778,7 +17608,8 @@
      "body": "సర్వద్వారేషు దేహేఽస్మిన్ప్రకాశ ఉపజాయతే ।\nజ్ఞానం యదా తదా విద్యాద్వివృద్ధం సత్త్వమిత్యుత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.12",
@@ -16808,7 +17639,8 @@
      "body": "లోభః ప్రవృత్తిరారమ్భః కర్మణామశమః స్పృహా ।\nరజస్యేతాని జాయన్తే వివృద్ధే భరతర్షభ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.13",
@@ -16838,7 +17670,8 @@
      "body": "అప్రకాశోఽప్రవృత్తిశ్చ ప్రమాదో మోహ ఏవ చ ।\nతమస్యేతాని జాయన్తే వివృద్ధే కురునన్దన ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.14",
@@ -16868,7 +17701,8 @@
      "body": "యదా సత్త్వే ప్రవృద్ధే తు ప్రలయం యాతి దేహభృత్ ।\nతదోత్తమవిదాం లోకానమలాన్ప్రతిపద్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.15",
@@ -16898,7 +17732,8 @@
      "body": "రజసి ప్రలయం గత్వా కర్మసఙ్గిషు జాయతే ।\nతథా ప్రలీనస్తమసి మూఢయోనిషు జాయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.16",
@@ -16928,7 +17763,8 @@
      "body": "కర్మణః సుకృతస్యాహుః సాత్త్వికం నిర్మలం ఫలమ్ ।\nరజసస్తు ఫలం దుఃఖమజ్ఞానం తమసః ఫలమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.17",
@@ -16958,7 +17794,8 @@
      "body": "సత్త్వాత్సఞ్జాయతే జ్ఞానం రజసో లోభ ఏవ చ ।\nప్రమాదమోహౌ తమసో భవతోఽజ్ఞానమేవ చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.18",
@@ -16988,7 +17825,8 @@
      "body": "ఊర్ధ్వం గచ్ఛన్తి సత్త్వస్థా మధ్యే తిష్ఠన్తి రాజసాః ।\nజఘన్యగుణవృత్తిస్థా అధో గచ్ఛన్తి తామసాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.19",
@@ -17018,7 +17856,8 @@
      "body": "నాన్యం గుణేభ్యః కర్తారం యదా ద్రష్టానుపశ్యతి ।\nగుణేభ్యశ్చ పరం వేత్తి మద్భావం సోఽధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.20",
@@ -17048,7 +17887,8 @@
      "body": "గుణానేతానతీత్య త్రీన్దేహీ దేహసముద్భవాన్ ।\nజన్మమృత్యుజరాదుఃఖైర్విముక్తోఽమృతమశ్నుతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.21",
@@ -17078,7 +17918,8 @@
      "body": "కైర్లింగైస్త్రీన్గుణానేతానతీతో భవతి ప్రభో ।\nకిమాచారః కథం చైతాంస్త్రీన్గుణానతివర్తతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.22",
@@ -17108,7 +17949,8 @@
      "body": "ప్రకాశం చ ప్రవృత్తిం చ మోహమేవ చ పాణ్డవ ।\nన ద్వేష్టి సమ్ప్రవృత్తాని న నివృత్తాని కాఙ్క్షతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.23",
@@ -17138,7 +17980,8 @@
      "body": "ఉదాసీనవదాసీనో గుణైర్యో న విచాల్యతే ।\nగుణా వర్తన్త ఇత్యేవ యోఽవతిష్ఠతి నేఙ్గతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.24",
@@ -17168,7 +18011,8 @@
      "body": "సమదుఃఖసుఖః స్వస్థః సమలోష్టాశ్మకాఞ్చనః ।\nతుల్యప్రియాప్రియో ధీరస్తుల్యనిన్దాత్మసంస్తుతిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.25",
@@ -17198,7 +18042,8 @@
      "body": "మానాపమానయోస్తుల్యస్తుల్యో మిత్రారిపక్షయోః ।\nసర్వారమ్భపరిత్యాగీ గుణాతీతః స ఉచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.26",
@@ -17230,7 +18075,8 @@
      "body": "మాం చ యోఽవ్యభిచారేణ భక్తియోగేన సేవతే ।\nస గుణాన్సమతీత్యైతాన్ బ్రహ్మభూయాయ కల్పతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "14.27",
@@ -17260,7 +18106,8 @@
      "body": "బ్రహ్మణో హి ప్రతిష్ఠాఽహమమృతస్యావ్యయస్య చ ।\nశాశ్వతస్య చ ధర్మస్య సుఖస్యైకాన్తికస్య చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.1",
@@ -17290,7 +18137,8 @@
      "body": "ఊర్ధ్వమూలమధఃశాఖమశ్వత్థం ప్రాహురవ్యయమ్ ।\nఛన్దాంసి యస్య పర్ణాని యస్తం వేద స వేదవిత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.2",
@@ -17320,7 +18168,8 @@
      "body": "అధశ్చోర్ధ్వం ప్రసృతాస్తస్య శాఖా గుణప్రవృద్ధా విషయప్రవాలాః ।\nఅధశ్చ మూలాన్యనుసన్తతాని కర్మానుబన్ధీని మనుష్యలోకే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.3",
@@ -17350,7 +18199,8 @@
      "body": "న రూపమస్యేహ తథోపలభ్యతే నాన్తో న చాదిర్న చ సంప్రతిష్ఠా ।\nఅశ్వత్థమేనం సువిరూఢమూల మసఙ్గశస్త్రేణ దృఢేన ఛిత్త్వా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.4",
@@ -17382,7 +18232,8 @@
      "body": "తతః పదం తత్పరిమార్గితవ్యం యస్మిన్గతా న నివర్తన్తి భూయః ।\nతమేవ చాద్యం పురుషం ప్రపద్యే యతః ప్రవృత్తిః ప్రసృతా పురాణీ ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.5",
@@ -17412,7 +18263,8 @@
      "body": "నిర్మానమోహా జితసఙ్గదోషా అధ్యాత్మనిత్యా వినివృత్తకామాః ।\nద్వన్ద్వైర్విముక్తాః సుఖదుఃఖసంజ్ఞై ర్గచ్ఛన్త్యమూఢాః పదమవ్యయం తత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.6",
@@ -17442,7 +18294,8 @@
      "body": "న తద్భాసయతే సూర్యో న శశాఙ్కో న పావకః ।\nయద్గత్వా న నివర్తన్తే తద్ధామ పరమం మమ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.7",
@@ -17472,7 +18325,8 @@
      "body": "మమైవాంశో జీవలోకే జీవభూతః సనాతనః ।\nమనఃషష్ఠానీన్ద్రియాణి ప్రకృతిస్థాని కర్షతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.8",
@@ -17502,7 +18356,8 @@
      "body": "శరీరం యదవాప్నోతి యచ్చాప్యుత్క్రామతీశ్వరః ।\nగృహీత్వైతాని సంయాతి వాయుర్గన్ధానివాశయాత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.9",
@@ -17532,7 +18387,8 @@
      "body": "శ్రోత్రం చక్షుః స్పర్శనం చ రసనం ఘ్రాణమేవ చ ।\nఅధిష్ఠాయ మనశ్చాయం విషయానుపసేవతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.10",
@@ -17562,7 +18418,8 @@
      "body": "ఉత్క్రామన్తం స్థితం వాపి భుఞ్జానం వా గుణాన్వితమ్ ।\nవిమూఢా నానుపశ్యన్తి పశ్యన్తి జ్ఞానచక్షుషః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.11",
@@ -17592,7 +18449,8 @@
      "body": "యతన్తో యోగినశ్చైనం పశ్యన్త్యాత్మన్యవస్థితమ్ ।\nయతన్తోఽప్యకృతాత్మానో నైనం పశ్యన్త్యచేతసః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.12",
@@ -17622,7 +18480,8 @@
      "body": "యదాదిత్యగతం తేజో జగద్భాసయతేఽఖిలమ్ ।\nయచ్చన్ద్రమసి యచ్చాగ్నౌ తత్తేజో విద్ధి మామకమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.13",
@@ -17652,7 +18511,8 @@
      "body": "గామావిశ్య చ భూతాని ధారయామ్యహమోజసా ।\nపుష్ణామి చౌషధీః సర్వాః సోమో భూత్వా రసాత్మకః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.14",
@@ -17682,7 +18542,8 @@
      "body": "అహం వైశ్వానరో భూత్వా ప్రాణినాం దేహమాశ్రితః ।\nప్రాణాపానసమాయుక్తః పచామ్యన్నం చతుర్విధమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.15",
@@ -17712,7 +18573,8 @@
      "body": "సర్వస్య చాహం హృది సన్నివిష్టో మత్తః స్మృతిర్జ్ఞానమపోహనం చ ।\nవేదైశ్చ సర్వైరహమేవ వేద్యో వేదాన్తకృద్వేదవిదేవ చాహమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.16",
@@ -17742,7 +18604,8 @@
      "body": "ద్వావిమౌ పురుషౌ లోకే క్షరశ్చాక్షర ఏవ చ ।\nక్షరః సర్వాణి భూతాని కూటస్థోఽక్షర ఉచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.17",
@@ -17772,7 +18635,8 @@
      "body": "ఉత్తమః పురుషస్త్వన్యః పరమాత్మేత్యుదాహృతః ।\nయో లోకత్రయమావిశ్య బిభర్త్యవ్యయ ఈశ్వరః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.18",
@@ -17802,7 +18666,8 @@
      "body": "యస్మాత్క్షరమతీతోఽహమక్షరాదపి చోత్తమః ।\nఅతోఽస్మి లోకే వేదే చ ప్రథితః పురుషోత్తమః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.19",
@@ -17832,7 +18697,8 @@
      "body": "యో మామేవమసమ్మూఢో జానాతి పురుషోత్తమమ్ ।\nస సర్వవిద్భజతి మాం సర్వభావేన భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "15.20",
@@ -17862,7 +18728,8 @@
      "body": "ఇతి గుహ్యతమం శాస్త్రమిదముక్తం మయాఽనఘ ।\nఏతద్బుద్ధ్వా బుద్ధిమాన్స్యాత్కృతకృత్యశ్చ భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.1",
@@ -17894,7 +18761,8 @@
      "body": "అభయం సత్త్వసంశుద్ధిర్జ్ఞానయోగవ్యవస్థితిః ।\nదానం దమశ్చ యజ్ఞశ్చ స్వాధ్యాయస్తప ఆర్జవమ్ ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.2",
@@ -17924,7 +18792,8 @@
      "body": "అహింసా సత్యమక్రోధస్త్యాగః శాన్తిరపైశునమ్ ।\nదయా భూతేష్వలోలుప్త్వం మార్దవం హ్రీరచాపలమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.3",
@@ -17954,7 +18823,8 @@
      "body": "తేజః క్షమా ధృతిః శౌచమద్రోహో నాతిమానితా ।\nభవన్తి సమ్పదం దైవీమభిజాతస్య భారత ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.4",
@@ -17984,7 +18854,8 @@
      "body": "దమ్భో దర్పోఽభిమానశ్చ క్రోధః పారుష్యమేవ చ ।\nఅజ్ఞానం చాభిజాతస్య పార్థ సమ్పదమాసురీమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.5",
@@ -18014,7 +18885,8 @@
      "body": "దైవీ సమ్పద్విమోక్షాయ నిబన్ధాయాసురీ మతా ।\nమా శుచః సమ్పదం దైవీమభిజాతోఽసి పాణ్డవ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.6",
@@ -18046,7 +18918,8 @@
      "body": "ద్వౌ భూతసర్గౌ లోకేఽస్మిన్ దైవ ఆసుర ఏవ చ ।\nదైవో విస్తరశః ప్రోక్త ఆసురం పార్థ మే శృణు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.7",
@@ -18076,7 +18949,8 @@
      "body": "ప్రవృత్తిం చ నివృత్తిం చ జనా న విదురాసురాః ।\nన శౌచం నాపి చాచారో న సత్యం తేషు విద్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.8",
@@ -18106,7 +18980,8 @@
      "body": "అసత్యమప్రతిష్ఠం తే జగదాహురనీశ్వరమ్ ।\nఅపరస్పరసమ్భూతం కిమన్యత్కామహైతుకమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.9",
@@ -18136,7 +19011,8 @@
      "body": "ఏతాం దృష్టిమవష్టభ్య నష్టాత్మానోఽల్పబుద్ధయః ।\nప్రభవన్త్యుగ్రకర్మాణః క్షయాయ జగతోఽహితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.10",
@@ -18166,7 +19042,8 @@
      "body": "కామమాశ్రిత్య దుష్పూరం దమ్భమానమదాన్వితాః ।\nమోహాద్గృహీత్వాసద్గ్రాహాన్ప్రవర్తన్తేఽశుచివ్రతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.11",
@@ -18198,7 +19075,8 @@
      "body": "చిన్తామపరిమేయాం చ ప్రలయాన్తాముపాశ్రితాః ।\nకామోపభోగపరమా ఏతావదితి నిశ్చితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.12",
@@ -18228,7 +19106,8 @@
      "body": "ఆశాపాశశతైర్బద్ధాః కామక్రోధపరాయణాః ।\nఈహన్తే కామభోగార్థమన్యాయేనార్థసఞ్చయాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.13",
@@ -18258,7 +19137,8 @@
      "body": "ఇదమద్య మయా లబ్ధమిమం ప్రాప్స్యే మనోరథమ్ ।\nఇదమస్తీదమపి మే భవిష్యతి పునర్ధనమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.14",
@@ -18288,7 +19168,8 @@
      "body": "అసౌ మయా హతః శత్రుర్హనిష్యే చాపరానపి ।\nఈశ్వరోఽహమహం భోగీ సిద్ధోఽహం బలవాన్సుఖీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.15",
@@ -18318,7 +19199,8 @@
      "body": "ఆఢ్యోఽభిజనవానస్మి కోఽన్యోఽస్తి సదృశో మయా ।\nయక్ష్యే దాస్యామి మోదిష్య ఇత్యజ్ఞానవిమోహితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.16",
@@ -18348,7 +19230,8 @@
      "body": "అనేకచిత్తవిభ్రాన్తా మోహజాలసమావృతాః ।\nప్రసక్తాః కామభోగేషు పతన్తి నరకేఽశుచౌ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.17",
@@ -18378,7 +19261,8 @@
      "body": "ఆత్మసమ్భావితాః స్తబ్ధా ధనమానమదాన్వితాః ।\nయజన్తే నామయజ్ఞైస్తే దమ్భేనావిధిపూర్వకమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.18",
@@ -18408,7 +19292,8 @@
      "body": "అహఙ్కారం బలం దర్పం కామం క్రోధం చ సంశ్రితాః ।\nమామాత్మపరదేహేషు ప్రద్విషన్తోఽభ్యసూయకాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.19",
@@ -18438,7 +19323,8 @@
      "body": "తానహం ద్విషతః క్రూరాన్సంసారేషు నరాధమాన్ ।\nక్షిపామ్యజస్రమశుభానాసురీష్వేవ యోనిషు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.20",
@@ -18470,7 +19356,8 @@
      "body": "ఆసురీం యోనిమాపన్నా మూఢా జన్మని జన్మని ।\nమామప్రాప్యైవ కౌన్తేయ తతో యాన్త్యధమాం గతిమ్ ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.21",
@@ -18500,7 +19387,8 @@
      "body": "త్రివిధం నరకస్యేదం ద్వారం నాశనమాత్మనః ।\nకామః క్రోధస్తథా లోభస్తస్మాదేతత్త్రయం త్యజేత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.22",
@@ -18530,7 +19418,8 @@
      "body": "ఏతైర్విముక్తః కౌన్తేయ తమోద్వారైస్త్రిభిర్నరః ।\nఆచరత్యాత్మనః శ్రేయస్తతో యాతి పరాం గతిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.23",
@@ -18560,7 +19449,8 @@
      "body": "యః శాస్త్రవిధిముత్సృజ్య వర్తతే కామకారతః ।\nన స సిద్ధిమవాప్నోతి న సుఖం న పరాం గతిమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "16.24",
@@ -18590,7 +19480,8 @@
      "body": "తస్మాచ్ఛాస్త్రం ప్రమాణం తే కార్యాకార్యవ్యవస్థితౌ ।\nజ్ఞాత్వా శాస్త్రవిధానోక్తం కర్మ కర్తుమిహార్హసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.1",
@@ -18620,7 +19511,8 @@
      "body": "యే శాస్త్రవిధిముత్సృజ్య యజన్తే శ్రద్ధయాఽన్వితాః ।\nతేషాం నిష్ఠా తు కా కృష్ణ సత్త్వమాహో రజస్తమః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.2",
@@ -18652,7 +19544,8 @@
      "body": "త్రివిధా భవతి శ్రద్ధా దేహినాం సా స్వభావజా ।\nసాత్త్వికీ రాజసీ చైవ తామసీ చేతి తాం శృణు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.3",
@@ -18682,7 +19575,8 @@
      "body": "సత్త్వానురూపా సర్వస్య శ్రద్ధా భవతి భారత ।\nశ్రద్ధామయోఽయం పురుషో యో యచ్ఛ్రద్ధః స ఏవ సః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.4",
@@ -18712,7 +19606,8 @@
      "body": "యజన్తే సాత్త్వికా దేవాన్యక్షరక్షాంసి రాజసాః ।\nప్రేతాన్భూతగణాంశ్చాన్యే యజన్తే తామసా జనాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.5",
@@ -18742,7 +19637,8 @@
      "body": "అశాస్త్రవిహితం ఘోరం తప్యన్తే యే తపో జనాః ।\nదమ్భాహఙ్కారసంయుక్తాః కామరాగబలాన్వితాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.6",
@@ -18772,7 +19668,8 @@
      "body": "కర్షయన్తః శరీరస్థం భూతగ్రామమచేతసః ।\nమాం చైవాన్తఃశరీరస్థం తాన్విద్ధ్యాసురనిశ్చయాన్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.7",
@@ -18804,7 +19701,8 @@
      "body": "ఆహారస్త్వపి సర్వస్య త్రివిధో భవతి ప్రియః ।\nయజ్ఞస్తపస్తథా దానం తేషాం భేదమిమం శృణు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.8",
@@ -18834,7 +19732,8 @@
      "body": "ఆయుఃసత్త్వబలారోగ్యసుఖప్రీతివివర్ధనాః ।\nరస్యాః స్నిగ్ధాః స్థిరా హృద్యా ఆహారాః సాత్త్వికప్రియాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.9",
@@ -18864,7 +19763,8 @@
      "body": "కట్వమ్లలవణాత్యుష్ణతీక్ష్ణరూక్షవిదాహినః ।\nఆహారా రాజసస్యేష్టా దుఃఖశోకామయప్రదాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.10",
@@ -18894,7 +19794,8 @@
      "body": "యాతయామం గతరసం పూతి పర్యుషితం చ యత్ ।\nఉచ్ఛిష్టమపి చామేధ్యం భోజనం తామసప్రియమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.11",
@@ -18924,7 +19825,8 @@
      "body": "అఫలాకాఙ్క్షిభిర్యజ్ఞో విధిదృష్టో య ఇజ్యతే ।\nయష్టవ్యమేవేతి మనః సమాధాయ స సాత్త్వికః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.12",
@@ -18954,7 +19856,8 @@
      "body": "అభిసంధాయ తు ఫలం దమ్భార్థమపి చైవ యత్ ।\nఇజ్యతే భరతశ్రేష్ఠ తం యజ్ఞం విద్ధి రాజసమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.13",
@@ -18984,7 +19887,8 @@
      "body": "విధిహీనమసృష్టాన్నం మన్త్రహీనమదక్షిణమ్ ।\nశ్రద్ధావిరహితం యజ్ఞం తామసం పరిచక్షతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.14",
@@ -19014,7 +19918,8 @@
      "body": "దేవద్విజగురుప్రాజ్ఞపూజనం శౌచమార్జవమ్ ।\nబ్రహ్మచర్యమహింసా చ శారీరం తప ఉచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.15",
@@ -19044,7 +19949,8 @@
      "body": "అనుద్వేగకరం వాక్యం సత్యం ప్రియహితం చ యత్ ।\nస్వాధ్యాయాభ్యసనం చైవ వాఙ్మయం తప ఉచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.16",
@@ -19074,7 +19980,8 @@
      "body": "మనఃప్రసాదః సౌమ్యత్వం మౌనమాత్మవినిగ్రహః ।\nభావసంశుద్ధిరిత్యేతత్తపో మానసముచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.17",
@@ -19106,7 +20013,8 @@
      "body": "శ్రద్ధయా పరయా తప్తం తపస్తత్త్రివిధం నరైః ।\nఅఫలాకాఙ్క్షిభిర్యుక్తైః సాత్త్వికం పరిచక్షతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.18",
@@ -19136,7 +20044,8 @@
      "body": "సత్కారమానపూజార్థం తపో దమ్భేన చైవ యత్ ।\nక్రియతే తదిహ ప్రోక్తం రాజసం చలమధ్రువమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.19",
@@ -19166,7 +20075,8 @@
      "body": "మూఢగ్రాహేణాత్మనో యత్పీడయా క్రియతే తపః ।\nపరస్యోత్సాదనార్థం వా తత్తామసముదాహృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.20",
@@ -19196,7 +20106,8 @@
      "body": "దాతవ్యమితి యద్దానం దీయతేఽనుపకారిణే ।\nదేశే కాలే చ పాత్రే చ తద్దానం సాత్త్వికం స్మృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.21",
@@ -19226,7 +20137,8 @@
      "body": "యత్తు ప్రత్యుపకారార్థం ఫలముద్దిశ్య వా పునః ।\nదీయతే చ పరిక్లిష్టం తద్దానం రాజసం స్మృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.22",
@@ -19256,7 +20168,8 @@
      "body": "అదేశకాలే యద్దానమపాత్రేభ్యశ్చ దీయతే ।\nఅసత్కృతమవజ్ఞాతం తత్తామసముదాహృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.23",
@@ -19288,7 +20201,8 @@
      "body": "ఓం తత్సదితి నిర్దేశో బ్రహ్మణస్త్రివిధః స్మృతః ।\nబ్రాహ్మణాస్తేన వేదాశ్చ యజ్ఞాశ్చ విహితాః పురా ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.24",
@@ -19318,7 +20232,8 @@
      "body": "తస్మాదోమిత్యుదాహృత్య యజ్ఞదానతపఃక్రియాః ।\nప్రవర్తన్తే విధానోక్తాః సతతం బ్రహ్మవాదినామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.25",
@@ -19350,7 +20265,8 @@
      "body": "తదిత్యనభిసన్ధాయ ఫలం యజ్ఞతపఃక్రియాః ।\nదానక్రియాశ్చ వివిధాః క్రియన్తే మోక్షకాఙ్క్షిభిః ॥",
      "review_status": "pending"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.26",
@@ -19380,7 +20296,8 @@
      "body": "సద్భావే సాధుభావే చ సదిత్యేతత్ప్రయుజ్యతే ।\nప్రశస్తే కర్మణి తథా సచ్ఛబ్దః పార్థ యుజ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.27",
@@ -19410,7 +20327,8 @@
      "body": "యజ్ఞే తపసి దానే చ స్థితిః సదితి చోచ్యతే ।\nకర్మ చైవ తదర్థీయం సదిత్యేవాభిధీయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "17.28",
@@ -19440,7 +20358,8 @@
      "body": "అశ్రద్ధయా హుతం దత్తం తపస్తప్తం కృతం చ యత్ ।\nఅసదిత్యుచ్యతే పార్థ న చ తత్ప్రేత్య నో ఇహ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.1",
@@ -19470,7 +20389,8 @@
      "body": "సంన్యాసస్య మహాబాహో తత్త్వమిచ్ఛామి వేదితుమ్ ।\nత్యాగస్య చ హృషీకేశ పృథక్కేశినిషూదన ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.2",
@@ -19500,7 +20420,8 @@
      "body": "కామ్యానాం కర్మణాం న్యాసం సంన్యాసం కవయో విదుః ।\nసర్వకర్మఫలత్యాగం ప్రాహుస్త్యాగం విచక్షణాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.3",
@@ -19530,7 +20451,8 @@
      "body": "త్యాజ్యం దోషవదిత్యేకే కర్మ ప్రాహుర్మనీషిణః ।\nయజ్ఞదానతపఃకర్మ న త్యాజ్యమితి చాపరే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.4",
@@ -19562,7 +20484,8 @@
      "body": "నిశ్చయం శృణు మే తత్ర త్యాగే భరతసత్తమ ।\nత్యాగో హి పురుషవ్యాఘ్ర త్రివిధః సంప్రకీర్తితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.5",
@@ -19592,7 +20515,8 @@
      "body": "యజ్ఞదానతపఃకర్మ న త్యాజ్యం కార్యమేవ తత్ ।\nయజ్ఞో దానం తపశ్చైవ పావనాని మనీషిణామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.6",
@@ -19624,7 +20548,8 @@
      "body": "ఏతాన్యపి తు కర్మాణి సఙ్గం త్యక్త్వా ఫలాని చ ।\nకర్తవ్యానీతి మే పార్థ నిశ్చితం మతముత్తమమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.7",
@@ -19654,7 +20579,8 @@
      "body": "నియతస్య తు సంన్యాసః కర్మణో నోపపద్యతే ।\nమోహాత్తస్య పరిత్యాగస్తామసః పరికీర్తితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.8",
@@ -19684,7 +20610,8 @@
      "body": "దుఃఖమిత్యేవ యత్కర్మ కాయక్లేశభయాత్త్యజేత్ ।\nస కృత్వా రాజసం త్యాగం నైవ త్యాగఫలం లభేత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.9",
@@ -19714,7 +20641,8 @@
      "body": "కార్యమిత్యేవ యత్కర్మ నియతం క్రియతేఽర్జున ।\nసఙ్గం త్యక్త్వా ఫలం చైవ స త్యాగః సాత్త్వికో మతః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.10",
@@ -19744,7 +20672,8 @@
      "body": "న ద్వేష్ట్యకుశలం కర్మ కుశలే నానుషజ్జతే ।\nత్యాగీ సత్త్వసమావిష్టో మేధావీ ఛిన్నసంశయః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.11",
@@ -19774,7 +20703,8 @@
      "body": "న హి దేహభృతా శక్యం త్యక్తుం కర్మాణ్యశేషతః ।\nయస్తు కర్మఫలత్యాగీ స త్యాగీత్యభిధీయతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.12",
@@ -19804,7 +20734,8 @@
      "body": "అనిష్టమిష్టం మిశ్రం చ త్రివిధం కర్మణః ఫలమ్ ।\nభవత్యత్యాగినాం ప్రేత్య న తు సంన్యాసినాం క్వచిత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.13",
@@ -19834,7 +20765,8 @@
      "body": "పఞ్చైతాని మహాబాహో కారణాని నిబోధ మే ।\nసాంఖ్యే కృతాన్తే ప్రోక్తాని సిద్ధయే సర్వకర్మణామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.14",
@@ -19864,7 +20796,8 @@
      "body": "అధిష్ఠానం తథా కర్తా కరణం చ పృథగ్విధమ్ ।\nవివిధాశ్చ పృథక్చేష్టా దైవం చైవాత్ర పఞ్చమమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.15",
@@ -19894,7 +20827,8 @@
      "body": "శరీరవాఙ్మనోభిర్యత్కర్మ ప్రారభతే నరః ।\nన్యాయ్యం వా విపరీతం వా పఞ్చైతే తస్య హేతవః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.16",
@@ -19924,7 +20858,8 @@
      "body": "తత్రైవం సతి కర్తారమాత్మానం కేవలం తు యః ।\nపశ్యత్యకృతబుద్ధిత్వాన్న స పశ్యతి దుర్మతిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.17",
@@ -19954,7 +20889,8 @@
      "body": "యస్య నాహంకృతో భావో బుద్ధిర్యస్య న లిప్యతే ।\nహత్వాపి స ఇమాఁల్లోకాన్న హన్తి న నిబధ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.18",
@@ -19984,7 +20920,8 @@
      "body": "జ్ఞానం జ్ఞేయం పరిజ్ఞాతా త్రివిధా కర్మచోదనా ।\nకరణం కర్మ కర్తేతి త్రివిధః కర్మసంగ్రహః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.19",
@@ -20014,7 +20951,8 @@
      "body": "జ్ఞానం కర్మ చ కర్తా చ త్రిధైవ గుణభేదతః ।\nప్రోచ్యతే గుణసంఖ్యానే యథావచ్ఛృణు తాన్యపి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.20",
@@ -20044,7 +20982,8 @@
      "body": "సర్వభూతేషు యేనైకం భావమవ్యయమీక్షతే ।\nఅవిభక్తం విభక్తేషు తజ్జ్ఞానం విద్ధి సాత్త్వికమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.21",
@@ -20074,7 +21013,8 @@
      "body": "పృథక్త్వేన తు యజ్జ్ఞానం నానాభావాన్పృథగ్విధాన్ ।\nవేత్తి సర్వేషు భూతేషు తజ్జ్ఞానం విద్ధి రాజసమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.22",
@@ -20104,7 +21044,8 @@
      "body": "యత్తు కృత్స్నవదేకస్మిన్కార్యే సక్తమహైతుకమ్ ।\nఅతత్త్వార్థవదల్పం చ తత్తామసముదాహృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.23",
@@ -20134,7 +21075,8 @@
      "body": "నియతం సఙ్గరహితమరాగద్వేషతః కృతమ్ ।\nఅఫలప్రేప్సునా కర్మ యత్తత్సాత్త్వికముచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.24",
@@ -20164,7 +21106,8 @@
      "body": "యత్తు కామేప్సునా కర్మ సాహఙ్కారేణ వా పునః ।\nక్రియతే బహులాయాసం తద్రాజసముదాహృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.25",
@@ -20194,7 +21137,8 @@
      "body": "అనుబన్ధం క్షయం హింసామనపేక్ష్య చ పౌరుషమ్ ।\nమోహాదారభ్యతే కర్మ యత్తత్తామసముచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.26",
@@ -20224,7 +21168,8 @@
      "body": "ముక్తసఙ్గోఽనహంవాదీ ధృత్యుత్సాహసమన్వితః ।\nసిద్ధ్యసిద్ధ్యోర్నిర్వికారః కర్తా సాత్త్విక ఉచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.27",
@@ -20254,7 +21199,8 @@
      "body": "రాగీ కర్మఫలప్రేప్సుర్లుబ్ధో హింసాత్మకోఽశుచిః ।\nహర్షశోకాన్వితః కర్తా రాజసః పరికీర్తితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.28",
@@ -20284,7 +21230,8 @@
      "body": "అయుక్తః ప్రాకృతః స్తబ్ధః శఠో నైష్కృతికోఽలసః ।\nవిషాదీ దీర్ఘసూత్రీ చ కర్తా తామస ఉచ్యతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.29",
@@ -20316,7 +21263,8 @@
      "body": "బుద్ధేర్భేదం ధృతేశ్చైవ గుణతస్త్రివిధం శృణు ।\nప్రోచ్యమానమశేషేణ పృథక్త్వేన ధనఞ్జయ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.30",
@@ -20346,7 +21294,8 @@
      "body": "ప్రవృత్తిం చ నివృత్తిం చ కార్యాకార్యే భయాభయే ।\nబన్ధం మోక్షం చ యా వేత్తి బుద్ధిః సా పార్థ సాత్త్వికీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.31",
@@ -20376,7 +21325,8 @@
      "body": "యయా ధర్మమధర్మం చ కార్యం చాకార్యమేవ చ ।\nఅయథావత్ప్రజానాతి బుద్ధిః సా పార్థ రాజసీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.32",
@@ -20406,7 +21356,8 @@
      "body": "అధర్మం ధర్మమితి యా మన్యతే తమసాఽఽవృతా ।\nసర్వార్థాన్విపరీతాంశ్చ బుద్ధిః సా పార్థ తామసీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.33",
@@ -20436,7 +21387,8 @@
      "body": "ధృత్యా యయా ధారయతే మనఃప్రాణేన్ద్రియక్రియాః ।\nయోగేనావ్యభిచారిణ్యా ధృతిః సా పార్థ సాత్త్వికీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.34",
@@ -20466,7 +21418,8 @@
      "body": "యయా తు ధర్మకామార్థాన్ ధృత్యా ధారయతేఽర్జున ।\nప్రసఙ్గేన ఫలాకాఙ్క్షీ ధృతిః సా పార్థ రాజసీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.35",
@@ -20496,7 +21449,8 @@
      "body": "యయా స్వప్నం భయం శోకం విషాదం మదమేవ చ ।\nన విముఞ్చతి దుర్మేధా ధృతిః సా పార్థ తామసీ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.36",
@@ -20528,7 +21482,8 @@
      "body": "సుఖం త్విదానీం త్రివిధం శృణు మే భరతర్షభ ।\nఅభ్యాసాద్రమతే యత్ర దుఃఖాన్తం చ నిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.37",
@@ -20558,7 +21513,8 @@
      "body": "యత్తదగ్రే విషమివ పరిణామేఽమృతోపమమ్ ।\nతత్సుఖం సాత్త్వికం ప్రోక్తమాత్మబుద్ధిప్రసాదజమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.38",
@@ -20588,7 +21544,8 @@
      "body": "విషయేన్ద్రియసంయోగాద్యత్తదగ్రేఽమృతోపమమ్ ।\nపరిణామే విషమివ తత్సుఖం రాజసం స్మృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.39",
@@ -20618,7 +21575,8 @@
      "body": "యదగ్రే చానుబన్ధే చ సుఖం మోహనమాత్మనః ।\nనిద్రాలస్యప్రమాదోత్థం తత్తామసముదాహృతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.40",
@@ -20650,7 +21608,8 @@
      "body": "న తదస్తి పృథివ్యాం వా దివి దేవేషు వా పునః ।\nసత్త్వం ప్రకృతిజైర్ముక్తం యదేభిః స్యాత్త్రిభిర్గుణైః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.41",
@@ -20680,7 +21639,8 @@
      "body": "బ్రాహ్మణక్షత్రియవిశాం శూద్రాణాం చ పరంతప ।\nకర్మాణి ప్రవిభక్తాని స్వభావప్రభవైర్గుణైః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.42",
@@ -20710,7 +21670,8 @@
      "body": "శమో దమస్తపః శౌచం క్షాన్తిరార్జవమేవ చ ।\nజ్ఞానం విజ్ఞానమాస్తిక్యం బ్రహ్మకర్మ స్వభావజమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.43",
@@ -20740,7 +21701,8 @@
      "body": "శౌర్యం తేజో ధృతిర్దాక్ష్యం యుద్ధే చాప్యపలాయనమ్ ।\nదానమీశ్వరభావశ్చ క్షాత్రం కర్మ స్వభావజమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.44",
@@ -20770,7 +21732,8 @@
      "body": "కృషిగౌరక్ష్యవాణిజ్యం వైశ్యకర్మ స్వభావజమ్ ।\nపరిచర్యాత్మకం కర్మ శూద్రస్యాపి స్వభావజమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.45",
@@ -20800,7 +21763,8 @@
      "body": "స్వే స్వే కర్మణ్యభిరతః సంసిద్ధిం లభతే నరః ।\nస్వకర్మనిరతః సిద్ధిం యథా విన్దతి తచ్ఛృణు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.46",
@@ -20830,7 +21794,8 @@
      "body": "యతః ప్రవృత్తిర్భూతానాం యేన సర్వమిదం తతమ్ ।\nస్వకర్మణా తమభ్యర్చ్య సిద్ధిం విన్దతి మానవః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.47",
@@ -20860,7 +21825,8 @@
      "body": "శ్రేయాన్స్వధర్మో విగుణః పరధర్మాత్స్వనుష్ఠితాత్ ।\nస్వభావనియతం కర్మ కుర్వన్నాప్నోతి కిల్బిషమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.48",
@@ -20890,7 +21856,8 @@
      "body": "సహజం కర్మ కౌన్తేయ సదోషమపి న త్యజేత్ ।\nసర్వారమ్భా హి దోషేణ ధూమేనాగ్నిరివావృతాః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.49",
@@ -20920,7 +21887,8 @@
      "body": "అసక్తబుద్ధిః సర్వత్ర జితాత్మా విగతస్పృహః ।\nనైష్కర్మ్యసిద్ధిం పరమాం సంన్యాసేనాధిగచ్ఛతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.50",
@@ -20950,7 +21918,8 @@
      "body": "సిద్ధిం ప్రాప్తో యథా బ్రహ్మ తథాప్నోతి నిబోధ మే ।\nసమాసేనైవ కౌన్తేయ నిష్ఠా జ్ఞానస్య యా పరా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.51",
@@ -20980,7 +21949,8 @@
      "body": "బుద్ధ్యా విశుద్ధయా యుక్తో ధృత్యాఽఽత్మానం నియమ్య చ ।\nశబ్దాదీన్ విషయాంస్త్యక్త్వా రాగద్వేషౌ వ్యుదస్య చ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.52",
@@ -21010,7 +21980,8 @@
      "body": "వివిక్తసేవీ లఘ్వాశీ యతవాక్కాయమానసః ।\nధ్యానయోగపరో నిత్యం వైరాగ్యం సముపాశ్రితః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.53",
@@ -21040,7 +22011,8 @@
      "body": "అహఙ్కారం బలం దర్పం కామం క్రోధం పరిగ్రహమ్ ।\nవిముచ్య నిర్మమః శాన్తో బ్రహ్మభూయాయ కల్పతే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.54",
@@ -21070,7 +22042,8 @@
      "body": "బ్రహ్మభూతః ప్రసన్నాత్మా న శోచతి న కాఙ్క్షతి ।\nసమః సర్వేషు భూతేషు మద్భక్తిం లభతే పరామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.55",
@@ -21100,7 +22073,8 @@
      "body": "భక్త్యా మామభిజానాతి యావాన్యశ్చాస్మి తత్త్వతః ।\nతతో మాం తత్త్వతో జ్ఞాత్వా విశతే తదనన్తరమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.56",
@@ -21130,7 +22104,8 @@
      "body": "సర్వకర్మాణ్యపి సదా కుర్వాణో మద్వ్యపాశ్రయః ।\nమత్ప్రసాదాదవాప్నోతి శాశ్వతం పదమవ్యయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.57",
@@ -21160,7 +22135,8 @@
      "body": "చేతసా సర్వకర్మాణి మయి సంన్యస్య మత్పరః ।\nబుద్ధియోగముపాశ్రిత్య మచ్చిత్తః సతతం భవ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.58",
@@ -21190,7 +22166,8 @@
      "body": "మచ్చిత్తః సర్వదుర్గాణి మత్ప్రసాదాత్తరిష్యసి ।\nఅథ చేత్త్వమహఙ్కారాన్న శ్రోష్యసి వినఙ్క్ష్యసి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.59",
@@ -21220,7 +22197,8 @@
      "body": "యదహఙ్కారమాశ్రిత్య న యోత్స్య ఇతి మన్యసే ।\nమిథ్యైష వ్యవసాయస్తే ప్రకృతిస్త్వాం నియోక్ష్యతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.60",
@@ -21250,7 +22228,8 @@
      "body": "స్వభావజేన కౌన్తేయ నిబద్ధః స్వేన కర్మణా ।\nకర్తుం నేచ్ఛసి యన్మోహాత్కరిష్యస్యవశోఽపి తత్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.61",
@@ -21280,7 +22259,8 @@
      "body": "ఈశ్వరః సర్వభూతానాం హృద్దేశేఽర్జున తిష్ఠతి ।\nభ్రామయన్సర్వభూతాని యన్త్రారూఢాని మాయయా ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.62",
@@ -21310,7 +22290,8 @@
      "body": "తమేవ శరణం గచ్ఛ సర్వభావేన భారత ।\nతత్ప్రసాదాత్పరాం శాన్తిం స్థానం ప్రాప్స్యసి శాశ్వతమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.63",
@@ -21340,7 +22321,8 @@
      "body": "ఇతి తే జ్ఞానమాఖ్యాతం గుహ్యాద్గుహ్యతరం మయా ।\nవిమృశ్యైతదశేషేణ యథేచ్ఛసి తథా కురు ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.64",
@@ -21372,7 +22354,8 @@
      "body": "సర్వగుహ్యతమం భూయః శృణు మే పరమం వచః ।\nఇష్టోఽసి మే దృఢమితి తతో వక్ష్యామి తే హితమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.65",
@@ -21402,7 +22385,8 @@
      "body": "మన్మనా భవ మద్భక్తో మద్యాజీ మాం నమస్కురు ।\nమామేవైష్యసి సత్యం తే ప్రతిజానే ప్రియోఽసి మే ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.66",
@@ -21432,7 +22416,8 @@
      "body": "సర్వధర్మాన్పరిత్యజ్య మామేకం శరణం వ్రజ ।\nఅహం త్వా సర్వపాపేభ్యో మోక్షయిష్యామి మా శుచః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.67",
@@ -21462,7 +22447,8 @@
      "body": "ఇదం తే నాతపస్కాయ నాభక్తాయ కదాచన ।\nన చాశుశ్రూషవే వాచ్యం న చ మాం యోఽభ్యసూయతి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.68",
@@ -21494,7 +22480,8 @@
      "body": "య ఇమం పరమం గుహ్యం మద్భక్తేష్వభిధాస్యతి ।\nభక్తిం మయి పరాం కృత్వా మామేవైష్యత్యసంశయః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.69",
@@ -21526,7 +22513,8 @@
      "body": "న చ తస్మాన్మనుష్యేషు కశ్చిన్మే ప్రియకృత్తమః ।\nభవితా న చ మే తస్మాదన్యః ప్రియతరో భువి ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.70",
@@ -21556,7 +22544,8 @@
      "body": "అధ్యేష్యతే చ య ఇమం ధర్మ్యం సంవాదమావయోః ।\nజ్ఞానయజ్ఞేన తేనాహమిష్టః స్యామితి మే మతిః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.71",
@@ -21588,7 +22577,8 @@
      "body": "శ్రద్ధావాననసూయశ్చ శృణుయాదపి యో నరః ।\nసోఽపి ముక్తః శుభాఁల్లోకాన్ప్రాప్నుయాత్పుణ్యకర్మణామ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.72",
@@ -21618,7 +22608,8 @@
      "body": "కచ్చిదేతచ్ఛ్రుతం పార్థ త్వయైకాగ్రేణ చేతసా ।\nకచ్చిదజ్ఞానసంమోహః ప్రనష్టస్తే ధనఞ్జయ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.73",
@@ -21648,7 +22639,8 @@
      "body": "నష్టో మోహః స్మృతిర్లబ్ధా త్వత్ప్రసాదాన్మయాచ్యుత ।\nస్థితోఽస్మి గతసన్దేహః కరిష్యే వచనం తవ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.74",
@@ -21678,7 +22670,8 @@
      "body": "ఇత్యహం వాసుదేవస్య పార్థస్య చ మహాత్మనః ।\nసంవాదమిమమశ్రౌషమద్భుతం రోమహర్షణమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.75",
@@ -21708,7 +22701,8 @@
      "body": "వ్యాసప్రసాదాచ్ఛ్రుతవానేతద్గుహ్యమహం పరమ్ ।\nయోగం యోగేశ్వరాత్కృష్ణాత్సాక్షాత్కథయతః స్వయమ్ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.76",
@@ -21738,7 +22732,8 @@
      "body": "రాజన్సంస్మృత్య సంస్మృత్య సంవాదమిమమద్భుతమ్ ।\nకేశవార్జునయోః పుణ్యం హృష్యామి చ ముహుర్ముహుః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.77",
@@ -21768,7 +22763,8 @@
      "body": "తచ్చ సంస్మృత్య సంస్మృత్య రూపమత్యద్భుతం హరేః ।\nవిస్మయో మే మహాన్ రాజన్ హృష్యామి చ పునః పునః ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   },
   {
    "id": "18.78",
@@ -21798,7 +22794,8 @@
      "body": "యత్ర యోగేశ్వరః కృష్ణో యత్ర పార్థో ధనుర్ధరః ।\nతత్ర శ్రీర్విజయో భూతిర్ధ్రువా నీతిర్మతిర్మమ ॥",
      "review_status": "unreviewed"
     }
-   ]
+   ],
+   "word_meanings": []
   }
  ],
  "aliases": [

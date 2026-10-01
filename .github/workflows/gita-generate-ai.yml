@@ -1,0 +1,78 @@
+# Generate AI explanations with free-tier LLMs (manual).
+#
+# Add at least one repository secret: GEMINI_API_KEY, GROQ_API_KEY or
+# OPENROUTER_API_KEY (Settings → Secrets and variables → Actions).
+# Runs are resumable: already-generated items in content/ai/ are skipped, so
+# when today's free quota runs out, run it again tomorrow.
+name: gita-generate-ai
+
+on:
+  workflow_dispatch:
+    inputs:
+      languages:
+        description: "Languages (comma-separated)"
+        default: "en,te"
+      kinds:
+        description: "What to generate: chapter, verse, or chapter,verse"
+        default: "chapter,verse"
+      only:
+        description: "Optional: only these verse ids / chapter numbers (e.g. 2,2.47,2.48)"
+        default: ""
+      limit:
+        description: "Maximum new items this run"
+        default: "150"
+      commit:
+        description: "Commit the results to this branch (otherwise only upload them)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gita-generate-ai-${{ github.ref }}
+
+jobs:
+  generate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        working-directory: gita-companion
+        run: pip install -e content -e backend
+      - name: Generate (free-tier providers from backend/llm.yaml)
+        working-directory: gita-companion/backend
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          args=(--dataset ../content/data/gita.json --out ../content/ai
+                --languages "${{ inputs.languages }}" --kinds "${{ inputs.kinds }}" --limit "${{ inputs.limit }}")
+          if [ -n "${{ inputs.only }}" ]; then args+=(--only "${{ inputs.only }}"); fi
+          python -m workers.generate_content "${args[@]}" || echo "Some items failed; see content/ai/failures.log"
+      - name: Fetch pinned sources and rebuild the dataset with the new content
+        working-directory: gita-companion/content
+        run: |
+          fetch() { git init -q "$1" && git -C "$1" fetch -q --depth 1 "$2" "$3" && git -C "$1" checkout -q FETCH_HEAD; }
+          fetch "$RUNNER_TEMP/gita" https://github.com/gita/gita.git c6fce39595445768876ddbb8d1268a9c935e1d2b
+          fetch "$RUNNER_TEMP/vs" https://github.com/vedicscriptures/bhagavad-gita-data.git 43dfc8db815d01e15a347ea294b089334cf2aa17
+          gita-content build --gita-json "$RUNNER_TEMP/gita/data/verse.json" --verify-with "$RUNNER_TEMP/vs/slok"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gita-ai-content
+          path: |
+            gita-companion/content/ai/
+            gita-companion/content/data/gita.json
+      - name: Commit
+        if: ${{ inputs.commit }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gita-companion/content/ai gita-companion/content/data
+          git diff --cached --quiet || git commit -m "Add AI-generated explanations (unreviewed)"
+          git push

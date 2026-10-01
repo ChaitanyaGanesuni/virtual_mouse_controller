@@ -2,14 +2,14 @@
 
 An offline-first, audio-first Bhagavad Gita study app (Android APK first)
 with a grounded AI teacher. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-for the approved design and [docs/PHASE-2.md](docs/PHASE-2.md) / [docs/PHASE-3.md](docs/PHASE-3.md) for the
+for the approved design and the phase reports in [docs/](docs/) for the
 current state.
 
 | Directory | What | Status |
 |---|---|---|
 | `content/` | Content pipeline: canonical Sanskrit text, transliteration, licence register, mobile SQLite pack | Phase 2 ✅ |
-| `backend/` | FastAPI modular monolith. Phase 2: database models + migrations | Phase 2 ✅ (DB layer) |
-| `mobile/` | Flutter app (offline, Android APK built by CI) | Phase 3 ✅ |
+| `backend/` | Database layer, free-tier LLM providers, batch explanation generator | Phases 2 + 4 |
+| `mobile/` | Flutter app: reader, chapters, search (offline, APK built by CI) | Phase 4 ✅ |
 | `infra/` | Local dev services (Postgres + pgvector) | ✅ |
 
 ## Quick start

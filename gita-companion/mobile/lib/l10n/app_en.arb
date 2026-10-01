@@ -4,15 +4,39 @@
   "todaysVerse": "Today's verse",
   "continueLearning": "Continue learning",
   "beginWithChapter": "Begin with Chapter {number}",
-  "@beginWithChapter": {"placeholders": {"number": {"type": "int"}}},
+  "@beginWithChapter": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "chapters": "Chapters",
   "allChapters": "All 18 chapters",
   "chapterNumber": "Chapter {number}",
-  "@chapterNumber": {"placeholders": {"number": {"type": "int"}}},
+  "@chapterNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "verseCount": "{count, plural, =1{1 verse} other{{count} verses}}",
-  "@verseCount": {"placeholders": {"count": {"type": "int"}}},
+  "@verseCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "verseRef": "Verse {ref}",
-  "@verseRef": {"placeholders": {"ref": {"type": "String"}}},
+  "@verseRef": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
   "verses": "Verses",
   "previousVerse": "Previous",
   "nextVerse": "Next",
@@ -21,7 +45,13 @@
   "nonCanonicalNote": "This verse appears only in some editions, where it is numbered 13.1. It is not counted among the 700 verses.",
   "translationsPending": "Translations and explanations are not installed yet. They will be added once each source is cleared for use and checked.",
   "sourceLabel": "Source: {title}",
-  "@sourceLabel": {"placeholders": {"title": {"type": "String"}}},
+  "@sourceLabel": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "reviewUnreviewed": "Not yet reviewed",
   "reviewPending": "Corrected, awaiting scholarly review",
   "reviewReviewed": "Reviewed",
@@ -57,5 +87,96 @@
   "welcome": "Welcome",
   "welcomeBody": "Choose how you would like to read. You can change these choices any time in Settings.",
   "begin": "Begin",
-  "previewSample": "Preview"
+  "previewSample": "Preview",
+  "search": "Search",
+  "searchHint": "Verse number, Sanskrit, or a word",
+  "searchNoResults": "No verses found.",
+  "searchMeaningLater": "Searching by meaning (for example “anxiety about results”) comes with the AI teacher.",
+  "matchReference": "Verse number",
+  "matchSanskrit": "Sanskrit",
+  "matchTransliteration": "Transliteration",
+  "matchTelugu": "Telugu script",
+  "matchTranslation": "Translation",
+  "matchExplanation": "Explanation",
+  "centralTheme": "Central theme",
+  "summary": "Summary",
+  "readMore": "Read more",
+  "showLess": "Show less",
+  "aboutMinutesRead": "About {minutes} min to read",
+  "@aboutMinutesRead": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "aboutMinutesListen": "About {minutes} min to listen",
+  "@aboutMinutesListen": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "startReading": "Start reading",
+  "startListening": "Start listening",
+  "audioComingSoon": "Listening arrives in the next update.",
+  "wordByWord": "Word by word",
+  "understand": "Understand",
+  "modeSimple": "Simple",
+  "modeDeep": "Deeper",
+  "modePractical": "In practice",
+  "modeStory": "Story",
+  "modeChild": "For young readers",
+  "modeTerms": "Sanskrit terms",
+  "explanationsNotYet": "Explanations for this verse have not been generated yet.",
+  "shownInOtherLanguage": "Not yet available in {language}; showing {other}.",
+  "@shownInOtherLanguage": {
+    "placeholders": {
+      "language": {
+        "type": "String"
+      },
+      "other": {
+        "type": "String"
+      }
+    }
+  },
+  "aiGeneratedBy": "AI-generated ({model})",
+  "@aiGeneratedBy": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "translation": "Translation",
+  "textSmaller": "Smaller text",
+  "textLarger": "Larger text",
+  "script": "Script",
+  "verseOfTotal": "{position} of {total} in this chapter",
+  "@verseOfTotal": {
+    "placeholders": {
+      "position": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "translationPending": "No translation is installed yet. A public-domain translation will be added once it has been imported and checked.",
+  "chapterPosition": "Chapter {chapter} · {position} of {total}",
+  "@chapterPosition": {
+    "placeholders": {
+      "chapter": {
+        "type": "int"
+      },
+      "position": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

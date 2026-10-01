@@ -9,7 +9,7 @@ from pathlib import Path
 from .romanize import loose
 
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schema" / "content_pack.sql"
-PACK_SCHEMA_VERSION = 1
+PACK_SCHEMA_VERSION = 2
 
 
 def pack_manifest(dataset: dict) -> dict:
@@ -55,7 +55,7 @@ def _fill(db: sqlite3.Connection, ds: dict, built_at: datetime) -> None:
 
     db.executemany(
         "INSERT INTO source VALUES (:id, :kind, :title, :author, :year, :language, :license,"
-        " :license_note, :url, :retrieved_commit, :is_ai_generated)",
+        " :license_note, :url, :retrieved_commit, :is_ai_generated, :model_id, :prompt_version)",
         ds["sources"],
     )
     for c in ds["chapters"]:
@@ -88,14 +88,20 @@ def _fill(db: sqlite3.Connection, ds: dict, built_at: datetime) -> None:
             " :review_status)",
             [{**t, "verse_id": v["id"]} for t in v["texts"]],
         )
+        db.executemany(
+            "INSERT INTO word_meaning VALUES"
+            " (:id, :verse_id, :source_id, :position, :word, :language, :meaning)",
+            [{**w, "verse_id": v["id"]} for w in v.get("word_meanings", [])],
+        )
         by_lang = {(t["kind"], t["language"]): t["body"] for t in v["texts"]}
         iast = by_lang.get(("transliteration", "sa-Latn"), "")
         telugu = by_lang.get(("transliteration", "sa-Telu"), "")
         translation = " ".join(t["body"] for t in v["texts"] if t["kind"] == "translation")
+        explanation = " ".join(t["body"] for t in v["texts"] if t["kind"] in ("simple", "deep", "practical"))
         roman = loose(iast)
         db.execute(
-            "INSERT INTO verse_fts VALUES (?, ?, ?, ?, ?, ?)",
-            (v["id"], v["sanskrit"], iast, roman, telugu, translation),
+            "INSERT INTO verse_fts VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (v["id"], v["sanskrit"], iast, roman, telugu, translation, explanation),
         )
         db.execute(
             "INSERT INTO verse_fts_sub VALUES (?, ?, ?, ?)",

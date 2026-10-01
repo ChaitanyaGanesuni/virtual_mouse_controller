@@ -1,12 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../core/content/content_repository.dart';
+import '../core/search/search_service.dart';
 import '../core/settings/app_settings.dart';
 
 /// Composition root. Real implementations are supplied in main.dart via
 /// ProviderScope overrides; tests supply fakes the same way.
 final contentRepositoryProvider = Provider<ContentRepository>(
   (ref) => throw UnimplementedError('contentRepositoryProvider must be overridden'),
+);
+
+final searchServiceProvider = Provider<SearchService>(
+  (ref) => throw UnimplementedError('searchServiceProvider must be overridden'),
 );
 
 final settingsRepositoryProvider = Provider<SettingsRepository>(

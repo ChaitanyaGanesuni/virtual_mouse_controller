@@ -6,6 +6,7 @@ import '../features/chapters/chapters_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/reader/verse_screen.dart';
+import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
 import 'providers.dart';
 
@@ -40,6 +41,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
         builder: (_, state) => VerseScreen(verseId: state.pathParameters['id']!),
       ),
+      GoRoute(path: '/search', builder: (_, _) => const SearchScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/settings/sources', builder: (_, _) => const SourcesScreen()),
     ],

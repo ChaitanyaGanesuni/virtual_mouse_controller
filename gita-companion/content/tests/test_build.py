@@ -240,7 +240,7 @@ def test_pack_manifest(dataset):
     m = pack_manifest(dataset)
     assert m == {
         "pack_schema_version": PACK_SCHEMA_VERSION,
-        "content_format": "gita-companion-content/1",
+        "content_format": "gita-companion-content/2",
         "content_hash": dataset["content_hash"],
         "verse_count": 701,
     }

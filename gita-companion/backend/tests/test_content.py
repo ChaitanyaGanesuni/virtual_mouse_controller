@@ -132,3 +132,44 @@ def test_review_status_survives_import(session):
         session.execute(text("select id, review_status from verse where id in ('1.1','16.20')")).all()
     )
     assert statuses == {"1.1": "unreviewed", "16.20": "pending"}
+
+
+def test_import_ai_source_and_word_meanings(session, dataset):
+    import copy
+
+    from app.modules.content.models import Source, WordMeaning
+
+    ds = copy.deepcopy(dataset)
+    ai = {
+        "id": "ai-groq-test-model-verse-explain-v1",
+        "kind": "ai",
+        "title": "AI",
+        "author": "test-model via groq",
+        "year": None,
+        "language": "mul",
+        "license": "AI-generated text",
+        "license_note": "",
+        "url": None,
+        "retrieved_commit": None,
+        "is_ai_generated": True,
+        "model_id": "test-model",
+        "prompt_version": "verse-explain-v1",
+    }
+    ds["sources"].append(ai)
+    v = next(v for v in ds["verses"] if v["id"] == "2.47")
+    v["word_meanings"] = [
+        {
+            "id": str(uuid.uuid4()),
+            "source_id": ai["id"],
+            "language": "en",
+            "position": 0,
+            "word": "karmaṇi",
+            "meaning": "in action",
+        },
+    ]
+    import_dataset(session, ds)
+    session.flush()
+    src = session.get(Source, ai["id"])
+    assert src.is_ai_generated and src.model_id == "test-model"
+    w = session.scalars(select(WordMeaning).where(WordMeaning.verse_id == "2.47")).one()
+    assert (w.word_sa, w.meaning) == ("karmaṇi", "in action")

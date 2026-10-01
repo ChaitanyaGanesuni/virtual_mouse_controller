@@ -26,9 +26,10 @@ from app.modules.content.models import (
     Verse,
     VerseAlias,
     VerseText,
+    WordMeaning,
 )
 
-SUPPORTED_FORMATS = {"gita-companion-content/1"}
+SUPPORTED_FORMATS = {"gita-companion-content/1", "gita-companion-content/2"}
 
 
 class ContentImportError(ValueError):
@@ -97,6 +98,22 @@ def import_dataset(session: Session, ds: dict) -> int:
     ]
     for i in range(0, len(texts), 500):
         _upsert(session, VerseText, texts[i : i + 500], ["id"])
+
+    words = [
+        {
+            "id": w["id"],
+            "verse_id": v["id"],
+            "source_id": w["source_id"],
+            "position": w["position"],
+            "word_sa": w["word"],
+            "language": w["language"],
+            "meaning": w["meaning"],
+        }
+        for v in ds["verses"]
+        for w in v.get("word_meanings", [])
+    ]
+    for i in range(0, len(words), 500):
+        _upsert(session, WordMeaning, words[i : i + 500], ["id"])
 
     _upsert(session, VerseAlias, ds["aliases"], ["edition", "ref"])
     _upsert(

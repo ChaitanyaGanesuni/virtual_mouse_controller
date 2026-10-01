@@ -1,0 +1,49 @@
+# LLM providers, tried in order. Free tiers first; nothing here costs money.
+#
+# Free-tier models, limits and terms change often. Verify each entry against
+# the provider's current documentation before relying on it, and keep
+# `daily_request_budget` below the provider's real daily limit.
+#
+# API keys are read from the environment variable named in `api_key_env`
+# and must never be committed. A provider whose key is not set is skipped.
+#
+# Data use: some free tiers may use prompts to improve the provider's
+# products. Batch content generation only sends public scripture text, so
+# that is acceptable there; user questions (Phase 6) must only go to
+# providers marked `user_data_ok: true`.
+
+providers:
+  - name: gemini
+    base_url: https://generativelanguage.googleapis.com/v1beta/openai
+    model: gemini-2.5-flash          # verify current free-tier model id
+    api_key_env: GEMINI_API_KEY
+    daily_request_budget: 200
+    user_data_ok: false              # free tier: prompts may be used to improve Google products
+    terms_url: https://ai.google.dev/gemini-api/terms
+
+  - name: groq
+    base_url: https://api.groq.com/openai/v1
+    model: llama-3.3-70b-versatile   # verify current model id
+    api_key_env: GROQ_API_KEY
+    daily_request_budget: 500
+    user_data_ok: true
+    terms_url: https://groq.com/terms-of-use/
+    output_terms: "Llama Community License applies to the model; keep the 'Built with Llama' notice in About."
+
+  - name: openrouter
+    base_url: https://openrouter.ai/api/v1
+    model: meta-llama/llama-3.3-70b-instruct:free   # any ':free' model; verify availability
+    api_key_env: OPENROUTER_API_KEY
+    daily_request_budget: 45
+    user_data_ok: false              # depends on the upstream host of the free model
+    terms_url: https://openrouter.ai/terms
+    extra_headers:
+      X-Title: Gita Companion
+
+  # Self-hosted, unlimited and private. Enable by setting OLLAMA_BASE_URL.
+  - name: ollama
+    base_url_env: OLLAMA_BASE_URL    # e.g. http://localhost:11434/v1
+    model: qwen2.5:7b-instruct
+    daily_request_budget: null
+    user_data_ok: true
+    supports_json_mode: true

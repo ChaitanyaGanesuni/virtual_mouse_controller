@@ -21,7 +21,7 @@ class ContentPackInstaller {
 
   static const packAsset = 'assets/content/gita_content_pack.sqlite';
   static const manifestAsset = 'assets/content/pack_manifest.json';
-  static const supportedSchemaVersion = 1;
+  static const supportedSchemaVersion = 2;
 
   Future<Database> install() async {
     final manifest = jsonDecode(utf8.decode(_bytes(await loadAsset(manifestAsset)))) as Map<String, dynamic>;

@@ -13,6 +13,9 @@ abstract interface class ContentRepository {
   /// A single verse with its texts, or null if [id] does not exist.
   Verse? verse(String id);
 
+  /// Every verse id in reading order (1.1 … 18.78, including 13.0).
+  List<String> readingOrder();
+
   /// The verse before/after [id] in reading order across chapters.
   String? previousVerseId(String id);
   String? nextVerseId(String id);

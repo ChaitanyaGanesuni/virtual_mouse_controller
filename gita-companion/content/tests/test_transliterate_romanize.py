@@ -52,3 +52,12 @@ def test_known_limitation_bare_stripped_r_vowel():
 def test_loose_output_is_ascii_words():
     out = loose("saṅgo'stvakarmaṇi ॥ mā")
     assert out == "sangostvakarmani ma"
+
+
+def test_shared_vectors_file_matches_python_implementation():
+    import json
+    from pathlib import Path
+
+    data = json.loads((Path(__file__).parent / "romanize_vectors.json").read_text(encoding="utf-8"))
+    for v in data["vectors"]:
+        assert loose(v["input"]) == v["loose"], v["input"]

@@ -62,7 +62,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install -e ".[dev]"
+      # The content generator (workers/) uses the canonical verse table from the content package.
+      - run: pip install -e ../content -e ".[dev]"
       - run: ruff check . && ruff format --check .
       - run: pytest -q
 
