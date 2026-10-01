@@ -22,6 +22,7 @@ class AppSettings {
     this.themeMode = ThemeMode.system,
     this.onboardingDone = false,
     this.voicePrefs = const {},
+    this.tutorServer = '',
   });
 
   static const supportedLanguages = ['en', 'te'];
@@ -40,6 +41,9 @@ class AppSettings {
   /// Preferred TTS voice per language ('en', 'te', 'sa') → voice id.
   final Map<String, String> voicePrefs;
 
+  /// AI teacher server chosen in Settings; empty = the address built into the app.
+  final String tutorServer;
+
   Locale get locale => Locale(uiLanguage);
 
   AppSettings copyWith({
@@ -52,6 +56,7 @@ class AppSettings {
     ThemeMode? themeMode,
     bool? onboardingDone,
     Map<String, String>? voicePrefs,
+    String? tutorServer,
   }) => AppSettings(
     uiLanguage: uiLanguage ?? this.uiLanguage,
     verseScript: verseScript ?? this.verseScript,
@@ -62,6 +67,7 @@ class AppSettings {
     themeMode: themeMode ?? this.themeMode,
     onboardingDone: onboardingDone ?? this.onboardingDone,
     voicePrefs: voicePrefs ?? this.voicePrefs,
+    tutorServer: tutorServer ?? this.tutorServer,
   );
 
   @override
@@ -75,7 +81,8 @@ class AppSettings {
       other.textScale == textScale &&
       other.themeMode == themeMode &&
       other.onboardingDone == onboardingDone &&
-      mapEquals(other.voicePrefs, voicePrefs);
+      mapEquals(other.voicePrefs, voicePrefs) &&
+      other.tutorServer == tutorServer;
 
   @override
   int get hashCode => Object.hash(
@@ -88,6 +95,7 @@ class AppSettings {
     themeMode,
     onboardingDone,
     Object.hashAllUnordered(voicePrefs.entries.map((e) => '${e.key}=${e.value}')),
+    tutorServer,
   );
 }
 
@@ -114,6 +122,7 @@ class DriftSettingsRepository implements SettingsRepository {
       themeMode: ThemeMode.values.firstWhere((m) => m.name == row.theme, orElse: () => ThemeMode.system),
       onboardingDone: row.onboardingDone,
       voicePrefs: _decodeVoices(row.voicePrefs),
+      tutorServer: row.tutorServer,
     );
   }
 
@@ -130,6 +139,7 @@ class DriftSettingsRepository implements SettingsRepository {
         theme: Value(s.themeMode.name),
         onboardingDone: Value(s.onboardingDone),
         voicePrefs: Value(jsonEncode(s.voicePrefs)),
+        tutorServer: Value(s.tutorServer),
         updatedAt: Value(DateTime.now()),
       ),
     );

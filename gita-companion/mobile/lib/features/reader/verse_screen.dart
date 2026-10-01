@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../app/providers.dart';
 import '../../core/content/models.dart';
@@ -184,6 +185,13 @@ class _VersePage extends ConsumerWidget {
         ),
         const SizedBox(height: 14),
         VerseListenActions(verse: verse, explanation: shownExplanation),
+        Center(
+          child: TextButton.icon(
+            icon: const Icon(Icons.auto_awesome, size: 18),
+            label: Text(l.askAboutVerse),
+            onPressed: () => context.push('/tutor?verse=${verse.id}'),
+          ),
+        ),
         if (!verse.isCanonical) ...[
           const SizedBox(height: 16),
           Notice(text: l.nonCanonicalNote, icon: Icons.info_outline),
@@ -297,11 +305,16 @@ class _ExplanationCard extends ConsumerWidget {
               ref.read(settingsProvider.notifier).update((s) => s.copyWith(explanationLanguage: v.first)),
         ),
         const SizedBox(height: 14),
-        if (!anyExplanation)
-          Notice(text: l.explanationsNotYet, icon: Icons.hourglass_empty)
-        else if (text == null)
-          Notice(text: l.explanationsNotYet, icon: Icons.hourglass_empty)
-        else ...[
+        if (!anyExplanation || text == null) ...[
+          Notice(text: l.explanationsNotYet, icon: Icons.hourglass_empty),
+          const SizedBox(height: 8),
+          // Generated on demand by the AI teacher, with checked sources.
+          OutlinedButton.icon(
+            icon: const Icon(Icons.auto_awesome, size: 18),
+            label: Text(l.explainWithTeacher),
+            onPressed: () => context.push('/tutor?verse=${verse.id}&explain=${mode.kind}'),
+          ),
+        ] else ...[
           if (text.language != language)
             Padding(
               padding: const EdgeInsets.only(bottom: 8),

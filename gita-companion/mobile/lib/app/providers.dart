@@ -1,4 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
+
+import '../core/api/api_client.dart';
+import '../core/api/server_address.dart';
+import '../core/api/token_store.dart';
 
 import '../core/audio/audio_cache.dart';
 import '../core/audio/listening_progress.dart';
@@ -9,6 +14,7 @@ import '../core/audio/tts_provider.dart';
 import '../core/content/content_repository.dart';
 import '../core/search/search_service.dart';
 import '../core/settings/app_settings.dart';
+import '../features/tutor/tutor_api.dart';
 
 /// Composition root. Real implementations are supplied in main.dart via
 /// ProviderScope overrides; tests supply fakes the same way.
@@ -85,3 +91,35 @@ final playbackControllerProvider = Provider<PlaybackController>((ref) {
 final manifestResolverProvider = Provider<ManifestResolver>(
   (ref) => ManifestResolver(ref.watch(contentRepositoryProvider)),
 );
+
+// ---- AI teacher (the only part of the app that needs the network) ---------
+
+final httpClientProvider = Provider<http.Client>((ref) {
+  final client = http.Client();
+  ref.onDispose(client.close);
+  return client;
+});
+
+/// Overridden in main.dart with the Keystore-backed store.
+final tokenStoreProvider = Provider<TokenStore>((ref) => MemoryTokenStore());
+
+/// The address compiled into the app (overridable in tests).
+final builtInServerAddressProvider = Provider<String>((ref) => builtInServerAddress);
+
+/// The server in use: the user's choice in Settings, else the built-in one.
+final serverAddressProvider = Provider<String>(
+  (ref) => effectiveServerAddress(
+    ref.watch(settingsProvider).tutorServer,
+    builtIn: ref.watch(builtInServerAddressProvider),
+  ),
+);
+
+final apiClientProvider = Provider<ApiClient>(
+  (ref) => ApiClient(
+    client: ref.watch(httpClientProvider),
+    serverAddress: () => ref.read(serverAddressProvider),
+    tokens: ref.watch(tokenStoreProvider),
+  ),
+);
+
+final tutorApiProvider = Provider<TutorApi>((ref) => TutorApi(ref.watch(apiClientProvider)));

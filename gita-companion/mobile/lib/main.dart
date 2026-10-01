@@ -15,6 +15,7 @@ import 'core/audio/audio_cache.dart';
 import 'core/audio/audio_handler.dart';
 import 'core/audio/device_tts_provider.dart';
 import 'core/audio/just_audio_backend.dart';
+import 'core/api/token_store.dart';
 import 'core/audio/listening_progress.dart';
 import 'core/content/content_pack.dart';
 import 'core/content/sqlite_content_repository.dart';
@@ -29,7 +30,7 @@ Future<void> main() async {
     yield LicenseEntryWithLineBreaks(['Noto Serif', 'Noto Serif Devanagari', 'Noto Sans Telugu'], ofl);
   });
 
-  // Everything the app needs is on the device: no network at startup.
+  // Everything except the AI teacher is on the device: no network at startup.
   final support = await getApplicationSupportDirectory();
   final contentDb = await ContentPackInstaller(
     directory: Directory(p.join(support.path, 'content')),
@@ -54,6 +55,8 @@ Future<void> main() async {
         AudioCache(directory: Directory(p.join(support.path, 'audio')), db: userDb),
       ),
       listeningProgressProvider.overrideWithValue(ListeningProgressRepository(userDb)),
+      // AI teacher credentials live in the Android Keystore.
+      tokenStoreProvider.overrideWithValue(SecureTokenStore()),
     ],
   );
 

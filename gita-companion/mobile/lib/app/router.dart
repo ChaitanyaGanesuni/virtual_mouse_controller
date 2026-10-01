@@ -9,6 +9,9 @@ import '../features/onboarding/onboarding_screen.dart';
 import '../features/reader/verse_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/tutor/chat_screen.dart';
+import '../features/tutor/conversations_screen.dart';
+import '../features/tutor/tutor_models.dart';
 import 'providers.dart';
 
 final _verseId = RegExp(r'^\d{1,2}\.\d{1,2}$');
@@ -44,6 +47,24 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(path: '/search', builder: (_, _) => const SearchScreen()),
       GoRoute(path: '/player', builder: (_, _) => const PlayerScreen()),
+      // /tutor?verse=2.47&explain=simple  ·  /tutor?c=<conversation id>
+      GoRoute(
+        path: '/tutor',
+        builder: (_, state) {
+          final q = state.uri.queryParameters;
+          final verse = q['verse'];
+          final pinned = verse != null && _verseId.hasMatch(verse) && repo.verse(verse) != null
+              ? verse
+              : null;
+          final explain = q['explain'];
+          return ChatScreen(
+            pinnedVerseId: pinned,
+            conversationId: q['c'],
+            explainMode: explain == null ? null : TutorMode.fromWire(explain),
+          );
+        },
+      ),
+      GoRoute(path: '/tutor/history', builder: (_, _) => const ConversationsScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/settings/sources', builder: (_, _) => const SourcesScreen()),
     ],

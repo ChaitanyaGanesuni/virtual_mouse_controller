@@ -42,7 +42,7 @@ jobs:
           path: gita-companion/content/build/gita_content_pack.sqlite
 
   backend:
-    name: Backend database layer
+    name: Backend (API, database, tutor)
     runs-on: ubuntu-24.04
     services:
       postgres:
@@ -66,6 +66,9 @@ jobs:
       - run: pip install -e ../content -e ".[dev]"
       - run: ruff check . && ruff format --check .
       - run: pytest -q
+      - name: Build the API container
+        working-directory: gita-companion
+        run: docker build -f backend/Dockerfile -t gita-api .
 
   mobile:
     name: Mobile app (tests + APK)
@@ -97,8 +100,11 @@ jobs:
         run: dart format --set-exit-if-changed $(git ls-files "lib/*.dart" "test/*.dart")
       - run: flutter analyze
       - run: flutter test
+      # The tutor's server address. Optional: set the repository variable
+      # GITA_API_BASE_URL (Settings → Secrets and variables → Actions →
+      # Variables), or enter the address in the app's settings.
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --dart-define=API_BASE_URL=${{ vars.GITA_API_BASE_URL }}
       - uses: actions/upload-artifact@v4
         with:
           name: gita-companion-apk

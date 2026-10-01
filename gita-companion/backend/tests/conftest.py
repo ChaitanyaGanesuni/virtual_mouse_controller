@@ -92,3 +92,89 @@ def session(seeded):
         s.close()
         trans.rollback()
         conn.close()
+
+
+# ---- API test support -------------------------------------------------------
+
+
+class ScriptedLLM:
+    """A fake provider that replies from a script. Each reply is a dict (sent
+    as JSON), a string, an exception to raise, or a function of the messages."""
+
+    def __init__(self, name: str = "fake", replies=None):
+        self.name = name
+        self.model = f"{name}-model"
+        self.replies = list(replies or [])
+        self.calls: list[list] = []
+
+    def generate(self, messages, opts=None):
+        from app.providers.llm import Completion
+
+        self.calls.append(messages)
+        if not self.replies:
+            raise AssertionError(f"{self.name}: unexpected LLM call")
+        r = self.replies.pop(0)
+        if callable(r) and not isinstance(r, type):
+            r = r(messages)
+        if isinstance(r, Exception):
+            raise r
+        text_ = r if isinstance(r, str) else json.dumps(r, ensure_ascii=False)
+        return Completion(text_, self.name, self.model, 100, 50)
+
+    def stream(self, messages, opts=None):
+        raise NotImplementedError
+
+
+def answer(text_: str = "Act without clinging to results (BG 2.47).", cites=("2.47",), **extra) -> dict:
+    return {
+        "answer": text_,
+        "citations": [{"verse": c, "source_id": "bg-sanskrit-gita-json"} for c in cites],
+        "confidence": "medium",
+        "uncertain_points": [],
+        "out_of_scope": False,
+        **extra,
+    }
+
+
+@pytest.fixture
+def make_client(seeded):
+    """make_client(*providers, **settings) -> (TestClient, router or None)."""
+    from fastapi.testclient import TestClient
+    from sqlalchemy.orm import sessionmaker
+
+    from app.core.settings import Settings
+    from app.main import create_app
+    from app.providers.llm import LLMRouter, RoutedProvider
+
+    clients = []
+
+    def make(*providers, **overrides):
+        settings = Settings(
+            **{
+                "database_url": seeded.url.render_as_string(hide_password=False),
+                "jwt_secret": "t" * 40,
+                "environment": "test",
+                "signups_per_ip_per_hour": 1000,
+                **overrides,
+            }
+        )
+        llm = LLMRouter([RoutedProvider(p) for p in providers]) if providers else None
+        app = create_app(settings, llm=llm, session_factory=sessionmaker(seeded, expire_on_commit=False))
+        client = TestClient(app)
+        clients.append(client)
+        return client, llm
+
+    yield make
+    for c in clients:
+        c.close()
+    # API tests commit; keep later tests independent of cached answers.
+    with seeded.begin() as conn:
+        conn.execute(text("DELETE FROM ai_answer_cache"))
+
+
+def signup(client) -> dict:
+    r = client.post("/v1/auth/anonymous")
+    assert r.status_code == 201, r.text
+    tokens = r.json()
+    tokens["headers"] = {"Authorization": f"Bearer {tokens['access_token']}"}
+    return tokens

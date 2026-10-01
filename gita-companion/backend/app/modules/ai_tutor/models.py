@@ -57,6 +57,8 @@ class AIMessage(Base):
     tokens_out: Mapped[int | None] = mapped_column(Integer)
     # Points the model said it is unsure about; shown to the user.
     uncertain_points: Mapped[list] = mapped_column(JSONB, server_default="[]")
+    # confidence, validation flags, retrieval methods, support note.
+    meta: Mapped[dict] = mapped_column(JSONB, server_default="{}")
     created_at: Mapped[datetime] = created_at()
 
 
@@ -76,7 +78,9 @@ class AICitation(Base):
 
 class AIAnswerCache(Base):
     """Explanation / answer cache.
-    cache_key = sha256(verse_id | mode | language | normalized question | prompt_version | model_id)."""
+    cache_key = sha256(verse_id | mode | language | normalized question | prompt_version).
+    The model that produced the answer is stored in model_id; any approved
+    model may serve a cached answer."""
 
     __tablename__ = "ai_answer_cache"
     __table_args__ = (

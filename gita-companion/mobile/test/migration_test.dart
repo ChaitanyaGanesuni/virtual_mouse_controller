@@ -8,18 +8,23 @@ import 'package:gita_companion/core/db/user_database.dart';
 import 'package:gita_companion/core/settings/app_settings.dart';
 import 'package:sqlite3/sqlite3.dart';
 
+Future<String> _settingsDdl() async {
+  final fresh = UserDatabase.memory();
+  final ddl =
+      (await fresh.customSelect("SELECT sql FROM sqlite_master WHERE name = 'user_settings'").getSingle())
+          .read<String>('sql');
+  await fresh.close();
+  return ddl;
+}
+
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
-  test('a v1 database (Phase 3) upgrades to v2 without losing settings', () async {
-    // The v1 schema is today's user_settings table without the v2 column.
-    final fresh = UserDatabase.memory();
-    final ddl =
-        (await fresh.customSelect("SELECT sql FROM sqlite_master WHERE name = 'user_settings'").getSingle())
-            .read<String>('sql');
-    await fresh.close();
-    final v1Ddl = ddl.replaceAll(RegExp(r',\s*"voice_prefs"[^,]*'), '');
+  test('a v1 database (Phase 3) upgrades without losing settings', () async {
+    // The v1 schema is today's user_settings table without the v2 and v3 columns.
+    final v1Ddl = (await _settingsDdl()).replaceAll(RegExp(r',\s*"(voice_prefs|tutor_server)"[^,]*'), '');
     expect(v1Ddl, isNot(contains('voice_prefs')));
+    expect(v1Ddl, isNot(contains('tutor_server')));
 
     final dir = Directory.systemTemp.createTempSync('migration');
     addTearDown(() => dir.deleteSync(recursive: true));
@@ -54,6 +59,27 @@ void main() {
     expect((await progress.latest())!.verseId, '2.2');
     await DriftSettingsRepository(db).save(settings.copyWith(voicePrefs: {'te': 'v'}));
     expect((await DriftSettingsRepository(db).load()).voicePrefs, {'te': 'v'});
+    await db.close();
+  });
+
+  test('a v2 database (Phase 5) gains the AI teacher server setting', () async {
+    final v2Ddl = (await _settingsDdl()).replaceAll(RegExp(r',\s*"tutor_server"[^,]*'), '');
+    final dir = Directory.systemTemp.createTempSync('migration');
+    addTearDown(() => dir.deleteSync(recursive: true));
+    final file = File('${dir.path}/user.sqlite');
+    sqlite3.open(file.path)
+      ..execute(v2Ddl)
+      ..execute("INSERT INTO user_settings (id, voice_prefs) VALUES (1, '{\"en\": \"v1\"}')")
+      ..execute('PRAGMA user_version = 2')
+      ..close();
+
+    final db = UserDatabase(NativeDatabase(file));
+    final repo = DriftSettingsRepository(db);
+    final settings = await repo.load();
+    expect(settings.voicePrefs, {'en': 'v1'});
+    expect(settings.tutorServer, '');
+    await repo.save(settings.copyWith(tutorServer: 'https://gita.example.org'));
+    expect((await repo.load()).tutorServer, 'https://gita.example.org');
     await db.close();
   });
 

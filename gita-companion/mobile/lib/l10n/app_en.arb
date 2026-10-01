@@ -241,5 +241,83 @@
       }
     }
   },
-  "noVoicesFound": "No text-to-speech voices were found on this phone."
+  "noVoicesFound": "No text-to-speech voices were found on this phone.",
+  "askTeacher": "Ask the AI teacher",
+  "askAboutVerse": "Ask about this verse",
+  "explainWithTeacher": "Explain with the AI teacher",
+  "teacherTitle": "AI Gita teacher",
+  "teacherHomeHint": "Ask about any verse, or about your life. Every answer shows the verses it relies on.",
+  "teacherInputHint": "Ask a question",
+  "teacherSend": "Send",
+  "teacherThinking": "The teacher is thinking… The first answer can take up to a minute while the server wakes up.",
+  "teacherEmpty": "Ask anything about the Gita. Every answer lists the verses it is based on, checked against the text.",
+  "teacherSuggestion1": "How can I work without worrying about results?",
+  "teacherSuggestion2": "What does the Gita say about a steady mind?",
+  "teacherSuggestion3": "Explain chapter 12 in simple words.",
+  "teacherSources": "Sources, checked against the verse text",
+  "teacherUncertain": "The teacher is not certain about:",
+  "teacherCitationsRemoved": "Some references could not be verified and were removed.",
+  "teacherUnverifiedQuotes": "Quotations that did not match the text are shown without quotation marks.",
+  "teacherCached": "Saved answer",
+  "teacherLowConfidence": "Low confidence",
+  "teacherHistory": "Past conversations",
+  "teacherHistoryEmpty": "No conversations yet.",
+  "teacherDeleteConversation": "Delete conversation",
+  "teacherUntitled": "Conversation",
+  "teacherStyle": "Style",
+  "modeFree": "Conversation",
+  "errNotConfigured": "The AI teacher isn't set up yet. Add its server address in Settings.",
+  "errOffline": "You're offline. The AI teacher needs the internet; everything else works offline.",
+  "errTimeout": "The server took too long. It may be waking up, so please try again.",
+  "errQuota": "You've used today's questions. You can ask again tomorrow.",
+  "errBusy": "The AI teacher is busy right now. Please try again in a minute.",
+  "errNoVerified": "The teacher couldn't give an answer whose sources could be verified. Try rephrasing, or ask about a specific verse.",
+  "errUnavailable": "The AI teacher is not available on this server.",
+  "errGeneric": "Something went wrong. Please try again.",
+  "tryAgain": "Try again",
+  "openSettings": "Open settings",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "settingsTeacher": "AI teacher",
+  "teacherServer": "Server address",
+  "teacherServerBuiltIn": "Built into the app",
+  "teacherServerNone": "Not set up",
+  "teacherServerInvalid": "Enter a full address, such as https://gita.example.org",
+  "teacherServerHttps": "For your security, the address must start with https://",
+  "teacherServerHelp": "Leave empty to use the address built into the app.",
+  "teacherPrivacy": "Your questions are sent to this server and to the AI service it uses. No name, email or other account details are needed.",
+  "teacherDeleteData": "Delete my AI teacher data",
+  "teacherDeleteConfirm": "This deletes your conversations from the server. It can't be undone.",
+  "teacherDeleted": "Your AI teacher data was deleted.",
+  "teacherPinned": "About verse {verse}",
+  "@teacherPinned": {
+    "placeholders": {
+      "verse": {
+        "type": "String"
+      }
+    }
+  },
+  "aiAnswerLabel": "AI-generated interpretation · {model} · {date}",
+  "@aiAnswerLabel": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "teacherQuestionsLeft": "{left} of {limit} questions left today",
+  "@teacherQuestionsLeft": {
+    "placeholders": {
+      "left": {
+        "type": "String"
+      },
+      "limit": {
+        "type": "String"
+      }
+    }
+  }
 }

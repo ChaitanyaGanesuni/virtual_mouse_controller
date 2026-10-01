@@ -1,0 +1,29 @@
+# Render Blueprint for the Gita Companion API (free plan).
+# Render dashboard → New → Blueprint → pick this repository and branch.
+# Database: a free Neon Postgres project (pgvector is included); paste its
+# connection string as DATABASE_URL when Render asks for it.
+# See gita-companion/docs/DEPLOY.md.
+services:
+  - type: web
+    name: gita-companion-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./gita-companion/backend/Dockerfile
+    dockerContext: ./gita-companion
+    healthCheckPath: /v1/health
+    buildFilter:
+      paths:
+        - gita-companion/backend/**
+        - gita-companion/content/data/**
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: TUTOR_DAILY_QUESTIONS
+        value: "30"

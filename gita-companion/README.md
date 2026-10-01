@@ -8,8 +8,8 @@ current state.
 | Directory | What | Status |
 |---|---|---|
 | `content/` | Content pipeline: canonical Sanskrit text, transliteration, licence register, mobile SQLite pack | Phase 2 ✅ |
-| `backend/` | Database layer, free-tier LLM providers, explanation and recitation generators | Phases 2, 4, 5 |
-| `mobile/` | Flutter app: reader, chapters, search, listening (offline, APK built by CI) | Phase 5 ✅ |
+| `backend/` | API: anonymous accounts, AI teacher with validated citations; free-tier LLM providers; explanation and recitation generators ([deploy for free](docs/DEPLOY.md)) | Phase 6 ✅ |
+| `mobile/` | Flutter app: reader, chapters, search, listening (offline) and the AI teacher (online); APK built by CI | Phase 6 ✅ |
 | `infra/` | Local dev services (Postgres + pgvector) | ✅ |
 
 ## Quick start

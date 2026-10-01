@@ -2,7 +2,9 @@
 
 Offline-first Android app (iOS-ready codebase). Scripture content comes from
 the content pipeline's SQLite pack, bundled as an asset and installed on
-first launch; the app makes no network requests.
+first launch. Only the AI teacher uses the network (HTTPS to the server set
+in Settings or built in with `--dart-define=API_BASE_URL=https://...`); its
+tokens are kept in the Android Keystore.
 
 ```
 lib/

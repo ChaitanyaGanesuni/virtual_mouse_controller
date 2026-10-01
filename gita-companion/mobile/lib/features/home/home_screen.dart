@@ -100,6 +100,18 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             ContinueListeningCard(header: _SectionLabel(l.continueListening)),
+            _SectionLabel(l.teacherTitle),
+            Card(
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                leading: const Icon(Icons.auto_awesome),
+                title: Text(l.askTeacher),
+                subtitle: Text(l.teacherHomeHint),
+                trailing: const Icon(Icons.arrow_forward),
+                onTap: () => context.push('/tutor'),
+              ),
+            ),
+            const SizedBox(height: 24),
             Row(
               children: [
                 Expanded(child: _SectionLabel(l.chapters)),
@@ -120,7 +132,7 @@ class HomeScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 28),
             _SectionLabel(l.comingNext),
-            _ComingNext(items: [l.featureTeacher, l.featureMyGita, l.featureDaily]),
+            _ComingNext(items: [l.featureMyGita, l.featureDaily]),
           ],
         ),
       ),

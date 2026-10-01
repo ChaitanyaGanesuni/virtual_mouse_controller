@@ -8,7 +8,7 @@ part 'user_database.g.dart';
 
 /// The user's own data, stored on the device (local-first).
 /// v1 (Phase 3): settings. v2 (Phase 5): voice preferences, listening
-/// progress, audio cache index. Bookmarks, notes and revision come in Phase 8.
+/// progress, audio cache index. v3 (Phase 6): AI teacher server address. Bookmarks, notes and revision come in Phase 8.
 ///
 /// Mirrors backend `user_settings` so the two can be synced.
 class UserSettingsTable extends Table {
@@ -28,6 +28,10 @@ class UserSettingsTable extends Table {
 
   /// JSON `{"en": "<voice id>", "te": ..., "sa": ...}` (v2).
   TextColumn get voicePrefs => text().withDefault(const Constant('{}'))();
+
+  /// AI teacher server address chosen by the user; empty = the address built
+  /// into the app (v3).
+  TextColumn get tutorServer => text().withDefault(const Constant(''))();
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 
   @override
@@ -101,7 +105,7 @@ class UserDatabase extends _$UserDatabase {
   factory UserDatabase.memory() => UserDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -114,6 +118,9 @@ class UserDatabase extends _$UserDatabase {
         await m.addColumn(userSettingsTable, userSettingsTable.voicePrefs);
         await m.createTable(listeningProgressTable);
         await m.createTable(audioCacheTable);
+      }
+      if (from < 3) {
+        await m.addColumn(userSettingsTable, userSettingsTable.tutorServer);
       }
     },
     beforeOpen: (details) async {

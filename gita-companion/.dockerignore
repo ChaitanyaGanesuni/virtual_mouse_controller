@@ -1,0 +1,12 @@
+# Docker build context is gita-companion/; only the API needs to go in.
+*
+!backend/pyproject.toml
+!backend/README.md
+!backend/app
+!backend/alembic.ini
+!backend/llm.yaml
+!backend/docker-start.sh
+!backend/migrations
+!content/data/gita.json
+**/__pycache__
+

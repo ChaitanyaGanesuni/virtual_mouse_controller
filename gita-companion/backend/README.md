@@ -1,8 +1,27 @@
 # Backend
 
-FastAPI modular monolith (API arrives in Phase 6). Currently: the database
-layer (SQLAlchemy + Alembic + Postgres/pgvector), the LLM provider layer,
-and the batch content generator.
+FastAPI modular monolith: anonymous accounts and the AI teacher (Phase 6),
+on a Postgres/pgvector database layer (SQLAlchemy + Alembic), the free-tier
+LLM provider layer, and batch generators for explanations and recitation.
+
+```bash
+pip install -e ../content -e ".[dev]"
+APP_ENV=development DATABASE_URL=postgresql://gita:gita@localhost:5432/gita \
+  GROQ_API_KEY=... uvicorn app.main:app --reload    # docs at http://localhost:8000/docs
+```
+
+Deploying for free (Render + Neon + Groq): [docs/DEPLOY.md](../docs/DEPLOY.md).
+How answers are grounded and checked: [docs/PHASE-6.md](../docs/PHASE-6.md).
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /v1/auth/anonymous`, `/v1/auth/refresh`, `/v1/auth/logout` | Device accounts; rotating refresh tokens |
+| `DELETE /v1/me` | Delete the account and all its data |
+| `GET /v1/tutor/status` | Teacher available? Questions left today |
+| `POST/GET /v1/tutor/conversations`, `GET/DELETE /v1/tutor/conversations/{id}` | Conversations |
+| `POST /v1/tutor/conversations/{id}/messages` | Ask; the answer comes back with validated citations |
+| `POST /v1/tutor/conversations/{id}/explain` | Explain the pinned verse in a mode (cached for everyone) |
+| `GET /v1/health` | Liveness and database check |
 
 ## LLM providers: free tiers only
 

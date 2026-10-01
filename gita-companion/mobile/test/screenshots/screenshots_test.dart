@@ -19,6 +19,7 @@ import 'package:gita_companion/core/settings/app_settings.dart';
 import 'package:go_router/go_router.dart';
 
 import '../support/audio_fakes.dart';
+import '../support/fake_server.dart';
 import '../support/pack.dart';
 import '../widgets_test.dart' show MemorySettingsRepository;
 
@@ -52,6 +53,7 @@ void main() {
     String? type,
     String? tap,
     bool back = false,
+    FakeGitaServer? server,
   }) async {
     tester.view.physicalSize = const Size(1080, 2280);
     tester.view.devicePixelRatio = 2.75;
@@ -64,6 +66,7 @@ void main() {
           settingsRepositoryProvider.overrideWithValue(MemorySettingsRepository()..saved = settings),
           initialSettingsProvider.overrideWithValue(settings),
           ...TestAudio().overrides,
+          ...(server ?? FakeGitaServer()).overrides(),
           clockProvider.overrideWithValue(() => DateTime(2026, 10, 1)),
         ],
         child: const GitaApp(),
@@ -148,5 +151,49 @@ void main() {
   testWidgets(
     'mini player',
     (t) => shot(t, 'mini_player', ready, route: '/verse/2.47', tap: 'Recite', back: true),
+  );
+
+  final english = FakeGitaServer.answer(
+    text:
+        'Krishna separates two things: the action, which is yours to do, and its result, which is not '
+        'yours to command (BG 2.47).\n\n'
+        '- Do the work fully and well.\n'
+        '- Let go of the demand that it turn out a particular way.\n'
+        '- Do not use this as a reason to stop acting.\n\n'
+        'The next verse calls this evenness, samatva (BG 2.48).',
+    verses: ['2.47', '2.48'],
+    uncertain: ['How literally to read adhikāra ("right" or "concern") here'],
+  );
+  final telugu = FakeGitaServer.answer(
+    text:
+        'కర్మ చేయడం మీ బాధ్యత; దాని ఫలితం మీ ఆధీనంలో లేదు (BG 2.47).\n\n'
+        'పని మీద పూర్తి శ్రద్ధ పెట్టండి, ఫలితంపై పట్టుదల వదిలేయండి. అలాగని పని మానేయకూడదు.',
+  );
+  testWidgets(
+    'tutor answer',
+    (t) => shot(
+      t,
+      'tutor_answer',
+      ready,
+      route: '/tutor?verse=2.47',
+      tap: 'Explain with the AI teacher',
+      server: FakeGitaServer()..answers.add(english),
+    ),
+  );
+  testWidgets(
+    'tutor answer telugu dark',
+    (t) => shot(
+      t,
+      'tutor_answer_telugu_dark',
+      ready.copyWith(themeMode: ThemeMode.dark, uiLanguage: 'te', explanationLanguage: 'te'),
+      route: '/tutor?verse=2.47',
+      tap: 'AI గురువుతో వివరించండి',
+      server: FakeGitaServer()..answers.add(telugu),
+    ),
+  );
+  testWidgets('tutor empty', (t) => shot(t, 'tutor_empty', ready, route: '/tutor'));
+  testWidgets(
+    'settings teacher',
+    (t) => shot(t, 'settings_teacher', ready, route: '/settings', scrollTo: find.text('Server address')),
   );
 }
