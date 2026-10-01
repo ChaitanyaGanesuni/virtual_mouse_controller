@@ -1,0 +1,186 @@
+# Documented corrections applied to the shipped Sanskrit text
+# (source: bg-sanskrit-gita-json) after normalisation and the automatic
+# legacy-encoding repairs in devanagari.py.
+#
+# Policy
+# - A correction is made only when the reading in the base source is
+#   clearly an error (typo, wrong sandhi, missing letter) AND the
+#   independent second transcription (bg-sanskrit-vedicscriptures) has the
+#   standard reading.
+# - Genuine variant readings attested in different editions are NOT
+#   corrected here; they are listed under `variants` and shown in the
+#   cross-check report for human review.
+# - `find` must occur exactly once in the verse, or the build fails, so an
+#   upstream change can never silently misapply a correction.
+# - review: "pending" until a Sanskrit-literate reviewer signs off. The
+#   pipeline records this in the review_status of the shipped text.
+#
+# Kinds
+#   replace:     substring replacement inside one verse
+#   restructure: re-split lines/speaker headings across verses. The pipeline
+#                verifies that the combined letters of the verses involved
+#                are unchanged (text is moved, never added or lost).
+
+review: pending
+
+errata:
+  - verse: "1.34"
+    find: "श्चशुराः"
+    replace: "श्वशुराः"
+    reason: "śvaśurāḥ (fathers-in-law); 'श्च' for 'श्व' is a typo"
+
+  - verse: "2.31"
+    find: "युद्धाछ्रेयो"
+    replace: "युद्धाच्छ्रेयो"
+    reason: "yuddhāc chreyo: sandhi t + ś → c ch; the 'च्' is missing"
+
+  - verse: "2.33"
+    find: "चैत्त्वमिमं"
+    replace: "चेत्त्वमिमं"
+    reason: "atha cet tvam imaṃ: 'cet' (if), not 'cait'"
+
+  - verse: "4.29"
+    find: "जुह्वति प्राण प्राणे"
+    replace: "जुह्वति प्राणं प्राणे"
+    reason: "prāṇaṃ (accusative object of juhvati); anusvāra missing"
+
+  - verse: "5.8"
+    find: "शृणवन्"
+    replace: "शृण्वन्"
+    reason: "śṛṇvan (present participle of √śru)"
+
+  - verse: "6.32"
+    find: "सः योगी"
+    replace: "स योगी"
+    reason: "sandhi: saḥ before a consonant becomes sa"
+
+  - verse: "9.21"
+    find: "एव त्रयीधर्म"
+    replace: "एवं त्रयीधर्म"
+    reason: "evaṃ trayīdharmam; anusvāra missing"
+
+  - verse: "11.21"
+    find: "सुरसङ्घाः विशन्ति"
+    replace: "सुरसङ्घा विशन्ति"
+    reason: "sandhi: -āḥ before a voiced consonant becomes -ā"
+
+  - verse: "11.28"
+    find: "समुद्रमेवाभिमुखाः द्रवन्ति"
+    replace: "समुद्रमेवाभिमुखा द्रवन्ति"
+    reason: "sandhi: -āḥ before a voiced consonant becomes -ā"
+
+  - verse: "11.54"
+    find: "शक्यमहमेवंविधोऽर्जुन"
+    replace: "शक्य अहमेवंविधोऽर्जुन"
+    reason: "śakya aham: śakyaḥ + a → śakya a (not śakyam)"
+
+  - verse: "11.54"
+    find: "दृष्टुं"
+    replace: "द्रष्टुं"
+    reason: "draṣṭum (infinitive of √dṛś)"
+
+  - verse: "15.4"
+    find: "तत्परिमार्गितव्य यस्मिन्"
+    replace: "तत्परिमार्गितव्यं यस्मिन्"
+    reason: "parimārgitavyam; anusvāra missing"
+
+  - verse: "16.1"
+    find: "सत्त्वसंशुद्धिः ज्ञानयोग"
+    replace: "सत्त्वसंशुद्धिर्ज्ञानयोग"
+    reason: "sandhi: -iḥ before a voiced consonant becomes -ir"
+
+  - verse: "16.20"
+    find: "असुरीं योनि"
+    replace: "आसुरीं योनि"
+    reason: "āsurīṃ (demonic), derived from asura with vṛddhi"
+
+  - verse: "17.23"
+    find: "तत्सदिति निर्देशो"
+    replace: "ॐ तत्सदिति निर्देशो"
+    reason: "the verse begins 'oṃ tat sad iti'; ॐ is missing"
+
+  - verse: "17.25"
+    find: "क्रियन्ते मोक्षकाङ्क्षि ॥"
+    replace: "क्रियन्ते मोक्षकाङ्क्षिभिः ॥"
+    reason: "mokṣakāṅkṣibhiḥ (instrumental plural); ending missing"
+
+  - kind: restructure
+    verses: ["1.20", "1.21"]
+    reason: >
+      Verse boundary: in the standard numbering the half-verse
+      'hṛṣīkeśaṃ tadā vākyam idam āha mahīpate' closes 1.20 (Sañjaya
+      speaking), and 'arjuna uvāca' opens 1.21. The base source moved that
+      half-verse into 1.21 under Arjuna's heading.
+    result:
+      "1.20":
+        speaker: null
+        lines:
+          - "अथ व्यवस्थितान् दृष्ट्वा धार्तराष्ट्रान्कपिध्वजः ।"
+          - "प्रवृत्ते शस्त्रसंपाते धनुरुद्यम्य पाण्डवः ।"
+          - "हृषीकेशं तदा वाक्यमिदमाह महीपते ॥"
+      "1.21":
+        speaker: arjuna
+        lines:
+          - "सेनयोरुभयोर्मध्ये रथं स्थापय मेऽच्युत ॥"
+
+  - kind: restructure
+    verses: ["1.28"]
+    reason: >
+      Speaker placement: the first half of 1.28 is Sañjaya's narration;
+      'arjuna uvāca' stands between the two halves. The base source put
+      the heading before the whole verse.
+    result:
+      "1.28":
+        speaker: null
+        lines:
+          - "कृपया परयाऽऽविष्टो विषीदन्निदमब्रवीत् ।"
+          - "अर्जुन उवाच"
+          - "दृष्ट्वेमं स्वजनं कृष्ण युयुत्सुं समुपस्थितम् ॥"
+
+# Differences that are genuine readings found in different editions. The
+# base-source reading is kept and this list is surfaced for human review.
+variants:
+  - verse: "1.19"
+    kept: "तुमुलो व्यनुनादयन्"
+    other: "तुमुलोऽभ्यनुनादयन्"
+  - verse: "2.64"
+    kept: "रागद्वेषवियुक्तैस्तु"
+    other: "रागद्वेषविमुक्तैस्तु"
+  - verse: "8.7"
+    kept: "मामेवैष्यस्यसंशयम्"
+    other: "मामेवैष्यस्यसंशयः"
+  - verse: "18.68"
+    kept: "य इमं परमं गुह्यं"
+    other: "य इदं परमं गुह्यं"
+
+# Differences where the base-source reading is kept because the
+# verification transcription is the one in error.
+verifier_errors:
+  - verse: "8.9"
+    note: "verifier has अणोरणीयंसम्; standard aṇor aṇīyāṃsam"
+  - verse: "8.12"
+    note: "verifier has मूध्न्यार्धाय; standard mūrdhny ādhāya"
+  - verse: "8.24"
+    note: "verifier has अग्निर्जोतिः; standard agnir jyotiḥ"
+  - verse: "12.6"
+    note: "verifier has मत्परः; standard matparāḥ (plural subject)"
+  - verse: "14.23"
+    note: "verifier has इत्येवं; standard guṇā vartanta ity eva"
+  - verse: "15.17"
+    note: "verifier has इत्युधाहृतः; standard ity udāhṛtaḥ"
+  - verse: "16.19"
+    note: "verifier has क्रुरान्; standard krūrān"
+  - verse: "17.11"
+    note: "verifier has अफलाङ्क्षिभिः; standard aphalākāṅkṣibhiḥ"
+
+# Differences that are only alternative spellings of the same words
+# (sandhi written across a pāda boundary, word-final m/anusvāra).
+equivalent:
+  - verse: "6.35"
+    note: "चलं / चलम् at the end of a half-verse"
+  - verse: "11.46"
+    note: "चक्रहस्त मिच्छामि / चक्रहस्तं इच्छामि (cakrahastam icchāmi)"
+  - verse: "12.2"
+    note: "परयोपेतास्ते / परयोपेताः ते (sandhi applied vs. not)"
+  - verse: "15.3"
+    note: "सुविरूढमूल मसङ्ग / सुविरूढमूलं असङ्ग (suvirūḍhamūlam asaṅga)"

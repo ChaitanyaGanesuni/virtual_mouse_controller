@@ -1,0 +1,94 @@
+# Licence register. Every piece of text that reaches the content pack must
+# reference a source listed here, and the build fails if a source has no
+# licence. Fields mirror the `source` table.
+#
+# kind: scripture | translation | commentary | transliteration | editorial
+#       | ai | dataset | recording
+# use:  how we are allowed to use it
+#       - ship:   text is redistributed in the app
+#       - verify: used only to cross-check another source, never shipped
+
+sources:
+  - id: bg-sanskrit-gita-json
+    kind: scripture
+    title: Bhagavad Gītā, Sanskrit text (Devanagari)
+    author: Traditional (Vyāsa, Mahābhārata, Bhīṣma Parva 25–42)
+    language: sa
+    license: public-domain
+    license_note: >
+      The Sanskrit text is ancient and in the public domain. This digital
+      transcription is taken from the gita/gita dataset, which is released
+      under the Unlicense. Only the Devanagari `text` field is used; the
+      dataset's transliteration, word meanings and translations are NOT
+      used, because their provenance and copyright status are unclear.
+    url: https://github.com/gita/gita
+    retrieved_commit: c6fce39595445768876ddbb8d1268a9c935e1d2b
+    retrieved_file: data/verse.json
+    use: ship
+
+  - id: bg-sanskrit-vedicscriptures
+    kind: dataset
+    title: Bhagavad Gītā Sanskrit text, vedicscriptures/bhagavad-gita-data
+    author: vedicscriptures contributors
+    language: sa
+    license: GPL-3.0 (repository); scripture text public domain
+    license_note: >
+      Used only as an independent second transcription to cross-check the
+      shipped Sanskrit text. Nothing from this dataset is redistributed.
+      The repository also bundles modern copyrighted translations; those
+      fields are never read.
+    url: https://github.com/vedicscriptures/bhagavad-gita-data
+    retrieved_commit: 43dfc8db815d01e15a347ea294b089334cf2aa17
+    retrieved_file: slok/*.json
+    use: verify
+
+  - id: gc-transliteration-iast
+    kind: transliteration
+    title: IAST transliteration (generated)
+    author: Generated deterministically from the Devanagari text with indic_transliteration
+    language: sa-Latn
+    license: public-domain
+    license_note: Mechanical conversion of a public-domain text; no AI involved.
+    url: https://pypi.org/project/indic-transliteration/
+    use: ship
+
+  - id: gc-transliteration-telugu
+    kind: transliteration
+    title: Sanskrit in Telugu script (generated)
+    author: Generated deterministically from the Devanagari text with indic_transliteration
+    language: sa-Telu
+    license: public-domain
+    license_note: Mechanical conversion of a public-domain text; no AI involved.
+    url: https://pypi.org/project/indic-transliteration/
+    use: ship
+
+  - id: gita-companion-editorial
+    kind: editorial
+    title: Gita Companion editorial text
+    author: Gita Companion project (drafted with AI assistance)
+    language: en
+    license: CC-BY-4.0
+    license_note: >
+      Short project-authored text such as chapter-title glosses. Drafted with
+      AI assistance, so it is flagged as AI-generated until a human reviewer
+      marks it reviewed.
+    is_ai_generated: true
+    use: ship
+
+  # Planned, blocked in Phase 2: the build container's network policy does
+  # not allow en.wikisource.org / archive.org, so the text could not be
+  # retrieved. Once it is converted to the verse-aligned JSONL import format
+  # (see README), `gita-content build --translation` ingests and validates it.
+  - id: besant-1922-en
+    kind: translation
+    title: The Bhagavad-Gita, or The Lord's Song (4th ed.)
+    author: Annie Besant
+    year: 1922
+    language: en
+    license: public-domain
+    license_note: >
+      Published 1922 (public domain in the US: published before 1931).
+      Annie Besant died 1933 (public domain in India: life + 60 years).
+    url: https://en.wikisource.org/wiki/Bhagavad-Gita_(Besant_4th)
+    use: ship
+    status: planned

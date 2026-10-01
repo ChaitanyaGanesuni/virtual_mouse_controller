@@ -1,0 +1,99 @@
+# Canonical chapter table: the single source of truth for chapter names and
+# verse counts. Every verse reference anywhere in the system (content
+# pipeline, backend citation validator, mobile app) is validated against
+# this file.
+#
+# Numbering: the common 700-verse numbering. In Chapter 13 many editions
+# prefix Arjuna's question (prakṛtiṃ puruṣaṃ caiva ...) as 13.1, giving 35
+# verses and 701 in total. We store that verse as 13.0 (is_canonical: false)
+# and keep the 701-numbering as an alias edition, so both kinds of
+# reference resolve.
+#
+# name_sa: the chapter-name form used in the traditional colophons
+#          (... nāma Xyogaḥ), without the visarga, in Devanagari.
+# alt_names_sa: other names attested in common editions.
+# name_iast / name_te are NOT stored here: they are generated
+# deterministically from name_sa by the pipeline.
+# title_en: a plain-English gloss of the Sanskrit name. These glosses are
+# project-authored editorial text (source: gita-companion-editorial), not a
+# quotation from any translation.
+
+numbering: standard-700
+total_verses: 700
+
+chapters:
+  - number: 1
+    name_sa: अर्जुनविषादयोग
+    title_en: The Yoga of Arjuna's Despondency
+    verse_count: 47
+  - number: 2
+    name_sa: साङ्ख्ययोग
+    title_en: The Yoga of Knowledge (Sāṅkhya)
+    verse_count: 72
+  - number: 3
+    name_sa: कर्मयोग
+    title_en: The Yoga of Action
+    verse_count: 43
+  - number: 4
+    name_sa: ज्ञानकर्मसंन्यासयोग
+    alt_names_sa: [ज्ञानयोग]
+    title_en: The Yoga of Knowledge, Action and Renunciation
+    verse_count: 42
+  - number: 5
+    name_sa: कर्मसंन्यासयोग
+    title_en: The Yoga of Renunciation of Action
+    verse_count: 29
+  - number: 6
+    name_sa: आत्मसंयमयोग
+    alt_names_sa: [ध्यानयोग]
+    title_en: The Yoga of Self-Mastery (Meditation)
+    verse_count: 47
+  - number: 7
+    name_sa: ज्ञानविज्ञानयोग
+    title_en: The Yoga of Knowledge and Realisation
+    verse_count: 30
+  - number: 8
+    name_sa: अक्षरब्रह्मयोग
+    title_en: The Yoga of the Imperishable Brahman
+    verse_count: 28
+  - number: 9
+    name_sa: राजविद्याराजगुह्ययोग
+    title_en: The Yoga of the Royal Knowledge and Royal Secret
+    verse_count: 34
+  - number: 10
+    name_sa: विभूतियोग
+    title_en: The Yoga of Divine Manifestations
+    verse_count: 42
+  - number: 11
+    name_sa: विश्वरूपदर्शनयोग
+    title_en: The Yoga of the Vision of the Universal Form
+    verse_count: 55
+  - number: 12
+    name_sa: भक्तियोग
+    title_en: The Yoga of Devotion
+    verse_count: 20
+  - number: 13
+    name_sa: क्षेत्रक्षेत्रज्ञविभागयोग
+    title_en: The Yoga of the Field and the Knower of the Field
+    verse_count: 34
+    extra_verses: [0]   # Arjuna's question, 13.0 (13.1 in 701-verse editions)
+  - number: 14
+    name_sa: गुणत्रयविभागयोग
+    title_en: The Yoga of the Three Guṇas
+    verse_count: 27
+  - number: 15
+    name_sa: पुरुषोत्तमयोग
+    title_en: The Yoga of the Supreme Person
+    verse_count: 20
+  - number: 16
+    name_sa: दैवासुरसम्पद्विभागयोग
+    title_en: The Yoga of the Divine and Demonic Natures
+    verse_count: 24
+  - number: 17
+    name_sa: श्रद्धात्रयविभागयोग
+    title_en: The Yoga of the Threefold Faith
+    verse_count: 28
+  - number: 18
+    name_sa: मोक्षसंन्यासयोग
+    title_en: The Yoga of Liberation through Renunciation
+    verse_count: 78
