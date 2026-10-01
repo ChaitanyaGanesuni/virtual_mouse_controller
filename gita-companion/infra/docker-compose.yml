@@ -1,0 +1,19 @@
+# Local development services. Usage:
+#   docker compose -f infra/docker-compose.yml up -d
+#   cd backend && alembic upgrade head && python -m app.modules.content.seed ../content/data/gita.json
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: gita
+      POSTGRES_PASSWORD: gita        # local development only
+      POSTGRES_DB: gita
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gita"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:

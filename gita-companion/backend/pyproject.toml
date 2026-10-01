@@ -1,0 +1,35 @@
+[project]
+name = "gita-backend"
+version = "0.1.0"
+description = "Gita Companion backend (FastAPI modular monolith) - Phase 2: database layer"
+requires-python = ">=3.11"
+dependencies = [
+  "SQLAlchemy>=2.0,<2.2",
+  "alembic>=1.13,<2",
+  "psycopg[binary]>=3.2,<4",
+  "pgvector>=0.3,<0.6",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003", "RUF012"]
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/versions/*" = ["E501"]  # generated SQL constraint strings
