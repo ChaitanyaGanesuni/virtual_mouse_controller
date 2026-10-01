@@ -17,7 +17,7 @@ from pathlib import Path
 from .build import BuildError, build_dataset, render_report
 from .canon import Canon
 from .errata import Errata
-from .pack import write_pack
+from .pack import pack_manifest, write_pack
 from .registry import Registry
 from .sources.readers import read_gita_json, read_vedicscriptures
 
@@ -37,11 +37,14 @@ def main(argv: list[str] | None = None) -> int:
     k = sub.add_parser("pack", help="rebuild the SQLite pack from an existing gita.json (offline)")
     k.add_argument("--dataset", type=Path, default=ROOT / "data" / "gita.json")
     k.add_argument("--pack", type=Path, default=DEFAULT_PACK)
+    k.add_argument("--manifest", type=Path, help="also write a JSON manifest (content hash, schema version)")
     args = p.parse_args(argv)
 
     if args.cmd == "pack":
         dataset = json.loads(args.dataset.read_text(encoding="utf-8"))
         write_pack(dataset, args.pack)
+        if args.manifest:
+            args.manifest.write_text(json.dumps(pack_manifest(dataset), indent=1) + "\n", encoding="utf-8")
         print(f"ok: {args.pack} ({len(dataset['verses'])} verses)")
         return 0
 

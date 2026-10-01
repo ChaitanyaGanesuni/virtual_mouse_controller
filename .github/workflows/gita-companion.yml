@@ -65,3 +65,40 @@ jobs:
       - run: pip install -e ".[dev]"
       - run: ruff check . && ruff format --check .
       - run: pytest -q
+
+  mobile:
+    name: Mobile app (tests + APK)
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: gita-companion/mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.5"
+          channel: stable
+          cache: true
+      - name: Build content pack from the committed dataset
+        run: |
+          pip install -e ../content
+          tool/sync_content.sh
+      - run: flutter pub get
+      - run: dart run build_runner build
+      - name: Check formatting (hand-written files only)
+        run: dart format --set-exit-if-changed $(git ls-files "lib/*.dart" "test/*.dart")
+      - run: flutter analyze
+      - run: flutter test
+      - name: Build APK
+        run: flutter build apk --release
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gita-companion-apk
+          path: gita-companion/mobile/build/app/outputs/flutter-apk/app-release.apk

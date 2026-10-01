@@ -12,6 +12,16 @@ SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schema" / "content_pack.
 PACK_SCHEMA_VERSION = 1
 
 
+def pack_manifest(dataset: dict) -> dict:
+    """Small sidecar the app reads to decide whether its installed pack is current."""
+    return {
+        "pack_schema_version": PACK_SCHEMA_VERSION,
+        "content_format": dataset["format"],
+        "content_hash": dataset["content_hash"],
+        "verse_count": len(dataset["verses"]),
+    }
+
+
 def write_pack(dataset: dict, out: Path, built_at: datetime | None = None) -> Path:
     out.parent.mkdir(parents=True, exist_ok=True)
     tmp = out.with_suffix(".tmp")

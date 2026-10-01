@@ -1,0 +1,3 @@
+tags:
+  screenshots:
+    skip: "Design-review renders; run with: flutter test --tags screenshots --run-skipped --update-goldens test/screenshots"

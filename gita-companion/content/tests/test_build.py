@@ -232,3 +232,15 @@ def test_pack_rejects_bad_verse_id(pack):
 def test_pack_search(pack, table, column, query, expected):
     rows = pack.execute(f"select verse_id from {table} where {column} match ?", (f'"{query}"',)).fetchall()
     assert expected in [r[0] for r in rows]
+
+
+def test_pack_manifest(dataset):
+    from gita_content.pack import PACK_SCHEMA_VERSION, pack_manifest
+
+    m = pack_manifest(dataset)
+    assert m == {
+        "pack_schema_version": PACK_SCHEMA_VERSION,
+        "content_format": "gita-companion-content/1",
+        "content_hash": dataset["content_hash"],
+        "verse_count": 701,
+    }
