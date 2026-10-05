@@ -6,6 +6,8 @@ import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
+from .concepts import normalize_en
+from .retrieval import STOPWORDS
 from .romanize import loose
 
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schema" / "content_pack.sql"
@@ -99,9 +101,13 @@ def _fill(db: sqlite3.Connection, ds: dict, built_at: datetime) -> None:
         translation = " ".join(t["body"] for t in v["texts"] if t["kind"] == "translation")
         explanation = " ".join(t["body"] for t in v["texts"] if t["kind"] in ("simple", "deep", "practical"))
         roman = loose(iast)
+        english = " ".join(
+            t["body"] for t in v["texts"] if t["language"] == "en" and t["kind"] != "transliteration"
+        )
+        english_stem = " ".join(w for w in normalize_en(english) if w not in STOPWORDS)
         db.execute(
-            "INSERT INTO verse_fts VALUES (?, ?, ?, ?, ?, ?, ?)",
-            (v["id"], v["sanskrit"], iast, roman, telugu, translation, explanation),
+            "INSERT INTO verse_fts VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (v["id"], v["sanskrit"], iast, roman, telugu, translation, explanation, english_stem),
         )
         db.execute(
             "INSERT INTO verse_fts_sub VALUES (?, ?, ?, ?)",
@@ -133,6 +139,7 @@ def _fill(db: sqlite3.Connection, ds: dict, built_at: datetime) -> None:
             "INSERT INTO verse_concept VALUES (?, ?, ?, ?)",
             [(vid, c["id"], c["source_id"], w) for vid, w in c["verses"]],
         )
+    db.executemany("INSERT INTO search_stopword VALUES (?)", [(w,) for w in sorted(STOPWORDS)])
     db.executemany(
         "INSERT INTO concept_related VALUES (?, ?)",
         [(c["id"], r) for c in ds.get("concepts", []) for r in c["related"]],

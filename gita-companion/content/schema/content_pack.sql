@@ -141,6 +141,10 @@ CREATE TABLE concept_term (
 );
 CREATE INDEX ix_concept_term_key ON concept_term(term_key);
 
+-- Words left out of keyword search ("the", "how", "thou"), shared with the
+-- server so both ignore the same words.
+CREATE TABLE search_stopword (word TEXT PRIMARY KEY) WITHOUT ROWID;
+
 CREATE TABLE concept_related (
   concept_id TEXT NOT NULL REFERENCES concept(id),
   related_id TEXT NOT NULL REFERENCES concept(id),
@@ -163,8 +167,11 @@ CREATE TABLE verse_relation (
 --   people actually type ("phaleshu", "kadachana").
 -- verse_fts_sub: trigram index for substrings inside long Sanskrit
 --   compounds ("धिकार" inside "कर्मण्येवाधिकारस्ते").
+--   `english_stem` (v3) holds the English translation and explanations
+--   after gita_content.concepts.normalize_en minus stopwords, so questions
+--   ("worried about results") match like the server's keyword channel.
 CREATE VIRTUAL TABLE verse_fts USING fts5(
-  verse_id UNINDEXED, sanskrit, iast, roman_loose, telugu_script, translation, explanation,
+  verse_id UNINDEXED, sanskrit, iast, roman_loose, telugu_script, translation, explanation, english_stem,
   tokenize = 'unicode61 remove_diacritics 2'
 );
 CREATE VIRTUAL TABLE verse_fts_sub USING fts5(
