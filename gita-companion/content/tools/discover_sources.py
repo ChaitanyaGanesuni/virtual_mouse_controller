@@ -88,3 +88,21 @@ for name, url in {
 }.items():
     save(name, get(url))
 print("saved", len(list(OUT.iterdir())), "files;", len(titles), "titles")
+
+# Artifacts may not be downloadable from where the results are reviewed, so
+# print a compact summary to the job log as well.
+print("=== TITLES ===")
+for t in sorted(titles):
+    print("T|", t)
+print("=== PAGE HEADS ===")
+for t, text in pages.items():
+    print(f"P| {t} | {len(text or '')} chars")
+    if text:
+        print("\n".join("  " + line for line in text[:1500].splitlines()[:40]))
+for name in ["st_sbe08_index.html", "st_sbe08_ch2.html", "st_gita_index.html"]:
+    raw = (OUT / name).read_bytes()[:20000].decode("utf-8", "replace")
+    import re as _re
+    text = _re.sub(r"<[^>]+>", " ", raw)
+    text = _re.sub(r"\s+", " ", text)
+    print(f"=== {name} ===")
+    print(text[:3000])
