@@ -22,7 +22,6 @@ from pathlib import Path
 
 import yaml
 
-from .concepts import load_concepts
 from .retrieval import Retriever
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -94,7 +93,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--details", action="store_true")
     args = ap.parse_args(argv)
     dataset = json.loads(args.dataset.read_text(encoding="utf-8"))
-    retriever = Retriever(dataset, load_concepts())
+    retriever = Retriever(dataset)
     results = evaluate(lambda q: [h.verse_id for h in retriever.search(q, k=K)], load_golden())
     if args.details:
         for r in results:

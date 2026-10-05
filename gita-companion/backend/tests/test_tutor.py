@@ -7,7 +7,6 @@ references are rejected.
 """
 
 import pytest
-from sqlalchemy import text
 
 from app.providers.llm import ProviderRejected, ProviderUnavailable, RateLimited
 from tests.conftest import ScriptedLLM, answer, signup
@@ -43,14 +42,17 @@ def test_pinned_answer_has_validated_sources_and_ai_label(make_client):
     assert a["ai_generated"] and a["model"] == "fake-model" and a["provider"] == "fake"
     assert a["prompt_version"] == "tutor-v1"
     assert a["citations"] == [{"verse": "2.47", "source_id": "bg-sanskrit-gita-json"}]
-    assert a["retrieval"] == ["pinned"] and a["flags"] == []
+    assert a["retrieval"][0] == "pinned" and a["flags"] == []
 
     prompt = _prompt(fake.calls[0])
     # The real text of the pinned verse and its neighbours is in the prompt.
     assert "[BG 2.47 | sanskrit | bg-sanskrit-gita-json]" in prompt
     assert "karmaṇyevādhikāraste" in prompt
     assert "BG 2.46 | sanskrit" in prompt and "BG 2.48 | sanskrit" in prompt
-    assert "Allowed citations: 2.47, 2.46, 2.48." in prompt
+    assert "Allowed citations: 2.47, 2.46, 2.48" in prompt
+    # The translation is part of the passages now (Besant, 1922).
+    assert "[BG 2.47 | translation | besant-1922-en]" in prompt
+    assert "Thy business is with the action only" in prompt
 
 
 @pytest.mark.parametrize(
@@ -189,38 +191,40 @@ def test_explicit_references_and_chapters_in_the_question(make_client):
     assert "[BG chapter 12 | summary | gita-companion-editorial] (AI-generated, unreviewed)" in prompt
 
 
-def test_model_suggested_verses_are_checked_against_the_table(make_client):
+def test_model_suggested_verses_are_a_last_resort(make_client):
     fake = ScriptedLLM(replies=[{"verses": ["2.47", "BG 2.99", "6.5"]}, answer(cites=("2.47",))])
     client, _ = make_client(fake)
     t = signup(client)
-    r = _ask(client, t, _conv(client, t), "How can I stop worrying about outcomes?")
+    # Nothing in the question matches the text, so retrieval finds nothing and
+    # the model may suggest verses; the ids are checked against the table.
+    r = _ask(client, t, _conv(client, t), "Tell me about xyzzy plugh")
     a = r.json()["answer"]
     assert a["retrieval"] == ["suggested"]
     prompt = _prompt(fake.calls[1])
     assert "Allowed citations: 2.47, 6.5." in prompt and "2.99" not in prompt
 
 
-def test_keyword_retrieval_over_translations(make_client, seeded):
-    fake = ScriptedLLM(replies=[answer()])
+def test_hybrid_retrieval_finds_verses_for_life_questions(make_client):
+    fake = ScriptedLLM(replies=[answer("Anger clouds judgement (BG 2.63).", cites=("2.63",))])
     client, _ = make_client(fake)
     t = signup(client)
-    with seeded.begin() as c:
-        c.execute(
-            text(
-                "INSERT INTO verse_text (id, verse_id, source_id, kind, language, body) VALUES "
-                "(gen_random_uuid(), '2.47', 'gita-companion-editorial', 'simple', 'en', "
-                "'Do your duty, but do not cling to the fruits of action.')"
-            )
-        )
-    try:
-        r = _ask(client, t, _conv(client, t), "Why shouldn't I cling to the fruits of my work?")
-        assert r.json()["answer"]["retrieval"] == ["keyword"]
-        assert "[BG 2.47 | simple | gita-companion-editorial] (AI-generated, unreviewed)" in _prompt(
-            fake.calls[0]
-        )
-    finally:
-        with seeded.begin() as c:
-            c.execute(text("DELETE FROM verse_text WHERE kind = 'simple' AND verse_id = '2.47'"))
+    r = _ask(client, t, _conv(client, t), "How do I control my anger?")
+    assert r.status_code == 200 and r.json()["answer"]["retrieval"] == ["hybrid"]
+    prompt = _prompt(fake.calls[0])
+    assert "[BG 2.63 | translation | besant-1922-en]" in prompt
+    assert "From anger proceedeth delusion" in prompt
+    # No extra model call was needed to find verses.
+    assert len(fake.calls) == 1
+
+
+def test_retrieval_works_without_the_hybrid_index(make_client):
+    fake = ScriptedLLM(
+        replies=[{"verses": ["2.63"]}, answer("Anger clouds judgement (BG 2.63).", cites=("2.63",))]
+    )
+    client, _ = make_client(fake, hybrid=False)
+    t = signup(client)
+    r = _ask(client, t, _conv(client, t), "How do I control my anger?")
+    assert r.json()["answer"]["retrieval"] == ["suggested"]
 
 
 def test_follow_up_questions_keep_earlier_citations(make_client):

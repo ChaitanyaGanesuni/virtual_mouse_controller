@@ -8,6 +8,7 @@ import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 
+from gita_content.retrieval import Retriever
 from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session
 
@@ -16,6 +17,8 @@ from app.modules.ai_tutor.prompts import MODES, PROMPT_VERSION, SUGGEST_SYSTEM, 
 from app.modules.ai_tutor.retrieval import VerseIndex, build_context
 from app.modules.ai_tutor.safety import support_note
 from app.modules.ai_tutor.validate import Answer, Citation, check_answer, finalize
+from app.modules.rag.index import vector_search
+from app.providers.embeddings import EmbeddingError, EmbeddingProvider
 from app.providers.llm import (
     AllProvidersFailed,
     GenerateOptions,
@@ -92,9 +95,17 @@ class Exchange:
 
 
 class TutorService:
-    def __init__(self, llm: LLMRouter | None, daily_questions: int):
+    def __init__(
+        self,
+        llm: LLMRouter | None,
+        daily_questions: int,
+        retriever: Retriever | None = None,
+        embeddings: EmbeddingProvider | None = None,
+    ):
         self.llm = llm
         self.daily_questions = daily_questions
+        self.retriever = retriever
+        self.embeddings = embeddings
         self._index: VerseIndex | None = None
         self._lock = threading.Lock()
 
@@ -227,6 +238,8 @@ class TutorService:
             pinned_verse_id=conv.pinned_verse_id,
             language=language,
             carry=carry[-4:],
+            hybrid=self.retriever,
+            vector=self._vector(session),
             suggest=self._suggest,
         )
         prompt = [
@@ -279,6 +292,19 @@ class TutorService:
                 )
             )
         return exchange
+
+    def _vector(self, session: Session):
+        if self.embeddings is None:
+            return None
+        provider = self.embeddings
+
+        def search(question: str) -> list[str]:
+            try:
+                return vector_search(session, provider, question)
+            except EmbeddingError:
+                return []  # the other channels still answer
+
+        return search
 
     def _suggest(self, question: str) -> list[str]:
         """Ask the model which verses to read. The ids are checked against the

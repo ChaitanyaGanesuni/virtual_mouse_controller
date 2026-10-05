@@ -240,31 +240,95 @@ def concept_keys(c: Concept, weak: bool = False) -> list[tuple[str, tuple[str, .
     return [(lang, k) for lang, k in dict.fromkeys(keys) if k]
 
 
+Key = tuple[str, tuple[str, ...]]  # (language, normalised words)
+
+
+@dataclass(frozen=True)
+class IndexEntry:
+    id: str
+    name_en: str
+    strong: tuple[Key, ...]
+    weak: tuple[Key, ...]
+    related: tuple[str, ...]
+    verses: dict[str, float]
+    sa_key: tuple[str, ...] = ()  # the Sanskrit term typed in Roman letters
+
+
+class ConceptIndex:
+    """What query matching needs, built either from the lexicon (at build time)
+    or from dataset rows (server, evaluation). The app builds the same thing
+    from its pack, so all three understand a question identically."""
+
+    def __init__(self, entries: list[IndexEntry]):
+        self.entries = entries
+        self.by_id = {e.id: e for e in entries}
+
+    @classmethod
+    def from_concepts(cls, concepts: list[Concept]) -> ConceptIndex:
+        return cls(
+            [
+                IndexEntry(
+                    c.id,
+                    c.name_en,
+                    tuple(concept_keys(c)),
+                    tuple(concept_keys(c, weak=True)),
+                    c.related,
+                    dict(c.verses),
+                    tuple(loose(c.sa).split()),
+                )
+                for c in concepts
+            ]
+        )
+
+    @classmethod
+    def from_rows(cls, rows: list[dict]) -> ConceptIndex:
+        def keys(by_lang: dict[str, list[str]]) -> tuple[Key, ...]:
+            return tuple((lang, tuple(k.split(" "))) for lang, ks in by_lang.items() for k in ks if k)
+
+        return cls(
+            [
+                IndexEntry(
+                    r["id"],
+                    r["names"]["en"],
+                    keys(r["terms"]),
+                    keys(r.get("weak_terms", {})),
+                    tuple(r["related"]),
+                    {v: w for v, w in r["verses"]},
+                    tuple(loose(r["term_sa"]).split()),
+                )
+                for r in rows
+            ]
+        )
+
+    def match(self, query: str) -> dict[str, float]:
+        """Concepts the query is about: 1.0 for a direct match, RELATED_FACTOR
+        for concepts related to a direct match, WEAK_TERM_FACTOR for a concept
+        named only by a generic word."""
+        raw = tokens(query)
+        en = [_stem_en(t) for t in raw if not is_telugu(t)]
+        loose_q = loose(" ".join(t for t in raw if not is_telugu(t))).split()
+        te = [t for t in raw if is_telugu(t)]
+
+        def hit(keys: tuple[Key, ...], weak: bool) -> bool:
+            for lang, key in keys:
+                q = te if lang == "te" else en
+                if _matches(key, q, lang) or (lang == "en" and not weak and _matches(key, loose_q, lang)):
+                    return True
+            return False
+
+        direct = {e.id: 1.0 for e in self.entries if hit(e.strong, weak=False)}
+        out = dict(direct)
+        for cid in direct:
+            for r in self.by_id[cid].related:
+                out.setdefault(r, RELATED_FACTOR)
+        for e in self.entries:
+            if e.id not in out and hit(e.weak, weak=True):
+                out[e.id] = WEAK_TERM_FACTOR
+        return out
+
+
 def match_concepts(query: str, concepts: list[Concept]) -> dict[str, float]:
-    """Concepts the query is about: 1.0 for a direct match, RELATED_FACTOR
-    for concepts related to a direct match."""
-    raw = tokens(query)
-    en = [_stem_en(t) for t in raw if not is_telugu(t)]
-    loose_q = loose(" ".join(t for t in raw if not is_telugu(t))).split()
-    te = [t for t in raw if is_telugu(t)]
-
-    def hit(c: Concept, weak: bool) -> bool:
-        for lang, key in concept_keys(c, weak):
-            q = te if lang == "te" else en
-            if _matches(key, q, lang) or (lang == "en" and not weak and _matches(key, loose_q, lang)):
-                return True
-        return False
-
-    direct = {c.id: 1.0 for c in concepts if hit(c, weak=False)}
-    by_id = {c.id: c for c in concepts}
-    out = dict(direct)
-    for cid in direct:
-        for r in by_id[cid].related:
-            out.setdefault(r, RELATED_FACTOR)
-    for c in concepts:
-        if c.id not in out and hit(c, weak=True):
-            out[c.id] = WEAK_TERM_FACTOR
-    return out
+    return ConceptIndex.from_concepts(concepts).match(query)
 
 
 def concept_rows(concepts: list[Concept], source_id: str) -> list[dict]:

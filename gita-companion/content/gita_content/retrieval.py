@@ -20,12 +20,12 @@ import re
 from collections import Counter
 from dataclasses import dataclass
 
-from .concepts import Concept, is_telugu, match_concepts, normalize_en, tokens
+from .concepts import ConceptIndex, is_telugu, normalize_en, tokens
 from .romanize import loose
 
 RRF_K = 60
 BM25_K1, BM25_B = 1.2, 0.75
-CHANNEL_WEIGHTS = {"explicit": 2.0, "concept": 1.0, "lexical": 1.0}
+CHANNEL_WEIGHTS = {"explicit": 2.0, "concept": 1.0, "lexical": 1.0, "vector": 1.0}
 # When the question clearly maps to concepts, keywords are supporting evidence.
 LEXICAL_WEIGHT_WITH_CONCEPTS = 0.5
 # The Gita teaches in passages (6.10-14 on meditation, 14.5-9 on the gunas):
@@ -66,14 +66,13 @@ class Hit:
 
 
 class Retriever:
-    def __init__(self, dataset: dict, concepts: list[Concept]):
-        self.concepts = concepts
+    """Built from the dataset alone (content format 3), like the app's search."""
+
+    def __init__(self, dataset: dict):
+        self.index = ConceptIndex.from_rows(dataset.get("concepts", []))
         self.verse_ids = [v["id"] for v in dataset["verses"]]
         self._known = set(self.verse_ids)
-        self._concept_verses = {c["id"]: dict(c["verses"]) for c in dataset.get("concepts", [])} or {
-            c.id: c.verses for c in concepts
-        }
-        self._by_id = {c.id: c for c in concepts}
+        self._concept_verses = {e.id: e.verses for e in self.index.entries}
         self._sanskrit = {}
         docs: dict[str, list[str]] = {}
         for v in dataset["verses"]:
@@ -108,7 +107,7 @@ class Retriever:
         return out
 
     def concept_scores(self, query: str) -> tuple[dict[str, float], dict[str, float]]:
-        matched = match_concepts(query, self.concepts)
+        matched = self.index.match(query)
         scores: dict[str, float] = {}
         for cid, qw in matched.items():
             for vid, w in self._concept_verses.get(cid, {}).items():
@@ -138,13 +137,14 @@ class Retriever:
             if is_telugu(t):
                 weights[t] = 1.0
         for cid, qw in (expand or {}).items():
-            c = self._by_id.get(cid)
-            if c is None or qw < 1.0:
+            entry = self.index.by_id.get(cid)
+            if entry is None or qw < 1.0:
                 continue
-            for term in (*c.terms_en, c.name_en):
-                for w in normalize_en(term):
-                    if w not in STOPWORDS:
-                        weights.setdefault(w, EXPANSION_WEIGHT)
+            for lang, key in entry.strong:
+                if lang == "en" and key != entry.sa_key:
+                    for w in key:
+                        if w not in STOPWORDS:
+                            weights.setdefault(w, EXPANSION_WEIGHT)
         scores: dict[str, float] = {}
         for w, qw in weights.items():
             idf = self._idf.get(w)
@@ -170,18 +170,21 @@ class Retriever:
 
     # -- fusion ------------------------------------------------------------------
 
-    def search(self, query: str, k: int = 8) -> list[Hit]:
+    def search(self, query: str, k: int = 8, extra: dict[str, list[str]] | None = None) -> list[Hit]:
+        """`extra`: rankings from channels outside this module (the server's
+        vector search), fused like the others."""
         concept, matched = self.concept_scores(query)
         rankings = {
             "explicit": self.explicit(query),
             "concept": _ranked(concept),
             "lexical": _ranked(self.lexical_scores(query, matched)),
+            **{name: [v for v in ranked if v in self._known] for name, ranked in (extra or {}).items()},
         }
         fused: dict[str, float] = {}
         via: dict[str, list[str]] = {}
         has_concepts = any(w == 1.0 for w in matched.values())
         for channel, ranked in rankings.items():
-            w = CHANNEL_WEIGHTS[channel]
+            w = CHANNEL_WEIGHTS.get(channel, 1.0)
             if channel == "lexical" and has_concepts:
                 w = LEXICAL_WEIGHT_WITH_CONCEPTS
             for rank, vid in enumerate(ranked[:200]):

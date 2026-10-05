@@ -6,7 +6,6 @@ from pathlib import Path
 import pytest
 
 from gita_content import evaluate as ev
-from gita_content.concepts import load_concepts
 from gita_content.retrieval import Retriever
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -15,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 @pytest.fixture(scope="module")
 def retriever():
     dataset = json.loads((ROOT / "data" / "gita.json").read_text(encoding="utf-8"))
-    return Retriever(dataset, load_concepts())
+    return Retriever(dataset)
 
 
 def top(retriever, q, k=8):

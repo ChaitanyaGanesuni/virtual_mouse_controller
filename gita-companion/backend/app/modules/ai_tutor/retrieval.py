@@ -1,15 +1,15 @@
-"""Phase 6 retrieval: which passages the tutor may use to answer.
+"""Retrieval: which passages the tutor may use to answer.
 
 Sources of candidate verses, in priority order:
 1. the verse the conversation is pinned to, with its neighbours;
 2. verses and chapters named in the question ("2.47", "chapter 3"), and
    verses cited earlier in the conversation;
-3. keyword matches in translations and explanations;
+3. hybrid search (gita_content.retrieval): the concept index, keywords in
+   the translation and explanations, Sanskrit typed in Roman letters, and,
+   when an embedding model is configured, vector search;
 4. only if 1-3 found nothing: verse numbers suggested by the model
    itself. The model then sees the real text of those verses, and the
    answer may cite only what it was shown.
-
-Phase 7 replaces 3 and 4 with embeddings and hybrid search.
 
 Every passage carries an ID like "BG 2.47 | sanskrit | bg-sanskrit-gita-json".
 The answer validator accepts citations only of verses passed here.
@@ -17,30 +17,24 @@ The answer validator accepts citations only of verses passed here.
 
 from __future__ import annotations
 
-import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from sqlalchemy import func, select, text
+from gita_content.retrieval import Retriever
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.modules.ai_tutor.refs import chapter_refs, verse_refs
 from app.modules.content.models import Chapter, ChapterText, Source, Verse, VerseText
 
 MAX_VERSES = 8
-KEYWORD_LIMIT = 6
+HYBRID_LIMIT = 6  # 3 when the conversation is about one verse
 SUGGEST_LIMIT = 5
 
 # Text kinds the tutor may read, best first. Transliteration helps the model
 # read the Sanskrit; explanations are AI-written and labelled as such.
 TEXT_KINDS = ("translation", "literal_translation", "simple", "practical", "deep", "commentary")
 SEARCHABLE_KINDS = (*TEXT_KINDS, "story", "child")
-
-_STOP = set(
-    "a an and are as at be but by can do does for from how i if in is it me my of on or so that the "
-    "this to was what when where which who why will with you your about should would could gita krishna "
-    "arjuna verse verses chapter bhagavad".split()
-)
 
 
 @dataclass(frozen=True)
@@ -83,31 +77,6 @@ class VerseIndex:
         return [f"{ch}.{n}" for n in (v - 1, v + 1) if f"{ch}.{n}" in self.ids]
 
 
-def _keywords(question: str) -> list[str]:
-    # Indic vowel signs are combining marks, which \w does not match.
-    # Only letters survive, so nothing can inject tsquery operators.
-    text_ = re.sub(r"[\u0964\u0965]", " ", question.lower())
-    words = [w for w in re.findall(r"(?:[^\W\d_]|[\u0900-\u0D7F])+", text_) if len(w) >= 3]
-    return [w for w in dict.fromkeys(words) if w not in _STOP][:12]
-
-
-def keyword_verses(session: Session, question: str, limit: int = KEYWORD_LIMIT) -> list[str]:
-    words = _keywords(question)
-    if not words:
-        return []
-    query = func.to_tsquery("simple", " | ".join(words))
-    doc = func.to_tsvector("simple", VerseText.body)
-    rank = func.ts_rank(doc, query)
-    rows = session.execute(
-        select(VerseText.verse_id, func.max(rank).label("r"))
-        .where(VerseText.kind.in_(SEARCHABLE_KINDS), doc.op("@@")(query))
-        .group_by(VerseText.verse_id)
-        .order_by(text("r DESC"), VerseText.verse_id)
-        .limit(limit)
-    ).all()
-    return [r[0] for r in rows]
-
-
 def build_context(
     session: Session,
     index: VerseIndex,
@@ -116,6 +85,8 @@ def build_context(
     pinned_verse_id: str | None,
     language: str,
     carry: list[str] | None = None,
+    hybrid: Retriever | None = None,
+    vector: Callable[[str], list[str]] | None = None,
     suggest: Callable[[str], list[str]] | None = None,
 ) -> Context:
     """`carry`: verses cited earlier in the conversation, so follow-up
@@ -136,7 +107,10 @@ def build_context(
     add([r.id for r in verse_refs(question)], "explicit")
     add(list(reversed(carry or [])), "conversation")
     chapters = [c for c in chapter_refs(question) if c in index.chapter_counts]
-    add(keyword_verses(session, question), "keyword")
+    if hybrid is not None:
+        extra = {"vector": vector(question)} if vector is not None else None
+        limit = HYBRID_LIMIT // 2 if pinned_verse_id else HYBRID_LIMIT
+        add([h.verse_id for h in hybrid.search(question, k=limit, extra=extra)], "hybrid")
     if suggest is not None and not ctx.verse_ids and not chapters:
         add(suggest(question)[:SUGGEST_LIMIT], "suggested")
 

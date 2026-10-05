@@ -9,6 +9,7 @@ offline from the content pack.
 from __future__ import annotations
 
 import functools
+import json
 import logging
 import math
 from datetime import UTC, datetime
@@ -16,6 +17,7 @@ from datetime import UTC, datetime
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from gita_content.retrieval import Retriever
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
@@ -25,6 +27,8 @@ from app.core.ratelimit import SlidingWindowLimiter
 from app.core.settings import Settings
 from app.modules.ai_tutor.service import ProvidersBusy, QuotaExceeded, TutorError, TutorService
 from app.modules.auth.service import AuthError
+from app.providers.embeddings import EmbeddingProvider
+from app.providers.embeddings import from_env as embeddings_from_env
 from app.providers.llm import LLMRouter, build_router
 
 VERSION = "0.6.0"
@@ -35,12 +39,27 @@ def _error(status: int, code: str, message: str, headers: dict | None = None) ->
     return JSONResponse({"error": {"code": code, "message": message}}, status_code=status, headers=headers)
 
 
+def load_retriever(settings: Settings) -> Retriever | None:
+    """The hybrid retriever runs from the content dataset (format 3)."""
+    path = settings.content_dataset
+    if path is None or not path.exists():
+        log.warning("content dataset not found (%s): tutor retrieval uses references only", path)
+        return None
+    return Retriever(json.loads(path.read_text(encoding="utf-8")))
+
+
 def create_app(
     settings: Settings | None = None,
     llm: LLMRouter | str | None = "from-config",
     session_factory: sessionmaker | None = None,
+    retriever: Retriever | str | None = "from-config",
+    embeddings: EmbeddingProvider | str | None = "from-config",
 ) -> FastAPI:
     settings = settings or Settings.from_env()
+    if retriever == "from-config":
+        retriever = load_retriever(settings)
+    if embeddings == "from-config":
+        embeddings = embeddings_from_env()
     if llm == "from-config":
         # Questions are personal: only providers approved for user data.
         router, notes = build_router(require_user_data_ok=True)
@@ -60,7 +79,7 @@ def create_app(
     )
     app.state.settings = settings
     app.state.session_factory = session_factory
-    app.state.tutor = TutorService(llm, settings.tutor_daily_questions)
+    app.state.tutor = TutorService(llm, settings.tutor_daily_questions, retriever, embeddings)
     app.state.signup_limiter = SlidingWindowLimiter(settings.signups_per_ip_per_hour, 3600)
     app.state.signup_limiter_total = SlidingWindowLimiter(settings.signups_per_hour_total, 3600)
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from pathlib import Path
 
 from app.core.config import DEFAULT_DATABASE_URL, normalize_database_url
 
@@ -30,6 +31,8 @@ class Settings:
     signups_per_hour_total: int = 300
     # Cloudflare/Render put the client address in X-Forwarded-For.
     trust_forwarded_for: bool = True
+    # Content dataset (content format 3) for the tutor's hybrid retrieval.
+    content_dataset: Path | None = None
 
     @staticmethod
     def from_env(env: dict[str, str] | None = None) -> Settings:
@@ -50,4 +53,17 @@ class Settings:
             signups_per_ip_per_hour=int(env.get("SIGNUPS_PER_IP_PER_HOUR", 10)),
             signups_per_hour_total=int(env.get("SIGNUPS_PER_HOUR_TOTAL", 300)),
             trust_forwarded_for=env.get("TRUST_FORWARDED_FOR", "1") == "1",
+            content_dataset=_dataset_path(env),
         )
+
+
+_BACKEND = Path(__file__).resolve().parents[2]
+
+
+def _dataset_path(env: dict[str, str]) -> Path | None:
+    if env.get("CONTENT_DATASET"):
+        return Path(env["CONTENT_DATASET"])
+    for candidate in (_BACKEND / "content" / "gita.json", _BACKEND.parent / "content" / "data" / "gita.json"):
+        if candidate.exists():
+            return candidate
+    return None

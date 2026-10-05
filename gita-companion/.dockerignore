@@ -8,5 +8,8 @@
 !backend/docker-start.sh
 !backend/migrations
 !content/data/gita.json
+!content/pyproject.toml
+!content/README.md
+!content/gita_content
 **/__pycache__
 

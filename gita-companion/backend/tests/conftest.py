@@ -148,7 +148,11 @@ def make_client(seeded):
 
     clients = []
 
-    def make(*providers, **overrides):
+    from gita_content.retrieval import Retriever
+
+    retriever = Retriever(json.loads(DATASET.read_text(encoding="utf-8")))
+
+    def make(*providers, embeddings=None, hybrid=True, **overrides):
         settings = Settings(
             **{
                 "database_url": seeded.url.render_as_string(hide_password=False),
@@ -159,7 +163,13 @@ def make_client(seeded):
             }
         )
         llm = LLMRouter([RoutedProvider(p) for p in providers]) if providers else None
-        app = create_app(settings, llm=llm, session_factory=sessionmaker(seeded, expire_on_commit=False))
+        app = create_app(
+            settings,
+            llm=llm,
+            session_factory=sessionmaker(seeded, expire_on_commit=False),
+            retriever=retriever if hybrid else None,
+            embeddings=embeddings,
+        )
         client = TestClient(app)
         clients.append(client)
         return client, llm

@@ -12,7 +12,7 @@ import json
 import sys
 from pathlib import Path
 
-from sqlalchemy import Engine, create_engine
+from sqlalchemy import Engine, create_engine, delete
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -20,16 +20,19 @@ from app.core.config import database_url
 from app.modules.content.models import (
     Chapter,
     ChapterText,
+    Concept,
+    ConceptText,
     ContentRelease,
     Source,
     Speaker,
     Verse,
     VerseAlias,
+    VerseConcept,
     VerseText,
     WordMeaning,
 )
 
-SUPPORTED_FORMATS = {"gita-companion-content/1", "gita-companion-content/2"}
+SUPPORTED_FORMATS = {"gita-companion-content/1", "gita-companion-content/2", "gita-companion-content/3"}
 
 
 class ContentImportError(ValueError):
@@ -116,6 +119,7 @@ def import_dataset(session: Session, ds: dict) -> int:
         _upsert(session, WordMeaning, words[i : i + 500], ["id"])
 
     _upsert(session, VerseAlias, ds["aliases"], ["edition", "ref"])
+    _import_concepts(session, ds.get("concepts", []))
     _upsert(
         session,
         ContentRelease,
@@ -123,6 +127,39 @@ def import_dataset(session: Session, ds: dict) -> int:
         ["content_hash"],
     )
     return len(verses)
+
+
+def _import_concepts(session: Session, rows: list[dict]) -> None:
+    """Concept index (format 3). Links are replaced, not merged: a link that a
+    newer build no longer makes must disappear."""
+    if not rows:
+        return
+    _upsert(session, Concept, [{"id": c["id"], "term_sa": c["term_sa"]} for c in rows], ["id"])
+    _upsert(
+        session,
+        ConceptText,
+        [
+            {
+                "concept_id": c["id"],
+                "source_id": c["source_id"],
+                "language": lang,
+                "name": c["names"][lang],
+                "definition": c["definition_en"] if lang == "en" else None,
+            }
+            for c in rows
+            for lang in ("en", "te")
+        ],
+        ["concept_id", "source_id", "language"],
+    )
+    sources = {c["source_id"] for c in rows}
+    session.execute(delete(VerseConcept).where(VerseConcept.source_id.in_(sources)))
+    links = [
+        {"verse_id": vid, "concept_id": c["id"], "source_id": c["source_id"], "weight": w}
+        for c in rows
+        for vid, w in c["verses"]
+    ]
+    for i in range(0, len(links), 1000):
+        session.execute(insert(VerseConcept).values(links[i : i + 1000]))
 
 
 def main(argv: list[str] | None = None, engine: Engine | None = None) -> int:

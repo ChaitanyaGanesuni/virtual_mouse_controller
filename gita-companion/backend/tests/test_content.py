@@ -5,7 +5,15 @@ from sqlalchemy import func, select, text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.modules.content.models import Chapter, ContentRelease, Verse, VerseAlias, VerseText
+from app.modules.content.models import (
+    Chapter,
+    Concept,
+    ContentRelease,
+    Verse,
+    VerseAlias,
+    VerseConcept,
+    VerseText,
+)
 from app.modules.content.seed import ContentImportError, import_dataset
 
 
@@ -16,8 +24,11 @@ def count(session, model) -> int:
 def test_import_counts(session, dataset):
     assert count(session, Verse) == 701
     assert count(session, Chapter) == 18
-    assert count(session, VerseText) == 701 * 2
+    # Two transliterations and Besant's translation per verse.
+    assert count(session, VerseText) == 701 * 3
     assert count(session, VerseAlias) == 35
+    assert count(session, Concept) == len(dataset["concepts"])
+    assert count(session, VerseConcept) == sum(len(c["verses"]) for c in dataset["concepts"])
     release = session.get(ContentRelease, dataset["content_hash"])
     assert release is not None and release.verse_count == 701
 
@@ -26,7 +37,20 @@ def test_import_is_idempotent(session, dataset):
     import_dataset(session, dataset)
     session.flush()
     assert count(session, Verse) == 701
-    assert count(session, VerseText) == 701 * 2
+    assert count(session, VerseText) == 701 * 3
+    assert count(session, VerseConcept) == sum(len(c["verses"]) for c in dataset["concepts"])
+
+
+def test_reimport_drops_concept_links_a_newer_build_removed(session, dataset):
+    import copy
+
+    newer = copy.deepcopy(dataset)
+    anger = next(c for c in newer["concepts"] if c["id"] == "anger")
+    anger["verses"] = [v for v in anger["verses"] if v[0] != "2.63"]
+    import_dataset(session, newer)
+    session.flush()
+    assert session.get(VerseConcept, ("2.63", "anger", anger["source_id"])) is None
+    assert session.get(VerseConcept, ("2.62", "anger", anger["source_id"])) is not None
 
 
 def test_import_rejects_unknown_format(session, dataset):
