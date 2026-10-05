@@ -149,8 +149,15 @@ def test_unregistered_or_verify_only_sources_cannot_ship(registry):
         registry.shippable("prabhupada-bbt")
     with pytest.raises(RegistryError, match="verify-only"):
         registry.shippable("bg-sanskrit-vedicscriptures")
+    import dataclasses
+
+    from gita_content.registry import Registry
+
+    besant = registry.sources["besant-1922-en"]
+    assert registry.shippable("besant-1922-en") is besant  # imported in Phase 7
+    planned = Registry({**registry.sources, "x": dataclasses.replace(besant, id="x", status="planned")})
     with pytest.raises(RegistryError, match="planned"):
-        registry.shippable("besant-1922-en")
+        planned.shippable("x")
 
 
 # --- errata ------------------------------------------------------------------
@@ -204,7 +211,10 @@ def pack(dataset, tmp_path_factory):
 
 def test_pack_contents(pack, dataset):
     assert pack.execute("select count(*) from verse").fetchone()[0] == 701
-    assert pack.execute("select count(*) from verse_text").fetchone()[0] == 701 * 2
+    # Two transliterations per verse, plus Besant's translation when the
+    # dataset was built with it.
+    translations = sum(1 for v in dataset["verses"] for t in v["texts"] if t["kind"] == "translation")
+    assert pack.execute("select count(*) from verse_text").fetchone()[0] == 701 * 2 + translations
     meta = dict(pack.execute("select key, value from pack_meta"))
     assert meta["content_hash"] == dataset["content_hash"]
     assert pack.execute("PRAGMA foreign_key_check").fetchall() == []
@@ -240,7 +250,7 @@ def test_pack_manifest(dataset):
     m = pack_manifest(dataset)
     assert m == {
         "pack_schema_version": PACK_SCHEMA_VERSION,
-        "content_format": "gita-companion-content/2",
+        "content_format": "gita-companion-content/3",
         "content_hash": dataset["content_hash"],
         "verse_count": 701,
     }

@@ -26,7 +26,7 @@ def get(url: str) -> bytes:
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 return r.read()
-        except Exception as e:  # noqa: BLE001 - report and continue
+        except Exception as e:
             err = e
             time.sleep(2 * (attempt + 1))
     return f"ERROR {err}".encode()
@@ -52,15 +52,33 @@ def save(name: str, data: bytes | str | dict | list) -> None:
 
 
 titles: set[str] = set()
-for q in ["Bhagavad Gita", "Bhagavadgita", "Bhagavad-Gita", "Song Celestial", "Telang Bhagavadgita",
-          "Swarupananda Gita", "Besant Bhagavad Gita", "Lord's Song Gita"]:
+for q in [
+    "Bhagavad Gita",
+    "Bhagavadgita",
+    "Bhagavad-Gita",
+    "Song Celestial",
+    "Telang Bhagavadgita",
+    "Swarupananda Gita",
+    "Besant Bhagavad Gita",
+    "Lord's Song Gita",
+]:
     r = ws(action="query", list="search", srsearch=q, srlimit=50, srnamespace="0|104|106")
     save(f"ws_search_{q.replace(' ', '_')}.json", r)
     titles |= {h["title"] for h in r.get("query", {}).get("search", [])}
 
-for prefix in ["The Bhagavad Gita", "Bhagavad Gita", "The Bhagavadgita", "Bhagavadgita", "Sacred Books of the East",
-               "The Sacred Books of the East", "Srimad Bhagavad Gita", "The Bhagavad-Gita", "Bhagavad-Gita",
-               "The Song Celestial", "The Lord's Song"]:
+for prefix in [
+    "The Bhagavad Gita",
+    "Bhagavad Gita",
+    "The Bhagavadgita",
+    "Bhagavadgita",
+    "Sacred Books of the East",
+    "The Sacred Books of the East",
+    "Srimad Bhagavad Gita",
+    "The Bhagavad-Gita",
+    "Bhagavad-Gita",
+    "The Song Celestial",
+    "The Lord's Song",
+]:
     r = ws(action="query", list="allpages", apprefix=prefix, aplimit=500)
     save(f"ws_allpages_{prefix.replace(' ', '_')}.json", r)
     titles |= {p["title"] for p in r.get("query", {}).get("allpages", [])}
@@ -102,6 +120,7 @@ for t, text in pages.items():
 for name in ["st_sbe08_index.html", "st_sbe08_ch2.html", "st_gita_index.html"]:
     raw = (OUT / name).read_bytes()[:20000].decode("utf-8", "replace")
     import re as _re
+
     text = _re.sub(r"<[^>]+>", " ", raw)
     text = _re.sub(r"\s+", " ", text)
     print(f"=== {name} ===")

@@ -27,7 +27,7 @@ def call(**params) -> dict:
         try:
             with urllib.request.urlopen(req, timeout=60) as r:
                 return json.loads(r.read())
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             print("retry", attempt, e)
             time.sleep(3 * (attempt + 1))
     raise SystemExit("Wikisource did not answer")
@@ -35,22 +35,44 @@ def call(**params) -> dict:
 
 index = call(action="query", prop="revisions", rvprop="content|ids", rvslots="main", titles=INDEX)
 page = index["query"]["pages"][0]
-print("INDEX\t" + json.dumps({"revid": page.get("revisions", [{}])[0].get("revid"),
-                               "text": page.get("revisions", [{}])[0].get("slots", {}).get("main", {}).get("content")},
-                              ensure_ascii=False))
+print(
+    "INDEX\t"
+    + json.dumps(
+        {
+            "revid": page.get("revisions", [{}])[0].get("revid"),
+            "text": page.get("revisions", [{}])[0].get("slots", {}).get("main", {}).get("content"),
+        },
+        ensure_ascii=False,
+    )
+)
 
 found = 0
 for start in range(1, 321, 40):
     titles = [f"{PREFIX}{n}" for n in range(start, start + 40)]
-    r = call(action="query", prop="revisions", rvprop="content|ids|timestamp", rvslots="main", titles="|".join(titles))
+    r = call(
+        action="query",
+        prop="revisions",
+        rvprop="content|ids|timestamp",
+        rvslots="main",
+        titles="|".join(titles),
+    )
     for p in r["query"]["pages"]:
         if p.get("missing"):
             continue
         rev = p["revisions"][0]
         n = int(p["title"].rsplit("/", 1)[1])
         found += 1
-        print("PAGE\t" + json.dumps(
-            {"n": n, "revid": rev["revid"], "timestamp": rev["timestamp"], "text": rev["slots"]["main"]["content"]},
-            ensure_ascii=False))
+        print(
+            "PAGE\t"
+            + json.dumps(
+                {
+                    "n": n,
+                    "revid": rev["revid"],
+                    "timestamp": rev["timestamp"],
+                    "text": rev["slots"]["main"]["content"],
+                },
+                ensure_ascii=False,
+            )
+        )
     time.sleep(1)
 print("FOUND", found)

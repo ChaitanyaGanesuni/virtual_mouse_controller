@@ -1,0 +1,203 @@
+# Golden set for retrieval: questions people actually ask, and the verses a
+# good answer must draw on. Every expected verse was checked by reading
+# Besant's translation and the Sanskrit (see docs/PHASE-7.md); this file must
+# not be tuned to the retriever: change it only when a verse is wrong for
+# its question, never to raise the score.
+#
+# Metrics (eval.py): hit@8 = at least one expected verse in the top 8;
+# recall@8 = expected verses in the top 8 / min(8, number expected).
+# Targets (set before the first measurement): hit@8 >= 0.85, recall@8 >= 0.60,
+# for English and for Telugu separately.
+
+questions:
+  # ---- English -----------------------------------------------------------
+  - q: I'm anxious about the results of my work
+    expect: ["2.47", "2.48", "3.19", "4.20", "5.10", "5.12"]
+  - q: How do I control my anger?
+    expect: ["2.62", "2.63", "3.37", "5.23", "5.26", "16.21"]
+  - q: What happens to the soul after death?
+    expect: ["2.13", "2.20", "2.22", "2.27", "8.6", "15.8"]
+  - q: Is the soul eternal?
+    expect: ["2.17", "2.18", "2.20", "2.23", "2.24"]
+  - q: Why should I grieve for someone who has died?
+    expect: ["2.11", "2.25", "2.27", "2.30"]
+  - q: My mind is restless. How can I control it?
+    expect: ["6.26", "6.33", "6.34", "6.35"]
+  - q: How should I meditate?
+    expect: ["6.10", "6.11", "6.12", "6.13", "6.14", "5.27"]
+  - q: What are the marks of a person of steady wisdom?
+    expect: ["2.54", "2.55", "2.56", "2.57", "2.58", "2.68"]
+  - q: How do I resist the pull of the senses and temptation?
+    expect: ["2.58", "2.60", "2.61", "2.62", "2.67", "3.41"]
+  - q: Should I quit my job and renounce everything?
+    expect: ["3.4", "3.5", "3.8", "5.2", "18.11", "18.47", "18.48"]
+  - q: Is it better to do my own duty badly than another's well?
+    expect: ["3.35", "18.47"]
+  - q: Why does God take birth again and again?
+    expect: ["4.6", "4.7", "4.8", "4.9"]
+  - q: How can I become fearless?
+    expect: ["2.40", "2.56", "4.10", "12.15", "16.1"]
+  - q: How can I find peace of mind?
+    expect: ["2.66", "2.70", "2.71", "4.39", "5.12", "5.29", "18.62"]
+  - q: What is true happiness?
+    expect: ["5.21", "6.21", "6.27", "18.36", "18.37", "18.38", "18.39"]
+  - q: What kind of food should I eat?
+    expect: ["6.16", "6.17", "17.7", "17.8", "17.9", "17.10"]
+  - q: What are the three gunas?
+    expect: ["14.5", "14.6", "14.7", "14.8", "14.9"]
+  - q: I procrastinate and feel lazy all the time
+    expect: ["14.8", "14.13", "18.28", "18.39"]
+  - q: Who is dear to God?
+    expect: ["12.13", "12.14", "12.15", "12.16", "12.17", "12.18", "12.19", "12.20"]
+  - q: How do I surrender to God?
+    expect: ["18.62", "18.65", "18.66", "9.34", "7.14"]
+  - q: What is the easiest way to reach God through devotion?
+    expect: ["9.22", "9.26", "9.34", "12.6", "12.7", "12.8", "18.65"]
+  - q: Can a great sinner still be saved?
+    expect: ["4.36", "9.30", "9.31", "9.32", "18.66"]
+  - q: Is God partial to some people?
+    expect: ["9.29"]
+  - q: What can I offer to God?
+    expect: ["9.26", "9.27"]
+  - q: How do I see God in everyone?
+    expect: ["5.18", "6.29", "6.30", "6.31", "13.27", "13.28", "18.61"]
+  - q: How should I treat friends and enemies?
+    expect: ["6.9", "12.13", "12.18", "14.25"]
+  - q: How should a student approach a spiritual teacher?
+    expect: ["4.34", "4.35"]
+  - q: What is karma yoga?
+    expect: ["2.48", "2.50", "3.3", "3.7", "3.19", "5.2"]
+  - q: What is the meaning of yoga?
+    expect: ["2.48", "2.50", "6.23"]
+  - q: How should I handle praise and criticism?
+    expect: ["12.18", "12.19", "14.24", "14.25"]
+  - q: What is faith?
+    expect: ["4.39", "4.40", "17.2", "17.3"]
+  - q: I am full of doubts
+    expect: ["4.40", "4.41", "4.42", "6.39"]
+  - q: What is true knowledge?
+    expect: ["4.33", "4.38", "13.8", "13.9", "13.10", "13.11", "18.20"]
+  - q: How should a leader set an example for others?
+    expect: ["3.20", "3.21", "3.25", "3.26"]
+  - q: Why should I work if I have nothing to gain?
+    expect: ["3.9", "3.20", "3.22", "3.25"]
+  - q: What happens to someone who fails in spiritual practice?
+    expect: ["6.37", "6.38", "6.40", "6.41", "6.43"]
+  - q: What should one remember at the time of death?
+    expect: ["8.5", "8.6", "8.10", "8.13"]
+  - q: Am I the body or the soul?
+    expect: ["2.13", "2.18", "2.22", "13.1", "13.2", "15.7"]
+  - q: What did Arjuna see in the universal form?
+    expect: ["11.10", "11.11", "11.12", "11.13", "11.16"]
+  - q: I am time, the destroyer of worlds
+    expect: ["11.32"]
+  - q: Arjuna does not want to fight his own family
+    expect: ["1.28", "1.31", "1.32", "1.34", "1.37", "2.5"]
+  - q: Is it right to fight a righteous war?
+    expect: ["2.31", "2.32", "2.33", "2.37", "2.38"]
+  - q: What is desire and how do I defeat it?
+    expect: ["3.37", "3.39", "3.40", "3.41", "3.43"]
+  - q: How can I be free from attachment?
+    expect: ["2.48", "3.9", "3.19", "5.10", "5.11"]
+  - q: What is the difference between renunciation and relinquishment?
+    expect: ["18.2", "18.4", "18.7", "18.9", "18.11"]
+  - q: What are divine and demonic qualities?
+    expect: ["16.1", "16.2", "16.3", "16.4", "16.5"]
+  - q: What is a pure gift of charity?
+    expect: ["17.20", "17.21", "17.22"]
+  - q: What are the austerities of body, speech and mind?
+    expect: ["17.14", "17.15", "17.16"]
+  - q: How should I speak to others?
+    expect: ["17.15"]
+  - q: How do I become free from sorrow?
+    expect: ["2.65", "18.54", "18.66"]
+  - q: What is the most secret teaching?
+    expect: ["9.1", "9.2", "18.63", "18.64", "18.65"]
+  - q: Why do pleasures end in pain?
+    expect: ["2.14", "5.22", "18.38"]
+  - q: Pleasure and pain come and go; how do I endure them?
+    expect: ["2.14", "2.15", "2.38"]
+  - q: Is any spiritual effort ever wasted?
+    expect: ["2.40", "6.40"]
+  - q: How do I fix my mind on God?
+    expect: ["8.7", "8.8", "9.34", "12.8", "12.9"]
+  - q: What is Brahman, the supreme?
+    expect: ["8.3", "13.12", "13.13", "15.17"]
+  - q: Who is the Supreme Person?
+    expect: ["15.16", "15.17", "15.18", "15.19"]
+  - q: What is the tree with roots above and branches below?
+    expect: ["15.1", "15.2", "15.3"]
+  - q: Seeing the same in a learned sage, a cow, an elephant and a dog
+    expect: ["5.18"]
+  - q: Can anyone stay without acting even for a moment?
+    expect: ["3.5"]
+  - q: Is action better than inaction?
+    expect: ["3.8", "4.18"]
+  - q: How do I get rid of my ego?
+    expect: ["3.27", "12.13", "13.8", "18.17", "18.53"]
+  - q: What happens to people who worship other gods?
+    expect: ["7.20", "7.21", "7.22", "7.23", "9.23"]
+  - q: Why can't people see God?
+    expect: ["7.24", "7.25", "11.8"]
+  - q: Lift yourself up; you are your own friend and your own enemy
+    expect: ["6.5", "6.6"]
+  - q: Why is sacrifice important?
+    expect: ["3.9", "3.10", "3.14", "4.24", "4.31"]
+  - q: How do I make my work an offering to God?
+    expect: ["3.30", "5.10", "9.27", "12.10", "18.46"]
+  - q: What does karmanye vadhikaraste mean?
+    expect: ["2.47"]
+  - q: sthitaprajna
+    expect: ["2.54", "2.55"]
+  - q: What does 18.66 say?
+    expect: ["18.66"]
+
+  # ---- Telugu --------------------------------------------------------------
+  - q: పని ఫలితాల గురించి ఆందోళనగా ఉంది
+    lang: te
+    expect: ["2.47", "2.48", "3.19", "5.12"]
+  - q: కోపాన్ని ఎలా నియంత్రించాలి?
+    lang: te
+    expect: ["2.62", "2.63", "3.37", "16.21"]
+  - q: మరణం తర్వాత ఆత్మకు ఏమవుతుంది?
+    lang: te
+    expect: ["2.13", "2.20", "2.22", "2.27"]
+  - q: నా మనసు చంచలంగా ఉంది
+    lang: te
+    expect: ["6.26", "6.34", "6.35"]
+  - q: ధ్యానం ఎలా చేయాలి?
+    lang: te
+    expect: ["6.10", "6.11", "6.12", "6.13", "6.14"]
+  - q: భయం ఎలా పోతుంది?
+    lang: te
+    expect: ["2.40", "2.56", "4.10", "12.15", "16.1"]
+  - q: మనశ్శాంతి ఎలా పొందాలి?
+    lang: te
+    expect: ["2.66", "2.70", "2.71", "4.39", "5.12"]
+  - q: భక్తుని లక్షణాలు ఏమిటి?
+    lang: te
+    expect: ["12.13", "12.14", "12.15", "12.16", "12.17", "12.18", "12.19", "12.20"]
+  - q: దేవునికి శరణాగతి
+    lang: te
+    expect: ["18.62", "18.65", "18.66"]
+  - q: ఎలాంటి ఆహారం తినాలి?
+    lang: te
+    expect: ["6.17", "17.8", "17.9", "17.10"]
+  - q: బద్ధకం ఎలా వదిలించుకోవాలి?
+    lang: te
+    expect: ["3.8", "14.8", "18.28", "18.39"]
+  - q: స్వధర్మం గొప్పదా?
+    lang: te
+    expect: ["3.35", "18.47"]
+  - q: నాకు చాలా సందేహాలు ఉన్నాయి
+    lang: te
+    expect: ["4.40", "4.41", "4.42"]
+  - q: దేవుడు ఎందుకు అవతారం ఎత్తుతాడు?
+    lang: te
+    expect: ["4.7", "4.8"]
+  - q: సుఖ దుఃఖాలను ఎలా సహించాలి?
+    lang: te
+    expect: ["2.14", "2.15", "2.38"]
+  - q: గురువును ఎలా ఆశ్రయించాలి?
+    lang: te
+    expect: ["4.34"]

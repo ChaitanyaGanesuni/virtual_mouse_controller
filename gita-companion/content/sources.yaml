@@ -75,10 +75,6 @@ sources:
     is_ai_generated: true
     use: ship
 
-  # Planned, blocked in Phase 2: the build container's network policy does
-  # not allow en.wikisource.org / archive.org, so the text could not be
-  # retrieved. Once it is converted to the verse-aligned JSONL import format
-  # (see README), `gita-content build --translation` ingests and validates it.
   - id: besant-1922-en
     kind: translation
     title: The Bhagavad-Gita, or The Lord's Song (4th ed.)
@@ -87,11 +83,17 @@ sources:
     language: en
     license: public-domain
     license_note: >
-      Published 1922 (public domain in the US: published before 1931).
-      Annie Besant died 1933 (public domain in India: life + 60 years).
-    url: https://en.wikisource.org/wiki/Bhagavad-Gita_(Besant_4th)
+      Published 1922 by G. A. Natesan & Co., Madras (public domain in the US:
+      published before 1931). Annie Besant died in 1933 (public domain in India,
+      life + 60 years). Text from the proofread Wikisource transcription; the
+      exact page revisions are recorded in sources/besant-1922/wikisource-pages.jsonl
+      and converted by `gita-content besant`. Every verse's Sanskrit in the book
+      is checked against the canonical text. Besant divides 1.20-21 and 1.27-28
+      at a different half-line, so her English for those verses covers a
+      slightly different span. Footnotes are not included.
+    url: https://en.wikisource.org/wiki/Index:Bhagavad_Gita_-_Annie_Besant_4th_edition.djvu
+    retrieved_file: sources/besant-1922/wikisource-pages.jsonl
     use: ship
-    status: planned
 
 # LLM providers whose output may be shipped as AI-generated explanations
 # (see backend/llm.yaml). Output is always labelled AI-generated and

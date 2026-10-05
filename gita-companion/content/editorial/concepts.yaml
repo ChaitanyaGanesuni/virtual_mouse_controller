@@ -1,0 +1,855 @@
+# Concept index: the bridge between how people ask ("I'm anxious about my
+# exam results") and the words the Gita uses (phala, saṅga, udvega).
+#
+# A verse is linked to a concept ONLY if one of the concept's Sanskrit stems
+# actually occurs in that verse (checked by the build against the loose IAST
+# of the canonical text). No verse numbers are written here by hand.
+#
+# Fields:
+#   id        stable identifier
+#   sa        the Sanskrit term shown to users (IAST)
+#   en / te   display name, a one-line definition (en), and the words people
+#             type for this idea. English terms are matched after light
+#             stemming ("worried" = "worry"); multi-word terms match as phrases.
+#   stems     loose-romanised substrings (see gita_content.romanize.loose)
+#             searched for inside each word of the verse. `weak:` stems count
+#             half (common words such as karma, jñāna, ātman).
+#   exclude   if a matching word contains one of these, it does not count
+#             (e.g. ubhaya "both" is not bhaya "fear").
+#   related   concepts to also consider, at lower weight, when this one is asked
+#             about ("anxiety" → equanimity, results).
+#
+# Editorial text, drafted with AI assistance: source gita-companion-editorial,
+# unreviewed until a human reviewer approves it.
+
+concepts:
+  # ---- emotions and inner states ------------------------------------------
+  - id: anger
+    sa: krodha
+    en:
+      name: Anger
+      definition: Anger and how it arises from frustrated desire and clouds judgement.
+      terms: [anger, angry, rage, temper, furious, irritation, irritated, frustration, frustrated, resentment, mad at]
+    te:
+      name: కోపం
+      terms: [కోపం, కోపము, క్రోధం, ఆగ్రహం, చిరాకు, కోపాన్ని, కోపంగా]
+    stems: [krodh]
+    related: [desire, self-control, peace]
+
+  - id: desire
+    sa: kāma
+    en:
+      name: Desire
+      definition: Craving and selfish desire, which the Gita calls the enemy of wisdom.
+      terms: [desire, desires, lust, craving, crave, longing, temptation, cravings]
+      weak: [want, wanting, wish]
+    te:
+      name: కోరిక
+      terms: [కోరిక, కోరికలు, కామం, ఆశ, ఆశలు, వాంఛ]
+    stems: [kama, sprih, trisn]
+    exclude: [ekama, lokama, kamala, sokama, yoddhukama, prakasakama, kamadhuk]
+    related: [anger, attachment, self-control]
+
+  - id: greed
+    sa: lobha
+    en:
+      name: Greed
+      definition: Greed for more, named with desire and anger as a gate to ruin.
+      terms: [greed, greedy, avarice, money hungry, more and more]
+    te:
+      name: లోభం
+      terms: [లోభం, అత్యాశ, దురాశ]
+    stems: [lobh]
+    exclude: [mulobh]
+    related: [desire, anger]
+
+  - id: fear
+    sa: bhaya
+    en:
+      name: Fear
+      definition: Fear, and the fearlessness of one whose mind is steady.
+      terms: [fear, afraid, scared, fright, frightened, terrified, panic, fearless, fearlessness, courage, brave]
+    te:
+      name: భయం
+      terms: [భయం, భయము, భయపడు, భయపడుతున్నాను, ధైర్యం, నిర్భయం]
+    stems: [bhay]
+    exclude: [ubhay, abhit, dambhit]
+    weak: [bhit]
+    related: [anxiety, equanimity, surrender]
+
+  - id: anxiety
+    sa: udvega
+    en:
+      name: Anxiety and agitation
+      definition: Agitation, worry and distress of mind, and the calm that is free of them.
+      terms: [anxiety, anxious, worry, worried, worrying, stress, stressed, tension, tense, nervous, overwhelmed, agitated, agitation, restless, uneasy, overthinking, pressure]
+    te:
+      name: ఆందోళన
+      terms: [ఆందోళన, ఆందోళనగా, ఒత్తిడి, టెన్షన్, భయాందోళన, కలవరం, చింత, దిగులు]
+    stems: [udvig, udveg, vyath, chintamaparimey]
+    related: [fear, equanimity, results, peace]
+
+  - id: grief
+    sa: śoka
+    en:
+      name: Grief and sorrow
+      definition: Grief over loss, which Krishna answers by teaching what is permanent.
+      terms: [grief, grieve, grieving, sorrow, sad, sadness, mourning, mourn, loss, lost someone, heartbroken, crying, depressed, depression, unhappy]
+    te:
+      name: శోకం
+      terms: [శోకం, దుఃఖం, బాధ, విచారం, ఏడుపు, నిరాశ]
+    stems: [sok, soch, suchah]
+    related: [despondency, death, soul]
+
+  - id: despondency
+    sa: viṣāda
+    en:
+      name: Despondency
+      definition: Arjuna's collapse of will and confusion about what is right, where the teaching begins.
+      terms: [despair, despondent, hopeless, hopelessness, giving up, breakdown, demotivated, no motivation, helpless, confused about what to do, dilemma]
+      weak: [weak, lost, give up]
+    te:
+      name: విషాదం
+      terms: [విషాదం, నిస్పృహ, నిరాశ, నిస్సహాయత, గందరగోళం]
+    stems: [visid, visad, kasmal, klaiby, karpany, kripay]
+    related: [grief, delusion, duty]
+
+  - id: delusion
+    sa: moha
+    en:
+      name: Delusion and confusion
+      definition: Confusion that hides the truth, and the clarity that ends it.
+      terms: [delusion, deluded, confusion, confused, bewildered, illusion, ignorance, ignorant, clarity]
+    te:
+      name: మోహం
+      terms: [మోహం, భ్రమ, అజ్ఞానం, గందరగోళం, మాయ]
+    stems: [moh, mudh, ajnan, mayaya, maya duratyay]
+    exclude: [samoh, yajn, svadhyay]
+    related: [knowledge, doubt]
+
+  - id: doubt
+    sa: saṃśaya
+    en:
+      name: Doubt
+      definition: Doubt, the doubting mind, and doubt cut by knowledge.
+      terms: [doubt, doubts, doubting, uncertain, uncertainty, skeptic, skeptical, unsure]
+    te:
+      name: సందేహం
+      terms: [సందేహం, సంశయం, అనుమానం]
+    stems: [samsay]
+    exclude: [asamsay]
+    related: [faith, knowledge]
+
+  - id: ego
+    sa: ahaṅkāra
+    en:
+      name: Ego and pride
+      definition: The ego that says "I am the doer", and the pride and hypocrisy it feeds.
+      terms: [ego, egoism, pride, proud, arrogance, arrogant, vanity, hypocrisy, hypocrite, show off, humility, humble, i am the doer]
+    te:
+      name: అహంకారం
+      terms: [అహంకారం, అహం, గర్వం, దంభం, వినయం, వినమ్రత]
+    stems: [ahankar, darpo, darpam, dambh, bhimanas, amanitv, nirmanamoh]
+    related: [divine-qualities, action]
+
+  - id: hatred
+    sa: dveṣa
+    en:
+      name: Hatred and envy
+      definition: Aversion, hatred and envy, and the freedom from them.
+      terms: [hate, hatred, hating, envy, envious, jealous, jealousy, aversion, dislike, hostility, enemy, enemies, revenge]
+    te:
+      name: ద్వేషం
+      terms: [ద్వేషం, అసూయ, పగ, శత్రువు, శత్రువులు, ఈర్ష్య]
+    stems: [dves, asuy, vimatsar, nirvair]
+    exclude: [anasuy]
+    weak: [satru, vairin, nityavair]
+    related: [compassion, equanimity]
+
+  # ---- attachment, results, equanimity --------------------------------------
+  - id: attachment
+    sa: saṅga
+    en:
+      name: Attachment
+      definition: Clinging to things, people and outcomes, and acting without that clinging.
+      terms: [attachment, attached, clinging, cling, possessive, letting go, let go, detachment, detached, non attachment, obsessed, obsession, addicted]
+    te:
+      name: ఆసక్తి
+      terms: [ఆసక్తి, మమకారం, బంధం, అనాసక్తి, వదిలేయడం, మోహం]
+    stems: [sang, sakt, ragadves, vitarag, nirmam, abhisvang]
+    exclude: [sangh, upasangam, sangram, sangrah, samgrah]
+    related: [results, renunciation, equanimity]
+
+  - id: results
+    sa: karma-phala
+    en:
+      name: Results of action
+      definition: The fruits of action, to which you have no claim, and working without craving them.
+      terms: [result, results, outcome, outcomes, fruit, fruits, reward, rewards, success, failure, fail, exam, marks, promotion, consequence, expectation, expectations, achievement, ambition]
+    te:
+      name: కర్మఫలం
+      terms: [ఫలితం, ఫలితాలు, ఫలం, కర్మఫలం, విజయం, అపజయం, పరీక్ష, అంచనాలు]
+    stems: [phala, siddhyasiddh]
+    weak: [labhalabh, jayajay]
+    related: [attachment, action, equanimity]
+
+  - id: equanimity
+    sa: samatva
+    en:
+      name: Equanimity
+      definition: Staying even-minded in success and failure, praise and blame, pleasure and pain.
+      terms: [equanimity, balance, balanced, composure, even minded, unshaken, ups and downs, praise and blame]
+      weak: [calm, stable, steady, criticism, insult]
+    te:
+      name: సమత్వం
+      terms: [సమత్వం, సమబుద్ధి, స్థిరత్వం, నిశ్చలత, ప్రశాంతంగా]
+    stems: [samatv, samaduhkh, tuly, dvandv, siddhyasiddh, samah siddh, samabuddh, samadarsi, samachitt, nirvikar]
+    related: [steady-wisdom, peace, results]
+
+  - id: steady-wisdom
+    sa: sthitaprajña
+    en:
+      name: Steady wisdom
+      definition: 'The person of steady wisdom: how they speak, sit and walk, untouched by craving and fear.'
+      terms: [steady wisdom, sthitaprajna, stable mind, steady mind, enlightened person, man of wisdom, settled intellect, inner stability, person of steady wisdom]
+      weak: [wise person, sage]
+    te:
+      name: స్థితప్రజ్ఞత
+      terms: [స్థితప్రజ్ఞుడు, స్థితప్రజ్ఞత, స్థిరబుద్ధి, జ్ఞాని]
+    stems: [sthitaprajn, sthitadh, pratisthit, sthirabuddh, munir]
+    related: [equanimity, self-control, peace]
+
+  # ---- mind, senses, practice --------------------------------------------------
+  - id: mind
+    sa: manas
+    en:
+      name: The restless mind
+      definition: The restless, wind-like mind, and how practice and detachment steady it.
+      terms: [restless mind, restless, distracted, distraction, overthinking, wandering mind, control mind, control my mind, monkey mind]
+      weak: [mind, thoughts, focus, concentration, concentrate, attention]
+    te:
+      name: మనస్సు
+      terms: [మనసు, మనస్సు, ఏకాగ్రత, ఆలోచనలు, చంచలం, దృష్టి]
+    stems: [chanchal, nigrah, manas, vairagy]
+    exclude: [atmanas, karmanas, brahmanas, bhimanas, kramanas, tmanas]
+    related: [meditation, self-control, practice]
+
+  - id: practice
+    sa: abhyāsa
+    en:
+      name: Practice
+      definition: Steady, repeated practice, the way the mind is trained.
+      terms: [practice, practise, habit, habits, discipline, routine, consistency, consistent, repetition, training]
+    te:
+      name: అభ్యాసం
+      terms: [అభ్యాసం, సాధన, అలవాటు, క్రమశిక్షణ]
+    stems: [abhyas]
+    exclude: [abhyasuy, labhyas]
+    related: [mind, meditation]
+
+  - id: self-control
+    sa: indriya-nigraha
+    en:
+      name: Self-control
+      definition: Mastery of the senses, which pull the mind toward their objects.
+      terms: [self control, self-control, discipline, senses, sense pleasure, pleasures, temptation, temptations, addiction, addictions, willpower, restraint, indulgence, cravings, sense objects]
+    te:
+      name: ఇంద్రియనిగ్రహం
+      terms: [ఇంద్రియాలు, ఇంద్రియనిగ్రహం, నిగ్రహం, ఆత్మనిగ్రహం, వ్యసనం]
+    stems: [indriy, visay, jitendriy, samyat, kurmo, damascha, damah sam, vase hi]
+    exclude: [visayasy]
+    related: [desire, mind, steady-wisdom]
+
+  - id: meditation
+    sa: dhyāna
+    en:
+      name: Meditation
+      definition: How to sit, steady the mind and meditate, as taught in chapter 6.
+      terms: [meditation, meditate, meditating, posture, breathing, breath, dhyana, samadhi, yoga practice, how to meditate]
+      weak: [sit, sitting]
+    te:
+      name: ధ్యానం
+      terms: [ధ్యానం, ధ్యానము, యోగాభ్యాసం, సమాధి, ప్రాణాయామం]
+    stems: [dhyan, yunj, samadh, nasikagr, pranapan, pranayam, sthiramasan, suchau des, "(ai|e)kagr", kayasirogriv, bhruvor]
+    exclude: [samadhigach, madhyan, viddhyan]
+    related: [mind, practice, peace]
+
+  - id: peace
+    sa: śānti
+    en:
+      name: Peace
+      definition: Inner peace, which comes to one free of craving.
+      terms: [peace, peaceful, inner peace, calm, calmness, tranquil, tranquility, serenity, relax, quiet mind, stillness]
+    te:
+      name: శాంతి
+      terms: [శాంతి, ప్రశాంతత, ప్రశాంతి, మనశ్శాంతి, నెమ్మది]
+    stems: [santim, santir, prasant, santasy]
+    exclude: [ksantir]
+    related: [equanimity, happiness, steady-wisdom]
+
+  - id: happiness
+    sa: sukha
+    en:
+      name: Happiness
+      definition: Kinds of happiness, the lasting joy within, and contentment.
+      terms: [happiness, happy, joy, joyful, contentment, content, satisfied, satisfaction, fulfilment, fulfillment, bliss, pleasure, enjoy]
+    te:
+      name: సుఖం
+      terms: [సుఖం, ఆనందం, సంతోషం, తృప్తి, సంతృప్తి, హాయి]
+    stems: [sukh, tust, santus]
+    exclude: [prith, aprit]
+    weak: [prit]
+    related: [peace, suffering]
+
+  - id: suffering
+    sa: duḥkha
+    en:
+      name: Suffering
+      definition: Pain and suffering, why they pass, and the end of sorrow.
+      terms: [suffering, suffer, pain, painful, misery, miserable, hardship, difficult times, trouble, troubles, struggle, struggling, hurt, adversity]
+    te:
+      name: దుఃఖం
+      terms: [దుఃఖం, కష్టం, కష్టాలు, బాధ, బాధలు, వేదన]
+    stems: [duhkh, vyath, kles, matrasparsa, titiks]
+    related: [happiness, grief, equanimity]
+
+  # ---- action, duty, renunciation --------------------------------------------
+  - id: action
+    sa: karma
+    en:
+      name: Action and work
+      definition: Why one must act, how to act without bondage, and action versus inaction.
+      terms: [action, actions, karma, deeds, inaction, stop working, quit my job, should i work, career, profession]
+      weak: [work, working, job, effort, busy, productivity]
+    te:
+      name: కర్మ
+      terms: [కర్మ, కర్మలు, పని, ఉద్యోగం, కృషి, ప్రయత్నం, కర్తవ్యం]
+    stems: ["(^|hy|y|d)akarm", naiskarm, kurvann, karot]
+    weak: [karm]
+    exclude: [punyakarm, indriyakarm, sukarm, duskarm, vaisyakarm]
+    related: [duty, results, karma-yoga]
+
+  - id: karma-yoga
+    sa: karma-yoga
+    en:
+      name: Karma yoga
+      definition: 'The yoga of action: work done as an offering, without selfish motive.'
+      terms: [karma yoga, selfless action, selfless service, seva, work as worship, nishkama karma, desireless action]
+    te:
+      name: కర్మయోగం
+      terms: [కర్మయోగం, నిష్కామకర్మ, సేవ]
+    stems: [karmayog, buddhiyog, asakt, yogasth, kausal]
+    related: [action, results, sacrifice]
+
+  - id: duty
+    sa: sva-dharma
+    en:
+      name: One's own duty
+      definition: One's own duty and nature, better done imperfectly than another's done well.
+      terms: [duty, duties, responsibility, responsibilities, obligation, role, my path, own path, calling, purpose, svadharma, compare, comparison, comparing myself, someone else, others job, right thing to do]
+    te:
+      name: స్వధర్మం
+      terms: [స్వధర్మం, ధర్మం, కర్తవ్యం, బాధ్యత, బాధ్యతలు]
+    stems: [svadharm, paradharm, kartavy, niyatam, sahajam, svabhavaj, svakarm]
+    weak: [dharm]
+    exclude: [narakeniyat, niyatamanas, viniyat]
+    related: [action, nature]
+
+  - id: righteousness
+    sa: dharma
+    en:
+      name: Dharma and its protection
+      definition: Righteousness, its decline, and the divine coming to restore it.
+      terms: [dharma, righteousness, righteous, morality, moral, ethics, ethical, justice, right and wrong, adharma, evil rising]
+    te:
+      name: ధర్మం
+      terms: [ధర్మం, అధర్మం, నీతి, న్యాయం]
+    stems: ["(^|m)adharm", dharmasamsthap, dharmasy]
+    weak: [dharm]
+    related: [incarnation, duty]
+
+  - id: incarnation
+    sa: avatāra
+    en:
+      name: Divine incarnation
+      definition: Why and when the Lord takes birth, to protect the good and restore dharma.
+      terms: [incarnation, avatar, avatara, why god comes, god takes birth, descent, divine birth, born again age after age]
+    te:
+      name: అవతారం
+      terms: [అవతారం, అవతారము, యుగే యుగే]
+    stems: [sambhavamy, paritran, abhyutthan, srijamy, janma karma cha me]
+    related: [righteousness, divine]
+
+  - id: renunciation
+    sa: saṃnyāsa
+    en:
+      name: Renunciation
+      definition: True renunciation is giving up the fruit and the selfish motive, not action itself.
+      terms: [renunciation, renounce, renouncing, sannyasa, sanyasa, monk, give up everything, leave everything, quit, quitting, abandon, tyaga, letting go of the world]
+    te:
+      name: సన్యాసం
+      terms: [సన్యాసం, సన్యాసి, త్యాగం, వదిలేయడం, విరక్తి]
+    stems: [samnyas, tyag, tyaj, parityaj]
+    exclude: [nityaj, ityajn]
+    related: [attachment, action, results]
+
+  - id: laziness
+    sa: tamas / ālasya
+    en:
+      name: Laziness and inertia
+      definition: Sloth, heedlessness and excess sleep, the marks of tamas.
+      terms: [laziness, lazy, procrastination, procrastinate, procrastinating, sloth, inertia, lethargy, tired, sleep too much, oversleeping, no energy, unmotivated, careless, negligence]
+    te:
+      name: బద్ధకం
+      terms: [బద్ధకం, సోమరితనం, వాయిదా, నిద్ర, అలసత్వం, నిర్లక్ష్యం]
+    stems: [alasy, olasah, pramad, nidr]
+    related: [gunas, action]
+
+  # ---- nature, gunas, qualities --------------------------------------------------
+  - id: gunas
+    sa: guṇa
+    en:
+      name: The three gunas
+      definition: Sattva, rajas and tamas, the three qualities of nature that bind and drive us.
+      terms: [gunas, guna, three qualities, modes of nature, sattva, sattvic, rajas, rajasic, tamas, tamasic, temperament, personality types]
+    te:
+      name: త్రిగుణాలు
+      terms: [గుణాలు, త్రిగుణాలు, సత్త్వం, రజస్సు, తమస్సు, సాత్త్విక, రాజసిక, తామసిక]
+    stems: [sattv, rajas, tamas, traigun, gunat, gunamay, gunasan]
+    weak: [gun]
+    exclude: [sirajas, tamasm, tamasn, tamasru, tamasv]
+    related: [nature, laziness]
+
+  - id: nature
+    sa: prakṛti / svabhāva
+    en:
+      name: Nature and temperament
+      definition: Prakṛti, the material nature that acts, and each person's inborn nature.
+      terms: [nature, human nature, my nature, temperament, character, personality, prakriti, instinct, born with, natural tendency, caste, varna, profession]
+    te:
+      name: స్వభావం
+      terms: [స్వభావం, ప్రకృతి, వర్ణం, స్వభావము]
+    stems: [prakrit, svabhav, chaturvarny, varnasank]
+    related: [gunas, duty]
+
+  - id: divine-qualities
+    sa: daivī sampad
+    en:
+      name: Divine and demonic qualities
+      definition: The qualities that free us (fearlessness, purity, kindness) and those that bind (hypocrisy, arrogance, cruelty).
+      terms: [good qualities, virtues, virtue, character, bad qualities, vices, demonic, divine qualities, evil people, bad people, good person, good character, qualities of a good person]
+    te:
+      name: దైవీ సంపద
+      terms: [సద్గుణాలు, దుర్గుణాలు, దైవీ సంపద, ఆసురీ, మంచి గుణాలు, మంచి వ్యక్తి]
+    stems: [daivi, "(^|m|n|y)asur", sampad, abhayam]
+    exclude: [jijnasu, svasur, sampadyat]
+    related: [ego, compassion, truthfulness]
+
+  - id: compassion
+    sa: dayā / karuṇā
+    en:
+      name: Compassion and friendliness
+      definition: Kindness, friendliness and compassion toward all beings, without hatred.
+      terms: [compassion, compassionate, kindness, kind, mercy, merciful, empathy, friendly, friendliness, love for all, caring, gentle, gentleness]
+    te:
+      name: కరుణ
+      terms: [కరుణ, దయ, కనికరం, ప్రేమ, స్నేహం, మైత్రి]
+    stems: ["^daya", karun, maitr, advest, ahims, mardav]
+    related: [divine-qualities, devotee-qualities]
+
+  - id: truthfulness
+    sa: satya
+    en:
+      name: Truthfulness and honesty
+      definition: Truthful, straightforward speech and conduct.
+      terms: [truth, truthful, truthfulness, honesty, honest, lying, lie, lies, integrity, straightforward, sincere, sincerity, speech, speak, speaking, talk, talking, harsh words, kind words]
+      weak: [words]
+    te:
+      name: సత్యం
+      terms: [సత్యం, నిజం, నిజాయితీ, సత్యము, మాట]
+    stems: [satyam, satya, arjav, vanmay, "^vakyam$"]
+    exclude: [asatyam, satyakis, bhagavanm]
+    related: [divine-qualities]
+
+  - id: patience
+    sa: kṣamā / titikṣā
+    en:
+      name: Patience and forgiveness
+      definition: Forbearance, forgiveness and endurance through hardship.
+      terms: [patience, patient, forgiveness, forgive, forgiving, endurance, endure, tolerate, tolerance, resilience, perseverance, persevere, fortitude]
+    te:
+      name: క్షమ
+      terms: [క్షమ, ఓర్పు, సహనం, ఓపిక, క్షమించడం, ధైర్యం]
+    stems: ["^ksam", ksami, tatksamaye, "^ksant", titiks, dhriti, dhrity]
+    exclude: [dhritirastr, dhritarastr]
+    related: [suffering, equanimity]
+
+  - id: purity
+    sa: śauca
+    en:
+      name: Purity
+      definition: Purity of body, mind and food, and what purifies.
+      terms: [purity, pure, purify, purification, cleanliness, clean, holy]
+    te:
+      name: శౌచం
+      terms: [శౌచం, పవిత్రత, శుద్ధి, శుభ్రత]
+    stems: [sauch, suddh, pavitr, visuddh]
+    related: [food, divine-qualities]
+
+  # ---- daily life ------------------------------------------------------------------
+  - id: food
+    sa: āhāra
+    en:
+      name: Food and diet
+      definition: Food that suits each temperament, and moderation in eating and sleep.
+      terms: [food, diet, eat, eating, meal, meals, vegetarian, fasting, fast, hunger, overeating, sleep, sleeping, moderation, lifestyle]
+    te:
+      name: ఆహారం
+      terms: [ఆహారం, భోజనం, తిండి, ఉపవాసం, నిద్ర, మితాహారం]
+    stems: ["^ahar", yuktahar, niraharasy, natyasn, asnat, svapn, jagrat, rasyah, bhunj]
+    exclude: [aharag]
+    related: [purity, gunas, self-control]
+
+  - id: self-mastery
+    sa: ātma-uddhāra
+    en:
+      name: Lifting yourself up
+      definition: 'You are your own friend and your own enemy: raise yourself by yourself.'
+      terms: [self improvement, self-improvement, improve myself, self help, uplift, motivation, motivate myself, self esteem, self-esteem, self worth, low confidence, confidence, own worst enemy, be my own friend, believe in myself]
+    te:
+      name: ఆత్మోద్ధరణ
+      terms: [ఆత్మవిశ్వాసం, ప్రేరణ, ఆత్మోద్ధరణ, నమ్మకం]
+    stems: [uddhar, ripur, bandhur, satrutv, avasadayet]
+    related: [mind, self-control]
+
+  - id: leadership
+    sa: loka-saṅgraha
+    en:
+      name: Leadership and example
+      definition: Acting for the welfare of the world; others follow what the best people do.
+      terms: [leader, leadership, leading, example, role model, set an example, influence, team, manager, society, social welfare, public service, others follow, parenting, teaching by example]
+    te:
+      name: లోకసంగ్రహం
+      terms: [నాయకత్వం, నాయకుడు, ఆదర్శం, సమాజం, లోకసంగ్రహం]
+    stems: [lokasamgrah, yadyadachar, samachar, "^sresth", pramanam]
+    related: [action, duty]
+
+  - id: family
+    sa: kula / svajana
+    en:
+      name: Family and kinsmen
+      definition: Arjuna's anguish over fighting his own family and teachers.
+      terms: [family, relatives, relative, kinsmen, cousins, parents, father, mother, grandfather, loved ones, family conflict, family fight, friends, teachers]
+    te:
+      name: కుటుంబం
+      terms: [కుటుంబం, బంధువులు, తల్లిదండ్రులు, స్నేహితులు, ఆప్తులు]
+    stems: [kulaks, kuladharm, kulaghn, kulastr, svajan, svabandhav, pitamah, pitrin, achary, suhrid, sambandhin]
+    exclude: [brahmachar]
+    related: [despondency, war]
+
+  - id: war
+    sa: yuddha
+    en:
+      name: War and conflict
+      definition: The battle of Kurukṣetra and the question of fighting a righteous war.
+      terms: [war, fight, fighting, battle, conflict, violence, kill, killing, weapons, army, soldier]
+    te:
+      name: యుద్ధం
+      terms: [యుద్ధం, పోరాటం, కలహం, హింస, సైన్యం]
+    stems: [yuddh, yoddh, samgram, mahave, ranasamudyam, "^hims"]
+    related: [duty, family, righteousness]
+
+  - id: reputation
+    sa: kīrti / nindā
+    en:
+      name: Reputation, praise and blame
+      definition: Honour and dishonour, praise and blame, and staying the same in both.
+      terms: [reputation, fame, honor, honour, dishonor, dishonour, shame, what people think, what will people say, criticism, criticized, praise, blame, insult, insulted, respect, disrespect]
+    te:
+      name: కీర్తి
+      terms: [కీర్తి, అపకీర్తి, పరువు, నింద, పొగడ్త, అవమానం, గౌరవం]
+    stems: [kirtim, kirtih, akirt, nind, stuti, manapaman, sambhavit]
+    exclude: [indriy]
+    related: [equanimity, ego]
+
+  - id: charity
+    sa: dāna / tapas
+    en:
+      name: Charity and austerity
+      definition: Giving, austerity and sacrifice, done in the sattvic way, are not to be abandoned.
+      terms: [charity, giving, donation, donate, generosity, generous, gift, help others, austerity, penance, tapas, self discipline]
+    te:
+      name: దానం
+      terms: [దానం, తపస్సు, దాతృత్వం, సహాయం]
+    stems: [danam, datavy, dane, tapas, tapo]
+    exclude: [tapasv, tapasah, vedan, syandan]
+    related: [sacrifice, gunas]
+
+  - id: sin
+    sa: pāpa
+    en:
+      name: Sin and redemption
+      definition: Wrongdoing, its consequences, and how even the worst can be freed by knowledge and devotion.
+      terms: [sin, sins, sinful, sinner, evil, wrong, wrongdoing, guilt, guilty, mistake, mistakes, bad karma, bad past, redemption, second chance, regret, forgiveness from god]
+    te:
+      name: పాపం
+      terms: [పాపం, పాపాలు, తప్పు, తప్పులు, అపరాధం, పశ్చాత్తాపం]
+    stems: [papa, papeb, papam, papm, kilbis, duskrit, suduracha, kalmas]
+    exclude: [prapa, upapad, opapad, upapatt, opapann, upapann]
+    related: [devotion, knowledge, purity]
+
+  # ---- knowledge, self, God -----------------------------------------------------------
+  - id: knowledge
+    sa: jñāna
+    en:
+      name: Knowledge and wisdom
+      definition: Spiritual knowledge, the greatest purifier, and how to gain it.
+      terms: [knowledge, wisdom, wise, learning, understanding, intellect, insight, jnana, enlightenment, truth]
+    te:
+      name: జ్ఞానం
+      terms: [జ్ఞానం, విజ్ఞానం, బుద్ధి, వివేకం, జ్ఞానము]
+    stems: [jnanen, jnanam, jnanag, vijnan, prajna, tattvadars]
+    weak: [jnan, buddh]
+    exclude: [ajnan]
+    related: [teacher, delusion, doubt]
+
+  - id: teacher
+    sa: guru
+    en:
+      name: The teacher
+      definition: Approaching a teacher with humility, questions and service.
+      terms: [teacher, guru, mentor, master, guidance, student, disciple, learn from, ask questions, spiritual teacher, find a guru]
+    te:
+      name: గురువు
+      terms: [గురువు, ఆచార్యుడు, శిష్యుడు, మార్గదర్శి]
+    stems: [pranipat, pariprasn, upadeks, "^sisy", sisyena]
+    exclude: [gurulaghav, brahmachar]
+    weak: [guru, achary]
+    related: [knowledge, faith]
+
+  - id: faith
+    sa: śraddhā
+    en:
+      name: Faith
+      definition: Faith, which shapes a person ("as one's faith is, so one is"), and its three kinds.
+      terms: [faith, belief, believe, trust, trusting, conviction, shraddha, devotion and faith]
+    te:
+      name: శ్రద్ధ
+      terms: [శ్రద్ధ, విశ్వాసం, నమ్మకం, భక్తిశ్రద్ధ]
+    stems: [sraddh, anasuy]
+    related: [doubt, devotion]
+
+  - id: soul
+    sa: ātman
+    en:
+      name: The Self (soul)
+      definition: The eternal Self that is never born and never dies, distinct from the body.
+      terms: [soul, self, spirit, atman, atma, consciousness, who am i, true self, inner self, immortal, eternal, immortality, never dies, cannot be killed, indestructible, unborn]
+    te:
+      name: ఆత్మ
+      terms: [ఆత్మ, జీవాత్మ, నేను ఎవరు, అమరత్వం, శాశ్వతం]
+    stems: [dehi, dehin, avinas, "^ajo", achchedy, adahy, nainam, "^hanyat", sasvat, ksetrajn, jivabhut, jivaloke]
+    weak: [atma]
+    related: [death, body]
+
+  - id: body
+    sa: deha / kṣetra
+    en:
+      name: Body and the field
+      definition: The body as the field, and the knower of the field who is not the body.
+      terms: [body, physical body, field, kshetra, matter, aging, old age, youth, childhood]
+    te:
+      name: దేహం
+      terms: [దేహం, శరీరం, క్షేత్రం, ముసలితనం, యవ్వనం]
+    stems: [sarir, deha, kaumar, yauvan, jara, ksetr, kalevar]
+    exclude: [jarasandh, sandeh, dharmaksetr, kuruksetr]
+    related: [soul, death]
+
+  - id: death
+    sa: mṛtyu / punarjanma
+    en:
+      name: Death and rebirth
+      definition: Death as changing worn-out clothes, rebirth, and what one remembers at the end.
+      terms: [death, die, dying, dead, afterlife, after death, rebirth, reincarnation, next life, past life, mortality, end of life, losing someone, funeral, last moments]
+    te:
+      name: మరణం
+      terms: [మరణం, చావు, మృత్యువు, పునర్జన్మ, మరుజన్మ, చనిపోయిన, చనిపోవడం]
+    stems: [mrityu, maran, mriyat, janm, punarjanm, antakal, prayan, vasamsi, jirnan, dehantar, kalevar, tyajandeh]
+    exclude: [amrit, smaran, unjanm, ajanm]
+    related: [soul, grief, liberation]
+
+  - id: liberation
+    sa: mokṣa
+    en:
+      name: Liberation
+      definition: Freedom from the cycle of birth and death, peace in Brahman, the supreme goal.
+      terms: [liberation, freedom, moksha, mukti, salvation, nirvana, enlightenment, free from rebirth, supreme goal, ultimate goal, highest goal, purpose of life, meaning of life]
+    te:
+      name: మోక్షం
+      terms: [మోక్షం, ముక్తి, నిర్వాణం, జీవిత లక్ష్యం, పరమపదం]
+    stems: [moks, nirvan, paramam gat, punarjanma na, vimukt, nivartant, brahmabhut, dhama paramam]
+    related: [death, knowledge, devotion]
+
+  - id: divine
+    sa: Īśvara / Puruṣottama
+    en:
+      name: The Divine
+      definition: The Supreme Lord, the highest person, source and support of all.
+      terms: [supreme being, supreme person, purushottama, krishna's nature, who is krishna, brahman, absolute, ishvara, bhagavan, creator, highest being, nature of god]
+      weak: [god, lord, divine, supreme]
+    te:
+      name: పరమాత్మ
+      terms: [దేవుడు, భగవంతుడు, పరమాత్మ, ఈశ్వరుడు, బ్రహ్మం, పురుషోత్తముడు]
+    stems: [purusottam, paramesvar, isvar, paramatm, param brahm, aksaram brahm, bhagavan]
+    exclude: [anisvar, bhogaisvary, visvar]
+    related: [presence, devotion, incarnation]
+
+  - id: presence
+    sa: sarva-bhūta-stha
+    en:
+      name: God in all beings
+      definition: The Lord dwelling in the heart of every being, and seeing the One in all.
+      terms: [god everywhere, omnipresent, omnipresence, in all beings, oneness, unity, everything is god, see god in everyone, same in all, inner controller, god in my heart, equal vision]
+    te:
+      name: సర్వాంతర్యామి
+      terms: [సర్వాంతర్యామి, అందరిలో దేవుడు, ఏకత్వం, సర్వవ్యాపి]
+    stems: [sarvabhutast, sarvabhutasth, hriddes, hridi sarv, samadars, samam sarves, sarvabhutesu, mayi sarvam, sutre maniga]
+    related: [divine, equanimity, compassion]
+
+  - id: cosmic-form
+    sa: viśvarūpa
+    en:
+      name: The universal form
+      definition: Arjuna's vision of the Lord's cosmic form in chapter 11.
+      terms: [universal form, cosmic form, vishwaroopa, vishvarupa, virat, vision of god, thousand suns, time destroyer of worlds, i am time]
+    te:
+      name: విశ్వరూపం
+      terms: [విశ్వరూపం, విరాట్ రూపం, విశ్వరూప]
+    stems: [visvarup, anekavaktr, anekabahu, divyam dadami, kalosmi, divi suryasahasr]
+    related: [divine]
+
+  - id: glories
+    sa: vibhūti
+    en:
+      name: Divine glories
+      definition: '"Among X, I am Y": how the Lord is seen in whatever is excellent.'
+      terms: [glories, vibhuti, manifestations, i am the best of, excellence, splendour, splendor, among rivers, divine manifestations]
+    te:
+      name: విభూతి
+      terms: [విభూతి, విభూతులు, మహిమ]
+    stems: [vibhut, "asmi$"]
+    related: [divine]
+
+  - id: creation
+    sa: sṛṣṭi / pralaya
+    en:
+      name: Creation and the cosmos
+      definition: The cycles of creation and dissolution, the day of Brahmā, and nature as the womb.
+      terms: [creation, universe, cosmos, world, origin of the world, cycle, cycles, dissolution, big bang, day of brahma, how was the world created]
+    te:
+      name: సృష్టి
+      terms: [సృష్టి, ప్రళయం, విశ్వం, జగత్తు, కల్పం]
+    stems: [pralay, kalpaks, kalpad, sahasrayug, srijam, srijati, visrijam, avyaktad, bhutagram, jagat]
+    related: [nature, divine]
+
+  - id: yoga
+    sa: yoga
+    en:
+      name: Yoga
+      definition: 'What the Gita means by yoga: evenness of mind, skill in action, and freedom from union with pain.'
+      terms: [yoga, yogi, yogis, meaning of yoga, what is yoga, union, discipline of yoga, skill in action]
+    te:
+      name: యోగం
+      terms: [యోగం, యోగి, యోగము, యోగా]
+    stems: ["^yog", samatvam yoga, yogah karmas, yogasamjnit]
+    related: [equanimity, karma-yoga, meditation]
+
+  - id: secret
+    sa: guhya
+    en:
+      name: The secret teaching
+      definition: The most secret, royal knowledge the Lord reveals to the devoted.
+      terms: [secret, secret teaching, most secret, highest secret, hidden teaching, royal knowledge, mystery, essence of the gita, final teaching]
+    te:
+      name: రహస్యం
+      terms: [రహస్యం, గుహ్యం, పరమ రహస్యం, రాజవిద్య]
+    stems: [guhy, rahasy, rajavidy, rajaguhy]
+    related: [devotion, surrender, knowledge]
+
+  # ---- devotion and worship ----------------------------------------------------------
+  - id: devotion
+    sa: bhakti
+    en:
+      name: Devotion
+      definition: Loving devotion to the Lord, the path open to everyone.
+      terms: [devotion, devotee, devotees, bhakti, love of god, love for god, loving god, worship with love, bhakta]
+    te:
+      name: భక్తి
+      terms: [భక్తి, భక్తుడు, భక్తులు, ప్రేమ, ఆరాధన]
+    stems: [bhakt, bhaj, ananya, madgat, manmana, matpar]
+    exclude: [vibhakt]
+    related: [surrender, offering, devotee-qualities]
+
+  - id: devotee-qualities
+    sa: bhakta-lakṣaṇa
+    en:
+      name: Qualities of a devotee
+      definition: 'The devotee dear to the Lord: without hatred, friendly, compassionate, the same in honour and dishonour.'
+      terms: [qualities of a devotee, dear to god, dear to krishna, who is dear to god, good devotee, ideal person]
+    te:
+      name: భక్తుని లక్షణాలు
+      terms: [భక్తుని లక్షణాలు, దేవునికి ప్రియమైన]
+    stems: [priyah, madbhakt, advest]
+    exclude: [apriy, priyahit]
+    related: [devotion, compassion, equanimity]
+
+  - id: surrender
+    sa: śaraṇāgati
+    en:
+      name: Surrender to God
+      definition: Taking refuge in the Lord, who promises to free you from all sin and fear.
+      terms: [surrender, surrendering, refuge, take refuge, give it to god, let god handle, trust god, protection, protect me, will god help me, gods promise, shelter]
+    te:
+      name: శరణాగతి
+      terms: [శరణాగతి, శరణు, శరణం, రక్షణ, ఆశ్రయం]
+    stems: [saranam, prapad, parityajy, moksayis, ma suchah, yogaksem, pranasyat, "^mamasrit", madasray, madvyapasray]
+    exclude: [aksaranam, buddhinas, niryog]
+    related: [devotion, fear, sin]
+
+  - id: offering
+    sa: arpaṇa
+    en:
+      name: Offering
+      definition: 'Offering everything you do, eat and give to the Lord: even a leaf, a flower, water.'
+      terms: [offering, offer, offer to god, leaf flower fruit water, dedicate, dedication, prasad, naivedya, dedicate my work]
+    te:
+      name: అర్పణ
+      terms: [అర్పణ, నైవేద్యం, సమర్పణ, పత్రం పుష్పం]
+    stems: [arpan, arpit, "^puspam", "^patram", "^toyam$", juhosi, upahrit]
+    exclude: [karpany, sarpan]
+    related: [devotion, sacrifice, karma-yoga]
+
+  - id: sacrifice
+    sa: yajña
+    en:
+      name: Sacrifice (yajña)
+      definition: Action done as sacrifice, which sustains the world and does not bind.
+      terms: [sacrifice, yajna, yagna, ritual, rituals, fire ritual, homa, offering to gods, cosmic cycle of giving]
+    te:
+      name: యజ్ఞం
+      terms: [యజ్ఞం, యాగం, హోమం, క్రతువు]
+    stems: [yajn, havir, juhv, "^hutam$"]
+    related: [offering, karma-yoga, charity]
+
+  - id: worship
+    sa: upāsanā
+    en:
+      name: Worship and prayer
+      definition: How people worship, the worship of other gods, and remembering the Lord.
+      terms: [worship, prayer, pray, praying, puja, chant, chanting, mantra, temple, rituals, other gods, demigods, idol, remember god, om]
+    te:
+      name: పూజ
+      terms: [పూజ, ప్రార్థన, ఉపాసన, జపం, మంత్రం, దేవతలు, ఓం]
+    stems: [upasat, yajant, pujy, namaskur, namasyant, smar, anyadevat, devayaj, omity]
+    exclude: [vismar]
+    related: [devotion, offering, faith]

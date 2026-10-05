@@ -9,7 +9,7 @@ from pathlib import Path
 from .romanize import loose
 
 SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schema" / "content_pack.sql"
-PACK_SCHEMA_VERSION = 2
+PACK_SCHEMA_VERSION = 3
 
 
 def pack_manifest(dataset: dict) -> dict:
@@ -108,6 +108,35 @@ def _fill(db: sqlite3.Connection, ds: dict, built_at: datetime) -> None:
             (v["id"], _no_space(v["sanskrit"]), roman.replace(" ", ""), _no_space(telugu)),
         )
     db.executemany("INSERT INTO verse_alias VALUES (:edition, :ref, :verse_id)", ds["aliases"])
+
+    for c in ds.get("concepts", []):
+        db.execute("INSERT INTO concept VALUES (?, ?)", (c["id"], c["term_sa"]))
+        db.executemany(
+            "INSERT INTO concept_text VALUES (?, ?, ?, ?, ?)",
+            [
+                (c["id"], c["source_id"], "en", c["names"]["en"], c["definition_en"]),
+                (c["id"], c["source_id"], "te", c["names"]["te"], None),
+            ],
+        )
+        strong = {(lang, k) for lang, keys in c["terms"].items() for k in keys}
+        db.executemany(
+            "INSERT INTO concept_term VALUES (?, ?, ?, ?)",
+            [(c["id"], lang, key, 0) for lang, key in sorted(strong)]
+            + [
+                (c["id"], lang, key, 1)
+                for lang, keys in c.get("weak_terms", {}).items()
+                for key in keys
+                if (lang, key) not in strong
+            ],
+        )
+        db.executemany(
+            "INSERT INTO verse_concept VALUES (?, ?, ?, ?)",
+            [(vid, c["id"], c["source_id"], w) for vid, w in c["verses"]],
+        )
+    db.executemany(
+        "INSERT INTO concept_related VALUES (?, ?)",
+        [(c["id"], r) for c in ds.get("concepts", []) for r in c["related"]],
+    )
 
 
 def _no_space(text: str) -> str:

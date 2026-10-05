@@ -34,8 +34,13 @@ jobs:
           fetch "$RUNNER_TEMP/vs"    https://github.com/vedicscriptures/bhagavad-gita-data.git 43dfc8db815d01e15a347ea294b089334cf2aa17
       - name: Rebuild and check reproducibility
         run: |
-          gita-content build --gita-json "$RUNNER_TEMP/gita/data/verse.json" --verify-with "$RUNNER_TEMP/vs/slok"
+          gita-content besant   # Besant (1922) from the committed Wikisource snapshot
+          git diff --exit-code -- sources/
+          gita-content build --gita-json "$RUNNER_TEMP/gita/data/verse.json" --verify-with "$RUNNER_TEMP/vs/slok" \
+            --translation besant-1922-en=sources/besant-1922/besant-1922-en.jsonl
           git diff --exit-code -- data/
+      - name: Retrieval quality (golden set)
+        run: python -m gita_content.evaluate
       - uses: actions/upload-artifact@v4
         with:
           name: gita-content-pack

@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .canon import EDITION_701, Canon, VerseRef
+from .concepts import concept_rows, link_verses, load_concepts
 from .devanagari import SPEAKER_LINES, ParsedVerse, orthographic_key, parse_verse, strict_key
 from .enrich import (
     AI_DIR,
@@ -28,7 +29,7 @@ from .registry import Registry
 from .sources.readers import RawVerse, read_translation_jsonl
 from .transliterate import all_scripts, transliterate
 
-CONTENT_FORMAT = "gita-companion-content/2"
+CONTENT_FORMAT = "gita-companion-content/3"
 SANSKRIT_SOURCE = "bg-sanskrit-gita-json"
 VERIFY_SOURCE = "bg-sanskrit-vedicscriptures"
 EDITORIAL_SOURCE = "gita-companion-editorial"
@@ -138,6 +139,7 @@ def build_dataset(
     translations: list[tuple[str, Path]] | None = None,
     editorial_dir: Path = EDITORIAL_DIR,
     ai_dir: Path = AI_DIR,
+    concepts_file: Path | None = None,
 ) -> tuple[dict, CrossCheck | None]:
     for sid in (SANSKRIT_SOURCE, EDITORIAL_SOURCE, *SCRIPT_SOURCES.values()):
         registry.shippable(sid)
@@ -285,6 +287,12 @@ def build_dataset(
             }
         )
 
+    # Concept index: links come only from stems found in each verse's text.
+    concepts = link_verses(
+        load_concepts(concepts_file or editorial_dir / "concepts.yaml"),
+        {v["id"]: next(t["body"] for t in v["texts"] if t["language"] == "sa-Latn") for v in verse_rows},
+    )
+
     aliases = []
     for ref in canon.all_refs():
         if ref.id in original_numbers and ref.chapter == 13:
@@ -306,6 +314,7 @@ def build_dataset(
         "speakers": speakers,
         "verses": verse_rows,
         "aliases": aliases,
+        "concepts": concept_rows(concepts, EDITORIAL_SOURCE),
     }
     dataset = {"format": CONTENT_FORMAT, "content_hash": content_hash(body), **body}
     return dataset, report

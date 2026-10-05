@@ -128,6 +128,26 @@ CREATE TABLE verse_concept (
   PRIMARY KEY (verse_id, concept_id, source_id)
 );
 
+-- Query side of the concept index (pack schema v3). `term_key` is the
+-- normalised form the app compares queries with: stemmed English words, or
+-- Telugu words with one common ending removed (gita_content.concepts.term_key).
+-- `weak` terms are generic words ("god", "work") that only hint at a concept.
+CREATE TABLE concept_term (
+  concept_id TEXT NOT NULL REFERENCES concept(id),
+  language   TEXT NOT NULL CHECK (language IN ('en', 'te')),
+  term_key   TEXT NOT NULL,
+  weak       INTEGER NOT NULL DEFAULT 0 CHECK (weak IN (0, 1)),
+  PRIMARY KEY (concept_id, language, term_key)
+);
+CREATE INDEX ix_concept_term_key ON concept_term(term_key);
+
+CREATE TABLE concept_related (
+  concept_id TEXT NOT NULL REFERENCES concept(id),
+  related_id TEXT NOT NULL REFERENCES concept(id),
+  PRIMARY KEY (concept_id, related_id),
+  CHECK (concept_id <> related_id)
+);
+
 CREATE TABLE verse_relation (
   from_verse TEXT NOT NULL REFERENCES verse(id),
   to_verse   TEXT NOT NULL REFERENCES verse(id),

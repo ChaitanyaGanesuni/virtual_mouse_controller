@@ -38,7 +38,32 @@ def main(argv: list[str] | None = None) -> int:
     k.add_argument("--dataset", type=Path, default=ROOT / "data" / "gita.json")
     k.add_argument("--pack", type=Path, default=DEFAULT_PACK)
     k.add_argument("--manifest", type=Path, help="also write a JSON manifest (content hash, schema version)")
+    bs = sub.add_parser(
+        "besant", help="convert the Wikisource snapshot of Besant (1922) to the import format"
+    )
+    bs.add_argument(
+        "--snapshot", type=Path, default=ROOT / "sources" / "besant-1922" / "wikisource-pages.jsonl"
+    )
+    bs.add_argument("--dataset", type=Path, default=ROOT / "data" / "gita.json")
+    bs.add_argument("--out", type=Path, default=ROOT / "sources" / "besant-1922" / "besant-1922-en.jsonl")
     args = p.parse_args(argv)
+
+    if args.cmd == "besant":
+        from .sources import besant
+
+        verses = besant.parse(besant.read_snapshot(args.snapshot))
+        dataset = json.loads(args.dataset.read_text(encoding="utf-8"))
+        problems = besant.check_against(verses, {v["id"]: v["sanskrit"] for v in dataset["verses"]})
+        if problems:
+            print(
+                "BESANT FAILED: Sanskrit does not match the canonical text at "
+                + ", ".join(f"{vid} ({r})" for vid, r in problems),
+                file=sys.stderr,
+            )
+            return 1
+        args.out.write_text(besant.to_jsonl_canonical(verses), encoding="utf-8")
+        print(f"ok: {len(verses)} verses -> {args.out}")
+        return 0
 
     if args.cmd == "pack":
         dataset = json.loads(args.dataset.read_text(encoding="utf-8"))
