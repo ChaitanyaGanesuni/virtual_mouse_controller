@@ -1,0 +1,25 @@
+name: gita-source-discovery
+
+# Looks for public-domain translations on Wikisource / sacred-texts.com and
+# uploads what it finds for review. Nothing is imported automatically.
+on:
+  workflow_dispatch:
+  push:
+    paths: [".github/workflows/gita-source-discovery.yml", "gita-companion/content/tools/discover_sources.py"]
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python gita-companion/content/tools/discover_sources.py discovery
+      - uses: actions/upload-artifact@v4
+        with:
+          name: source-discovery
+          path: discovery/
