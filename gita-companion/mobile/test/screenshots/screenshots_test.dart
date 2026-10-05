@@ -137,6 +137,21 @@ void main() {
   );
   testWidgets('search', (t) => shot(t, 'search_phaleshu', ready, route: '/search', type: 'phaleshu'));
   testWidgets('search english', (t) => shot(t, 'search_anxiety', ready, route: '/search', type: 'anxiety'));
+  testWidgets(
+    'search question',
+    (t) => shot(t, 'search_question_anger', ready, route: '/search', type: 'How do I control my anger?'),
+  );
+  testWidgets(
+    'search question telugu',
+    (t) => shot(
+      t,
+      'search_question_telugu_dark',
+      ready.copyWith(themeMode: ThemeMode.dark, uiLanguage: 'te', translationLanguage: 'te'),
+      route: '/search',
+      type: 'కోపం ఎలా తగ్గించుకోవాలి',
+    ),
+  );
+  testWidgets('search topics', (t) => shot(t, 'search_topics', ready, route: '/search'));
   testWidgets('player', (t) => shot(t, 'player_recitation', ready, route: '/verse/2.47', tap: 'Recite'));
   testWidgets(
     'player dark',

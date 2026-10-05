@@ -25,7 +25,9 @@ raw source ──► normalise ──► renumber ──► errata ──► val
 | `schema/content_pack.sql` | Mobile SQLite schema (mirrors backend content tables) |
 | `data/gita.json` | Canonical dataset (committed). CI rebuilds it from pinned sources and requires an exact match |
 | `data/sanskrit-report.md` | Cross-check and corrections report |
-| `editorial/` | Project-written text (chapter overviews), labelled AI-assisted and unreviewed |
+| `editorial/` | Project-written text (chapter overviews), labelled AI-assisted and unreviewed; `concepts.yaml`, the concept index |
+| `sources/besant-1922/` | Wikisource snapshot of Besant's translation (with revision ids) and the derived verse-aligned JSONL |
+| `eval/golden.yaml` | Golden set of questions and the verses that answer them |
 | `ai/` | Output of the free-tier LLM generator (`backend/workers`), imported as AI-generated and unreviewed |
 
 ## Commands
@@ -35,7 +37,12 @@ pip install -e ".[dev]"
 pytest -q
 
 # Full rebuild from the pinned upstream sources (see sources.yaml for commits)
-gita-content build --gita-json <gita/gita>/data/verse.json --verify-with <bhagavad-gita-data>/slok
+gita-content besant    # Besant's translation from the committed Wikisource snapshot
+gita-content build --gita-json <gita/gita>/data/verse.json --verify-with <bhagavad-gita-data>/slok \
+  --translation besant-1922-en=sources/besant-1922/besant-1922-en.jsonl
+
+# Retrieval quality on the golden set (fails below the regression floors)
+python -m gita_content.evaluate --details
 
 # Rebuild only the SQLite pack from the committed dataset (no network)
 gita-content pack
@@ -73,3 +80,13 @@ Transliterations inherit the status of the Devanagari they were generated from.
 ("phaleshu", "kadachana", "krishna") into one ASCII form for search. The
 mobile app must port it exactly; the test vectors in
 `tests/test_transliterate_romanize.py` are the contract.
+
+## Concepts and retrieval
+
+`editorial/concepts.yaml` maps everyday English and Telugu words to Sanskrit
+stems. A verse is linked to a concept only where a stem occurs in its
+Sanskrit, and the build fails on stems that match nothing.
+`gita_content/retrieval.py` combines explicit references, concepts and
+keyword search (RRF). The server uses it directly and the app ports it.
+`tests/query_vectors.json` (from `tools/gen_query_vectors.py`) is the
+contract for the app's port. See [docs/PHASE-7.md](../docs/PHASE-7.md).

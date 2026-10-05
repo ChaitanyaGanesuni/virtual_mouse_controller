@@ -12,6 +12,7 @@ APP_ENV=development DATABASE_URL=postgresql://gita:gita@localhost:5432/gita \
 
 Deploying for free (Render + Neon + Groq): [docs/DEPLOY.md](../docs/DEPLOY.md).
 How answers are grounded and checked: [docs/PHASE-6.md](../docs/PHASE-6.md).
+Retrieval (concepts, keywords, optional vectors): [docs/PHASE-7.md](../docs/PHASE-7.md).
 
 | Endpoint | Purpose |
 |---|---|

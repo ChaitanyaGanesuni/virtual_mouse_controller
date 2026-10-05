@@ -11,6 +11,7 @@ lib/
   app/        bootstrap: providers (composition root), router, theme
   core/
     content/  domain models, ContentRepository, pack installer (SQLite)
+    search/   offline search: references, scripts, concepts and keywords (port of content/gita_content/retrieval.py)
     db/       user database (drift): settings now, study data later
     settings/ AppSettings + repository
   features/   home, chapters, reader, settings, onboarding
@@ -44,4 +45,7 @@ flutter test --tags screenshots --run-skipped --update-goldens test/screenshots
   status). Keep it that way for new content.
 - Telugu UI strings were drafted with AI assistance and should be reviewed
   by a fluent Telugu reader.
+- Search quality is measured on the server's golden set
+  (`test/golden_eval_test.dart`), and query understanding must match the
+  Python reference exactly (`test/concepts_test.dart`).
 - Fonts: Noto Serif Devanagari, Noto Sans Telugu, Noto Serif (SIL OFL 1.1).

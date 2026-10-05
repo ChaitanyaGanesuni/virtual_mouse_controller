@@ -7,9 +7,9 @@ current state.
 
 | Directory | What | Status |
 |---|---|---|
-| `content/` | Content pipeline: canonical Sanskrit text, transliteration, licence register, mobile SQLite pack | Phase 2 ✅ |
-| `backend/` | API: anonymous accounts, AI teacher with validated citations; free-tier LLM providers; explanation and recitation generators ([deploy for free](docs/DEPLOY.md)) | Phase 6 ✅ |
-| `mobile/` | Flutter app: reader, chapters, search, listening (offline) and the AI teacher (online); APK built by CI | Phase 6 ✅ |
+| `content/` | Content pipeline: canonical Sanskrit text, Besant's English translation (1922), concept index, hybrid retriever and golden-set evaluation, mobile SQLite pack | Phase 7 ✅ except English recall@8 0.594 vs 0.60 ([report](docs/PHASE-7.md)) |
+| `backend/` | API: anonymous accounts, AI teacher with validated citations and hybrid retrieval (optional vector search); free-tier LLM providers; explanation and recitation generators ([deploy for free](docs/DEPLOY.md)) | Phase 7 ✅ |
+| `mobile/` | Flutter app: reader, chapters, search by meaning and topics, listening (offline) and the AI teacher (online); APK built by CI | Phase 7 ✅ |
 | `infra/` | Local dev services (Postgres + pgvector) | ✅ |
 
 ## Quick start
@@ -17,6 +17,7 @@ current state.
 ```bash
 # Content: tests + rebuild the mobile pack from the committed dataset (offline)
 cd content && pip install -e ".[dev]" && pytest -q && gita-content pack
+python -m gita_content.evaluate   # retrieval quality on the golden set
 
 # Backend database
 docker compose -f infra/docker-compose.yml up -d

@@ -61,6 +61,9 @@ Android emulator).
 | `TUTOR_DAILY_QUESTIONS` | 30 | Questions per device per UTC day. Cached explanations don't count. |
 | `SIGNUPS_PER_IP_PER_HOUR` | 10 | New anonymous accounts per network address. |
 | `SIGNUPS_PER_HOUR_TOTAL` | 300 | New accounts per hour overall (a backstop, since addresses can be forged). |
+| `CONTENT_DATASET` | `content/gita.json` in the image | The dataset the tutor's retriever is built from (the same file the database is seeded from). |
+| `EMBEDDINGS_BASE_URL`, `EMBEDDINGS_MODEL` | — | Optional vector search: any OpenAI-compatible `/embeddings` endpoint, e.g. Ollama with `bge-m3` (`http://host:11434/v1`, 1024 dimensions). Then run `python -m workers.index_embeddings` once (and after content updates). Off by default; retrieval works without it. |
+| `EMBEDDINGS_API_KEY` | — | Only if the embeddings endpoint needs one. |
 | `APP_ENV` | production | `development` enables `/docs` and allows a missing `JWT_SECRET`. |
 
 ## Running it locally

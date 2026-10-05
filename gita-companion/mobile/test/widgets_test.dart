@@ -72,7 +72,10 @@ void main() {
     await tester.tap(find.textContaining('Verse ${today.id}'));
     await tester.pumpAndSettle();
     expect(find.textContaining(today.sanskrit.split(' ').first), findsWidgets);
-    expect(find.textContaining('No translation is installed yet'), findsOneWidget);
+    // Besant's public-domain translation (1922) ships with the app.
+    final besant = today.texts.firstWhere((t) => t.kind == 'translation' && t.sourceId == 'besant-1922-en');
+    expect(find.textContaining(besant.body.split(' ').take(4).join(' ')), findsWidgets);
+    expect(find.textContaining('No translation is installed yet'), findsNothing);
   });
 
   testWidgets('Chapters list → chapter → verse → next verse', (tester) async {

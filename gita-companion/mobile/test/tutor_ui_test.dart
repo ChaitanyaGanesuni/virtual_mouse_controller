@@ -101,6 +101,9 @@ void main() {
       300,
       scrollable: find.byType(Scrollable).last,
     );
+    // Clear of the bottom bar.
+    await tester.drag(find.byType(Scrollable).last, const Offset(0, -200));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Explain with the AI teacher'));
     await work(tester);
     final explain = server.requests.firstWhere((r) => r.url.path.endsWith('/explain'));
