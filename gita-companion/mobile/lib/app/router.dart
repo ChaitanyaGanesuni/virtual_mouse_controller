@@ -9,6 +9,9 @@ import '../features/onboarding/onboarding_screen.dart';
 import '../features/reader/verse_screen.dart';
 import '../features/search/search_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/study/my_gita_screen.dart';
+import '../features/study/practice_screen.dart';
+import '../features/study/revision_screen.dart';
 import '../features/tutor/chat_screen.dart';
 import '../features/tutor/conversations_screen.dart';
 import '../features/tutor/tutor_models.dart';
@@ -65,6 +68,9 @@ final routerProvider = Provider<GoRouter>((ref) {
         },
       ),
       GoRoute(path: '/tutor/history', builder: (_, _) => const ConversationsScreen()),
+      GoRoute(path: '/my', builder: (_, _) => const MyGitaScreen()),
+      GoRoute(path: '/my/revise', builder: (_, _) => const RevisionScreen()),
+      GoRoute(path: '/practice', builder: (_, _) => const PracticeScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/settings/sources', builder: (_, _) => const SourcesScreen()),
     ],

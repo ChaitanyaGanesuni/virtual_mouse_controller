@@ -44,19 +44,15 @@ def test_settings_reject_unknown_script(session, user):
     )
 
 
-def test_one_live_bookmark_per_verse(session, user):
-    session.add(Bookmark(user_id=user.id, verse_id="2.47"))
-    session.flush()
-    flush_fails(session, Bookmark(user_id=user.id, verse_id="2.47"), "uq_bookmark_user_verse_live")
-
-
-def test_soft_deleted_bookmark_can_be_recreated(session, user):
+def test_one_bookmark_row_per_verse(session, user):
+    """Deleting a bookmark sets deleted_at; bookmarking again clears it, so
+    two devices syncing the same verse meet on one row."""
     b = Bookmark(user_id=user.id, verse_id="2.47")
     session.add(b)
     session.flush()
     b.deleted_at = datetime.now(UTC)
-    session.add(Bookmark(user_id=user.id, verse_id="2.47"))
     session.flush()
+    flush_fails(session, Bookmark(user_id=user.id, verse_id="2.47"), "uq_bookmark_user_id_verse_id")
 
 
 def test_highlight_range_must_be_valid(session, user):

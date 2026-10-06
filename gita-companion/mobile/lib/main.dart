@@ -47,6 +47,7 @@ Future<void> main() async {
       contentRepositoryProvider.overrideWithValue(content),
       searchServiceProvider.overrideWithValue(SqliteSearchService(contentDb, verseExists: verseIds.contains)),
       settingsRepositoryProvider.overrideWithValue(settingsRepo),
+      userDatabaseProvider.overrideWithValue(userDb),
       initialSettingsProvider.overrideWithValue(settings),
       // Audio: device TTS first (free, offline); more engines plug in here.
       ttsProvidersProvider.overrideWithValue([DeviceTtsProvider()]),

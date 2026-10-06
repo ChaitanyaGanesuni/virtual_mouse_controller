@@ -5,7 +5,7 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import CheckConstraint, DateTime, MetaData, func, text
+from sqlalchemy import BigInteger, CheckConstraint, DateTime, MetaData, func, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
@@ -40,6 +40,18 @@ def updated_at() -> Mapped[datetime]:
 
 def deleted_at() -> Mapped[datetime | None]:
     # Soft delete: sync clients must learn about deletions.
+    return mapped_column(DateTime(timezone=True), nullable=True)
+
+
+def sync_seq() -> Mapped[int]:
+    # Global change counter, bumped by the set_sync_seq() trigger on every
+    # write (migration 0003). Devices pull "changes after N".
+    return mapped_column(BigInteger, nullable=False, server_default=text("nextval('sync_seq')"))
+
+
+def client_updated_at() -> Mapped[datetime | None]:
+    # When the change was made on the device; sync conflicts are resolved by
+    # it (last write wins). updated_at is the server's write time.
     return mapped_column(DateTime(timezone=True), nullable=True)
 
 

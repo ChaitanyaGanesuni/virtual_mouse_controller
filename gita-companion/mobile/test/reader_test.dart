@@ -12,6 +12,7 @@ import 'package:go_router/go_router.dart';
 import 'support/audio_fakes.dart';
 import 'support/pack.dart';
 import 'widgets_test.dart' show MemorySettingsRepository;
+import 'support/finders.dart';
 
 void main() {
   late SqliteContentRepository content;
@@ -48,7 +49,7 @@ void main() {
   }
 
   Future<void> scrollTo(WidgetTester tester, Finder f) async {
-    await tester.scrollUntilVisible(f, 200, scrollable: find.byType(Scrollable).last);
+    await tester.scrollUntilVisible(f, 200, scrollable: mainList());
     await tester.pumpAndSettle();
   }
 

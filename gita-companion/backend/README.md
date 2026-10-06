@@ -17,6 +17,8 @@ Retrieval (concepts, keywords, optional vectors): [docs/PHASE-7.md](../docs/PHAS
 | Endpoint | Purpose |
 |---|---|
 | `POST /v1/auth/anonymous`, `/v1/auth/refresh`, `/v1/auth/logout` | Device accounts; rotating refresh tokens |
+| `POST /v1/auth/recovery-code`, `/v1/auth/recover` | Recovery code (shown once) and signing a new installation back in |
+| `POST /v1/sync` | Study-data sync: send changes, receive other devices' changes ([PHASE-8](../docs/PHASE-8.md)) |
 | `DELETE /v1/me` | Delete the account and all its data |
 | `GET /v1/tutor/status` | Teacher available? Questions left today |
 | `POST/GET /v1/tutor/conversations`, `GET/DELETE /v1/tutor/conversations/{id}` | Conversations |

@@ -13,6 +13,7 @@ import 'package:go_router/go_router.dart';
 import 'support/audio_fakes.dart';
 import 'support/pack.dart';
 import 'widgets_test.dart' show MemorySettingsRepository;
+import 'support/finders.dart';
 
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -115,6 +116,7 @@ void main() {
     GoRouterHelper(tester.element(find.byType(Scaffold).first)).go('/');
     await work(tester);
     await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(find.text('CONTINUE LISTENING'), 200, scrollable: mainList());
     expect(find.text('CONTINUE LISTENING'), findsOneWidget);
     expect(find.textContaining('Listening progress: 0%'), findsOneWidget);
     expect(find.text('Chapter 12 · Verse 12.1'), findsOneWidget);
@@ -125,7 +127,7 @@ void main() {
     await tester.tap(find.text('Recite'));
     await work(tester);
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(find.text('1.5x'), 200, scrollable: find.byType(Scrollable).last);
+    await tester.scrollUntilVisible(find.text('1.5x'), 200, scrollable: mainList());
     await tester.tap(find.text('1.5x'));
     await work(tester);
     await tester.pumpAndSettle();
@@ -144,11 +146,7 @@ void main() {
       ),
     );
     final r = await pumpAt(tester, '/settings', audio: audio);
-    await tester.scrollUntilVisible(
-      find.text('English voice'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await tester.scrollUntilVisible(find.text('English voice'), 300, scrollable: mainList());
     await work(tester);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Automatic').first);
@@ -165,11 +163,7 @@ void main() {
       ),
     );
     await pumpAt(tester, '/settings', audio: audio);
-    await tester.scrollUntilVisible(
-      find.text('Telugu voice'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await tester.scrollUntilVisible(find.text('Telugu voice'), 300, scrollable: mainList());
     await work(tester);
     await tester.pumpAndSettle();
     expect(find.textContaining('No Telugu voice is installed'), findsOneWidget);

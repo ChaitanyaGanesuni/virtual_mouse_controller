@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:gita_companion/core/audio/listening_progress.dart';
 import 'package:gita_companion/core/db/user_database.dart';
 import 'package:gita_companion/core/settings/app_settings.dart';
+import 'package:gita_companion/core/study/study_repository.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 Future<String> _settingsDdl() async {
@@ -80,6 +81,46 @@ void main() {
     expect(settings.tutorServer, '');
     await repo.save(settings.copyWith(tutorServer: 'https://gita.example.org'));
     expect((await repo.load()).tutorServer, 'https://gita.example.org');
+    await db.close();
+  });
+
+  test('a v3 database (Phase 6) gains the study tables, keeping everything else', () async {
+    final fresh = UserDatabase.memory();
+    final ddl = [
+      for (final r
+          in await fresh
+              .customSelect(
+                "SELECT sql FROM sqlite_master WHERE type = 'table' "
+                "AND name IN ('user_settings', 'listening_progress', 'audio_cache')",
+              )
+              .get())
+        r.read<String>('sql'),
+    ];
+    await fresh.close();
+    expect(ddl, hasLength(3));
+
+    final dir = Directory.systemTemp.createTempSync('migration');
+    addTearDown(() => dir.deleteSync(recursive: true));
+    final file = File('${dir.path}/user.sqlite');
+    final raw = sqlite3.open(file.path);
+    for (final d in ddl) {
+      raw.execute(d);
+    }
+    raw
+      ..execute(
+        "INSERT INTO user_settings (id, ui_language, tutor_server) VALUES (1, 'te', 'https://x.example')",
+      )
+      ..execute('PRAGMA user_version = 3')
+      ..close();
+
+    final db = UserDatabase(NativeDatabase(file));
+    final settings = await DriftSettingsRepository(db).load();
+    expect((settings.uiLanguage, settings.tutorServer), ('te', 'https://x.example'));
+    final study = StudyRepository(db);
+    await study.setBookmarked('2.47', true);
+    expect((await study.verse('2.47')).bookmarked, isTrue);
+    final sync = await db.select(db.syncStateTable).getSingle();
+    expect((sync.enabled, sync.cursor), (false, 0));
     await db.close();
   });
 

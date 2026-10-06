@@ -88,14 +88,59 @@ class HomeScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                icon: const Icon(Icons.self_improvement),
+                label: Text(l.dailyPractice),
+                onPressed: () => context.push('/practice'),
+              ),
+            ),
+            const SizedBox(height: 12),
             _SectionLabel(l.continueLearning),
             Card(
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                title: Text(l.beginWithChapter(1)),
-                subtitle: Text('${first.nameIn(settings.verseScript)} · ${l.verseCount(first.verseCount)}'),
-                trailing: const Icon(Icons.arrow_forward),
-                onTap: () => context.push('/chapters/1'),
+              child: Builder(
+                builder: (context) {
+                  final last = ref.watch(continueReadingProvider).value;
+                  final next = last;
+                  final verse = next == null ? null : repo.verse(next);
+                  return verse == null
+                      ? ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          title: Text(l.beginWithChapter(1)),
+                          subtitle: Text(
+                            '${first.nameIn(settings.verseScript)} · ${l.verseCount(first.verseCount)}',
+                          ),
+                          trailing: const Icon(Icons.arrow_forward),
+                          onTap: () => context.push('/chapters/1'),
+                        )
+                      : ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                          title: Text(l.continueAt(l.verseRef(verse.id))),
+                          subtitle: Text(
+                            '${l.chapterNumber(verse.chapter)} · ${repo.chapter(verse.chapter).nameIn(settings.verseScript)}',
+                          ),
+                          trailing: const Icon(Icons.arrow_forward),
+                          onTap: () => context.push('/verse/${verse.id}'),
+                        );
+                },
+              ),
+            ),
+            const SizedBox(height: 24),
+            _SectionLabel(l.myGita),
+            Card(
+              child: Builder(
+                builder: (context) {
+                  final due = ref.watch(dueCountProvider).value ?? 0;
+                  return ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                    leading: const Icon(Icons.auto_stories_outlined),
+                    title: Text(due > 0 ? l.cardsDue(due) : l.myGitaHomeTitle),
+                    subtitle: Text(l.myGitaHomeHint),
+                    trailing: const Icon(Icons.arrow_forward),
+                    onTap: () => context.push(due > 0 ? '/my/revise' : '/my'),
+                  );
+                },
               ),
             ),
             const SizedBox(height: 24),
@@ -130,9 +175,6 @@ class HomeScreen extends ConsumerWidget {
                 },
               ),
             ),
-            const SizedBox(height: 28),
-            _SectionLabel(l.comingNext),
-            _ComingNext(items: [l.featureMyGita, l.featureDaily]),
           ],
         ),
       ),
@@ -194,38 +236,6 @@ class _ChapterChip extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _ComingNext extends StatelessWidget {
-  const _ComingNext({required this.items});
-
-  final List<String> items;
-
-  @override
-  Widget build(BuildContext context) {
-    final muted = Theme.of(context).colorScheme.onSurfaceVariant;
-    return Padding(
-      padding: const EdgeInsets.only(left: 4),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (final item in items)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Row(
-                children: [
-                  Icon(Icons.radio_button_unchecked, size: 14, color: muted),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(item, style: TextStyle(color: muted)),
-                  ),
-                ],
-              ),
-            ),
-        ],
       ),
     );
   }

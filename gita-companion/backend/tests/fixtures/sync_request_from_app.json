@@ -1,0 +1,109 @@
+{
+  "cursor": 0,
+  "changes": {
+    "bookmark": [
+      {
+        "verse_id": "2.47",
+        "updated_at": "2026-01-06T09:00:00.000Z",
+        "deleted": false
+      }
+    ],
+    "verse_state": [
+      {
+        "verse_id": "2.47",
+        "favorite": true,
+        "understood": false,
+        "needs_revision": true,
+        "updated_at": "2026-01-06T09:00:00.000Z"
+      }
+    ],
+    "highlight": [
+      {
+        "id": "2e4ccf15-603f-4f41-9314-d0516d40c614",
+        "verse_id": "2.47",
+        "text_id": "1ad12c86-fefd-53ad-9f09-70fa8a12862e",
+        "start": 4,
+        "end": 20,
+        "color": "gold",
+        "updated_at": "2026-01-06T09:00:00.000Z",
+        "deleted": false
+      }
+    ],
+    "note": [
+      {
+        "id": "bdb86adc-2fdb-4858-a842-65196fbfa00c",
+        "verse_id": "2.47",
+        "chapter": null,
+        "kind": "question",
+        "body": "What counts as a fruit?",
+        "updated_at": "2026-01-06T09:00:00.000Z",
+        "deleted": false
+      }
+    ],
+    "revision_item": [
+      {
+        "verse_id": "2.47",
+        "card_type": "meaning",
+        "state": "review",
+        "step": 1,
+        "due_at": "2026-01-09T09:00:00.000Z",
+        "reps": 1,
+        "lapses": 0,
+        "last_reviewed_at": "2026-01-07T09:00:00.000Z",
+        "updated_at": "2026-01-07T09:00:00.000Z",
+        "deleted": false
+      },
+      {
+        "verse_id": "2.47",
+        "card_type": "application",
+        "state": "new",
+        "step": 0,
+        "due_at": "2026-01-08T09:00:00.000Z",
+        "reps": 0,
+        "lapses": 0,
+        "last_reviewed_at": null,
+        "updated_at": "2026-01-06T09:00:00.000Z",
+        "deleted": false
+      }
+    ],
+    "revision_review": [
+      {
+        "id": "cd0c8490-027d-4d38-8cc1-75410023c067",
+        "verse_id": "2.47",
+        "card_type": "meaning",
+        "rating": 3,
+        "reviewed_at": "2026-01-07T09:00:00.000Z",
+        "elapsed_days": null,
+        "scheduled_days": 2.0
+      }
+    ],
+    "daily_practice": [
+      {
+        "date": "2026-01-07",
+        "verse_id": "2.47",
+        "listened_at": "2026-01-07T09:00:00.000Z",
+        "understood_at": null,
+        "reflected_at": null,
+        "applied_at": null,
+        "journal": "Calm today.",
+        "updated_at": "2026-01-07T09:00:00.000Z",
+        "deleted": false
+      }
+    ],
+    "verse_read": [
+      {
+        "verse_id": "2.47",
+        "first_read_at": "2026-01-07T09:00:00.000Z",
+        "last_read_at": "2026-01-07T09:00:00.000Z",
+        "read_count": 1
+      }
+    ],
+    "reading_progress": [
+      {
+        "chapter": 2,
+        "last_verse_id": "2.47",
+        "updated_at": "2026-01-07T09:00:00.000Z"
+      }
+    ]
+  }
+}

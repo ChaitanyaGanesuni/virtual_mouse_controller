@@ -5,15 +5,18 @@ from __future__ import annotations
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Date, DateTime, ForeignKey, Text, UniqueConstraint
+from sqlalchemy import Date, DateTime, ForeignKey, Index, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base, created_at, deleted_at, updated_at, uuid_pk
+from app.core.db import Base, client_updated_at, created_at, deleted_at, sync_seq, updated_at, uuid_pk
 
 
 class DailyPractice(Base):
     __tablename__ = "daily_practice"
-    __table_args__ = (UniqueConstraint("user_id", "practice_date"),)
+    __table_args__ = (
+        UniqueConstraint("user_id", "practice_date"),
+        Index("ix_daily_practice_sync", "user_id", "sync_seq"),
+    )
 
     id: Mapped[uuid.UUID] = uuid_pk()
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("app_user.id", ondelete="CASCADE"))
@@ -28,3 +31,5 @@ class DailyPractice(Base):
     created_at: Mapped[datetime] = created_at()
     updated_at: Mapped[datetime] = updated_at()
     deleted_at: Mapped[datetime | None] = deleted_at()
+    sync_seq: Mapped[int] = sync_seq()
+    client_updated_at: Mapped[datetime | None] = client_updated_at()

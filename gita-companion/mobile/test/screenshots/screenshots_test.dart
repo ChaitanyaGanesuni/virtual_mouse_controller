@@ -22,6 +22,10 @@ import '../support/audio_fakes.dart';
 import '../support/fake_server.dart';
 import '../support/pack.dart';
 import '../widgets_test.dart' show MemorySettingsRepository;
+import '../support/finders.dart';
+
+import 'package:gita_companion/core/db/user_database.dart';
+import 'package:gita_companion/core/study/study_repository.dart';
 
 Future<void> _loadFont(String family, List<String> files) async {
   final loader = FontLoader(family);
@@ -54,7 +58,14 @@ void main() {
     String? tap,
     bool back = false,
     FakeGitaServer? server,
+    Future<void> Function(StudyRepository study)? seed,
   }) async {
+    final userDb = UserDatabase.memory();
+    addTearDown(userDb.close);
+    if (seed != null) {
+      // Written a few days earlier, so revision cards are due "today".
+      await tester.runAsync(() => seed(StudyRepository(userDb, clock: () => DateTime(2026, 9, 28, 9))));
+    }
     tester.view.physicalSize = const Size(1080, 2280);
     tester.view.devicePixelRatio = 2.75;
     addTearDown(tester.view.reset);
@@ -68,6 +79,7 @@ void main() {
           ...TestAudio().overrides,
           ...(server ?? FakeGitaServer()).overrides(),
           clockProvider.overrideWithValue(() => DateTime(2026, 10, 1)),
+          userDatabaseProvider.overrideWithValue(userDb),
         ],
         child: const GitaApp(),
       ),
@@ -94,8 +106,8 @@ void main() {
       }
     }
     if (scrollTo != null) {
-      await tester.scrollUntilVisible(scrollTo, 300, scrollable: find.byType(Scrollable).last);
-      await tester.drag(find.byType(Scrollable).last, const Offset(0, -500));
+      await tester.scrollUntilVisible(scrollTo, 300, scrollable: mainList());
+      await tester.drag(mainList(), const Offset(0, -500));
       await tester.pumpAndSettle();
     }
     await expectLater(find.byType(GitaApp), matchesGoldenFile('out/$name.png'));
@@ -152,6 +164,65 @@ void main() {
     ),
   );
   testWidgets('search topics', (t) => shot(t, 'search_topics', ready, route: '/search'));
+  Future<void> studied(StudyRepository s) async {
+    final translation = content.verse('2.47')!.texts.firstWhere((t) => t.kind == 'translation');
+    for (final v in ['2.11', '2.12', '2.13', '2.14', '2.20', '2.47', '2.48', '3.19', '6.35']) {
+      await s.markRead(v);
+    }
+    await s.setBookmarked('2.47', true);
+    await s.setFavorite('2.47', true);
+    await s.setUnderstood('2.20', true);
+    await s.setNeedsRevision('2.47', true);
+    await s.setNeedsRevision('6.35', true);
+    await s.addHighlight(
+      verseId: '2.47',
+      textId: translation.id,
+      start: 0,
+      end: translation.body.indexOf(';'),
+    );
+    await s.saveNote(
+      verseId: '2.47',
+      kind: NoteKind.question,
+      body: 'Does "not the fruits" mean I should not plan?',
+    );
+  }
+
+  testWidgets('my gita', (t) => shot(t, 'my_gita_overview', ready, route: '/my', seed: studied));
+  testWidgets(
+    'reader with study data',
+    (t) => shot(
+      t,
+      'reader_2_47_study',
+      ready,
+      route: '/verse/2.47',
+      seed: studied,
+      scrollTo: find.text('TRANSLATION'),
+    ),
+  );
+  testWidgets(
+    'revision card',
+    (t) => shot(t, 'revision_card', ready, route: '/my/revise', seed: studied, tap: 'Show the meaning'),
+  );
+  testWidgets('daily practice', (t) => shot(t, 'daily_practice', ready, route: '/practice', seed: studied));
+  testWidgets(
+    'daily practice telugu dark',
+    (t) => shot(
+      t,
+      'daily_practice_telugu_dark',
+      ready.copyWith(themeMode: ThemeMode.dark, uiLanguage: 'te', verseScript: VerseScript.telugu),
+      route: '/practice',
+    ),
+  );
+  testWidgets(
+    'settings sync',
+    (t) => shot(
+      t,
+      'settings_sync',
+      ready,
+      route: '/settings',
+      scrollTo: find.text('Restore from a recovery code'),
+    ),
+  );
   testWidgets('player', (t) => shot(t, 'player_recitation', ready, route: '/verse/2.47', tap: 'Recite'));
   testWidgets(
     'player dark',

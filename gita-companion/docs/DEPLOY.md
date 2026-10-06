@@ -56,8 +56,10 @@ Android emulator).
 | Variable | Default | Meaning |
 |---|---|---|
 | `DATABASE_URL` | — | Postgres connection string (`postgres://`, `postgresql://` or `postgresql+psycopg://`). |
+| `DATA_ENCRYPTION_KEY` | — | Required in production (32+ random characters; the Render blueprint generates it). Encrypts synced notes and journal entries. Keep it: changing or losing it makes them unreadable. |
 | `JWT_SECRET` | — | Required in production, at least 32 random characters. Changing it signs every device out (they sign in again automatically). |
 | `GROQ_API_KEY` | — | Enables Groq. Others: `OLLAMA_BASE_URL` for a self-hosted model. |
+| `SYNCS_PER_USER_PER_HOUR` | 240 | Study-data sync requests per account. |
 | `TUTOR_DAILY_QUESTIONS` | 30 | Questions per device per UTC day. Cached explanations don't count. |
 | `SIGNUPS_PER_IP_PER_HOUR` | 10 | New anonymous accounts per network address. |
 | `SIGNUPS_PER_HOUR_TOTAL` | 300 | New accounts per hour overall (a backstop, since addresses can be forged). |

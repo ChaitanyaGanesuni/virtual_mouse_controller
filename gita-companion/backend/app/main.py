@@ -22,16 +22,19 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 
 from app.api import auth as auth_api
+from app.api import sync as sync_api
 from app.api import tutor as tutor_api
+from app.core.crypto import FieldCipher
 from app.core.ratelimit import SlidingWindowLimiter
 from app.core.settings import Settings
 from app.modules.ai_tutor.service import ProvidersBusy, QuotaExceeded, TutorError, TutorService
 from app.modules.auth.service import AuthError
+from app.modules.sync.schemas import MAX_RECORDS_PER_REQUEST
 from app.providers.embeddings import EmbeddingProvider
 from app.providers.embeddings import from_env as embeddings_from_env
 from app.providers.llm import LLMRouter, build_router
 
-VERSION = "0.6.0"
+VERSION = "0.8.0"
 log = logging.getLogger("gita")
 
 
@@ -82,9 +85,16 @@ def create_app(
     app.state.tutor = TutorService(llm, settings.tutor_daily_questions, retriever, embeddings)
     app.state.signup_limiter = SlidingWindowLimiter(settings.signups_per_ip_per_hour, 3600)
     app.state.signup_limiter_total = SlidingWindowLimiter(settings.signups_per_hour_total, 3600)
+    # Recovery codes are 120-bit random, so this only stops noise.
+    app.state.recover_limiter = SlidingWindowLimiter(20, 3600)
+    app.state.sync_limiter = SlidingWindowLimiter(settings.syncs_per_user_per_hour, 3600)
+    app.state.cipher = FieldCipher(settings.data_encryption_key)
+    if not app.state.cipher.enabled:
+        log.warning("DATA_ENCRYPTION_KEY not set: notes and journal are stored unencrypted")
 
     app.include_router(auth_api.router)
     app.include_router(tutor_api.router)
+    app.include_router(sync_api.router)
 
     @app.get("/v1/health", tags=["meta"])
     def health():
@@ -97,13 +107,12 @@ def create_app(
         return _error(401, "unauthorized", str(e), {"WWW-Authenticate": "Bearer"})
 
     @app.exception_handler(auth_api.RateLimitedError)
-    def _signup_limited(_: Request, e: Exception):
-        return _error(
-            429,
-            "rate_limited",
-            "Too many new accounts from this network. Try again later.",
-            {"Retry-After": "3600"},
-        )
+    def _rate_limited(_: Request, e: auth_api.RateLimitedError):
+        return _error(429, "rate_limited", str(e), {"Retry-After": str(e.retry_after)})
+
+    @app.exception_handler(sync_api.TooLarge)
+    def _too_large(_: Request, e: Exception):
+        return _error(413, "too_large", f"send at most {MAX_RECORDS_PER_REQUEST} changes (4 MB) per request")
 
     @app.exception_handler(TutorError)
     def _tutor(_: Request, e: TutorError):

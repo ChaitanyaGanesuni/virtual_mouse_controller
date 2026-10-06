@@ -21,6 +21,10 @@ services:
         value: production
       - key: JWT_SECRET
         generateValue: true
+      # Encrypts synced notes and journal entries at rest. Keep it: changing
+      # or losing it makes the stored notes unreadable.
+      - key: DATA_ENCRYPTION_KEY
+        generateValue: true
       - key: DATABASE_URL
         sync: false
       - key: GROQ_API_KEY

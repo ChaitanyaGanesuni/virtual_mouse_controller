@@ -19,26 +19,30 @@ from sqlalchemy import (
     String,
     Text,
     UniqueConstraint,
-    text,
 )
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.core.db import Base, check_in, created_at, deleted_at, updated_at, uuid_pk
+from app.core.db import (
+    Base,
+    check_in,
+    client_updated_at,
+    created_at,
+    deleted_at,
+    sync_seq,
+    updated_at,
+    uuid_pk,
+)
 
 USER_FK = "app_user.id"
 
 
 class Bookmark(Base):
     __tablename__ = "bookmark"
+    # One row per verse per user: deleting sets deleted_at, bookmarking again
+    # clears it, so devices syncing the same verse meet on one row.
     __table_args__ = (
-        # One live bookmark per verse per user; a deleted one may be re-created.
-        Index(
-            "uq_bookmark_user_verse_live",
-            "user_id",
-            "verse_id",
-            unique=True,
-            postgresql_where=text("deleted_at IS NULL"),
-        ),
+        UniqueConstraint("user_id", "verse_id"),
+        Index("ix_bookmark_sync", "user_id", "sync_seq"),
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
@@ -48,6 +52,8 @@ class Bookmark(Base):
     created_at: Mapped[datetime] = created_at()
     updated_at: Mapped[datetime] = updated_at()
     deleted_at: Mapped[datetime | None] = deleted_at()
+    sync_seq: Mapped[int] = sync_seq()
+    client_updated_at: Mapped[datetime | None] = client_updated_at()
 
 
 class Highlight(Base):
@@ -58,6 +64,7 @@ class Highlight(Base):
     __table_args__ = (
         CheckConstraint("start_offset >= 0 AND end_offset > start_offset", name="valid_range"),
         Index("ix_highlight_user_verse", "user_id", "verse_id"),
+        Index("ix_highlight_sync", "user_id", "sync_seq"),
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
@@ -70,6 +77,8 @@ class Highlight(Base):
     created_at: Mapped[datetime] = created_at()
     updated_at: Mapped[datetime] = updated_at()
     deleted_at: Mapped[datetime | None] = deleted_at()
+    sync_seq: Mapped[int] = sync_seq()
+    client_updated_at: Mapped[datetime | None] = client_updated_at()
 
 
 class Note(Base):
@@ -81,6 +90,7 @@ class Note(Base):
         check_in("kind", "kind", ("note", "question", "reflection")),
         CheckConstraint("chapter IS NULL OR verse_id IS NULL", name="single_anchor"),
         Index("ix_note_user_updated", "user_id", "updated_at"),
+        Index("ix_note_sync", "user_id", "sync_seq"),
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
@@ -92,10 +102,13 @@ class Note(Base):
     created_at: Mapped[datetime] = created_at()
     updated_at: Mapped[datetime] = updated_at()
     deleted_at: Mapped[datetime | None] = deleted_at()
+    sync_seq: Mapped[int] = sync_seq()
+    client_updated_at: Mapped[datetime | None] = client_updated_at()
 
 
 class VerseState(Base):
     __tablename__ = "verse_state"
+    __table_args__ = (Index("ix_verse_state_sync", "user_id", "sync_seq"),)
 
     user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey(USER_FK, ondelete="CASCADE"), primary_key=True)
     verse_id: Mapped[str] = mapped_column(ForeignKey("verse.id"), primary_key=True)
@@ -103,6 +116,8 @@ class VerseState(Base):
     is_understood: Mapped[bool] = mapped_column(Boolean, server_default="false")
     needs_revision: Mapped[bool] = mapped_column(Boolean, server_default="false")
     updated_at: Mapped[datetime] = updated_at()
+    sync_seq: Mapped[int] = sync_seq()
+    client_updated_at: Mapped[datetime | None] = client_updated_at()
 
 
 class RevisionItem(Base):
@@ -117,6 +132,7 @@ class RevisionItem(Base):
         check_in("state", "state", ("new", "learning", "review", "relearning", "suspended")),
         CheckConstraint("reps >= 0 AND lapses >= 0 AND step >= 0", name="counters_nonnegative"),
         Index("ix_revision_item_due", "user_id", "due_at"),
+        Index("ix_revision_item_sync", "user_id", "sync_seq"),
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
@@ -134,6 +150,8 @@ class RevisionItem(Base):
     created_at: Mapped[datetime] = created_at()
     updated_at: Mapped[datetime] = updated_at()
     deleted_at: Mapped[datetime | None] = deleted_at()
+    sync_seq: Mapped[int] = sync_seq()
+    client_updated_at: Mapped[datetime | None] = client_updated_at()
 
 
 class RevisionReview(Base):
@@ -142,6 +160,7 @@ class RevisionReview(Base):
     __tablename__ = "revision_review"
     __table_args__ = (
         CheckConstraint("rating BETWEEN 1 AND 4", name="rating_range"),  # again/hard/good/easy
+        Index("ix_revision_review_sync", "sync_seq"),
     )
 
     id: Mapped[uuid.UUID] = uuid_pk()
@@ -151,3 +170,4 @@ class RevisionReview(Base):
     answer_text: Mapped[str | None] = mapped_column(Text)
     elapsed_days: Mapped[float | None] = mapped_column(Float)
     scheduled_days: Mapped[float | None] = mapped_column(Float)
+    sync_seq: Mapped[int] = sync_seq()

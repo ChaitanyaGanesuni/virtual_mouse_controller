@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 
 import 'support/audio_fakes.dart';
 import 'support/pack.dart';
+import 'support/finders.dart';
 
 class MemorySettingsRepository implements SettingsRepository {
   AppSettings saved = const AppSettings();
@@ -74,12 +75,15 @@ void main() {
     expect(find.textContaining(today.sanskrit.split(' ').first), findsWidgets);
     // Besant's public-domain translation (1922) ships with the app.
     final besant = today.texts.firstWhere((t) => t.kind == 'translation' && t.sourceId == 'besant-1922-en');
-    expect(find.textContaining(besant.body.split(' ').take(4).join(' ')), findsWidgets);
+    final start = find.textContaining(besant.body.split(' ').take(4).join(' '), findRichText: true);
+    await tester.scrollUntilVisible(start, 200, scrollable: mainList());
+    expect(start, findsWidgets);
     expect(find.textContaining('No translation is installed yet'), findsNothing);
   });
 
   testWidgets('Chapters list → chapter → verse → next verse', (tester) async {
     await pumpApp(tester, ready);
+    await tester.scrollUntilVisible(find.text('All 18 chapters'), 200, scrollable: mainList());
     await tester.tap(find.text('All 18 chapters'));
     await tester.pumpAndSettle();
     expect(find.text('साङ्ख्ययोग'), findsOneWidget);
@@ -148,11 +152,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(store.saved.verseScript, VerseScript.iast);
 
-    await tester.scrollUntilVisible(
-      find.text('Sources and licences'),
-      300,
-      scrollable: find.byType(Scrollable).first,
-    );
+    await tester.scrollUntilVisible(find.text('Sources and licences'), 300, scrollable: mainList());
     await tester.pumpAndSettle();
     await tester.tap(find.text('Sources and licences'));
     await tester.pumpAndSettle();

@@ -78,12 +78,9 @@
   "sourcesAndLicences": "Sources and licences",
   "openSourceLicences": "Open-source licences",
   "aiLabel": "AI-assisted",
-  "comingNext": "Coming next",
   "featureListen": "Listen to verses and chapters",
   "featureTeacher": "AI Gita Teacher",
   "featureSearch": "Search",
-  "featureMyGita": "My Gita: bookmarks, notes, revision",
-  "featureDaily": "Daily reflection",
   "welcome": "Welcome",
   "welcomeBody": "Choose how you would like to read. You can change these choices any time in Settings.",
   "begin": "Begin",
@@ -324,5 +321,230 @@
         "type": "String"
       }
     }
-  }
+  },
+  "myGita": "My Gita",
+  "myGitaOverview": "Overview",
+  "myGitaSaved": "Saved",
+  "myGitaNotes": "Notes",
+  "myGitaHighlights": "Highlights",
+  "myGitaHomeTitle": "Bookmarks, notes and progress",
+  "myGitaHomeHint": "Everything stays on this phone",
+  "addBookmark": "Bookmark",
+  "removeBookmark": "Remove bookmark",
+  "addFavorite": "Add to favourites",
+  "removeFavorite": "Remove from favourites",
+  "understood": "I understand this",
+  "revise": "Revise",
+  "reviseHint": "Add to spaced revision",
+  "addNote": "Add a note",
+  "newNote": "New note",
+  "noteGeneral": "General note",
+  "noteOnVerse": "Note on {ref}",
+  "@noteOnVerse": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "noteHint": "Write your thoughts…",
+  "notePrivacy": "Stays on this phone unless you turn on sync.",
+  "noteKindNote": "Note",
+  "noteKindQuestion": "Question",
+  "noteKindReflection": "Reflection",
+  "notesEmpty": "No notes yet. Add one from any verse, or write a general note.",
+  "edit": "Edit",
+  "more": "More",
+  "highlight": "Highlight",
+  "highlighted": "Highlighted",
+  "removeHighlight": "Remove highlight",
+  "highlightsEmpty": "No highlights yet. In a verse, select words in the translation and choose Highlight.",
+  "bookmarks": "Bookmarks",
+  "favorites": "Favourites",
+  "savedEmpty": "Nothing saved yet. Use the bookmark or heart under a verse.",
+  "journal": "Journal",
+  "progress": "Progress",
+  "versesReadOf": "{read} of {total} verses read",
+  "@versesReadOf": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "versesUnderstood": "{count, plural, =0{No verses marked as understood yet} =1{1 verse understood} other{{count} verses understood}}",
+  "@versesUnderstood": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardsSettled": "{settled} of {total} revision cards remembered for a week or more",
+  "@cardsSettled": {
+    "placeholders": {
+      "settled": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "readOfVerses": "{read} of {total}",
+  "@readOfVerses": {
+    "placeholders": {
+      "read": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "revision": "Revision",
+  "cardsDue": "{count, plural, =1{1 verse to revise today} other{{count} verses to revise today}}",
+  "@cardsDue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "cardsLeft": "{count} left",
+  "@cardsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "revisionEmpty": "Mark verses with “Revise” to remember them: they come back after 1, 2, 4, 7, 14… days.",
+  "revisionNothingDue": "Nothing to revise today.",
+  "revisionFinished": "{count, plural, =1{1 card revised. That is all for today.} other{{count} cards revised. That is all for today.}}",
+  "@revisionFinished": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "startRevision": "Start revision",
+  "promptMeaning": "What does this verse teach?",
+  "promptConcept": "Which idea is this verse about?",
+  "promptApplication": "How could you apply this verse today?",
+  "showAnswer": "Show the meaning",
+  "howWellRemembered": "How well did you remember?",
+  "rateAgain": "Again",
+  "rateHard": "Hard",
+  "rateGood": "Good",
+  "rateEasy": "Easy",
+  "inMinutes": "{count} min",
+  "@inMinutes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "inDays": "{count, plural, =1{1 day} other{{count} days}}",
+  "@inDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "back": "Back",
+  "dailyPractice": "Daily practice",
+  "dailyPracticeHint": "Listen, understand, reflect, apply, and write",
+  "practiceSteps": "{done} of {total} steps today",
+  "@practiceSteps": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "practiceComplete": "Today's practice is complete.",
+  "stepListen": "Listen",
+  "stepUnderstand": "Understand",
+  "stepReflect": "Reflect",
+  "stepApply": "Apply",
+  "stepJournal": "Journal",
+  "stepDone": "Done",
+  "stepNotDone": "Not done yet",
+  "markDone": "Mark as done",
+  "openInReader": "Open in the reader",
+  "reflectPrompt": "Sit quietly for a minute. What in this verse speaks to your life today?",
+  "applyPrompt": "Choose one small way to live this verse today.",
+  "journalHint": "A few lines for yourself…",
+  "journalPrivacy": "Private. Stays on this phone unless you choose to sync your journal.",
+  "journalSaved": "Saved",
+  "continueAt": "Continue at {ref}",
+  "@continueAt": {
+    "placeholders": {
+      "ref": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSync": "Account & sync",
+  "syncTitle": "Sync my study data",
+  "syncExplain": "Bookmarks, notes, highlights, revision and progress are kept on this phone. With sync on, they are also kept on the server, so they survive reinstalling and reach your other devices. Notes and journal are encrypted there. No name or email is needed.",
+  "syncNeedsServer": "Sync needs the Gita Companion server. Set it up under AI teacher above.",
+  "syncJournal": "Include my journal",
+  "syncJournalHint": "Off: your journal never leaves this phone. Turning it off erases it from the server.",
+  "syncNow": "Sync now",
+  "syncLast": "Last synced {date} {time}",
+  "@syncLast": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "syncPending": "{count, plural, =1{1 change waiting} other{{count} changes waiting}}",
+  "@syncPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "syncFailed": "Sync failed: {reason}",
+  "@syncFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "syncErrorOffline": "no connection. It will try again.",
+  "syncErrorServer": "the server had a problem. It will try again.",
+  "syncErrorSignedOut": "signed out. Restore with your recovery code.",
+  "recoveryCodeShow": "Get a recovery code",
+  "recoveryCodeShowHint": "Needed to get your data back after reinstalling. A new code replaces the old one.",
+  "recoveryCodeOfferTitle": "Keep your data safe",
+  "recoveryCodeOffer": "Get a recovery code now and keep it somewhere safe. Without it, your data cannot be restored on a new phone or after reinstalling.",
+  "recoveryCodeTitle": "Your recovery code",
+  "recoveryCodeWarning": "Write it down or save it in a password manager. Anyone with this code can read your synced notes. It is shown only now.",
+  "recoveryCodeSaved": "I have saved it",
+  "recoveryRestore": "Restore from a recovery code",
+  "recoveryRestoreHint": "After reinstalling, or on a new phone",
+  "recoveryRestoreExplain": "Enter the code you saved. Your data comes back and is merged with anything on this phone.",
+  "recoveryRestored": "Your data has been restored.",
+  "recoveryCodeWrong": "That code was not recognised. Check it and try again.",
+  "restore": "Restore",
+  "copy": "Copy",
+  "later": "Later"
 }

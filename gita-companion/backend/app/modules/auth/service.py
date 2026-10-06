@@ -142,6 +142,43 @@ def logout(session: Session, raw: str) -> None:
         revoke_family(session, token.family_id)
 
 
+# Crockford base32: no I, L, O or U, so a code read aloud or retyped is
+# unambiguous. 24 symbols = 120 random bits, so codes cannot be guessed and
+# a fast hash is enough.
+_CODE_ALPHABET = "0123456789ABCDEFGHJKMNPQRSTVWXYZ"
+_CODE_LENGTH = 24
+
+
+def normalize_recovery_code(code: str) -> str:
+    c = code.upper().translate(str.maketrans({"O": "0", "I": "1", "L": "1"}))
+    return "".join(ch for ch in c if ch in _CODE_ALPHABET)
+
+
+def create_recovery_code(session: Session, user_id: uuid.UUID) -> str:
+    """A new recovery code for the account; any previous code stops working.
+    Returned once, never stored (only its hash)."""
+    user = active_user(session, user_id)
+    raw = "".join(secrets.choice(_CODE_ALPHABET) for _ in range(_CODE_LENGTH))
+    user.recovery_code_hash = _hash(raw)
+    user.recovery_code_created_at = _now()
+    session.flush()
+    return "-".join(raw[i : i + 4] for i in range(0, _CODE_LENGTH, 4))
+
+
+def recover(session: Session, settings: Settings, code: str) -> TokenPair:
+    """Sign a new installation into the account the code belongs to."""
+    normalized = normalize_recovery_code(code)
+    if len(normalized) != _CODE_LENGTH:
+        raise AuthError("unknown recovery code")
+    user = session.scalars(
+        select(AppUser).where(AppUser.recovery_code_hash == _hash(normalized), AppUser.deleted_at.is_(None))
+    ).one_or_none()
+    if user is None:
+        raise AuthError("unknown recovery code")
+    user.last_seen_at = _now()
+    return _issue(session, settings, user.id, uuid.uuid4())
+
+
 def delete_account(session: Session, user_id: uuid.UUID) -> None:
     """Hard delete: the user row and, by cascade, every row they own."""
     user = session.get(AppUser, user_id)

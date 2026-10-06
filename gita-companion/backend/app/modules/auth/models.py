@@ -38,6 +38,9 @@ class AppUser(Base):
     email: Mapped[str | None] = mapped_column(Text)
     display_name: Mapped[str | None] = mapped_column(Text)
     last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    # SHA-256 of the recovery code that signs a new installation back in.
+    recovery_code_hash: Mapped[str | None] = mapped_column(String(64), unique=True)
+    recovery_code_created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     created_at: Mapped[datetime] = created_at()
     updated_at: Mapped[datetime] = updated_at()
     deleted_at: Mapped[datetime | None] = deleted_at()

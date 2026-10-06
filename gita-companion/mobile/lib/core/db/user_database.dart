@@ -4,11 +4,16 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 
+import 'study_tables.dart';
+
+export 'study_tables.dart';
+
 part 'user_database.g.dart';
 
 /// The user's own data, stored on the device (local-first).
 /// v1 (Phase 3): settings. v2 (Phase 5): voice preferences, listening
-/// progress, audio cache index. v3 (Phase 6): AI teacher server address. Bookmarks, notes and revision come in Phase 8.
+/// progress, audio cache index. v3 (Phase 6): AI teacher server address.
+/// v4 (Phase 8): study data and sync state (study_tables.dart).
 ///
 /// Mirrors backend `user_settings` so the two can be synced.
 class UserSettingsTable extends Table {
@@ -95,7 +100,23 @@ class AudioCacheTable extends Table {
   List<String> get customConstraints => ['CHECK (length(hash) = 64)', 'CHECK (bytes >= 0)'];
 }
 
-@DriftDatabase(tables: [UserSettingsTable, ListeningProgressTable, AudioCacheTable])
+@DriftDatabase(
+  tables: [
+    UserSettingsTable,
+    ListeningProgressTable,
+    AudioCacheTable,
+    BookmarksTable,
+    VerseStatesTable,
+    HighlightsTable,
+    NotesTable,
+    RevisionItemsTable,
+    RevisionReviewsTable,
+    DailyPracticesTable,
+    VersesReadTable,
+    ReadingProgressTable,
+    SyncStateTable,
+  ],
+)
 class UserDatabase extends _$UserDatabase {
   UserDatabase(super.e);
 
@@ -105,13 +126,14 @@ class UserDatabase extends _$UserDatabase {
   factory UserDatabase.memory() => UserDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
     onCreate: (m) async {
       await m.createAll();
       await into(userSettingsTable).insert(const UserSettingsTableCompanion());
+      await into(syncStateTable).insert(const SyncStateTableCompanion());
     },
     onUpgrade: (m, from, to) async {
       if (from < 2) {
@@ -121,6 +143,23 @@ class UserDatabase extends _$UserDatabase {
       }
       if (from < 3) {
         await m.addColumn(userSettingsTable, userSettingsTable.tutorServer);
+      }
+      if (from < 4) {
+        for (final TableInfo<Table, dynamic> t in [
+          bookmarksTable,
+          verseStatesTable,
+          highlightsTable,
+          notesTable,
+          revisionItemsTable,
+          revisionReviewsTable,
+          dailyPracticesTable,
+          versesReadTable,
+          readingProgressTable,
+          syncStateTable,
+        ]) {
+          await m.createTable(t);
+        }
+        await into(syncStateTable).insert(const SyncStateTableCompanion());
       }
     },
     beforeOpen: (details) async {

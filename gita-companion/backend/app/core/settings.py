@@ -33,6 +33,10 @@ class Settings:
     trust_forwarded_for: bool = True
     # Content dataset (content format 3) for the tutor's hybrid retrieval.
     content_dataset: Path | None = None
+    # Encrypts notes and journal text at rest (app/core/crypto.py).
+    data_encryption_key: str | None = None
+    # Sync requests per user per hour.
+    syncs_per_user_per_hour: int = 240
 
     @staticmethod
     def from_env(env: dict[str, str] | None = None) -> Settings:
@@ -43,6 +47,11 @@ class Settings:
             if environment == "production":
                 raise SettingsError("JWT_SECRET must be set to a random string of at least 32 characters")
             secret = "development-only-secret-not-for-production-use"
+        data_key = env.get("DATA_ENCRYPTION_KEY") or None
+        if environment == "production" and (data_key is None or len(data_key) < 32):
+            raise SettingsError(
+                "DATA_ENCRYPTION_KEY must be set to a random string of at least 32 characters"
+            )
         return Settings(
             database_url=normalize_database_url(env.get("DATABASE_URL", DEFAULT_DATABASE_URL)),
             jwt_secret=secret,
@@ -54,6 +63,8 @@ class Settings:
             signups_per_hour_total=int(env.get("SIGNUPS_PER_HOUR_TOTAL", 300)),
             trust_forwarded_for=env.get("TRUST_FORWARDED_FOR", "1") == "1",
             content_dataset=_dataset_path(env),
+            data_encryption_key=data_key,
+            syncs_per_user_per_hour=int(env.get("SYNCS_PER_USER_PER_HOUR", 240)),
         )
 
 

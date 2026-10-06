@@ -7,6 +7,7 @@ import '../../core/content/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../audio/voice_settings.dart';
 import '../../shared/verse_text_view.dart';
+import '../study/sync_settings.dart';
 import '../tutor/teacher_settings.dart';
 
 class SettingsScreen extends ConsumerWidget {
@@ -91,6 +92,8 @@ class SettingsScreen extends ConsumerWidget {
           const VoiceSettingsSection(),
           _Header(l.settingsTeacher),
           const TeacherSettingsSection(),
+          _Header(l.settingsSync),
+          const SyncSettingsSection(),
           const Divider(height: 32),
           ListTile(
             leading: const Icon(Icons.menu_book_outlined),

@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'support/audio_fakes.dart';
 import 'support/pack.dart';
 import 'widgets_test.dart' show MemorySettingsRepository;
+import 'support/finders.dart';
 
 void main() {
   late SqliteContentRepository content;
@@ -65,7 +66,7 @@ void main() {
     await pumpSearch(tester);
     expect(find.text('Browse by topic'), findsOneWidget);
     final chip = find.widgetWithText(ActionChip, 'Anger (krodha)');
-    await tester.scrollUntilVisible(chip, 200, scrollable: find.byType(Scrollable).last);
+    await tester.scrollUntilVisible(chip, 200, scrollable: mainList());
     await tester.tap(chip);
     await tester.pumpAndSettle();
     expect(find.text('Verses on this topic, best first'), findsOneWidget);

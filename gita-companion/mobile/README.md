@@ -12,9 +12,10 @@ lib/
   core/
     content/  domain models, ContentRepository, pack installer (SQLite)
     search/   offline search: references, scripts, concepts and keywords (port of content/gita_content/retrieval.py)
-    db/       user database (drift): settings now, study data later
+    db/       user database (drift): settings, listening, study data (study_tables.dart)
+    study/    My Gita: StudyRepository, spaced repetition (srs.dart), SyncService, AutoSync
     settings/ AppSettings + repository
-  features/   home, chapters, reader, settings, onboarding
+  features/   home, chapters, reader, search, study (My Gita, revision, practice, sync), tutor, settings
   shared/     verse rendering, provenance labels, lotus ornament
   l10n/       UI strings: app_en.arb, app_te.arb
 ```
@@ -48,4 +49,7 @@ flutter test --tags screenshots --run-skipped --update-goldens test/screenshots
 - Search quality is measured on the server's golden set
   (`test/golden_eval_test.dart`), and query understanding must match the
   Python reference exactly (`test/concepts_test.dart`).
+- The sync format is pinned by `test/sync_contract_test.dart`, which writes
+  `backend/tests/fixtures/sync_request_from_app.json` (`UPDATE_CONTRACT=1`);
+  the backend tests send it to the real server.
 - Fonts: Noto Serif Devanagari, Noto Sans Telugu, Noto Serif (SIL OFL 1.1).

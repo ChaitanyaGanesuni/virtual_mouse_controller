@@ -57,6 +57,45 @@ class ApiClient {
     await _tokens.clear();
   }
 
+  /// The account this device is signed in to, signing in (anonymously)
+  /// first if needed.
+  Future<String?> accountId() async {
+    final server = _server();
+    if (server.isEmpty) {
+      throw ApiException('not_configured', 'No server is set up.');
+    }
+    final t =
+        await _currentTokens() ??
+        await (_signingUp ??= _signUp(server).whenComplete(() => _signingUp = null));
+    return t.userId;
+  }
+
+  /// A new recovery code for this account (any previous one stops working).
+  Future<String> createRecoveryCode() async {
+    final json = await post('/v1/auth/recovery-code') as Map<String, dynamic>;
+    return json['recovery_code'] as String;
+  }
+
+  /// Signs this installation in to the account [code] belongs to. The
+  /// previous credentials are replaced.
+  Future<String?> recover(String code) async {
+    final server = _server();
+    if (server.isEmpty) {
+      throw ApiException('not_configured', 'No server is set up.');
+    }
+    final response = await _send('POST', '$server/v1/auth/recover', body: {'recovery_code': code});
+    final t = _tokensFrom(server, _decode(response) as Map<String, dynamic>);
+    await _tokens.write(t);
+    return t.userId;
+  }
+
+  static Tokens _tokensFrom(String server, Map<String, dynamic> json) => Tokens(
+    server: server,
+    access: json['access_token'] as String,
+    refresh: json['refresh_token'] as String,
+    userId: json['user_id'] as String?,
+  );
+
   Future<dynamic> _request(String method, String path, {Object? body}) async {
     final server = _server();
     if (server.isEmpty) {
@@ -80,11 +119,7 @@ class ApiClient {
 
   Future<Tokens> _signUp(String server) async {
     final json = _decode(await _send('POST', '$server/v1/auth/anonymous')) as Map<String, dynamic>;
-    final t = Tokens(
-      server: server,
-      access: json['access_token'] as String,
-      refresh: json['refresh_token'] as String,
-    );
+    final t = _tokensFrom(server, json);
     await _tokens.write(t);
     return t;
   }
@@ -103,12 +138,7 @@ class ApiClient {
       await _tokens.clear();
       return _signUp(stale.server);
     }
-    final json = _decode(response) as Map<String, dynamic>;
-    final t = Tokens(
-      server: stale.server,
-      access: json['access_token'] as String,
-      refresh: json['refresh_token'] as String,
-    );
+    final t = _tokensFrom(stale.server, _decode(response) as Map<String, dynamic>);
     await _tokens.write(t);
     return t;
   }

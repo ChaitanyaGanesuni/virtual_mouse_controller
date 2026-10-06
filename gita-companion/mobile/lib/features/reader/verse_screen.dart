@@ -11,6 +11,7 @@ import '../../l10n/app_localizations.dart';
 import '../../shared/provenance.dart';
 import '../../shared/verse_text_view.dart';
 import '../audio/listen_actions.dart';
+import '../study/study_widgets.dart';
 
 /// The selected explanation mode stays the same while swiping between verses.
 class ExplanationModeController extends Notifier<ExplanationMode> {
@@ -45,7 +46,11 @@ class _VerseScreenState extends ConsumerState<VerseScreen> {
     _order = ref.read(contentRepositoryProvider).readingOrder();
     _index = _order.indexOf(widget.verseId).clamp(0, _order.length - 1);
     _pages = PageController(initialPage: _index);
+    _markRead(_order[_index]);
   }
+
+  // Opening a verse counts as reading it ("Chapter 2 · 14 of 72 verses").
+  void _markRead(String id) => ref.read(studyRepositoryProvider).markRead(id);
 
   @override
   void dispose() {
@@ -112,7 +117,10 @@ class _VerseScreenState extends ConsumerState<VerseScreen> {
       body: PageView.builder(
         controller: _pages,
         itemCount: _order.length,
-        onPageChanged: (i) => setState(() => _index = i),
+        onPageChanged: (i) {
+          setState(() => _index = i);
+          _markRead(_order[i]);
+        },
         itemBuilder: (context, i) => _VersePage(verseId: _order[i]),
       ),
       bottomNavigationBar: SafeArea(
@@ -185,6 +193,7 @@ class _VersePage extends ConsumerWidget {
         ),
         const SizedBox(height: 14),
         VerseListenActions(verse: verse, explanation: shownExplanation),
+        StudyBar(verseId: verse.id),
         Center(
           child: TextButton.icon(
             icon: const Icon(Icons.auto_awesome, size: 18),
@@ -232,9 +241,15 @@ class _VersePage extends ConsumerWidget {
         if (translation == null)
           Notice(text: l.translationPending, icon: Icons.translate)
         else ...[
-          Text(translation.body, style: theme.textTheme.bodyLarge?.copyWith(height: 1.6)),
+          HighlightableText(
+            text: translation.body,
+            verseId: verse.id,
+            textId: translation.id,
+            style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
+          ),
           ProvenanceNote(sourceId: translation.sourceId, reviewStatus: translation.reviewStatus),
         ],
+        VerseNotes(verseId: verse.id),
         _Heading(l.understand),
         _ExplanationCard(verse: verse),
       ],

@@ -12,6 +12,10 @@ import '../core/audio/playback_controller.dart';
 import '../core/audio/synthesizer.dart';
 import '../core/audio/tts_provider.dart';
 import '../core/content/content_repository.dart';
+import '../core/db/user_database.dart';
+import '../core/study/auto_sync.dart';
+import '../core/study/study_repository.dart';
+import '../core/study/sync_service.dart';
 import '../core/search/search_service.dart';
 import '../core/settings/app_settings.dart';
 import '../features/tutor/tutor_api.dart';
@@ -123,3 +127,48 @@ final apiClientProvider = Provider<ApiClient>(
 );
 
 final tutorApiProvider = Provider<TutorApi>((ref) => TutorApi(ref.watch(apiClientProvider)));
+
+// ---- My Gita: study data and sync ------------------------------------------
+
+/// The user's database. main.dart supplies the on-disk one; tests get a
+/// fresh in-memory database.
+final userDatabaseProvider = Provider<UserDatabase>((ref) {
+  final db = UserDatabase.memory();
+  ref.onDispose(db.close);
+  return db;
+});
+
+final studyRepositoryProvider = Provider<StudyRepository>(
+  (ref) => StudyRepository(ref.watch(userDatabaseProvider), clock: ref.watch(clockProvider)),
+);
+
+final syncServiceProvider = Provider<SyncService>(
+  (ref) => SyncService(
+    ref.watch(userDatabaseProvider),
+    ref.watch(apiClientProvider),
+    clock: ref.watch(clockProvider),
+  ),
+);
+
+/// Started by the app; keeps data in step while sync is on.
+final autoSyncProvider = Provider<AutoSync>((ref) {
+  final auto = AutoSync(ref.watch(userDatabaseProvider), ref.watch(syncServiceProvider))..start();
+  ref.onDispose(auto.dispose);
+  return auto;
+});
+
+final verseStudyProvider = StreamProvider.family<VerseStudy, String>(
+  (ref, verseId) => ref.watch(studyRepositoryProvider).watchVerse(verseId),
+);
+
+final studyProgressProvider = StreamProvider<StudyProgress>(
+  (ref) => ref.watch(studyRepositoryProvider).watchProgress(),
+);
+
+final dueCountProvider = StreamProvider<int>((ref) => ref.watch(studyRepositoryProvider).watchDueCount());
+
+final continueReadingProvider = StreamProvider<String?>(
+  (ref) => ref.watch(studyRepositoryProvider).watchContinue(),
+);
+
+final syncStatusProvider = StreamProvider<SyncStatus>((ref) => ref.watch(syncServiceProvider).watchStatus());

@@ -27,7 +27,11 @@ class RefreshRequest(BaseModel):
 
 
 class RateLimitedError(Exception):
-    pass
+    def __init__(
+        self, message: str = "Too many requests from this network. Try again later.", retry_after: int = 3600
+    ):
+        super().__init__(message)
+        self.retry_after = retry_after
 
 
 def _tokens(pair: TokenPair) -> TokenResponse:
@@ -44,7 +48,7 @@ def create_anonymous(request: Request, session: Session = DB, cfg: Settings = De
     """Create an account for this device. No personal data is collected."""
     state = request.app.state
     if not (state.signup_limiter.allow(client_ip(request)) and state.signup_limiter_total.allow("all")):
-        raise RateLimitedError()
+        raise RateLimitedError("Too many new accounts from this network. Try again later.")
     return _tokens(service.create_anonymous_account(session, cfg))
 
 
@@ -60,6 +64,29 @@ def refresh(body: RefreshRequest, request: Request, cfg: Settings = Depends(sett
             with session.begin():
                 service.revoke_family(session, e.family_id)
             raise
+
+
+class RecoveryCodeResponse(BaseModel):
+    recovery_code: str
+
+
+class RecoverRequest(BaseModel):
+    recovery_code: str = Field(min_length=20, max_length=60)
+
+
+@router.post("/auth/recovery-code", response_model=RecoveryCodeResponse, status_code=201)
+def new_recovery_code(user_id: uuid.UUID = Depends(current_user_id), session: Session = DB):
+    """Create a recovery code for this account (shown once; replaces the old
+    one). Entering it on a new installation restores the account."""
+    return RecoveryCodeResponse(recovery_code=service.create_recovery_code(session, user_id))
+
+
+@router.post("/auth/recover", response_model=TokenResponse)
+def recover(body: RecoverRequest, request: Request, session: Session = DB, cfg: Settings = Depends(settings)):
+    """Sign this installation into the account the recovery code belongs to."""
+    if not request.app.state.recover_limiter.allow(client_ip(request)):
+        raise RateLimitedError()
+    return _tokens(service.recover(session, cfg, body.recovery_code))
 
 
 @router.post("/auth/logout", status_code=204)
