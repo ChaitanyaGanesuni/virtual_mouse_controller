@@ -121,6 +121,7 @@ What that means on the free tiers. Check each provider's current limits; they ch
 - **Kotlin operator precedence** (`flags and X != 0`) was caught by reading the code, before CI compiled it.
 - **The first frame-time budget failed once on CI** (66 ms against 60 ms) because of timing noise. Frame time is now reported, not judged; the rebuild count is the real check.
 - **Newer `apksigner` versions label certificates differently**, so the CI step that prints the signer now matches both forms.
+- **A vector-search test failed once in CI** with no rows. The HNSW index is approximate, and rows other tests had rolled back were still in its graph. The test now does an exact scan. The app's own vector search now uses pgvector's iterative scans, so its model filter can no longer leave it short of results.
 
 ## Limitations
 

@@ -188,6 +188,9 @@ def test_vector_search_and_generated_tsvector(session):
             )
         )
     session.flush()
+    # Exact scan: HNSW is approximate, and rows other tests rolled back stay in
+    # its graph until vacuum, so it can miss rows inserted here (seen in CI).
+    session.execute(text("SET LOCAL enable_indexscan = off"))
     nearest = session.scalars(
         select(EmbeddingDoc.verse_id).order_by(EmbeddingDoc.embedding.cosine_distance(vec(1))).limit(1)
     ).one()

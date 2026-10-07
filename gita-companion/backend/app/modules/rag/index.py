@@ -12,7 +12,7 @@ from __future__ import annotations
 import uuid
 from collections.abc import Iterator
 
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.orm import Session
 
@@ -80,9 +80,20 @@ def index_embeddings(session: Session, provider: EmbeddingProvider, batch: int =
     return len(todo)
 
 
+def exhaustive_hnsw(session: Session) -> None:
+    """Let the HNSW index keep scanning until the LIMIT is filled.
+
+    By default it stops after ``ef_search`` candidates, so rows dropped by
+    the WHERE filter (another embedding model) can leave too few results.
+    Iterative scans (pgvector 0.8+) fix that. Applies to this transaction.
+    """
+    session.execute(text("SET LOCAL hnsw.iterative_scan = strict_order"))
+
+
 def vector_search(session: Session, provider: EmbeddingProvider, query: str, k: int = 40) -> list[str]:
     """Verse ids nearest to the query (cosine), best first, one per verse."""
     [vector] = provider.embed([query], "query")
+    exhaustive_hnsw(session)
     distance = EmbeddingDoc.embedding.cosine_distance(vector)
     rows = session.execute(
         select(EmbeddingDoc.verse_id, distance.label("d"))
