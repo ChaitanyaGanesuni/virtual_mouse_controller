@@ -8,8 +8,8 @@ current state.
 | Directory | What | Status |
 |---|---|---|
 | `content/` | Content pipeline: canonical Sanskrit text, Besant's English translation (1922), concept index, hybrid retriever and golden-set evaluation, mobile SQLite pack | Phase 7 ✅ except English recall@8 0.594 vs 0.60 ([report](docs/PHASE-7.md)) |
-| `backend/` | API: anonymous accounts with recovery codes, study-data sync (notes and journal encrypted at rest), downloadable content packs with resumable downloads, AI teacher with validated citations and hybrid retrieval (optional vector search); free-tier LLM providers; explanation and recitation generators ([deploy for free](docs/DEPLOY.md)) | Phase 9 ✅ |
-| `mobile/` | Flutter app: reader, chapters, search by meaning and topics, listening, My Gita (bookmarks, notes, highlights, spaced revision, Daily Practice), downloads for offline listening and content updates; AI teacher and optional sync online; APK built by CI | Phase 9 ✅ ([report](docs/PHASE-9.md)) |
+| `backend/` | API: anonymous accounts with recovery codes, study-data sync (notes and journal encrypted at rest), downloadable content packs with resumable downloads, AI teacher with validated citations and hybrid retrieval (optional vector search); free-tier LLM providers; explanation and recitation generators ([deploy for free](docs/DEPLOY.md)) | Phase 10 ✅ |
+| `mobile/` | Flutter app: reader, chapters, search by meaning and topics, listening, My Gita (bookmarks, notes, highlights, spaced revision, Daily Practice), downloads for offline listening and content updates; AI teacher and optional sync online; signed, obfuscated release APKs built by CI | Phase 10 ✅ ([report](docs/PHASE-10.md), [release checklist](docs/RELEASE-CHECKLIST.md), [how to release](docs/RELEASE.md)) |
 | `infra/` | Local dev services (Postgres + pgvector) | ✅ |
 
 ## Quick start
