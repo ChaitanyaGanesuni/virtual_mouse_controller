@@ -8,6 +8,7 @@ import '../core/api/server_address.dart';
 import '../core/api/token_store.dart';
 
 import '../core/audio/audio_cache.dart';
+import '../core/audio/compressor.dart';
 import '../core/audio/listening_progress.dart';
 import '../core/audio/manifest_resolver.dart';
 import '../core/audio/playback_controller.dart';
@@ -81,11 +82,15 @@ final listeningProgressProvider = Provider<ListeningProgressRepository>(
   (ref) => throw UnimplementedError('listeningProgressProvider must be overridden'),
 );
 
+/// Compresses synthesized speech (AAC on Android). Null: keep WAV.
+final audioCompressorProvider = Provider<AudioCompressor?>((ref) => null);
+
 final synthesizerProvider = Provider<AudioSynthesizer>(
   (ref) => AudioSynthesizer(
     providers: ref.watch(ttsProvidersProvider),
     cache: ref.watch(audioCacheProvider),
     voicePrefs: () => ref.read(settingsProvider).voicePrefs,
+    compressor: ref.watch(audioCompressorProvider),
   ),
 );
 

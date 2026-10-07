@@ -1,8 +1,23 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Release signing (docs/RELEASE.md): android/key.properties locally, or
+// GITA_KEYSTORE / GITA_KEYSTORE_PASSWORD / GITA_KEY_ALIAS / GITA_KEY_PASSWORD
+// in CI. The key itself is never in the repository.
+val keystoreProperties = Properties().apply {
+    val f = rootProject.file("key.properties")
+    if (f.exists()) f.inputStream().use { load(it) }
+}
+
+fun signingValue(property: String, env: String): String? =
+    keystoreProperties.getProperty(property) ?: System.getenv(env)?.takeIf { it.isNotEmpty() }
+
+val releaseKeystore = signingValue("storeFile", "GITA_KEYSTORE")
 
 android {
     namespace = "app.gitacompanion.gita_companion"
@@ -28,11 +43,22 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            if (releaseKeystore != null) {
+                storeFile = file(releaseKeystore)
+                storePassword = signingValue("storePassword", "GITA_KEYSTORE_PASSWORD")
+                keyAlias = signingValue("keyAlias", "GITA_KEY_ALIAS")
+                keyPassword = signingValue("keyPassword", "GITA_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // Test builds are signed with the debug key so the APK installs directly.
-            // A Play Store release needs a real upload key (kept out of the repo).
-            signingConfig = signingConfigs.getByName("debug")
+            // Signed with the release key when one is configured; otherwise
+            // with the debug key, so a local test build still installs.
+            signingConfig = signingConfigs.getByName(if (releaseKeystore != null) "release" else "debug")
         }
     }
 }

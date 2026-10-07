@@ -126,19 +126,24 @@ class _VerseScreenState extends ConsumerState<VerseScreen> {
       bottomNavigationBar: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          // Labels shrink (ellipsis) at large text sizes instead of overflowing.
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton.icon(
-                onPressed: _index == 0 ? null : () => _go(-1),
-                icon: const Icon(Icons.chevron_left),
-                label: Text(l.previousVerse),
+              Flexible(
+                child: TextButton.icon(
+                  onPressed: _index == 0 ? null : () => _go(-1),
+                  icon: const Icon(Icons.chevron_left),
+                  label: Text(l.previousVerse, overflow: TextOverflow.ellipsis),
+                ),
               ),
-              const Spacer(),
-              TextButton.icon(
-                onPressed: _index == _order.length - 1 ? null : () => _go(1),
-                icon: const Icon(Icons.chevron_right),
-                label: Text(l.nextVerse),
-                iconAlignment: IconAlignment.end,
+              Flexible(
+                child: TextButton.icon(
+                  onPressed: _index == _order.length - 1 ? null : () => _go(1),
+                  icon: const Icon(Icons.chevron_right),
+                  label: Text(l.nextVerse, overflow: TextOverflow.ellipsis),
+                  iconAlignment: IconAlignment.end,
+                ),
               ),
             ],
           ),

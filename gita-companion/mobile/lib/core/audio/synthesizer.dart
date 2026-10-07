@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'audio_cache.dart';
+import 'compressor.dart';
 import 'manifest.dart';
 import 'tts_provider.dart';
 import 'wav.dart';
@@ -29,7 +30,10 @@ class NoVoiceAvailable implements Exception {
 /// order given, which is cheapest/most local first), and serves from the
 /// content-addressed cache before synthesizing anything.
 class AudioSynthesizer {
-  AudioSynthesizer({required this.providers, required this.cache, required this.voicePrefs});
+  AudioSynthesizer({required this.providers, required this.cache, required this.voicePrefs, this.compressor});
+
+  /// Shrinks WAV before caching (null: keep WAV).
+  final AudioCompressor? compressor;
 
   /// In priority order (device → on-device neural → server …).
   final List<TtsProvider> providers;
@@ -109,13 +113,19 @@ class AudioSynthesizer {
     }
     await tmp.rename(out.path);
     final seconds = wavDurationSeconds(out);
+    var file = out;
+    final compressed = await compressor?.compress(out);
+    if (compressed != null) {
+      await out.delete();
+      file = compressed;
+    }
     await cache.put(
       hash,
-      out,
+      file,
       provider: choice.provider.id,
       voice: choice.voice.id,
       durationSeconds: seconds,
     );
-    return (file: out, hash: hash, choice: choice, seconds: seconds);
+    return (file: file, hash: hash, choice: choice, seconds: seconds);
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -12,6 +13,7 @@ import 'package:audio_service/audio_service.dart';
 import 'app/app.dart';
 import 'app/providers.dart';
 import 'core/audio/audio_cache.dart';
+import 'core/audio/compressor.dart';
 import 'core/audio/audio_handler.dart';
 import 'core/audio/device_tts_provider.dart';
 import 'core/audio/just_audio_backend.dart';
@@ -53,6 +55,8 @@ Future<void> main() async {
       initialSettingsProvider.overrideWithValue(settings),
       // Audio: device TTS first (free, offline); more engines plug in here.
       ttsProvidersProvider.overrideWithValue([DeviceTtsProvider()]),
+      // Speech is cached as AAC (about a ninth of WAV); WAV if that fails.
+      if (Platform.isAndroid) audioCompressorProvider.overrideWithValue(PlatformAacCompressor()),
       audioBackendProvider.overrideWithValue(JustAudioBackend()),
       audioCacheProvider.overrideWithValue(
         AudioCache(directory: Directory(p.join(support.path, 'audio')), db: userDb),
@@ -63,7 +67,14 @@ Future<void> main() async {
     ],
   );
 
-  // Background playback, notification and lock-screen controls.
+  runApp(UncontrolledProviderScope(container: container, child: const GitaApp()));
+
+  // Background playback, notification and lock-screen controls. Started
+  // after the first frame, so it never delays opening the app (Phase 10).
+  unawaited(_startAudioService(container));
+}
+
+Future<void> _startAudioService(ProviderContainer container) async {
   try {
     await AudioService.init(
       builder: () => GitaAudioHandler(container.read(playbackControllerProvider)),
@@ -78,6 +89,4 @@ Future<void> main() async {
     // Playback still works in the foreground without the service.
     debugPrint('AudioService unavailable: $e');
   }
-
-  runApp(UncontrolledProviderScope(container: container, child: const GitaApp()));
 }

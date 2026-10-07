@@ -7,8 +7,9 @@ import '../../core/packs/download_manager.dart';
 import '../../core/packs/offline_audio.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Device TTS writes 16-bit mono WAV at about 24 kHz: ~48 kB per second.
-const _bytesPerSecond = 48000;
+/// Device TTS writes 16-bit mono WAV at about 24 kHz: ~48 kB per second,
+/// unless it is compressed (AudioCompressor).
+const _wavBytesPerSecond = 48000;
 
 String formatBytes(int bytes) {
   if (bytes >= 1000 * 1000) return '${(bytes / 1e6).toStringAsFixed(bytes >= 1e8 ? 0 : 1)} MB';
@@ -46,7 +47,8 @@ class _DownloadsScreenState extends ConsumerState<DownloadsScreen> {
   int _estimate(int chapter, String language) => _estimates.putIfAbsent(chapter, () {
     final m = ref.read(offlineAudioProvider).manifest(chapter, language);
     final seconds = m.chunks.fold(0.0, (s, c) => s + c.estimatedSeconds);
-    return (seconds * _bytesPerSecond).round();
+    final perSecond = ref.read(audioCompressorProvider)?.bytesPerSecond ?? _wavBytesPerSecond;
+    return (seconds * perSecond).round();
   });
 
   @override

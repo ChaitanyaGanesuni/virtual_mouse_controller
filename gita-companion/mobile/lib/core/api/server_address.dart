@@ -1,13 +1,19 @@
 /// The AI teacher's server address.
 ///
 /// Built into the app with `--dart-define=API_BASE_URL=https://...`, or
-/// entered by the user in Settings. Only HTTPS is accepted, except for a
-/// server on this device or the Android emulator's host during development.
+/// entered by the user in Settings. Only HTTPS is accepted, except, in
+/// debug builds only, a server on this device or the Android emulator's host.
 library;
+
+import 'package:flutter/foundation.dart' show kReleaseMode;
 
 const builtInServerAddress = String.fromEnvironment('API_BASE_URL');
 
 const _localHosts = {'localhost', '127.0.0.1', '10.0.2.2'};
+
+/// Plain HTTP to a development server; never in a release build (whose
+/// network security config forbids it as well).
+const allowLocalHttp = !kReleaseMode;
 
 enum ServerAddressProblem { invalid, httpsRequired }
 
@@ -30,7 +36,7 @@ ServerAddressProblem? checkServerAddress(String input) {
   }
   if (uri.scheme == 'https') return null;
   if (uri.scheme == 'http') {
-    return _localHosts.contains(uri.host) ? null : ServerAddressProblem.httpsRequired;
+    return _localHosts.contains(uri.host) && allowLocalHttp ? null : ServerAddressProblem.httpsRequired;
   }
   return ServerAddressProblem.invalid;
 }

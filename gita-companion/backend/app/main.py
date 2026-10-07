@@ -27,6 +27,7 @@ from app.api import sync as sync_api
 from app.api import tutor as tutor_api
 from app.core.crypto import FieldCipher
 from app.core.ratelimit import SlidingWindowLimiter
+from app.core.security import HardeningMiddleware
 from app.core.settings import Settings
 from app.modules.ai_tutor.service import ProvidersBusy, QuotaExceeded, TutorError, TutorService
 from app.modules.auth.service import AuthError
@@ -86,6 +87,7 @@ def create_app(
         redoc_url=None,
     )
     app.state.settings = settings
+    app.add_middleware(HardeningMiddleware)
     app.state.session_factory = session_factory
     app.state.tutor = TutorService(llm, settings.tutor_daily_questions, retriever, embeddings)
     app.state.signup_limiter = SlidingWindowLimiter(settings.signups_per_ip_per_hour, 3600)

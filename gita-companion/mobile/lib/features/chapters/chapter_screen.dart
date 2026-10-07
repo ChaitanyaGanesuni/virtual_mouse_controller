@@ -157,12 +157,13 @@ class _Stat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final muted = Theme.of(context).colorScheme.onSurfaceVariant;
+    // Wraps at large text sizes instead of overflowing the screen.
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: 16, color: muted),
         const SizedBox(width: 6),
-        Text(text, style: Theme.of(context).textTheme.bodySmall),
+        Flexible(child: Text(text, style: Theme.of(context).textTheme.bodySmall)),
       ],
     );
   }

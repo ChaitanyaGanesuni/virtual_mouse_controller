@@ -5,6 +5,9 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_DISABLE_PIP_VERSION_CHECK=1
 WORKDIR /app
 
+# Patched packaging tools (pip-audit flags the ones in the base image).
+RUN pip install --no-cache-dir --upgrade pip setuptools
+
 # Shared retrieval code (concept index, hybrid search) from the content package.
 COPY content/pyproject.toml content/README.md ./content-pkg/
 COPY content/gita_content ./content-pkg/gita_content

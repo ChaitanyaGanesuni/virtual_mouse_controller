@@ -71,6 +71,13 @@ jobs:
       - run: pip install -e ../content -e ".[dev]"
       - run: ruff check . && ruff format --check .
       - run: pytest -q
+      # Known vulnerabilities in the server's dependencies fail the build.
+      - name: Dependency audit
+        run: |
+          pip install --upgrade pip setuptools pip-audit
+          pip-audit --skip-editable
+      - name: Cost measurements (tokens, database, bandwidth)
+        run: pytest -q -s tests/test_costs.py | grep '^COST' || true
       - name: Build the API container
         working-directory: gita-companion
         run: docker build -f backend/Dockerfile -t gita-api .
@@ -105,12 +112,60 @@ jobs:
         run: dart format --set-exit-if-changed $(git ls-files "lib/*.dart" "test/*.dart")
       - run: flutter analyze
       - run: flutter test
+      - name: Performance benchmarks
+        run: flutter test test/perf 2>&1 | grep -E '^BENCH|tests passed|failed'
+      # Release signing. With the repository secrets GITA_KEYSTORE_BASE64,
+      # GITA_KEYSTORE_PASSWORD, GITA_KEY_ALIAS and GITA_KEY_PASSWORD (see
+      # gita-companion/docs/RELEASE.md) the APK is signed with your release
+      # key. Without them a throwaway key proves the signing path works; such
+      # an APK is for testing only.
+      - name: Signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.GITA_KEYSTORE_BASE64 }}
+          STORE_PASSWORD: ${{ secrets.GITA_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.GITA_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.GITA_KEY_PASSWORD }}
+        run: |
+          ks="$RUNNER_TEMP/release.jks"
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$ks"
+            echo "SIGNED_WITH=release key" >> "$GITHUB_ENV"
+          else
+            STORE_PASSWORD="test-$(openssl rand -hex 16)"; KEY_PASSWORD="$STORE_PASSWORD"; KEY_ALIAS=test
+            keytool -genkeypair -keystore "$ks" -storepass "$STORE_PASSWORD" -keypass "$KEY_PASSWORD" \
+              -alias "$KEY_ALIAS" -keyalg RSA -keysize 2048 -validity 1 -dname "CN=Gita Companion test build"
+            echo "SIGNED_WITH=throwaway test key (add the GITA_KEYSTORE_* secrets for a real release)" >> "$GITHUB_ENV"
+          fi
+          { echo "GITA_KEYSTORE=$ks"; echo "GITA_KEYSTORE_PASSWORD=$STORE_PASSWORD"
+            echo "GITA_KEY_ALIAS=$KEY_ALIAS"; echo "GITA_KEY_PASSWORD=$KEY_PASSWORD"; } >> "$GITHUB_ENV"
       # The tutor's server address. Optional: set the repository variable
       # GITA_API_BASE_URL (Settings → Secrets and variables → Actions →
       # Variables), or enter the address in the app's settings.
-      - name: Build APK
-        run: flutter build apk --release --dart-define=API_BASE_URL=${{ vars.GITA_API_BASE_URL }}
+      # Dart code is obfuscated; the symbols to read crash reports are kept
+      # as an artifact.
+      - name: Build release APKs
+        run: |
+          flags="--release --obfuscate --split-debug-info=build/symbols --dart-define=API_BASE_URL=${{ vars.GITA_API_BASE_URL }}"
+          flutter build apk $flags
+          flutter build apk $flags --split-per-abi
+      - name: Verify signature and report sizes
+        run: |
+          apksigner=$(ls -d "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -1)
+          cd build/app/outputs/flutter-apk
+          for apk in app-release.apk app-*-release.apk; do
+            "$apksigner" verify "$apk"
+            echo "APK $apk: $(du -h "$apk" | cut -f1)"
+          done
+          "$apksigner" verify --print-certs app-release.apk | grep -E "Signer #1 certificate (DN|SHA-256)"
+          echo "Signed with: $SIGNED_WITH"
       - uses: actions/upload-artifact@v4
         with:
           name: gita-companion-apk
-          path: gita-companion/mobile/build/app/outputs/flutter-apk/app-release.apk
+          path: |
+            gita-companion/mobile/build/app/outputs/flutter-apk/app-release.apk
+            gita-companion/mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
+            gita-companion/mobile/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gita-companion-debug-symbols
+          path: gita-companion/mobile/build/symbols

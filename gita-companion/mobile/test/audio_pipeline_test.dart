@@ -13,6 +13,8 @@ import 'package:gita_companion/core/db/user_database.dart';
 import 'support/audio_fakes.dart';
 import 'support/pack.dart';
 
+import 'package:gita_companion/core/audio/compressor.dart';
+
 void main() {
   driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
 
@@ -153,6 +155,31 @@ void main() {
       expect(tts.calls, hasLength(1));
     });
 
+    test('speech is cached compressed; if compression fails the WAV is kept', () async {
+      final shrink = _FakeCompressor();
+      final s = AudioSynthesizer(
+        providers: [FakeTtsProvider()],
+        cache: cache,
+        voicePrefs: () => {},
+        compressor: shrink,
+      );
+      final r = await s.fileFor(chunk);
+      expect(r.file.path, endsWith('.m4a'));
+      expect(r.file.readAsStringSync(), startsWith('M4A:'));
+      expect(File(r.file.path.replaceFirst('.m4a', '.wav')).existsSync(), isFalse);
+      expect((await s.fileFor(chunk)).file.path, r.file.path, reason: 'served from the cache');
+
+      final broken = AudioSynthesizer(
+        providers: [FakeTtsProvider(version: '2')],
+        cache: cache,
+        voicePrefs: () => {},
+        compressor: _FakeCompressor(fail: true),
+      );
+      final w = await broken.fileFor(chunk);
+      expect(w.file.path, endsWith('.wav'));
+      expect(w.file.existsSync(), isTrue);
+    });
+
     test('preferred voice wins; Indian locale preferred otherwise', () async {
       final tts = FakeTtsProvider(
         voices: const [
@@ -242,4 +269,21 @@ void main() {
       expect(tts.calls, hasLength(2));
     });
   });
+}
+
+class _FakeCompressor implements AudioCompressor {
+  _FakeCompressor({this.fail = false});
+
+  final bool fail;
+
+  @override
+  int get bytesPerSecond => 5000;
+
+  @override
+  Future<File?> compress(File wav) async {
+    if (fail) return null;
+    final out = File(wav.path.replaceFirst('.wav', '.m4a'));
+    await out.writeAsString('M4A:${await wav.readAsString()}');
+    return out;
+  }
 }
