@@ -132,6 +132,7 @@ jobs:
             echo "SIGNED_WITH=release key" >> "$GITHUB_ENV"
           else
             STORE_PASSWORD="test-$(openssl rand -hex 16)"; KEY_PASSWORD="$STORE_PASSWORD"; KEY_ALIAS=test
+            echo "::add-mask::$STORE_PASSWORD"
             keytool -genkeypair -keystore "$ks" -storepass "$STORE_PASSWORD" -keypass "$KEY_PASSWORD" \
               -alias "$KEY_ALIAS" -keyalg RSA -keysize 2048 -validity 1 -dname "CN=Gita Companion test build"
             echo "SIGNED_WITH=throwaway test key (add the GITA_KEYSTORE_* secrets for a real release)" >> "$GITHUB_ENV"
@@ -156,7 +157,8 @@ jobs:
             "$apksigner" verify "$apk"
             echo "APK $apk: $(du -h "$apk" | cut -f1)"
           done
-          "$apksigner" verify --print-certs app-release.apk | grep -E "Signer #1 certificate (DN|SHA-256)"
+          # Which key signed it (the label differs between apksigner versions).
+          "$apksigner" verify --print-certs app-release.apk | grep -E "certificate (DN|SHA-256 digest):" | head -2
           echo "Signed with: $SIGNED_WITH"
       - uses: actions/upload-artifact@v4
         with:
