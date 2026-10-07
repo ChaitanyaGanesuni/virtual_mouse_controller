@@ -59,6 +59,8 @@ Android emulator).
 | `DATA_ENCRYPTION_KEY` | — | Required in production (32+ random characters; the Render blueprint generates it). Encrypts synced notes and journal entries. Keep it: changing or losing it makes them unreadable. |
 | `JWT_SECRET` | — | Required in production, at least 32 random characters. Changing it signs every device out (they sign in again automatically). |
 | `GROQ_API_KEY` | — | Enables Groq. Others: `OLLAMA_BASE_URL` for a self-hosted model. |
+| `PACKS_DIR` | `packs/` in the image | Downloadable packs. The image builds the content pack itself; add `extra.json` there to list packs hosted elsewhere (HTTPS URLs with checksums). |
+| `DOWNLOADS_PER_IP_PER_HOUR` | 30 | New pack downloads per network address (resumed downloads are not counted). |
 | `SYNCS_PER_USER_PER_HOUR` | 240 | Study-data sync requests per account. |
 | `TUTOR_DAILY_QUESTIONS` | 30 | Questions per device per UTC day. Cached explanations don't count. |
 | `SIGNUPS_PER_IP_PER_HOUR` | 10 | New anonymous accounts per network address. |

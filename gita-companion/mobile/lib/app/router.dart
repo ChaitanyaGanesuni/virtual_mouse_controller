@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../features/audio/player_screen.dart';
 import '../features/chapters/chapter_screen.dart';
 import '../features/chapters/chapters_screen.dart';
+import '../features/downloads/downloads_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/reader/verse_screen.dart';
@@ -73,6 +74,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/practice', builder: (_, _) => const PracticeScreen()),
       GoRoute(path: '/settings', builder: (_, _) => const SettingsScreen()),
       GoRoute(path: '/settings/sources', builder: (_, _) => const SourcesScreen()),
+      GoRoute(path: '/settings/downloads', builder: (_, _) => const DownloadsScreen()),
     ],
   );
 });

@@ -62,7 +62,8 @@ class AudioCache {
             lastUsedAt: now,
           ),
         );
-    await evict();
+    // Never the file just added: the caller is about to play or pin it.
+    await evict(keep: hash);
   }
 
   Future<void> setDuration(String hash, double seconds) => (db.update(
@@ -84,8 +85,9 @@ class AudioCache {
     )..addColumns([sum])).map((r) => r.read(sum) ?? 0).getSingle();
   }
 
-  /// Deletes least-recently-used unpinned files until under [maxBytes].
-  Future<void> evict() async {
+  /// Deletes least-recently-used unpinned files (except [keep]) until under
+  /// [maxBytes].
+  Future<void> evict({String? keep}) async {
     var total = await totalBytes();
     if (total <= maxBytes) return;
     final candidates =
@@ -95,6 +97,7 @@ class AudioCache {
             .get();
     for (final row in candidates) {
       if (total <= maxBytes) break;
+      if (row.hash == keep) continue;
       final file = File(p.join(directory.path, row.fileName));
       if (file.existsSync()) file.deleteSync();
       await (db.delete(db.audioCacheTable)..where((t) => t.hash.equals(row.hash))).go();

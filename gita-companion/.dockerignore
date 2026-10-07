@@ -11,5 +11,6 @@
 !content/pyproject.toml
 !content/README.md
 !content/gita_content
+!content/schema
 **/__pycache__
 

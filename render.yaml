@@ -16,6 +16,8 @@ services:
       paths:
         - gita-companion/backend/**
         - gita-companion/content/data/**
+        - gita-companion/content/gita_content/**
+        - gita-companion/content/schema/**
     envVars:
       - key: APP_ENV
         value: production

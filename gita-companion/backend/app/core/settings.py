@@ -37,6 +37,9 @@ class Settings:
     data_encryption_key: str | None = None
     # Sync requests per user per hour.
     syncs_per_user_per_hour: int = 240
+    # Downloadable packs (catalog + files), and new downloads per IP per hour.
+    packs_dir: Path | None = None
+    downloads_per_ip_per_hour: int = 30
 
     @staticmethod
     def from_env(env: dict[str, str] | None = None) -> Settings:
@@ -65,6 +68,8 @@ class Settings:
             content_dataset=_dataset_path(env),
             data_encryption_key=data_key,
             syncs_per_user_per_hour=int(env.get("SYNCS_PER_USER_PER_HOUR", 240)),
+            packs_dir=_packs_path(env),
+            downloads_per_ip_per_hour=int(env.get("DOWNLOADS_PER_IP_PER_HOUR", 30)),
         )
 
 
@@ -78,3 +83,10 @@ def _dataset_path(env: dict[str, str]) -> Path | None:
         if candidate.exists():
             return candidate
     return None
+
+
+def _packs_path(env: dict[str, str]) -> Path | None:
+    if env.get("PACKS_DIR"):
+        return Path(env["PACKS_DIR"])
+    candidate = _BACKEND / "packs"  # built into the Docker image
+    return candidate if candidate.is_dir() else None

@@ -13,6 +13,7 @@ lib/
     content/  domain models, ContentRepository, pack installer (SQLite)
     search/   offline search: references, scripts, concepts and keywords (port of content/gita_content/retrieval.py)
     db/       user database (drift): settings, listening, study data (study_tables.dart)
+    packs/    offline downloads: catalog, verified resumable downloader, content updates, chapter audio, download manager
     study/    My Gita: StudyRepository, spaced repetition (srs.dart), SyncService, AutoSync
     settings/ AppSettings + repository
   features/   home, chapters, reader, search, study (My Gita, revision, practice, sync), tutor, settings

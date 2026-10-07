@@ -546,5 +546,114 @@
   "recoveryCodeWrong": "That code was not recognised. Check it and try again.",
   "restore": "Restore",
   "copy": "Copy",
-  "later": "Later"
+  "later": "Later",
+  "downloads": "Downloads & storage",
+  "downloadsHint": "Audio for offline listening, content updates",
+  "storageDownloads": "Downloads use {size}",
+  "@storageDownloads": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "storageCache": "All audio on this phone: {size}. Audio that was only played, not downloaded, is cleared automatically when space is needed.",
+  "@storageCache": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "contentUpdates": "Texts and explanations",
+  "contentUpdatesNeedServer": "Updates come from the Gita Companion server. Set it up under AI teacher in Settings.",
+  "contentUpToDate": "Up to date",
+  "contentUpdateAvailable": "New texts and explanations are available ({size})",
+  "@contentUpdateAvailable": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "contentReadyAfterRestart": "Downloaded. Used the next time the app starts.",
+  "contentNeedsAppUpdate": "Newer content needs a newer version of the app.",
+  "contentCannotCheck": "No connection: cannot check for updates. Everything on this phone still works.",
+  "offlineAudio": "Audio for offline listening",
+  "offlineAudioExplain": "Each chapter (recitation and simple explanations in your explanation language) is prepared on this phone with its own voices, then plays without a connection.",
+  "aboutSize": "About {size}",
+  "@aboutSize": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "queued": "Waiting…",
+  "preparingProgress": "Preparing {done} of {total}",
+  "@preparingProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "availableOffline": "Available offline · {size}",
+  "@availableOffline": {
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "availableOfflineShort": "Available offline",
+  "audioUpdateAvailable": "The texts changed: update to match",
+  "makeAvailableOffline": "Make available offline",
+  "preparingChapter": "Preparing chapter {chapter} for offline listening…",
+  "@preparingChapter": {
+    "placeholders": {
+      "chapter": {
+        "type": "int"
+      }
+    }
+  },
+  "download": "Download",
+  "downloadingPercent": "Downloading… {percent}%",
+  "@downloadingPercent": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "downloadFailed": "Not finished: {reason}",
+  "@downloadFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "downloadErrorOffline": "no connection. Try again to continue where it stopped.",
+  "downloadErrorServer": "the server had a problem.",
+  "downloadErrorCorrupt": "the file was damaged on the way and was discarded.",
+  "downloadErrorNoSpace": "not enough storage space.",
+  "downloadErrorNoVoice": "no voice is installed for this language (see Voices in Settings).",
+  "downloadErrorInterrupted": "the app was closed. Try again to continue.",
+  "downloadErrorCancelled": "cancelled.",
+  "retry": "Try again",
+  "update": "Update",
+  "remove": "Remove",
+  "removeDownloadTitle": "Remove chapter {chapter} audio?",
+  "@removeDownloadTitle": {
+    "placeholders": {
+      "chapter": {
+        "type": "int"
+      }
+    }
+  },
+  "removeDownloadExplain": "It will still play when you are online, prepared again as needed."
 }

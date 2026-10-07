@@ -26,6 +26,16 @@ import '../support/finders.dart';
 
 import 'package:gita_companion/core/db/user_database.dart';
 import 'package:gita_companion/core/study/study_repository.dart';
+import 'package:drift/drift.dart' show Value;
+import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:gita_companion/core/api/token_store.dart';
+import 'package:gita_companion/core/audio/audio_cache.dart';
+import 'package:gita_companion/core/audio/manifest_resolver.dart';
+import 'package:gita_companion/core/audio/synthesizer.dart';
+import 'package:gita_companion/core/content/content_pack.dart';
+import 'package:gita_companion/core/packs/offline_audio.dart';
+
+import '../support/fake_pack_server.dart';
 
 Future<void> _loadFont(String family, List<String> files) async {
   final loader = FontLoader(family);
@@ -59,7 +69,10 @@ void main() {
     bool back = false,
     FakeGitaServer? server,
     Future<void> Function(StudyRepository study)? seed,
+    Future<List<Override>> Function(TestAudio audio)? setup,
   }) async {
+    final audio = TestAudio();
+    final extra = setup == null ? const <Override>[] : (await tester.runAsync(() => setup(audio)))!;
     final userDb = UserDatabase.memory();
     addTearDown(userDb.close);
     if (seed != null) {
@@ -76,8 +89,10 @@ void main() {
           searchServiceProvider.overrideWithValue(search),
           settingsRepositoryProvider.overrideWithValue(MemorySettingsRepository()..saved = settings),
           initialSettingsProvider.overrideWithValue(settings),
-          ...TestAudio().overrides,
-          ...(server ?? FakeGitaServer()).overrides(),
+          ...audio.overrides,
+          // A setup brings its own network (it may serve the pack catalog).
+          if (setup == null) ...(server ?? FakeGitaServer()).overrides(),
+          ...extra,
           clockProvider.overrideWithValue(() => DateTime(2026, 10, 1)),
           userDatabaseProvider.overrideWithValue(userDb),
         ],
@@ -88,6 +103,11 @@ void main() {
     if (route != null) {
       GoRouterHelper(tester.element(find.byType(Scaffold).first)).go(route);
       await tester.pumpAndSettle();
+    }
+    // Let screens that load from the database finish.
+    for (var i = 0; i < 3; i++) {
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 30)));
+      await tester.pump(const Duration(milliseconds: 50));
     }
     if (type != null) {
       await tester.enterText(find.byType(TextField), type);
@@ -221,6 +241,71 @@ void main() {
       ready,
       route: '/settings',
       scrollTo: find.text('Restore from a recovery code'),
+    ),
+  );
+  Future<List<Override>> downloads(TestAudio audio) async {
+    final dir = Directory.systemTemp.createTempSync('shot_content');
+    final installer = ContentPackInstaller(directory: dir, loadAsset: loadAssetFromDisk);
+    (await installer.install()).close();
+    final packs = FakePackServer(makeUpdatedPack());
+    // Chapter 1 really downloaded (fake voices), chapter 2 in progress, 3 failed.
+    final cache = AudioCache(directory: audio.dir, db: audio.db);
+    final offline = OfflineAudio(
+      db: audio.db,
+      cache: cache,
+      synthesizer: AudioSynthesizer(providers: [audio.tts], cache: cache, voicePrefs: () => const {}),
+      resolver: ManifestResolver(content),
+    );
+    final bytes = await offline.download(1, 'en');
+    final rows = [
+      OfflinePacksTableCompanion.insert(
+        id: OfflineAudio.packId(1, 'en'),
+        kind: 'audio',
+        state: 'downloaded',
+        bytes: Value(bytes),
+        fingerprint: Value(OfflineAudio.fingerprint(offline.manifest(1, 'en'))),
+        updatedAt: 0,
+      ),
+      OfflinePacksTableCompanion.insert(
+        id: OfflineAudio.packId(2, 'en'),
+        kind: 'audio',
+        state: 'downloading',
+        done: const Value(46),
+        total: const Value(128),
+        updatedAt: 0,
+      ),
+      OfflinePacksTableCompanion.insert(
+        id: OfflineAudio.packId(3, 'en'),
+        kind: 'audio',
+        state: 'failed',
+        error: const Value('offline'),
+        updatedAt: 0,
+      ),
+    ];
+    for (final r in rows) {
+      await audio.db.into(audio.db.offlinePacksTable).insert(r);
+    }
+    return [
+      contentDirectoryProvider.overrideWithValue(dir),
+      installedContentProvider.overrideWithValue(installer.active),
+      httpClientProvider.overrideWithValue(packs.client),
+      builtInServerAddressProvider.overrideWithValue(packServer),
+      tokenStoreProvider.overrideWithValue(MemoryTokenStore()),
+    ];
+  }
+
+  testWidgets(
+    'downloads',
+    (t) => shot(t, 'downloads', ready, route: '/settings/downloads', setup: downloads),
+  );
+  testWidgets(
+    'downloads telugu dark',
+    (t) => shot(
+      t,
+      'downloads_telugu_dark',
+      ready.copyWith(themeMode: ThemeMode.dark, uiLanguage: 'te', explanationLanguage: 'te'),
+      route: '/settings/downloads',
+      setup: downloads,
     ),
   );
   testWidgets('player', (t) => shot(t, 'player_recitation', ready, route: '/verse/2.47', tap: 'Recite'));

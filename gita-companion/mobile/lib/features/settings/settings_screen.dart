@@ -94,6 +94,12 @@ class SettingsScreen extends ConsumerWidget {
           const TeacherSettingsSection(),
           _Header(l.settingsSync),
           const SyncSettingsSection(),
+          ListTile(
+            leading: const Icon(Icons.download_for_offline_outlined),
+            title: Text(l.downloads),
+            subtitle: Text(l.downloadsHint),
+            onTap: () => context.push('/settings/downloads'),
+          ),
           const Divider(height: 32),
           ListTile(
             leading: const Icon(Icons.menu_book_outlined),

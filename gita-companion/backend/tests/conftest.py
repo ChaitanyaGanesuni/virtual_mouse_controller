@@ -152,7 +152,9 @@ def make_client(seeded):
 
     retriever = Retriever(json.loads(DATASET.read_text(encoding="utf-8")))
 
-    def make(*providers, embeddings=None, hybrid=True, **overrides):
+    def make(*providers, embeddings=None, hybrid=True, packs=None, **overrides):
+        from app.modules.packs.catalog import PackCatalog
+
         settings = Settings(
             **{
                 "database_url": seeded.url.render_as_string(hide_password=False),
@@ -169,6 +171,7 @@ def make_client(seeded):
             session_factory=sessionmaker(seeded, expire_on_commit=False),
             retriever=retriever if hybrid else None,
             embeddings=embeddings,
+            packs=packs or PackCatalog(),
         )
         client = TestClient(app)
         clients.append(client)

@@ -7,6 +7,7 @@ import '../../core/content/estimates.dart';
 import '../../core/content/models.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/provenance.dart';
+import '../../core/packs/download_manager.dart';
 import '../audio/listen_actions.dart';
 
 class ChapterScreen extends ConsumerWidget {
@@ -43,7 +44,10 @@ class ChapterScreen extends ConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(title: Text(l.chapterNumber(number))),
+      appBar: AppBar(
+        title: Text(l.chapterNumber(number)),
+        actions: [_OfflineButton(chapter: number)],
+      ),
       body: ListView.builder(
         itemCount: verses.length + 1,
         itemBuilder: (context, i) {
@@ -211,5 +215,42 @@ class _ExpandableSummaryState extends State<_ExpandableSummary> {
         ),
       ],
     );
+  }
+}
+
+/// Makes the chapter's audio available offline, or shows that it is.
+class _OfflineButton extends ConsumerWidget {
+  const _OfflineButton({required this.chapter});
+
+  final int chapter;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final language = ref.watch(settingsProvider).explanationLanguage;
+    final status = ref.watch(downloadsOverviewProvider(language)).value?.audio[chapter];
+    return switch (status?.state) {
+      PackState.downloaded => IconButton(
+        tooltip: l.availableOfflineShort,
+        icon: const Icon(Icons.offline_pin),
+        onPressed: () => context.push('/settings/downloads'),
+      ),
+      PackState.queued || PackState.downloading => IconButton(
+        tooltip: l.preparingProgress(status!.done, status.total),
+        icon: SizedBox.square(
+          dimension: 20,
+          child: CircularProgressIndicator(strokeWidth: 2.5, value: status.progress),
+        ),
+        onPressed: () => context.push('/settings/downloads'),
+      ),
+      _ => IconButton(
+        tooltip: l.makeAvailableOffline,
+        icon: const Icon(Icons.download_for_offline_outlined),
+        onPressed: () {
+          ref.read(downloadManagerProvider).downloadAudio(chapter, language);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l.preparingChapter(chapter))));
+        },
+      ),
+    };
   }
 }

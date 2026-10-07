@@ -90,7 +90,7 @@ def test_signups_are_rate_limited_per_ip(make_client):
 
 def test_health(make_client):
     client, _ = make_client()
-    assert client.get("/v1/health").json() == {"status": "ok", "version": "0.8.0", "tutor": False}
+    assert client.get("/v1/health").json() == {"status": "ok", "version": "0.9.0", "tutor": False}
 
 
 def test_production_requires_a_real_secret():

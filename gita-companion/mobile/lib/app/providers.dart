@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
@@ -11,7 +13,13 @@ import '../core/audio/manifest_resolver.dart';
 import '../core/audio/playback_controller.dart';
 import '../core/audio/synthesizer.dart';
 import '../core/audio/tts_provider.dart';
+import '../core/content/content_pack.dart';
 import '../core/content/content_repository.dart';
+import '../core/packs/content_updates.dart';
+import '../core/packs/download_manager.dart';
+import '../core/packs/downloader.dart';
+import '../core/packs/offline_audio.dart';
+import '../core/packs/pack_catalog.dart';
 import '../core/db/user_database.dart';
 import '../core/study/auto_sync.dart';
 import '../core/study/study_repository.dart';
@@ -172,3 +180,52 @@ final continueReadingProvider = StreamProvider<String?>(
 );
 
 final syncStatusProvider = StreamProvider<SyncStatus>((ref) => ref.watch(syncServiceProvider).watchStatus());
+
+// ---- Offline downloads ----------------------------------------------------
+
+/// Where content packs are installed; null where content updates are not
+/// possible (tests). Overridden in main.dart.
+final contentDirectoryProvider = Provider<Directory?>((ref) => null);
+
+/// The content pack the app opened at startup. Overridden in main.dart.
+final installedContentProvider = Provider<InstalledContent?>((ref) => null);
+
+final packCatalogClientProvider = Provider<PackCatalogClient>(
+  (ref) => PackCatalogClient(ref.watch(httpClientProvider), () => ref.read(serverAddressProvider)),
+);
+
+final offlineAudioProvider = Provider<OfflineAudio>((ref) {
+  final cache = ref.watch(audioCacheProvider);
+  return OfflineAudio(
+    db: cache.db,
+    cache: cache,
+    synthesizer: ref.watch(synthesizerProvider),
+    resolver: ref.watch(manifestResolverProvider),
+  );
+});
+
+final downloadManagerProvider = Provider<DownloadManager>((ref) {
+  final dir = ref.watch(contentDirectoryProvider);
+  final installed = ref.watch(installedContentProvider);
+  final manager = DownloadManager(
+    db: ref.watch(audioCacheProvider).db,
+    catalogClient: ref.watch(packCatalogClientProvider),
+    offlineAudio: ref.watch(offlineAudioProvider),
+    contentUpdates: dir == null || installed == null
+        ? null
+        : ContentUpdates(
+            directory: dir,
+            downloader: Downloader(ref.watch(httpClientProvider)),
+            installed: installed,
+          ),
+    clock: ref.watch(clockProvider),
+  );
+  manager.init();
+  ref.onDispose(manager.dispose);
+  return manager;
+});
+
+/// Downloads screen data for an audio language.
+final downloadsOverviewProvider = StreamProvider.family<DownloadsOverview, String>(
+  (ref, language) => ref.watch(downloadManagerProvider).watch(language),
+);

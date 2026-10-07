@@ -19,6 +19,7 @@ Retrieval (concepts, keywords, optional vectors): [docs/PHASE-7.md](../docs/PHAS
 | `POST /v1/auth/anonymous`, `/v1/auth/refresh`, `/v1/auth/logout` | Device accounts; rotating refresh tokens |
 | `POST /v1/auth/recovery-code`, `/v1/auth/recover` | Recovery code (shown once) and signing a new installation back in |
 | `POST /v1/sync` | Study-data sync: send changes, receive other devices' changes ([PHASE-8](../docs/PHASE-8.md)) |
+| `GET /v1/packs`, `/v1/packs/files/{name}` | Download catalog and files for offline use, with HTTP Range ([PHASE-9](../docs/PHASE-9.md)) |
 | `DELETE /v1/me` | Delete the account and all its data |
 | `GET /v1/tutor/status` | Teacher available? Questions left today |
 | `POST/GET /v1/tutor/conversations`, `GET/DELETE /v1/tutor/conversations/{id}` | Conversations |

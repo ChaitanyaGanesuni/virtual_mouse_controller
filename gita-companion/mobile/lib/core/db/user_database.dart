@@ -4,8 +4,10 @@ import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
 
+import 'pack_tables.dart';
 import 'study_tables.dart';
 
+export 'pack_tables.dart';
 export 'study_tables.dart';
 
 part 'user_database.g.dart';
@@ -14,6 +16,7 @@ part 'user_database.g.dart';
 /// v1 (Phase 3): settings. v2 (Phase 5): voice preferences, listening
 /// progress, audio cache index. v3 (Phase 6): AI teacher server address.
 /// v4 (Phase 8): study data and sync state (study_tables.dart).
+/// v5 (Phase 9): offline downloads (pack_tables.dart).
 ///
 /// Mirrors backend `user_settings` so the two can be synced.
 class UserSettingsTable extends Table {
@@ -115,6 +118,8 @@ class AudioCacheTable extends Table {
     VersesReadTable,
     ReadingProgressTable,
     SyncStateTable,
+    OfflinePacksTable,
+    OfflinePackFilesTable,
   ],
 )
 class UserDatabase extends _$UserDatabase {
@@ -126,7 +131,7 @@ class UserDatabase extends _$UserDatabase {
   factory UserDatabase.memory() => UserDatabase(NativeDatabase.memory());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -160,6 +165,10 @@ class UserDatabase extends _$UserDatabase {
           await m.createTable(t);
         }
         await into(syncStateTable).insert(const SyncStateTableCompanion());
+      }
+      if (from < 5) {
+        await m.createTable(offlinePacksTable);
+        await m.createTable(offlinePackFilesTable);
       }
     },
     beforeOpen: (details) async {

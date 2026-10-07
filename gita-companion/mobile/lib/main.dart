@@ -32,10 +32,9 @@ Future<void> main() async {
 
   // Everything except the AI teacher is on the device: no network at startup.
   final support = await getApplicationSupportDirectory();
-  final contentDb = await ContentPackInstaller(
-    directory: Directory(p.join(support.path, 'content')),
-    loadAsset: rootBundle.load,
-  ).install();
+  final contentDir = Directory(p.join(support.path, 'content'));
+  final installer = ContentPackInstaller(directory: contentDir, loadAsset: rootBundle.load);
+  final contentDb = await installer.install();
   final userDb = UserDatabase.inDirectory(support);
   final settingsRepo = DriftSettingsRepository(userDb);
   final settings = await settingsRepo.load();
@@ -48,6 +47,9 @@ Future<void> main() async {
       searchServiceProvider.overrideWithValue(SqliteSearchService(contentDb, verseExists: verseIds.contains)),
       settingsRepositoryProvider.overrideWithValue(settingsRepo),
       userDatabaseProvider.overrideWithValue(userDb),
+      // Content updates are downloaded next to the installed pack.
+      contentDirectoryProvider.overrideWithValue(contentDir),
+      installedContentProvider.overrideWithValue(installer.active),
       initialSettingsProvider.overrideWithValue(settings),
       // Audio: device TTS first (free, offline); more engines plug in here.
       ttsProvidersProvider.overrideWithValue([DeviceTtsProvider()]),
