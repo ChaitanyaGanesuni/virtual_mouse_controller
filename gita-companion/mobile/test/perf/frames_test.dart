@@ -75,8 +75,9 @@ void main() {
 
   double p95(List<double> xs) => xs[((xs.length - 1) * .95).round()];
 
-  // Debug-mode frame time on the CI machine: only catches gross regressions.
-  const budgetMs = 60.0;
+  // Debug-mode frame time is printed for information only: on shared CI
+  // machines it varies 2x from run to run, so it cannot be a pass/fail
+  // check. The rebuild count below is deterministic.
 
   testWidgets('chapter 18 (78 verses)', (tester) async {
     final (f, perFrame) = await scrollFrames(tester, '/chapters/18');
@@ -86,7 +87,6 @@ void main() {
     );
     // Only rows scrolling into view are built (measured ~55).
     expect(perFrame, lessThan(110));
-    expect(p95(f), lessThan(budgetMs));
   });
 
   testWidgets('reader, largest text size', (tester) async {
@@ -97,7 +97,6 @@ void main() {
     );
     // Only rows scrolling into view are built (measured ~22).
     expect(perFrame, lessThan(45));
-    expect(p95(f), lessThan(budgetMs));
   });
 
   testWidgets('search results for a question', (tester) async {
@@ -108,6 +107,5 @@ void main() {
     );
     // Only rows scrolling into view are built (measured ~40).
     expect(perFrame, lessThan(80));
-    expect(p95(f), lessThan(budgetMs));
   });
 }
