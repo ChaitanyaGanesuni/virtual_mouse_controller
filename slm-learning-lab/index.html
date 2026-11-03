@@ -1,0 +1,1020 @@
+<title>SLM Learning Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a lab bench. Header with progress, roadmap rail, then one stage at a time as a stack of instrument panels. */
+:root{
+  color-scheme: dark;
+  --bg:#091015; --panel:#0e171d; --panel2:#132029; --line:#1f303a; --line2:#2c4350;
+  --fg:#dbe7ed; --muted:#87a1ae; --dim:#5a7380;
+  /* data-flow colour code, used everywhere */
+  --tok:#f3b955;   /* text & tokens */
+  --emb:#52d3e2;   /* vectors / embeddings */
+  --hid:#a993ff;   /* model internals */
+  --out:#62e3a2;   /* probabilities / outputs */
+  --err:#ff7d93;   /* error / loss / gradient */
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:10px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:48px 48px;background-attachment:fixed;background-position:-1px -1px}
+body::before{content:"";position:fixed;inset:0;background:radial-gradient(ellipse at 50% -10%,rgba(82,211,226,.08),transparent 60%),linear-gradient(rgba(9,16,21,.82),rgba(9,16,21,.92));z-index:-1;pointer-events:none}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 64px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;margin:0;font-weight:700;letter-spacing:-.01em}
+h2{font-size:1.65rem} h3{font-size:1.1rem;font-weight:500}
+p{margin:0}
+.mono{font-family:var(--f-mono)}
+.muted{color:var(--muted)} .dim{color:var(--dim)}
+.c-tok{color:var(--tok)} .c-emb{color:var(--emb)} .c-hid{color:var(--hid)} .c-out{color:var(--out)} .c-err{color:var(--err)}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--emb);outline-offset:2px}
+.eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(9,16,21,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap;padding-block:12px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand h1{font-size:1.25rem}
+.brand .mono{font-size:.75rem;color:var(--muted)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.75rem;font-family:var(--f-mono);color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:0}
+.prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.segs{display:flex;gap:3px}
+.segs span{width:12px;height:8px;border-radius:2px;background:var(--line2)}
+.segs span.done{background:var(--out)} .segs span.open{background:var(--emb);opacity:.55}
+
+/* roadmap */
+.roadmap{padding-block:28px 8px}
+.roadmap header{display:flex;justify-content:space-between;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.rail{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:8px}
+.node{position:relative;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;min-height:84px;display:flex;flex-direction:column;gap:4px;transition:border-color .2s,transform .2s}
+.node:hover{border-color:var(--line2);transform:translateY(-1px)}
+.node .n{font-family:var(--f-mono);font-size:.7rem;color:var(--dim)}
+.node .t{font-weight:600;font-size:.88rem;line-height:1.3}
+.node .st{margin-top:auto;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase}
+.node.locked{opacity:.55}
+.node.locked .st{color:var(--dim)}
+.node.open .st{color:var(--emb)}
+.node.done .st{color:var(--out)}
+.node.done{border-color:rgba(98,227,162,.4)}
+.node.active{border-color:var(--emb);box-shadow:0 0 0 1px var(--emb),0 0 24px rgba(82,211,226,.15)}
+
+/* stage */
+.stagehead{padding-block:30px 10px;display:grid;gap:8px}
+.stagehead h2{font-size:clamp(1.7rem,4vw,2.5rem)}
+.stagehead p{max-width:68ch;color:var(--muted)}
+.subnav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 58px);z-index:15;display:flex;gap:6px;overflow-x:auto;padding:8px 0;background:linear-gradient(var(--bg) 70%,transparent)}
+.subnav button{white-space:nowrap;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.8rem;color:var(--muted)}
+.subnav button:hover{color:var(--fg);border-color:var(--line2)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;margin-top:18px;scroll-margin-top:120px}
+.phead{display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;margin-bottom:16px}
+.phead .tag{font-family:var(--f-mono);font-size:.7rem;color:var(--bg);background:var(--emb);padding:2px 7px;border-radius:4px;font-weight:500}
+.phead p{flex-basis:100%;color:var(--muted);max-width:72ch;font-size:.92rem}
+.grid2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px}
+@media (max-width:860px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.box{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:14px;min-width:0}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.88rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0}
+.btn{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:7px 13px;font-size:.85rem}
+.btn:hover{border-color:var(--emb)}
+.btn.primary{background:var(--emb);color:#06222a;border-color:var(--emb);font-weight:600}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.field{display:grid;gap:4px;font-size:.8rem;color:var(--muted)}
+.field input[type=text],.field select,input.txt{background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--fg);font-family:var(--f-mono);font-size:.88rem;width:100%}
+input[type=range]{accent-color:var(--emb);width:100%}
+.sim{display:inline-flex;gap:6px;align-items:center;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid}
+.sim.real{color:var(--out);border-color:rgba(98,227,162,.45)}
+.sim.illus{color:var(--tok);border-color:rgba(243,185,85,.45)}
+.formula{font-family:var(--f-mono);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:.88rem;overflow-x:auto;white-space:nowrap}
+
+/* hierarchy */
+.hier{display:flex}
+.ring{flex:1;border:1.5px solid;border-radius:16px;padding:30px 12px 12px;position:relative;cursor:pointer;transition:background .25s,box-shadow .25s;min-width:0}
+.ring > .rl{position:absolute;top:7px;left:12px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.05em;text-transform:uppercase}
+.ring[data-k=ai]{border-color:#3d5563;color:#9fb6c2}
+.ring[data-k=ml]{border-color:#41607a;color:#9ec3db}
+.ring[data-k=dl]{border-color:rgba(169,147,255,.55);color:var(--hid)}
+.ring[data-k=nlp]{border-color:rgba(82,211,226,.55);color:var(--emb)}
+.ring[data-k=lm]{border-color:rgba(243,185,85,.6);color:var(--tok)}
+.ring[data-k=slm],.ring[data-k=llm]{border-color:rgba(98,227,162,.6);color:var(--out);padding:12px;text-align:center;min-height:64px;display:grid;place-items:center}
+.ring[data-k=slm] .rl,.ring[data-k=llm] .rl{position:static}
+.ring.sel{background:rgba(82,211,226,.07);box-shadow:inset 0 0 0 1px currentColor}
+.ring.pulse{animation:pulse 1s ease}
+@keyframes pulse{0%{box-shadow:inset 0 0 0 0 currentColor}40%{box-shadow:inset 0 0 0 3px currentColor}100%{box-shadow:inset 0 0 0 0 transparent}}
+.nnchip{display:inline-block;margin:-4px 0 10px;font-family:var(--f-mono);font-size:.72rem;padding:3px 9px;border-radius:999px;border:1px dashed rgba(169,147,255,.6);color:var(--hid);background:transparent}
+.lmkids{display:flex;gap:10px}
+.lmkids .ring{font-size:.8rem}
+.detail h3{font-size:1.35rem;margin-bottom:6px}
+.detail .def{font-size:1rem;margin-bottom:12px}
+.detail .blk{border-top:1px solid var(--line);padding-top:10px;margin-top:10px;font-size:.9rem}
+.detail .blk b{display:block;font-family:var(--f-mono);font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:3px}
+.neuron{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 14px;margin-top:8px}
+.neuron .field{font-size:.75rem}
+.neuron svg{grid-column:1/-1;width:100%;height:auto}
+
+/* bars */
+.bars{display:grid;gap:5px}
+.bar{display:grid;grid-template-columns:92px minmax(0,1fr) 58px;gap:8px;align-items:center;font-family:var(--f-mono);font-size:.8rem}
+.bar .lbl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;color:var(--tok)}
+.bar .trk{height:16px;background:var(--bg);border-radius:4px;overflow:hidden}
+.bar .fill{height:100%;background:var(--out);border-radius:4px;transition:width .35s ease}
+.bar.pick .fill{background:linear-gradient(90deg,var(--out),#b6f7d3)}
+.bar .val{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-family:var(--f-mono);font-size:.82rem;padding:3px 8px;border-radius:6px;background:rgba(243,185,85,.12);color:var(--tok);border:1px solid rgba(243,185,85,.3)}
+.chip.gen{background:rgba(98,227,162,.12);color:var(--out);border-color:rgba(98,227,162,.35);animation:pop .35s ease}
+.chip.unk{background:rgba(255,125,147,.12);color:var(--err);border-color:rgba(255,125,147,.35)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.stat{display:grid;gap:0}
+.stat .v{font-family:var(--f-display);font-size:1.5rem;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .k{font-size:.72rem;color:var(--muted);font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.06em}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.note{font-size:.84rem;color:var(--muted);border-left:2px solid var(--line2);padding-left:10px}
+
+/* pipeline */
+.pipe{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:6px 2px 14px}
+.step{flex:1 0 108px;display:flex;flex-direction:column;gap:3px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 10px;position:relative;text-align:left;transition:all .25s}
+.step .sn{font-family:var(--f-mono);font-size:.66rem;color:var(--dim)}
+.step .sl{font-size:.82rem;font-weight:600;line-height:1.2}
+.step .ss{font-family:var(--f-mono);font-size:.68rem;color:var(--muted)}
+.step.on{border-color:var(--sc);box-shadow:0 0 0 1px var(--sc),0 0 22px color-mix(in srgb,var(--sc) 30%,transparent)}
+.step.past{border-color:color-mix(in srgb,var(--sc) 45%,var(--line))}
+.arrow{flex:0 0 22px;align-self:center;height:2px;background:var(--line2);position:relative;overflow:hidden}
+.arrow.flow::after{content:"";position:absolute;top:0;left:-40%;width:40%;height:100%;background:var(--emb);animation:flow .7s linear}
+@keyframes flow{to{left:100%}}
+.stage-out{min-height:220px}
+.vecs{display:grid;gap:4px;overflow-x:auto}
+.vrow{display:grid;grid-template-columns:86px repeat(8,minmax(34px,1fr));gap:3px;align-items:center;font-family:var(--f-mono);font-size:.68rem;min-width:390px}
+.vrow .lbl{color:var(--tok);text-align:right;padding-right:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cell{height:24px;border-radius:3px;display:grid;place-items:center;color:var(--fg);font-variant-numeric:tabular-nums;animation:pop .3s ease both}
+.vrow.last .lbl{color:var(--out)}
+.shape{display:inline-block;font-family:var(--f-mono);font-size:.78rem;padding:2px 8px;border-radius:5px;background:var(--bg);border:1px solid var(--line2);color:var(--emb)}
+table.tbl{border-collapse:collapse;font-family:var(--f-mono);font-size:.8rem}
+.tbl td,.tbl th{padding:4px 10px;border-bottom:1px solid var(--line);text-align:left;font-weight:400}
+.tbl th{color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em}
+.scroll{overflow-x:auto}
+
+/* size explorer */
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.ctrls .field b{color:var(--fg);font-family:var(--f-mono);font-weight:500}
+.big{font-family:var(--f-display);font-size:clamp(2.2rem,6vw,3.4rem);font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--hid)}
+.stackbar{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--bg)}
+.stackbar div{height:100%;transition:flex-grow .35s ease;min-width:2px}
+.verdict{display:inline-block;padding:5px 11px;border-radius:999px;font-size:.82rem;font-weight:600;border:1px solid}
+.towers{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:end}
+.tower{display:flex;flex-direction:column-reverse;align-items:center;gap:2px;min-height:230px;justify-content:flex-start}
+.tower .blk{height:9px;border-radius:2px;transition:width .35s ease}
+.tower .cap{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);text-align:center;margin-top:6px}
+.logchart{display:grid;gap:5px}
+.lc{display:grid;grid-template-columns:150px minmax(0,1fr) 62px;gap:8px;align-items:center;font-size:.78rem}
+.lc .nm{text-align:right;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lc .tr{height:14px;background:var(--bg);border-radius:3px;position:relative}
+.lc .fl{position:absolute;inset:0 auto 0 0;border-radius:3px;background:var(--line2)}
+.lc.you .fl{background:var(--hid)} .lc.you .nm{color:var(--hid);font-weight:600}
+.lc .vv{font-family:var(--f-mono);color:var(--muted);font-variant-numeric:tabular-nums}
+.ticks{display:grid;grid-template-columns:150px minmax(0,1fr) 62px;gap:8px;font-family:var(--f-mono);font-size:.65rem;color:var(--dim)}
+.ticks .tt{display:flex;justify-content:space-between}
+@media (max-width:560px){.lc,.ticks{grid-template-columns:96px minmax(0,1fr) 50px}.bar{grid-template-columns:70px minmax(0,1fr) 50px}}
+
+/* code */
+.code{background:#060b0e;border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.code .tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);overflow-x:auto}
+.code .tabs button{background:transparent;border:0;padding:8px 14px;font-family:var(--f-mono);font-size:.78rem;color:var(--muted);border-bottom:2px solid transparent}
+.code .tabs button.on{color:var(--fg);border-bottom-color:var(--emb)}
+.code .tabs .copy{margin-left:auto}
+.code pre{margin:0;padding:14px 16px;overflow-x:auto;font-family:var(--f-mono);font-size:.8rem;line-height:1.6}
+.code .cm{color:#5f7d8a;font-style:italic} .code .kw{color:var(--hid)} .code .st{color:var(--tok)} .code .nu{color:var(--emb)}
+
+/* checklist & quiz */
+.checks{display:grid;gap:6px;margin-top:10px}
+.ck{display:flex;gap:10px;align-items:center;font-size:.88rem}
+.ck .dot{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line2);display:grid;place-items:center;font-size:.7rem;flex:none}
+.ck.ok .dot{background:var(--out);border-color:var(--out);color:#05231a}
+.ck.no .dot{border-color:var(--err);color:var(--err)}
+.qs{display:grid;gap:14px}
+.q{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.q .qh{display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.q .qt{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:var(--bg);color:var(--muted)}
+.q .qp{margin-bottom:10px;max-width:75ch}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;margin-top:6px;cursor:pointer;font-size:.92rem}
+.opt:hover{border-color:var(--line2)}
+.opt input{margin-top:4px;accent-color:var(--emb)}
+.opt.right{border-color:var(--out);background:rgba(98,227,162,.07)}
+.opt.wrong{border-color:var(--err);background:rgba(255,125,147,.07)}
+.fb{margin-top:10px;padding:10px 12px;border-radius:8px;font-size:.88rem;display:none}
+.fb.show{display:block}
+.fb.ok{background:rgba(98,227,162,.08);border:1px solid rgba(98,227,162,.35)}
+.fb.bad{background:rgba(255,125,147,.08);border:1px solid rgba(255,125,147,.35)}
+.fb b{display:block;margin-bottom:2px}
+.result{margin-top:16px;padding:16px;border-radius:var(--r);border:1px solid var(--line2);display:none}
+.result.show{display:block}
+.locked-view .topics{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.locked-view .topics span{font-size:.8rem;padding:3px 9px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);color:var(--muted)}
+.lockicon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--panel2);border:1px solid var(--line2)}
+.spark{width:100%;height:auto;display:block}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><h1>SLM Lab</h1><span class="mono">small language model workbench</span></div>
+    <div class="legend" aria-label="Colour code for data flow">
+      <span><i style="background:var(--tok)"></i>text / tokens</span>
+      <span><i style="background:var(--emb)"></i>vectors</span>
+      <span><i style="background:var(--hid)"></i>model internals</span>
+      <span><i style="background:var(--out)"></i>probabilities</span>
+      <span><i style="background:var(--err)"></i>loss / error</span>
+    </div>
+    <div class="prog"><span id="progTxt">0 / 13 complete</span><div class="segs" id="segs"></div></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="roadmap">
+    <header>
+      <div><div class="eyebrow">The full journey</div><h2>SLM development roadmap</h2></div>
+      <div class="row"><span class="muted" style="font-size:.85rem">A stage unlocks when you score 4/5 or better on the previous stage's assessment.</span><button class="btn" id="resetBtn" type="button">Reset progress</button></div>
+    </header>
+    <div class="rail" id="rail"></div>
+    <div id="resetConfirm" class="row" hidden style="margin-top:10px"><span class="c-err" style="font-size:.88rem">Erase all progress and lock every stage again?</span><button class="btn" id="resetYes" type="button">Erase progress</button><button class="btn" id="resetNo" type="button">Keep it</button></div>
+  </section>
+
+  <!-- ====================== STAGE 0 ====================== -->
+  <section id="stage0">
+    <div class="stagehead">
+      <div class="eyebrow">Stage 00 · open</div>
+      <h2>What is a language model, really?</h2>
+      <p>By the end of this stage you'll know where SLMs sit in AI, you'll have watched a sentence travel through a model, and you'll know what decides whether a model fits on your CPU. Every panel here responds to what you do.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 0 sections">
+      <button type="button" data-go="p-map">1 · The AI map</button>
+      <button type="button" data-go="p-learn">2 · What learning means</button>
+      <button type="button" data-go="p-journey">3 · A sentence's journey</button>
+      <button type="button" data-go="p-size">4 · SLM vs LLM sizes</button>
+      <button type="button" data-go="p-code">5 · Code it (CPU)</button>
+      <button type="button" data-go="p-ex">6 · Exercise</button>
+      <button type="button" data-go="p-quiz">7 · Assessment</button>
+    </nav>
+
+    <!-- 1 MAP -->
+    <div class="panel" id="p-map">
+      <div class="phead"><span class="tag">01</span><h3>The AI map: from AI down to SLMs</h3>
+        <p>Each box sits inside the one around it. Click any layer to open it. "Walk it" steps from the outermost layer to the innermost.</p></div>
+      <div class="grid2">
+        <div>
+          <div class="hier">
+            <div class="ring" data-k="ai" role="button" tabindex="0"><span class="rl">Artificial Intelligence</span>
+              <div class="ring" data-k="ml" role="button" tabindex="0"><span class="rl">Machine Learning</span>
+                <div class="ring" data-k="dl" role="button" tabindex="0"><span class="rl">Deep Learning</span>
+                  <button class="nnchip" type="button" data-k="nn">built from: neural networks</button>
+                  <div class="ring" data-k="nlp" role="button" tabindex="0"><span class="rl">NLP (neural)</span>
+                    <div class="ring" data-k="lm" role="button" tabindex="0"><span class="rl">Language Models</span>
+                      <div class="lmkids">
+                        <div class="ring" data-k="slm" role="button" tabindex="0"><span class="rl">SLM<br><span class="dim" style="font-size:.65rem">≈1M – 10B params</span></span></div>
+                        <div class="ring" data-k="llm" role="button" tabindex="0"><span class="rl">LLM<br><span class="dim" style="font-size:.65rem">≈10B – 1T+ params</span></span></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row" style="margin-top:12px"><button class="btn" id="walkBtn" type="button">Walk it from outside in</button></div>
+        </div>
+        <div class="box detail" id="detail" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- 2 LEARN -->
+    <div class="panel" id="p-learn">
+      <div class="phead"><span class="tag">02</span><h3>What it means for a model to "learn language"</h3><span class="sim real">real computation · n-gram model</span>
+        <p>This is a real (tiny) language model, trained in your browser by counting which word follows which. Drag <b>training data</b> and watch it get better: its predictions sharpen and its loss on unseen sentences falls. A Transformer learns the same thing, P(next token | previous tokens), with gradient descent in place of counting.</p></div>
+      <div class="grid2">
+        <div class="box" style="display:grid;gap:14px">
+          <label class="field">Prompt (the model continues it)
+            <input class="txt" id="gPrompt" type="text" value="the customer asked about the" autocomplete="off"></label>
+          <div class="ctrls">
+            <label class="field">Training data used: <b id="gFracV">100%</b>
+              <input id="gFrac" type="range" min="1" max="10" value="10"></label>
+            <label class="field">Temperature T: <b id="gTempV">1.0</b>
+              <input id="gTemp" type="range" min="1" max="30" value="10"></label>
+          </div>
+          <div>
+            <div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="eyebrow">P(next word | context)</span><span class="mono dim" id="gSrc" style="font-size:.75rem"></span></div>
+            <div class="bars" id="gBars"></div>
+          </div>
+          <div class="row">
+            <button class="btn primary" id="gSample" type="button">Sample next word</button>
+            <button class="btn" id="gGreedy" type="button">Pick most likely</button>
+            <button class="btn" id="gRun" type="button">Generate a sentence</button>
+            <button class="btn" id="gReset" type="button">Reset prompt</button>
+          </div>
+          <div class="chips" id="gOut" aria-live="polite"></div>
+        </div>
+        <div style="display:grid;gap:14px;align-content:start">
+          <div class="stats">
+            <div class="stat"><span class="v c-tok" id="sSent">0</span><span class="k">sentences</span></div>
+            <div class="stat"><span class="v c-tok" id="sTok">0</span><span class="k">tokens seen</span></div>
+            <div class="stat"><span class="v c-emb" id="sVocab">0</span><span class="k">vocab size</span></div>
+            <div class="stat"><span class="v c-err" id="sPpl">0</span><span class="k">held-out perplexity</span></div>
+          </div>
+          <div class="box">
+            <div class="eyebrow" style="margin-bottom:6px">Learning curve · loss on 4 unseen sentences</div>
+            <svg class="spark" id="lossSvg" viewBox="0 0 320 130" role="img" aria-label="Held-out loss versus training data"></svg>
+            <p class="note" style="margin-top:6px">Cross-entropy L = −(1/N)·Σ log P(actual next word). Lower is better. Perplexity = e<sup>L</sup>, roughly "how many words the model is torn between".</p>
+          </div>
+          <div class="box">
+            <div class="eyebrow" style="margin-bottom:6px">What the model learned (raw counts after "<span id="cWord" class="c-tok"></span>")</div>
+            <div class="scroll"><table class="tbl" id="cTbl"></table></div>
+            <p class="note" style="margin-top:8px">P(w | prev) = count(prev, w) / count(prev). These counts are this model's parameters. An SLM keeps millions of learned weights in their place, which lets it generalise to contexts it never saw.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3 JOURNEY -->
+    <div class="panel" id="p-journey">
+      <div class="phead"><span class="tag">03</span><h3>A sentence's journey through a language model</h3><span class="sim illus">illustrative tensors · real shapes</span>
+        <p>Type a sentence and press Play. Each stop shows the actual numbers and the tensor shape at that point. Embeddings use small made-up values (d = 8) because a real model learns them during training. At the last stop, add the predicted word and run again: that loop is autoregressive generation.</p></div>
+      <div class="row" style="margin-bottom:12px">
+        <label class="field" style="flex:1 1 260px">Input sentence<input class="txt" id="jIn" type="text" value="the bank approved the" autocomplete="off"></label>
+        <div class="row" style="align-self:end"><button class="btn primary" id="jPlay" type="button">Play</button><button class="btn" id="jPrev" type="button">Back</button><button class="btn" id="jNext" type="button">Next</button></div>
+      </div>
+      <div class="pipe" id="pipe"></div>
+      <div class="box stage-out" id="jOut" aria-live="polite"></div>
+    </div>
+
+    <!-- 4 SIZE -->
+    <div class="panel" id="p-size">
+      <div class="phead"><span class="tag">04</span><h3>SLM vs LLM: same blueprint, different scale</h3><span class="sim real">exact parameter math · rough compute estimates</span>
+        <p>SLMs and LLMs are usually the same decoder-only Transformer. What differs is width (d<sub>model</sub>), depth (layers) and vocabulary. Move the controls and every number and drawing updates. Parameter counts use the exact GPT-2-style formula. Times are order-of-magnitude estimates for a typical laptop CPU.</p></div>
+      <div class="row" style="margin-bottom:12px" id="presets"></div>
+      <div class="ctrls box">
+        <label class="field">d_model (width): <b id="vD"></b><input id="cD" type="range" min="0" max="11" value="2"></label>
+        <label class="field">Layers L (depth): <b id="vL"></b><input id="cL" type="range" min="1" max="96" value="4"></label>
+        <label class="field">Attention heads: <b id="vH"></b><input id="cH" type="range" min="0" max="6" value="2"></label>
+        <label class="field">Vocabulary V: <b id="vV"></b><input id="cV" type="range" min="0" max="7" value="1"></label>
+        <label class="field">Context length C: <b id="vC"></b><input id="cC" type="range" min="0" max="6" value="1"></label>
+        <label class="field">Inference precision<select id="cP"><option value="4">FP32 · 4 bytes</option><option value="2" selected>FP16 / BF16 · 2 bytes</option><option value="1">INT8 · 1 byte</option><option value="0.5">INT4 · 0.5 byte</option></select></label>
+      </div>
+      <div class="grid2" style="margin-top:16px">
+        <div style="display:grid;gap:14px;align-content:start">
+          <div class="box">
+            <div class="eyebrow">Total parameters</div>
+            <div class="big" id="oN">0</div>
+            <div class="mono dim" id="oNexact" style="font-size:.8rem;margin-top:2px"></div>
+            <div style="margin-top:12px" class="stackbar" id="oStack"></div>
+            <div class="row" id="oStackLeg" style="margin-top:8px;gap:12px;font-size:.75rem;font-family:var(--f-mono)"></div>
+            <div style="margin-top:12px"><span class="verdict" id="oVerdict"></span></div>
+          </div>
+          <div class="box">
+            <dl class="kv" id="oKv"></dl>
+          </div>
+        </div>
+        <div style="display:grid;gap:14px;align-content:start">
+          <div class="box">
+            <div class="row" style="justify-content:space-between"><span class="eyebrow">Architecture side by side</span>
+              <label class="field" style="flex-direction:row;display:flex;gap:6px;align-items:center">compare with <select id="cmpSel" style="background:var(--bg);border:1px solid var(--line2);border-radius:6px;padding:3px 6px;color:var(--fg);font-size:.8rem"></select></label></div>
+            <div class="towers" style="margin-top:10px">
+              <div><div class="tower" id="t1"></div><div class="cap" id="t1c"></div></div>
+              <div><div class="tower" id="t2"></div><div class="cap" id="t2c"></div></div>
+            </div>
+            <p class="note" style="margin-top:8px">Block width ∝ d<sub>model</sub> (log scale). One bar = one Transformer block (<span class="c-hid">attention + feed-forward</span>), on top of the <span class="c-emb">embedding layer</span> and under the <span class="c-out">LM head</span>.</p>
+          </div>
+          <div class="box">
+            <div class="eyebrow" style="margin-bottom:8px">Where your model sits (log scale)</div>
+            <div class="logchart" id="logc"></div>
+          </div>
+        </div>
+      </div>
+      <p class="note" style="margin-top:14px">Try this: change the number of <b>heads</b>. The parameter count stays the same, because heads split d<sub>model</sub> into slices of size d<sub>model</sub>/H and add no new weights. Now double d<sub>model</sub>: the block parameters roughly quadruple, because they scale with d².</p>
+    </div>
+
+    <!-- 5 CODE -->
+    <div class="panel" id="p-code">
+      <div class="phead"><span class="tag">05</span><h3>Code it on your CPU</h3>
+        <p>Two short files to run locally. The first is the panel 02 model in pure Python. The second is the panel 04 calculator, checked against PyTorch. Neither needs a GPU.</p></div>
+      <div class="code">
+        <div class="tabs" id="codeTabs"></div>
+        <pre id="codePre"></pre>
+      </div>
+      <p class="note" style="margin-top:10px">Setup: <span class="mono">python -m venv slm && pip install torch --index-url https://download.pytorch.org/whl/cpu</span> (CPU-only build, about 200 MB).</p>
+    </div>
+
+    <!-- 6 EXERCISE -->
+    <div class="panel" id="p-ex">
+      <div class="phead"><span class="tag">06</span><h3>Hands-on exercise: design your first CPU-trainable SLM</h3>
+        <p>In panel 04, build the model you'll train later in this course. It must pass all five checks below. Then press "Check my design". Hint: start from the "CPU lab" preset and make it bigger without breaking the time budget.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <div class="checks" id="exChecks"></div>
+          <div class="row" style="margin-top:14px"><button class="btn primary" id="exBtn" type="button">Check my design</button><button class="btn" id="exGo" type="button">Go to the size explorer</button></div>
+          <p id="exMsg" class="note" style="margin-top:10px" aria-live="polite">Not checked yet.</p>
+        </div>
+        <div class="box">
+          <div class="eyebrow" style="margin-bottom:6px">Mini challenge in panel 02</div>
+          <p style="font-size:.92rem">Set training data to <b>30%</b> and type the prompt <span class="mono c-tok">the bank</span>. The model has never seen "bank", so it backs off to plain word frequencies. Move the slider back up to 100% and watch the prediction change. That is the gap more data fills, and it's why domain-specific data matters (Stage 7).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7 QUIZ -->
+    <div class="panel" id="p-quiz">
+      <div class="phead"><span class="tag">07</span><h3>Stage 0 assessment</h3>
+        <p>5 questions: conceptual, numerical and practical. Score 4/5 or better to unlock Stage 1. Each wrong answer comes with the misconception behind it. Every retry uses new numbers.</p></div>
+      <div class="qs" id="quiz"></div>
+      <div class="row" style="margin-top:14px"><button class="btn primary" id="qSubmit" type="button">Submit answers</button><button class="btn" id="qRetry" type="button" hidden>Retry with new numbers</button><span class="mono dim" id="qAttempts" style="font-size:.78rem"></span></div>
+      <div class="result" id="qResult" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- ====================== OTHER STAGES ====================== -->
+  <section id="stageOther" class="locked-view" hidden>
+    <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
+    <div class="panel">
+      <div class="row" style="gap:14px;align-items:flex-start;flex-wrap:nowrap">
+        <div class="lockicon" id="loIcon"></div>
+        <div style="min-width:0">
+          <h3 id="loState"></h3>
+          <p class="muted" id="loMsg" style="margin-top:4px;max-width:70ch"></p>
+          <div class="eyebrow" style="margin-top:16px">Concepts in this stage</div>
+          <div class="topics" id="loTopics"></div>
+          <div class="eyebrow" style="margin-top:16px">Instruments you'll use</div>
+          <div class="topics" id="loLabs"></div>
+          <div class="row" style="margin-top:18px"><button class="btn" id="loBack" type="button">Back to Stage 0</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------------- STAGES & PROGRESS ---------------- */
+const STAGES=[
+ {t:"Understanding Language Models",s:"Where SLMs live, how text flows through them, why size matters.",topics:["AI / ML / DL / NLP","Neural networks","Language models","SLM vs LLM","Generation","What learning means"],labs:["AI map","n-gram learner","Sentence journey","Size explorer"]},
+ {t:"Mathematical Foundations",s:"The linear algebra and calculus every SLM runs on.",topics:["Scalars → tensors","Matrix multiplication","Dot products","Probability distributions","Softmax","Derivatives & gradients","Chain rule","Gradient descent","Loss & cross-entropy","Backpropagation"],labs:["Matrix multiplication calculator","Vector & embedding plotter","Softmax calculator","Gradient descent animation","Backprop animation"]},
+ {t:"Text Processing & Tokenization",s:"How raw language becomes integers.",topics:["Normalization","Vocabulary","Character / word / subword","Byte Pair Encoding","Token IDs","Special tokens","Padding & truncation","Sequence length"],labs:["Live tokenizer","BPE merge stepper","Vocabulary size comparator","Unknown word handling"]},
+ {t:"Word Embeddings",s:"Turning token IDs into meaning-bearing vectors.",topics:["Embedding matrices","Embedding dimensions","Learned positions","Sinusoidal encoding","Semantic similarity","Cosine similarity"],labs:["Embedding explorer","2D projection","Positional encoding heatmap","Similarity calculator"]},
+ {t:"Neural Network Fundamentals",s:"Neurons, layers, activations, forward and backward passes.",topics:["Perceptrons","Layers","Weights & biases","ReLU / Sigmoid / Tanh","Forward propagation","Backpropagation"],labs:["Editable neural network","Forward/backward pass animator"]},
+ {t:"Transformer Architecture",s:"Self-attention, step by step, with real numbers.",topics:["RNN/LSTM limits","Encoder vs decoder","Q, K, V","Scaled dot-product attention","Causal masking","Multi-head attention","FFN","Residuals","LayerNorm","Context windows"],labs:["Clickable Transformer diagram","Self-attention visualizer (QKᵀ → mask → softmax → ·V)"]},
+ {t:"Building a Tiny Transformer",s:"A decoder-only model in PyTorch, one module at a time.",topics:["Dataset & tokenizer","Embeddings","Attention heads","Causal mask","FFN","Blocks","LM head"],labs:["Architecture code explorer with shapes & param counts"]},
+ {t:"Dataset Preparation",s:"From messy text to clean training sequences.",topics:["Train / val / test","Cleaning","Deduplication","Sequence creation","Data leakage","Domain data: banking, support, QA"],labs:["Data pipeline with your own text"]},
+ {t:"Training the SLM",s:"The full optimisation loop, visualised.",topics:["Initialization","Batches","Forward / loss / backward","Adam & AdamW","LR schedules","Gradient clipping","Over/underfitting"],labs:["Training simulator","Loss curves","Weight-update viewer"]},
+ {t:"Model Evaluation",s:"Measuring what the model actually learned.",topics:["Train/val/test loss","Perplexity","Why accuracy falls short","Generalization","Benchmarks","Hallucination"],labs:["Evaluation dashboard","Two-model comparison"]},
+ {t:"Fine-Tuning & Domain Adaptation",s:"Specialising a pretrained model, e.g. for banking.",topics:["Pretraining vs fine-tuning","SFT","Instruction tuning","LoRA / QLoRA","PEFT","Catastrophic forgetting"],labs:["LoRA rank visualizer","Before/after banking model"]},
+ {t:"Optimization & Quantization",s:"Making it small and fast enough for a CPU.",topics:["FP32 / FP16 / BF16","INT8 / INT4","Quantization","Pruning","Distillation","CPU inference"],labs:["Memory & precision calculator","Quantization error viewer"]},
+ {t:"Deployment & Production",s:"Serving your SLM behind an API.",topics:["Saving & loading","Inference pipeline","Temperature / Top-K / Top-P","FastAPI","Monitoring","Latency & throughput"],labs:["End-to-end architecture","Inference simulator"]}
+];
+let P={completed:[],attempts:0};
+try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(s));}catch(e){}
+const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
+const unlocked=i=>i===0||P.completed.includes(i-1);
+let current=0;
+function renderRail(){
+  const rail=$("#rail");rail.innerHTML="";
+  STAGES.forEach((s,i)=>{
+    const done=P.completed.includes(i),open=unlocked(i);
+    const b=document.createElement("button");b.type="button";
+    b.className="node "+(done?"done":open?"open":"locked")+(i===current?" active":"");
+    b.innerHTML=`<span class="n">STAGE ${String(i).padStart(2,"0")}</span><span class="t">${esc(s.t)}</span><span class="st">${done?"✓ complete":open?"● unlocked":"locked"}</span>`;
+    b.addEventListener("click",()=>showStage(i));
+    rail.appendChild(b);
+  });
+  const segs=$("#segs");segs.innerHTML="";
+  STAGES.forEach((_,i)=>{const sp=document.createElement("span");if(P.completed.includes(i))sp.className="done";else if(unlocked(i))sp.className="open";segs.appendChild(sp);});
+  $("#progTxt").textContent=`${P.completed.length} / ${STAGES.length} complete`;
+}
+const LOCK_SVG='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>';
+const OPEN_SVG='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>';
+function showStage(i){
+  current=i;renderRail();
+  if(i===0){$("#stage0").hidden=false;$("#stageOther").hidden=true;}
+  else{
+    const s=STAGES[i],open=unlocked(i);
+    $("#stage0").hidden=true;$("#stageOther").hidden=false;
+    $("#loEye").textContent=`Stage ${String(i).padStart(2,"0")} · ${open?"unlocked":"locked"}`;
+    $("#loTitle").textContent=s.t;$("#loSub").textContent=s.s;
+    $("#loIcon").innerHTML=open?OPEN_SVG:LOCK_SVG;$("#loIcon").style.color=open?"var(--out)":"var(--dim)";
+    $("#loState").textContent=open?"Unlocked. Ready to build.":"Locked";
+    $("#loMsg").textContent=open
+      ?`You passed Stage ${i-1}. Tell Claude in chat "Start Stage ${i}" and this stage's lab will be built into this page, with its own assessment.`
+      :`Pass the Stage ${i-1} assessment with 4/5 or better to unlock this stage.`;
+    $("#loTopics").innerHTML=s.topics.map(t=>`<span>${esc(t)}</span>`).join("");
+    $("#loLabs").innerHTML=s.labs.map(t=>`<span class="c-emb" style="border-color:rgba(82,211,226,.3)">${esc(t)}</span>`).join("");
+  }
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$("#loBack").addEventListener("click",()=>showStage(0));
+$("#resetBtn").addEventListener("click",()=>{$("#resetConfirm").hidden=false;});
+$("#resetNo").addEventListener("click",()=>{$("#resetConfirm").hidden=true;});
+$("#resetYes").addEventListener("click",()=>{P={completed:[],attempts:0};save();$("#resetConfirm").hidden=true;newQuiz();showStage(0);});
+$$(".subnav button").forEach(b=>b.addEventListener("click",()=>document.getElementById(b.dataset.go).scrollIntoView({behavior:"smooth"})));
+
+/* ---------------- 1. AI MAP ---------------- */
+const DET={
+ ai:{t:"Artificial Intelligence",c:"#9fb6c2",def:"Any technique that makes a computer do tasks we'd call intelligent: planning, perceiving, reasoning, using language.",ex:"A 1990s chess engine searching moves with hand-written rules is AI, and it learns nothing at all.",slm:"An SLM is one narrow kind of AI: it does language tasks, and it learned to do them from data.",k:"AI is the goal. The inner layers are ways of reaching it."},
+ ml:{t:"Machine Learning",c:"#9ec3db",def:"Instead of writing rules, you give the computer examples and it fits a function f(x; θ) whose parameters θ minimise a loss.",ex:"A spam filter that learns from 10,000 labelled emails which words signal spam.",slm:"Training an SLM is ML: θ = billions of numbers, x = text so far, f(x) = next-token probabilities.",k:"θ* = argmin_θ  (1/N) Σ loss( f(xᵢ; θ), yᵢ )"},
+ dl:{t:"Deep Learning",c:"var(--hid)",def:"ML that uses neural networks with many stacked layers. Each layer turns the representation from the layer below into a more abstract one.",ex:"Image models: early layers detect edges, middle layers shapes, late layers whole objects.",slm:"An SLM is a deep network: 4 to 40 Transformer blocks stacked on top of each other.",k:"h⁽ˡ⁺¹⁾ = σ( W⁽ˡ⁾ h⁽ˡ⁾ + b⁽ˡ⁾ )  repeated L times"},
+ nn:{t:"Neural Network (the machinery)",c:"var(--hid)",def:"A network of simple units. Each one computes a weighted sum of its inputs, adds a bias, and passes the result through a non-linear activation. Learning means adjusting the weights.",ex:"Move the sliders below. This single neuron is the atom every SLM is built from.",slm:"The feed-forward layers inside every Transformer block are exactly this, thousands of neurons wide.",k:"y = σ(w₁x₁ + w₂x₂ + b)",neuron:true},
+ nlp:{t:"Natural Language Processing",c:"var(--emb)",def:"Getting computers to read, understand and produce human language: translation, summarisation, Q&A, sentiment analysis.",ex:"Classifying a bank complaint as 'card fraud' or 'login problem'.",slm:"SLMs are today's general-purpose NLP engine: one model can handle many of these tasks.",k:"Strictly, NLP is older than deep learning (rules, then statistics). This map shows the modern neural part, which now dominates the field."},
+ lm:{t:"Language Model",c:"var(--tok)",def:"A model that assigns probabilities to text by predicting the next token from the ones before it. Generation applies that prediction over and over.",ex:"Given 'the bank approved the', it might give P(loan) = 0.62, P(account) = 0.21 …",slm:"This is the entire training objective of an SLM. Nothing else is required to learn grammar, facts and style.",k:"P(w₁…wₙ) = Π P(wₜ | w₁…wₜ₋₁)   (chain rule of probability)"},
+ slm:{t:"Small Language Model",c:"var(--out)",def:"A language model small enough to run on modest hardware, from about 1M parameters for teaching models up to a few billion. Usually it's specialised or heavily optimised.",ex:"A 100M–3B model running on a laptop or phone, answering banking FAQs offline.",slm:"Typical trade-off: less broad knowledge, but cheaper, faster, private, and easy to fine-tune for one domain.",k:"Memory ≈ params × bytes per param. 1B params in INT4 ≈ 0.5 GB."},
+ llm:{t:"Large Language Model",c:"var(--out)",def:"The same architecture scaled to tens or hundreds of billions of parameters and trillions of training tokens. Broad knowledge and strong reasoning, at a high cost.",ex:"A 70B model needs ~140 GB of memory in FP16, so it runs on multiple data-centre GPUs.",slm:"Often used as a teacher: a large model's outputs can train (distil) a small one. Covered in Stage 11.",k:"Training compute ≈ 6 · N · D FLOPs (N params, D tokens)"}
+};
+const ORDER=["ai","ml","dl","nn","nlp","lm","slm","llm"];
+let nState={x1:.8,x2:-.4,w1:1.2,w2:.7,b:.1,act:"sigmoid"};
+function actF(z,a){return a==="relu"?Math.max(0,z):a==="tanh"?Math.tanh(z):1/(1+Math.exp(-z));}
+function neuronHTML(){
+  return `<div class="neuron">
+    ${["x1","x2","w1","w2","b"].map(k=>`<label class="field">${k.replace("1","₁").replace("2","₂")} = <b class="mono" id="nv-${k}">${nState[k].toFixed(2)}</b><input type="range" id="n-${k}" min="-2" max="2" step="0.05" value="${nState[k]}"></label>`).join("")}
+    <label class="field">activation σ<select id="n-act" class="txt"><option value="sigmoid">sigmoid</option><option value="relu">ReLU</option><option value="tanh">tanh</option></select></label>
+    <svg viewBox="0 0 340 120" id="nSvg" aria-label="Single neuron diagram"></svg>
+  </div>`;
+}
+function drawNeuron(){
+  const s=nState,z=s.w1*s.x1+s.w2*s.x2+s.b,y=actF(z,s.act);
+  const lw=w=>1+Math.abs(w)*2.5, lc=w=>w>=0?"var(--emb)":"var(--err)";
+  $("#nSvg").innerHTML=`
+   <line x1="40" y1="30" x2="170" y2="60" style="stroke:${lc(s.w1)}" stroke-width="${lw(s.w1)}"/>
+   <line x1="40" y1="90" x2="170" y2="60" style="stroke:${lc(s.w2)}" stroke-width="${lw(s.w2)}"/>
+   <line x1="190" y1="60" x2="290" y2="60" style="stroke:var(--out)" stroke-width="2.5"/>
+   <circle cx="30" cy="30" r="16" style="fill:var(--panel);stroke:var(--tok)"/><text x="30" y="34" text-anchor="middle" font-size="11" style="fill:var(--tok)" font-family="IBM Plex Mono">${s.x1.toFixed(1)}</text>
+   <circle cx="30" cy="90" r="16" style="fill:var(--panel);stroke:var(--tok)"/><text x="30" y="94" text-anchor="middle" font-size="11" style="fill:var(--tok)" font-family="IBM Plex Mono">${s.x2.toFixed(1)}</text>
+   <circle cx="180" cy="60" r="22" style="fill:var(--panel);stroke:var(--hid)" stroke-width="2"/><text x="180" y="64" text-anchor="middle" font-size="11" style="fill:var(--hid)" font-family="IBM Plex Mono">Σ→σ</text>
+   <text x="100" y="32" font-size="10" style="fill:var(--muted)" font-family="IBM Plex Mono">w₁=${s.w1.toFixed(2)}</text>
+   <text x="100" y="98" font-size="10" style="fill:var(--muted)" font-family="IBM Plex Mono">w₂=${s.w2.toFixed(2)}</text>
+   <circle cx="305" cy="60" r="18" style="fill:var(--panel);stroke:var(--out)" stroke-width="2"/><text x="305" y="64" text-anchor="middle" font-size="11" style="fill:var(--out)" font-family="IBM Plex Mono">${y.toFixed(2)}</text>
+   <text x="170" y="112" text-anchor="middle" font-size="10.5" style="fill:var(--fg)" font-family="IBM Plex Mono">z = ${s.w1.toFixed(2)}·${s.x1.toFixed(2)} + ${s.w2.toFixed(2)}·${s.x2.toFixed(2)} + ${s.b.toFixed(2)} = ${z.toFixed(3)}  →  y = ${y.toFixed(3)}</text>`;
+}
+function selectLayer(k){
+  $$(".ring,.nnchip").forEach(r=>r.classList.toggle("sel",r.dataset.k===k));
+  const d=DET[k];
+  $("#detail").innerHTML=`<div class="eyebrow">Layer ${ORDER.indexOf(k)+1} of ${ORDER.length}</div><h3 style="color:${d.c}">${d.t}</h3><p class="def">${d.def}</p>
+   <div class="blk"><b>Concrete example</b>${d.ex}</div>
+   <div class="blk"><b>Inside an SLM</b>${d.slm}</div>
+   <div class="blk"><b>Key idea</b><div class="formula" style="white-space:normal">${esc(d.k)}</div></div>
+   ${d.neuron?neuronHTML():""}`;
+  if(d.neuron){
+    ["x1","x2","w1","w2","b"].forEach(key=>$("#n-"+key).addEventListener("input",e=>{nState[key]=+e.target.value;$("#nv-"+key).textContent=nState[key].toFixed(2);drawNeuron();}));
+    $("#n-act").value=nState.act;$("#n-act").addEventListener("change",e=>{nState.act=e.target.value;drawNeuron();});
+    drawNeuron();
+  }
+}
+$$(".ring").forEach(r=>{
+  const go=e=>{e.stopPropagation();selectLayer(r.dataset.k);};
+  r.addEventListener("click",go);
+  r.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();go(e);}});
+});
+$(".nnchip").addEventListener("click",e=>{e.stopPropagation();selectLayer("nn");});
+let walkT=null;
+$("#walkBtn").addEventListener("click",()=>{
+  clearInterval(walkT);let i=0;
+  const tick=()=>{const k=ORDER[i];selectLayer(k);const el=document.querySelector(`[data-k="${k}"]`);el.classList.remove("pulse");void el.offsetWidth;el.classList.add("pulse");i++;if(i>=ORDER.length)clearInterval(walkT);};
+  tick();walkT=setInterval(tick,2200);
+});
+selectLayer("lm");
+
+/* ---------------- 2. N-GRAM LEARNER ---------------- */
+const CORPUS=`the cat sat on the mat .
+the dog sat on the rug .
+the cat chased the mouse .
+the dog chased the cat .
+the mouse ran under the bed .
+the cat slept on the bed .
+the dog ran to the park .
+the cat ran to the bed .
+a language model predicts the next word .
+the model reads the text one token at a time .
+the model learns patterns from data .
+the model learns which word comes next .
+the next word depends on the previous words .
+more data helps the model learn .
+the text is split into tokens .
+each token becomes a vector .
+each vector flows through the model .
+the model outputs a probability for each word .
+we sample the next word from the probabilities .
+a small model can run on a laptop .
+a small model is fast .
+a large model is slow on a laptop .
+the customer opened a savings account .
+the customer asked about the loan .
+the customer asked about the account balance .
+the bank approved the loan .
+the bank rejected the loan .
+the bank approved the account .
+the bank charged a small fee .
+the customer paid the fee .
+the agent answered the customer .
+the agent helped the customer with the account .
+the account balance is low .
+the account balance is high .
+the loan has a low interest rate .
+the loan has a high interest rate .`.split("\n");
+const HELD=["the cat sat on the rug .","the customer asked about the fee .","the model predicts the next token .","the bank approved the savings account ."];
+const tokenize=t=>t.toLowerCase().replace(/([.,!?;:])/g," $1 ").replace(/[^a-z0-9.,!?;:'\s-]/g," ").split(/\s+/).filter(Boolean);
+const FULLVOCAB=[...new Set(CORPUS.flatMap(tokenize))].sort();
+function train(sents){
+  const uni=new Map(),bi=new Map(),tri=new Map();let ntok=0;
+  const inc=(m,k,w)=>{if(!m.has(k))m.set(k,new Map());const mm=m.get(k);mm.set(w,(mm.get(w)||0)+1);};
+  sents.forEach(s=>{const t=["<s>","<s>",...tokenize(s)];
+    for(let i=2;i<t.length;i++){uni.set(t[i],(uni.get(t[i])||0)+1);inc(bi,t[i-1],t[i]);inc(tri,t[i-2]+" "+t[i-1],t[i]);ntok++;}});
+  return {uni,bi,tri,ntok,nsent:sents.length,vocab:new Set(uni.keys())};
+}
+function nextCounts(m,ctx){
+  const c=["<s>","<s>",...ctx];const a=c[c.length-2],b=c[c.length-1];
+  if(m.tri.has(a+" "+b))return {src:`trigram: count("${a} ${b}", w)`,counts:m.tri.get(a+" "+b),key:b};
+  if(m.bi.has(b))return {src:`backed off to bigram: count("${b}", w)`,counts:m.bi.get(b),key:b};
+  return {src:`"${b}" never seen → backed off to word frequency`,counts:m.uni,key:b,unk:true};
+}
+function distFrom(counts,T){
+  const arr=[...counts.entries()].map(([w,c])=>({w,c,l:Math.log(c)/T}));
+  const mx=Math.max(...arr.map(a=>a.l));let z=0;arr.forEach(a=>{a.e=Math.exp(a.l-mx);z+=a.e;});
+  arr.forEach(a=>a.p=a.e/z);arr.sort((x,y)=>y.p-x.p);return arr;
+}
+function sample(arr){let r=Math.random(),acc=0;for(const a of arr){acc+=a.p;if(r<=acc)return a;}return arr[arr.length-1];}
+const trainSet=CORPUS;
+function heldLoss(m){ // add-k smoothed bigram
+  const k=0.1,V=FULLVOCAB.length+1;let nll=0,n=0;
+  HELD.forEach(s=>{const t=["<s>",...tokenize(s)];for(let i=1;i<t.length;i++){const row=m.bi.get(t[i-1]);let tot=0,c=0;if(row){row.forEach(v=>tot+=v);c=row.get(t[i])||0;}nll+=-Math.log((c+k)/(tot+k*V));n++;}});
+  return nll/n;
+}
+const CURVE=[];for(let f=1;f<=10;f++){CURVE.push(heldLoss(train(trainSet.slice(0,Math.max(1,Math.round(trainSet.length*f/10))))));}
+let gModel=null,gGen=[],gLast=null;
+function gTrain(){const f=+$("#gFrac").value;$("#gFracV").textContent=f*10+"%";gModel=train(trainSet.slice(0,Math.max(1,Math.round(trainSet.length*f/10))));
+  $("#sSent").textContent=gModel.nsent;$("#sTok").textContent=gModel.ntok;$("#sVocab").textContent=gModel.vocab.size;$("#sPpl").textContent=Math.exp(CURVE[f-1]).toFixed(1);drawCurve(f);}
+function drawCurve(f){
+  const W=320,H=130,l=36,r=10,t=10,b=24;const mx=Math.ceil(Math.max(...CURVE)),mn=Math.floor(Math.min(...CURVE));
+  const X=i=>l+(i/(CURVE.length-1))*(W-l-r),Y=v=>t+(mx-v)/(mx-mn||1)*(H-t-b);
+  const pts=CURVE.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  let g="";for(let v=mn;v<=mx;v++){g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l-6}" y="${Y(v)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text>`;}
+  [0,4,9].forEach(i=>g+=`<text x="${X(i)}" y="${H-8}" text-anchor="middle" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${(i+1)*10}%</text>`);
+  const i=f-1;
+  $("#lossSvg").innerHTML=g+`<polygon points="${X(0)},${H-b} ${pts} ${X(CURVE.length-1)},${H-b}" style="fill:var(--err);opacity:.1"/><polyline points="${pts}" style="fill:none;stroke:var(--err)" stroke-width="2"/>
+   <circle cx="${X(i)}" cy="${Y(CURVE[i])}" r="5" style="fill:var(--err);stroke:var(--bg)" stroke-width="2"/>
+   <text x="${Math.min(X(i)+8,W-60)}" y="${Y(CURVE[i])-8}" font-size="10" style="fill:var(--fg)" font-family="IBM Plex Mono">L=${CURVE[i].toFixed(2)}</text>
+   <text x="${l}" y="${t-1}" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">loss (nats)</text>`;
+}
+function gCtx(){return [...tokenize($("#gPrompt").value),...gGen];}
+function gRender(){
+  const T=+$("#gTemp").value/10;$("#gTempV").textContent=T.toFixed(1);
+  const ctx=gCtx();const nc=nextCounts(gModel,ctx);const d=distFrom(nc.counts,T);gLast=d;
+  $("#gSrc").textContent=nc.src;$("#gSrc").style.color=nc.unk?"var(--err)":"var(--dim)";
+  $("#gBars").innerHTML=d.slice(0,8).map(a=>`<div class="bar"><span class="lbl">${esc(a.w)}</span><span class="trk"><span class="fill" style="display:block;width:${(a.p*100).toFixed(1)}%"></span></span><span class="val">${(a.p*100).toFixed(1)}%</span></div>`).join("")+(d.length>8?`<div class="mono dim" style="font-size:.72rem;padding-left:100px">+ ${d.length-8} more words share ${(d.slice(8).reduce((s,a)=>s+a.p,0)*100).toFixed(1)}%</div>`:"");
+  const pt=tokenize($("#gPrompt").value);
+  $("#gOut").innerHTML=pt.map(w=>`<span class="chip${gModel.vocab.has(w)?"":" unk"}" title="${gModel.vocab.has(w)?"seen in training":"never seen in training"}">${esc(w)}</span>`).join("")+gGen.map(w=>`<span class="chip gen">${esc(w)}</span>`).join("");
+  const key=nc.key;$("#cWord").textContent=key;
+  const rows=[...nc.counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);const tot=[...nc.counts.values()].reduce((a,b)=>a+b,0);
+  $("#cTbl").innerHTML=`<tr><th>next word w</th><th>count</th><th>count / ${tot}</th></tr>`+rows.map(([w,c])=>`<tr><td class="c-tok">${esc(w)}</td><td>${c}</td><td class="c-out">${(c/tot).toFixed(3)}</td></tr>`).join("");
+}
+function gStep(greedy){if(!gLast||!gLast.length)return false;const a=greedy?gLast[0]:sample(gLast);gGen.push(a.w);gRender();return a.w!==".";}
+$("#gSample").addEventListener("click",()=>gStep(false));
+$("#gGreedy").addEventListener("click",()=>gStep(true));
+let gTimer=null;
+$("#gRun").addEventListener("click",()=>{clearInterval(gTimer);let n=0;gTimer=setInterval(()=>{if(!gStep(false)||++n>=14)clearInterval(gTimer);},260);});
+$("#gReset").addEventListener("click",()=>{clearInterval(gTimer);gGen=[];gRender();});
+$("#gPrompt").addEventListener("input",()=>{gGen=[];gRender();});
+$("#gFrac").addEventListener("input",()=>{gTrain();gRender();});
+$("#gTemp").addEventListener("input",gRender);
+gTrain();gRender();
+
+/* ---------------- 3. JOURNEY ---------------- */
+const FULL=train(CORPUS);
+const SPECIAL=["<pad>","<unk>","<s>"];
+const VOCAB=[...SPECIAL,...FULLVOCAB];const ID=new Map(VOCAB.map((w,i)=>[w,i]));
+const D=8;
+function hashSeed(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+// illustrative embeddings: similar-role words share a base direction so you can spot structure
+const GROUPS={animal:["cat","dog","mouse"],finance:["bank","loan","account","fee","savings","balance","interest","rate"],person:["customer","agent"],ml:["model","token","tokens","vector","text","data","word","words"],func:["the","a","on","to","of","about","with","from","into","at","each"]};
+function emb(w){
+  const r=mulberry(hashSeed(w));let v=Array.from({length:D},()=>(r()*2-1)*.45);
+  for(const [g,ws] of Object.entries(GROUPS)){if(ws.includes(w)){const gr=mulberry(hashSeed("G"+g));v=v.map(x=>x+(gr()*2-1)*.8);}}
+  return v.map(x=>Math.max(-1.5,Math.min(1.5,x)));
+}
+function pe(pos){return Array.from({length:D},(_,i)=>{const k=Math.floor(i/2),f=pos/Math.pow(10000,2*k/D);return i%2===0?Math.sin(f):Math.cos(f);});}
+const cellCol=v=>{const a=Math.min(1,Math.abs(v)/1.5)*.85+.08;return v>=0?`rgba(82,211,226,${a.toFixed(2)})`:`rgba(255,125,147,${a.toFixed(2)})`;};
+function vecRows(rows,lastHi){return `<div class="vecs">${rows.map((r,ri)=>`<div class="vrow${lastHi&&ri===rows.length-1?" last":""}"><span class="lbl">${esc(r.l)}</span>${r.v.map((x,i)=>`<span class="cell" style="background:${cellCol(x)};animation-delay:${(ri*8+i)*12}ms" title="dim ${i}: ${x.toFixed(4)}">${x.toFixed(2)}</span>`).join("")}</div>`).join("")}</div>`;}
+const STEPS=[
+ {l:"Raw text",c:"var(--tok)",s:"string"},
+ {l:"Tokens",c:"var(--tok)",s:"[T]"},
+ {l:"Token IDs",c:"var(--tok)",s:"[T] int"},
+ {l:"Embedding lookup",c:"var(--emb)",s:"[T, d]"},
+ {l:"+ Positions",c:"var(--emb)",s:"[T, d]"},
+ {l:"Transformer ×L",c:"var(--hid)",s:"[T, d]"},
+ {l:"LM head → logits",c:"var(--out)",s:"[V]"},
+ {l:"Softmax → token",c:"var(--out)",s:"[V] → 1"}
+];
+let jStep=0,jTimer=null,jTemp=1;
+$("#pipe").innerHTML=STEPS.map((s,i)=>(i?`<span class="arrow" id="ar${i}"></span>`:"")+`<button type="button" class="step" data-i="${i}" style="--sc:${s.c}"><span class="sn">${i+1}</span><span class="sl" style="color:${s.c}">${s.l}</span><span class="ss">${s.s}</span></button>`).join("");
+$$(".step").forEach(b=>b.addEventListener("click",()=>{stopPlay();setStep(+b.dataset.i);}));
+function jData(){
+  const toks=tokenize($("#jIn").value).slice(-12);
+  const ids=toks.map(t=>ID.has(t)?ID.get(t):1);
+  const E=toks.map(t=>ID.has(t)?emb(t):emb("<unk>"));
+  const X=E.map((v,p)=>v.map((x,i)=>x+pe(p)[i]));
+  const H=X.map((_,t)=>{const m=Array(D).fill(0);for(let j=0;j<=t;j++)X[j].forEach((x,i)=>m[i]+=x/(t+1));return m.map((x,i)=>Math.tanh(1.3*x+.3*X[t][i]));});
+  const nc=nextCounts(FULL,toks);const tot=[...nc.counts.values()].reduce((a,b)=>a+b,0);
+  const logits=FULLVOCAB.map(w=>({w,z:Math.log(((nc.counts.get(w)||0)+0.02)/(tot+0.02*FULLVOCAB.length))+3}));
+  return {toks,ids,E,X,H,logits,src:nc.src};
+}
+function setStep(i){
+  jStep=Math.max(0,Math.min(STEPS.length-1,i));
+  $$(".step").forEach((b,k)=>{b.classList.toggle("on",k===jStep);b.classList.toggle("past",k<jStep);});
+  const ar=$("#ar"+jStep);if(ar){ar.classList.remove("flow");void ar.offsetWidth;ar.classList.add("flow");}
+  const d=jData(),T=d.toks.length,o=$("#jOut");
+  if(!T){o.innerHTML='<p class="muted">Type a sentence above to start.</p>';return;}
+  const head=(txt,shape)=>`<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>${txt}</h3><span class="shape">shape ${shape}</span></div>`;
+  let h="";
+  switch(jStep){
+   case 0:h=head("1 · Raw text arrives","str")+`<div class="formula c-tok" style="font-size:1.05rem">"${esc($("#jIn").value)}"</div><p class="note" style="margin-top:10px">To a computer this is only a sequence of bytes. A neural network can do arithmetic on numbers but can't read characters, so every following step exists to turn this text into numbers and back again.</p>`;break;
+   case 1:h=head("2 · Tokenizer splits text into tokens",`[T] , T = ${T}`)+`<div class="chips">${d.toks.map(t=>`<span class="chip${ID.has(t)?"":" unk"}">${esc(t)}</span>`).join("")}</div><p class="note" style="margin-top:10px">This demo uses a <b>word</b> tokenizer: lowercase, then split on spaces and punctuation. Real SLMs use <b>subword</b> tokenizers (BPE, Stage 2), so a rare word like "approvals" becomes "approv" + "als" and nothing is ever unknown. Red chips are words outside this model's vocabulary.</p>`;break;
+   case 2:h=head("3 · Vocabulary lookup → integer IDs",`[T] = [${T}]`)+`<div class="scroll"><table class="tbl"><tr><th>position</th>${d.toks.map((_,i)=>`<td class="dim">${i}</td>`).join("")}</tr><tr><th>token</th>${d.toks.map(t=>`<td class="c-tok">${esc(t)}</td>`).join("")}</tr><tr><th>id</th>${d.ids.map(x=>`<td class="${x===1?"c-err":"c-emb"}">${x}</td>`).join("")}</tr></table></div><p class="note" style="margin-top:10px">Vocabulary V = ${VOCAB.length} entries, with ids 0–2 reserved for special tokens: <span class="mono">&lt;pad&gt;=0, &lt;unk&gt;=1, &lt;s&gt;=2</span>. The model actually receives the tensor <span class="mono c-emb">[${d.ids.join(", ")}]</span>.</p>`;break;
+   case 3:h=head("4 · Each ID selects one row of the embedding matrix E",`[T, d] = [${T}, ${D}]`)+vecRows(d.toks.map((t,i)=>({l:`${t} #${d.ids[i]}`,v:d.E[i]})))+`<p class="note" style="margin-top:10px">E has shape [V, d] = [${VOCAB.length}, ${D}], which is ${VOCAB.length*D} learnable numbers. Looking up id k just copies row k. In this illustration words with similar roles (cat/dog, bank/loan) were given similar rows, so their colour patterns match. Training produces that kind of structure on its own. <span class="c-emb">Cyan</span> = positive, <span class="c-err">rose</span> = negative.</p>`;break;
+   case 4:h=head("5 · Add positional encoding so order matters",`[T, d] = [${T}, ${D}]`)+`<div class="grid2" style="gap:12px"><div><div class="eyebrow" style="margin-bottom:4px">PE(pos): sinusoids</div>${vecRows(d.toks.map((t,i)=>({l:"pos "+i,v:pe(i)})))}</div><div><div class="eyebrow" style="margin-bottom:4px">x = E[id] + PE(pos)</div>${vecRows(d.toks.map((t,i)=>({l:t,v:d.X[i]})))}</div></div><p class="note" style="margin-top:10px">PE(pos, 2i) = sin(pos / 10000^(2i/d)), PE(pos, 2i+1) = cos(…). Without this, "bank approved the loan" and "loan approved the bank" would look identical to attention. The same word now gets a different vector at each position: compare the two "the" rows.</p>`;break;
+   case 5:h=head("6 · L Transformer blocks mix information across tokens",`[T, d] → [T, d]`)+vecRows(d.toks.map((t,i)=>({l:(i===T-1?"→ ":"")+t,v:d.H[i]})),true)+`<p class="note" style="margin-top:10px"><span class="sim illus">simplified</span> Each row here is a causal average of itself and the earlier rows, passed through tanh. A real block does this with <b class="c-hid">self-attention</b> (learned weights decide which earlier tokens matter, Stage 5) and then a <b class="c-hid">feed-forward network</b>, with residual connections and LayerNorm. The shape never changes: [T, d] in, [T, d] out. Only the <span class="c-out">last row</span> predicts the next token.</p>`;break;
+   case 6:{const top=[...d.logits].sort((a,b)=>b.z-a.z).slice(0,8);const mx=top[0].z,mn=Math.min(...d.logits.map(a=>a.z));
+     h=head("7 · LM head: last vector → one score (logit) per vocabulary word",`[d] · [d, V] → [V] = [${FULLVOCAB.length}]`)+`<div class="bars">${top.map(a=>`<div class="bar"><span class="lbl">${esc(a.w)}</span><span class="trk"><span class="fill" style="display:block;width:${((a.z-mn)/(mx-mn)*100).toFixed(1)}%;background:var(--hid)"></span></span><span class="val">${a.z.toFixed(2)}</span></div>`).join("")}</div><p class="note" style="margin-top:10px">logits = h<sub>T</sub> · W<sub>out</sub>ᵀ. Each of the ${FULLVOCAB.length} words gets one raw score, and higher means more likely. <span class="sim real">real</span> In this demo the scores are the log-probabilities from the panel 02 model (${esc(d.src)}), so the predictions are meaningful.</p>`;break;}
+   case 7:{const z=d.logits.map(a=>a.z/jTemp),mx=Math.max(...z);let s=0;const e=z.map(v=>{const x=Math.exp(v-mx);s+=x;return x;});const pr=d.logits.map((a,i)=>({w:a.w,p:e[i]/s})).sort((a,b)=>b.p-a.p);
+     const pick=sample(pr);
+     h=head("8 · Softmax turns logits into probabilities, then one token is sampled",`[V] → 1 token`)+`<div class="row" style="margin-bottom:10px;gap:16px"><label class="field" style="flex:1 1 200px">Temperature T = <b id="jTv">${jTemp.toFixed(1)}</b><input type="range" id="jT" min="1" max="30" value="${Math.round(jTemp*10)}"></label><div class="formula" style="flex:1 1 260px">p<sub>i</sub> = e<sup>z<sub>i</sub>/T</sup> / Σ<sub>j</sub> e<sup>z<sub>j</sub>/T</sup></div></div>
+     <div class="bars">${pr.slice(0,6).map(a=>`<div class="bar${a.w===pick.w?" pick":""}"><span class="lbl">${esc(a.w)}</span><span class="trk"><span class="fill" style="display:block;width:${(a.p*100).toFixed(1)}%"></span></span><span class="val">${(a.p*100).toFixed(1)}%</span></div>`).join("")}</div>
+     <div class="row" style="margin-top:12px"><span>Sampled: <span class="chip gen">${esc(pick.w)}</span></span><button class="btn primary" id="jAppend" type="button">Append "${esc(pick.w)}" and run again</button><button class="btn" id="jResample" type="button">Sample again</button></div>
+     <p class="note" style="margin-top:10px">Probabilities sum to 1 over all ${FULLVOCAB.length} words. A low T makes the top choice dominate (more predictable); a high T flattens the distribution (more varied). Appending the sampled token and repeating is <b>autoregressive generation</b>, the only way any GPT-style model writes text.</p>`;
+     o.innerHTML=h;
+     $("#jT").addEventListener("input",e=>{jTemp=+e.target.value/10;setStep(7);});
+     $("#jAppend").addEventListener("click",()=>{$("#jIn").value=$("#jIn").value.trim()+" "+pick.w;setStep(0);play();});
+     $("#jResample").addEventListener("click",()=>setStep(7));
+     return;}
+  }
+  o.innerHTML=h;
+}
+function stopPlay(){clearInterval(jTimer);jTimer=null;$("#jPlay").textContent="Play";}
+function play(){stopPlay();$("#jPlay").textContent="Pause";setStep(0);jTimer=setInterval(()=>{if(jStep>=STEPS.length-1){stopPlay();return;}setStep(jStep+1);},1700);}
+$("#jPlay").addEventListener("click",()=>{if(jTimer)stopPlay();else{if(jStep>=STEPS.length-1)jStep=-1;$("#jPlay").textContent="Pause";setStep(jStep+1);jTimer=setInterval(()=>{if(jStep>=STEPS.length-1){stopPlay();return;}setStep(jStep+1);},1700);}});
+$("#jNext").addEventListener("click",()=>{stopPlay();setStep(jStep+1);});
+$("#jPrev").addEventListener("click",()=>{stopPlay();setStep(jStep-1);});
+$("#jIn").addEventListener("input",()=>setStep(jStep));
+setStep(3);
+
+/* ---------------- 4. SIZE EXPLORER ---------------- */
+const DS=[64,128,256,384,512,768,1024,2048,3072,4096,5120,8192];
+const HS=[1,2,4,8,16,32,64];
+const VS=[256,512,2048,8000,16000,32000,50257,128000];
+const CS=[64,128,512,1024,2048,4096,8192];
+const PRESETS=[
+ {n:"CPU lab (~0.9M)",d:1,L:4,h:2,v:1,c:1},
+ {n:"Small SLM (~30M)",d:3,L:6,h:3,v:3,c:2},
+ {n:"GPT-2-small class (124M)",d:5,L:12,h:4,v:6,c:3},
+ {n:"1B-class SLM",d:7,L:16,h:5,v:5,c:4},
+ {n:"7B-class LLM",d:9,L:32,h:6,v:5,c:5},
+ {n:"65B-class LLM",d:11,L:80,h:6,v:5,c:5}
+];
+function params(V,d,L,C){const f=4*d;const emb=V*d,pos=C*d,attn=4*d*d+4*d,ffn=2*d*f+f+d,norm=4*d;return {emb,pos,attn:L*attn,ffn:L*ffn,norm:L*norm+2*d,total:emb+pos+L*(attn+ffn+norm)+2*d};}
+const fmtN=n=>n>=1e12?(n/1e12).toFixed(2)+"T":n>=1e9?(n/1e9).toFixed(2)+"B":n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toFixed(1)+"K":String(Math.round(n));
+const fmtB=b=>b>=1e12?(b/1e12).toFixed(1)+" TB":b>=1e9?(b/1e9).toFixed(2)+" GB":b>=1e6?(b/1e6).toFixed(1)+" MB":(b/1e3).toFixed(1)+" KB";
+const fmtT=s=>s<1?"< 1 s":s<90?s.toFixed(0)+" s":s<5400?(s/60).toFixed(0)+" min":s<172800?(s/3600).toFixed(1)+" h":s<3.15e7*2?(s/86400).toFixed(0)+" days":(s/3.15e7).toFixed(0)+" years";
+const CPU_FLOPS=2e11, GPU_FLOPS=1.5e14, CPU_BW=3e10;
+function cfg(){
+  const d=DS[+$("#cD").value];let hi=+$("#cH").value;while(d%HS[hi]!==0&&hi>0)hi--;
+  return {d,L:+$("#cL").value,H:HS[hi],V:VS[+$("#cV").value],C:CS[+$("#cC").value],bytes:+$("#cP").value};
+}
+function tower(el,cap,c,label){
+  const p=params(c.V,c.d,c.L,c.C);const w=Math.max(14,Math.min(100,(Math.log2(c.d)-5)/(13-5)*100));
+  const show=Math.min(c.L,20);
+  let h=`<div class="blk" style="width:${w}%;background:var(--emb);height:12px"></div>`;
+  for(let i=0;i<show;i++)h+=`<div class="blk" style="width:${w}%;background:var(--hid);opacity:${.55+.45*(i%2)}"></div>`;
+  if(c.L>show)h+=`<div class="mono dim" style="font-size:.65rem">+ ${c.L-show} more blocks</div>`;
+  h+=`<div class="blk" style="width:${w}%;background:var(--out);height:12px"></div>`;
+  el.innerHTML=h;cap.innerHTML=`<b style="color:var(--fg)">${esc(label)}</b><br>${fmtN(p.total)} · d=${c.d} · L=${c.L}`;
+}
+$("#presets").innerHTML='<span class="eyebrow">Presets</span>'+PRESETS.map((p,i)=>`<button type="button" class="btn" data-p="${i}">${esc(p.n)}</button>`).join("");
+$$("#presets button").forEach(b=>b.addEventListener("click",()=>{const p=PRESETS[+b.dataset.p];$("#cD").value=p.d;$("#cL").value=p.L;$("#cH").value=p.h;$("#cV").value=p.v;$("#cC").value=p.c;renderSize();}));
+$("#cmpSel").innerHTML=PRESETS.map((p,i)=>`<option value="${i}">${esc(p.n)}</option>`).join("");$("#cmpSel").value="4";
+function renderSize(){
+  const c=cfg();const p=params(c.V,c.d,c.L,c.C);const N=p.total;
+  $("#vD").textContent=c.d;$("#vL").textContent=c.L;$("#vH").textContent=`${c.H} (head dim ${c.d/c.H})`;$("#vV").textContent=c.V.toLocaleString();$("#vC").textContent=c.C;
+  $("#oN").textContent=fmtN(N);$("#oNexact").textContent=N.toLocaleString()+" parameters";
+  const parts=[["token emb",p.emb,"var(--emb)"],["positions",p.pos,"#2f8f9a"],["attention",p.attn,"var(--hid)"],["feed-forward",p.ffn,"#7a63d9"],["norms",p.norm,"var(--muted)"]];
+  $("#oStack").innerHTML=parts.map(([n,v,col])=>`<div style="flex-grow:${v};background:${col}" title="${n}: ${fmtN(v)}"></div>`).join("");
+  $("#oStackLeg").innerHTML=parts.map(([n,v,col])=>`<span><i style="display:inline-block;width:8px;height:8px;border-radius:2px;background:${col};margin-right:4px"></i>${n} ${(v/N*100).toFixed(0)}%</span>`).join("");
+  const D_tok=20*N,flops=6*N*D_tok,cpuT=flops/CPU_FLOPS,gpuT=flops/GPU_FLOPS;
+  const wb=N*c.bytes,tps=Math.min(CPU_BW/wb,CPU_FLOPS/(2*N));
+  const kv=2*c.L*c.C*c.d*c.bytes;
+  const v=$("#oVerdict");
+  if(cpuT<48*3600){v.textContent="Trainable from scratch on a CPU";v.style.color="var(--out)";}
+  else if(N*4<12e9){v.textContent="Runs on a CPU; pretraining needs GPUs";v.style.color="var(--emb)";}
+  else if(N*0.5<12e9){v.textContent="CPU inference only if quantized; training needs a GPU cluster";v.style.color="var(--tok)";}
+  else {v.textContent="Needs multi-GPU servers even for inference";v.style.color="var(--err)";}
+  v.style.borderColor="currentColor";
+  $("#oKv").innerHTML=`
+   <dt>Weights in FP32 / FP16 / INT4</dt><dd class="mono">${fmtB(N*4)} / ${fmtB(N*2)} / ${fmtB(N*.5)}</dd>
+   <dt>Training memory (AdamW)</dt><dd class="mono">≈ ${fmtB(N*16)} <span class="dim">+ activations</span></dd>
+   <dt>KV cache, 1 full context</dt><dd class="mono">${fmtB(kv)}</dd>
+   <dt>Compute-optimal data (20 tokens/param)</dt><dd class="mono">${fmtN(D_tok)} tokens</dd>
+   <dt>Training compute ≈ 6·N·D</dt><dd class="mono">${flops.toExponential(1)} FLOPs</dd>
+   <dt>Training time · laptop CPU</dt><dd class="mono" style="color:${cpuT<48*3600?"var(--out)":"var(--err)"}">${fmtT(cpuT)}</dd>
+   <dt>Training time · one data-centre GPU</dt><dd class="mono">${fmtT(gpuT)}</dd>
+   <dt>CPU generation speed (upper bound)</dt><dd class="mono">≈ ${tps>=100?Math.round(tps).toLocaleString():tps.toFixed(1)} tokens/s</dd>`;
+  tower($("#t1"),$("#t1c"),c,"Your model");
+  const q=PRESETS[+$("#cmpSel").value];tower($("#t2"),$("#t2c"),{d:DS[q.d],L:q.L,V:VS[q.v],C:CS[q.c]},q.n);
+  const lo=5,hi=11,X=n=>Math.max(0,Math.min(100,(Math.log10(n)-lo)/(hi-lo)*100));
+  const rows=PRESETS.map(q=>({n:q.n,N:params(VS[q.v],DS[q.d],q.L,CS[q.c]).total})).concat([{n:"Your model",N,you:true}]).sort((a,b)=>a.N-b.N);
+  $("#logc").innerHTML=rows.map(r=>`<div class="lc${r.you?" you":""}"><span class="nm">${esc(r.n)}</span><span class="tr"><span class="fl" style="width:${X(r.N)}%"></span></span><span class="vv">${fmtN(r.N)}</span></div>`).join("")+`<div class="ticks"><span></span><span class="tt"><span>100K</span><span>1M</span><span>10M</span><span>100M</span><span>1B</span><span>10B</span><span>100B</span></span><span></span></div>`;
+  if(exChecked)runEx(false);
+}
+["#cD","#cL","#cH","#cV","#cC","#cP","#cmpSel"].forEach(s=>$(s).addEventListener("input",renderSize));
+
+/* ---------------- 5. CODE ---------------- */
+const CODE={
+"bigram_lm.py":`# A real (tiny) language model in pure Python. Runs instantly on any CPU.
+from collections import Counter, defaultdict
+import random
+
+corpus = """the cat sat on the mat .
+the dog sat on the rug .
+the bank approved the loan .
+the customer asked about the loan .""".split("\\n")
+
+# 1) "Training" = counting which token follows which
+counts = defaultdict(Counter)
+for line in corpus:
+    toks = ["<s>"] + line.split()
+    for prev, nxt in zip(toks, toks[1:]):
+        counts[prev][nxt] += 1
+
+# 2) P(next | prev) with temperature:  p_i = c_i^(1/T) / sum_j c_j^(1/T)
+def next_token_probs(prev, temperature=1.0):
+    c = counts.get(prev, {})
+    w = {tok: n ** (1 / temperature) for tok, n in c.items()}
+    z = sum(w.values())
+    return {tok: v / z for tok, v in w.items()}
+
+# 3) Autoregressive generation: predict, sample, append, repeat
+def generate(start="the", max_tokens=10, temperature=1.0):
+    out = [start]
+    for _ in range(max_tokens):
+        p = next_token_probs(out[-1], temperature)
+        if not p:
+            break
+        out.append(random.choices(list(p), weights=list(p.values()))[0])
+        if out[-1] == ".":
+            break
+    return " ".join(out)
+
+print(next_token_probs("the"))   # {'cat': 0.2, 'mat': 0.2, ...}
+print(generate("the", temperature=0.7))`,
+"count_params.py":`# The same formula the size explorer uses (GPT-2 style, tied LM head).
+def gpt_params(V, d, L, C, ffn_mult=4):
+    f = ffn_mult * d
+    emb   = V * d                 # token embedding matrix   [V, d]
+    pos   = C * d                 # learned positions        [C, d]
+    attn  = 4 * d * d + 4 * d     # W_q, W_k, W_v, W_o + biases
+    ffn   = 2 * d * f + f + d     # Linear(d, 4d) -> GELU -> Linear(4d, d)
+    norms = 2 * 2 * d             # two LayerNorms (gamma, beta)
+    return emb + pos + L * (attn + ffn + norms) + 2 * d   # + final LayerNorm
+
+print(f"{gpt_params(50257, 768, 12, 1024):,}")   # 124,439,808  (GPT-2 small)
+print(f"{gpt_params(512, 128, 4, 128):,}")       # 875,264      (our CPU lab model)
+
+# Verify one piece with PyTorch (pip install torch, CPU build is fine)
+import torch.nn as nn
+emb = nn.Embedding(num_embeddings=512, embedding_dim=128)
+print(sum(p.numel() for p in emb.parameters()))  # 65,536 = V x d
+
+# Memory rule of thumb: params x bytes per param
+n = gpt_params(512, 128, 4, 128)
+for name, b in [("fp32", 4), ("fp16", 2), ("int8", 1), ("int4", 0.5)]:
+    print(name, f"{n * b / 1e6:.2f} MB")`
+};
+let codeCur="bigram_lm.py";
+function hl(src){
+  return esc(src).split("\n").map(line=>{
+    const i=line.indexOf("#");let code=i>=0?line.slice(0,i):line,cm=i>=0?line.slice(i):"";
+    code=code.replace(/(&quot;.*?&quot;|"[^"]*"|f?"(?:[^"\\]|\\.)*")/g,'<span class="st">$1</span>')
+      .replace(/\b(def|return|for|in|import|from|if|not|break|print|as|lambda)\b/g,'<span class="kw">$1</span>')
+      .replace(/(?<![\w.#])(\d[\d_,.]*)\b/g,'<span class="nu">$1</span>');
+    return code+(cm?`<span class="cm">${cm}</span>`:"");
+  }).join("\n");
+}
+function renderCode(){
+  $("#codeTabs").innerHTML=Object.keys(CODE).map(k=>`<button type="button" class="${k===codeCur?"on":""}" data-f="${k}">${k}</button>`).join("")+`<button type="button" class="copy" id="copyBtn">Copy</button>`;
+  $$("#codeTabs [data-f]").forEach(b=>b.addEventListener("click",()=>{codeCur=b.dataset.f;renderCode();}));
+  $("#copyBtn").addEventListener("click",()=>{const b=$("#copyBtn");navigator.clipboard.writeText(CODE[codeCur]).then(()=>{b.textContent="Copied";setTimeout(()=>b.textContent="Copy",1500);}).catch(()=>{const r=document.createRange();r.selectNodeContents($("#codePre"));const s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent="Selected, press Ctrl+C";});});
+  $("#codePre").innerHTML=hl(CODE[codeCur]);
+}
+renderCode();
+
+/* ---------------- 6. EXERCISE ---------------- */
+let exChecked=false;
+const EX=[
+ {t:"Between 1M and 10M parameters",f:(c,p)=>p.total>=1e6&&p.total<=1e7},
+ {t:"At least 4 layers",f:c=>c.L>=4},
+ {t:"d_model ≥ 128",f:c=>c.d>=128},
+ {t:"Embeddings under 30% of all parameters (spend capacity on the blocks)",f:(c,p)=>p.emb/p.total<0.3},
+ {t:"Compute-optimal CPU training time under 24 hours",f:(c,p)=>6*p.total*20*p.total/CPU_FLOPS<24*3600}
+];
+function runEx(show){
+  const c=cfg(),p=params(c.V,c.d,c.L,c.C);let ok=0;
+  $("#exChecks").innerHTML=EX.map(e=>{const r=e.f(c,p);if(r)ok++;return `<div class="ck ${exChecked?(r?"ok":"no"):""}"><span class="dot">${exChecked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(exChecked)$("#exMsg").innerHTML=ok===EX.length?`<span class="c-out">All 5 checks pass.</span> Your design: d=${c.d}, L=${c.L}, H=${c.H}, V=${c.V}, C=${c.C} → ${p.total.toLocaleString()} params. Note it down: it's roughly the model you'll train in Stage 8.`:`${ok}/5 checks pass. Adjust the size explorer and the list updates live.`;
+}
+$("#exBtn").addEventListener("click",()=>{exChecked=true;runEx(true);});
+$("#exGo").addEventListener("click",()=>$("#p-size").scrollIntoView({behavior:"smooth"}));
+renderSize();runEx(false);
+
+/* ---------------- 7. ASSESSMENT ---------------- */
+function parseNum(s){
+  s=String(s).trim().replace(/,/g,"").replace(/_/g,"");if(!s)return NaN;
+  if(/%$/.test(s))return parseFloat(s)/100;
+  if(/^-?\d+(\.\d+)?\s*\/\s*\d+(\.\d+)?$/.test(s)){const [a,b]=s.split("/");return +a/+b;}
+  return Number(s);
+}
+let quiz=[],qSeed=Date.now()%100000,qDone=false;
+function shuffle(a,r){for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function makeQuiz(seed){
+  const r=mulberry(seed);const pick=a=>a[Math.floor(r()*a.length)];
+  const V=pick([1000,5000,8000,16000,32000]),d=pick([64,128,256,384,512]);
+  const cs={cat:1+Math.floor(r()*8),dog:1+Math.floor(r()*8),bank:1+Math.floor(r()*6),model:1+Math.floor(r()*6)};
+  const target=pick(Object.keys(cs));const tot=Object.values(cs).reduce((a,b)=>a+b,0);
+  return [
+   {type:"Conceptual",kind:"mcq",q:"What does a language model actually learn during pretraining?",opts:shuffle([
+     {t:"A probability distribution over the next token, given the tokens before it",ok:true,why:"Correct. Pretraining minimises cross-entropy on next-token prediction, so the model learns P(wₜ | w₁…wₜ₋₁). Grammar, facts and style all show up as side effects of getting that distribution right."},
+     {t:"A searchable database of the sentences it was trained on",why:"Misconception: <b>the model is a lookup table</b>. Training text is not stored row by row. It's compressed into weights that generalise. That's why a model can continue a sentence it has never seen (panel 02's unigram backoff shows what happens without generalisation)."},
+     {t:"Grammar rules written by linguists and encoded into the network",why:"Misconception: <b>hand-written rules</b>. That describes classical rule-based NLP. Nobody writes rules for an SLM; whatever grammar it has is learned from data."},
+     {t:"Dictionary definitions of each word in its vocabulary",why:"Misconception: <b>meaning is stored as definitions</b>. Words become vectors (embeddings) whose meaning comes from the contexts they appear in. There is no text definition anywhere inside the model."}],r)},
+   {type:"Conceptual",kind:"mcq",q:"What primarily distinguishes a Small Language Model from a Large Language Model?",opts:shuffle([
+     {t:"Scale: parameter count, and the memory and compute that follow from it. Both are usually decoder-only Transformers.",ok:true,why:"Correct. In panel 04 the 0.9M lab model and the 65B model use the same block diagram. Only d_model, L and V change."},
+     {t:"SLMs use a fundamentally different architecture from Transformers",why:"Misconception: <b>small means a different design</b>. Most modern SLMs are the same decoder-only Transformer, just narrower and shallower."},
+     {t:"SLMs can only classify text; only LLMs can generate it",why:"Misconception: <b>generation needs scale</b>. Even the n-gram model in panel 02 generates text. Any model that outputs P(next token) can generate by sampling autoregressively."},
+     {t:"LLMs don't need tokenization because they read raw characters",why:"Misconception: <b>big models skip tokenization</b>. Every model needs numbers as input. LLMs use subword tokenizers just like SLMs (Stage 2)."}],r)},
+   {type:"Numerical",kind:"num",q:`A tokenizer has a vocabulary of <b>V = ${V.toLocaleString()}</b> tokens and the model uses <b>d_model = ${d}</b>. How many learnable parameters are in the token embedding matrix?`,ans:V*d,
+    check:v=>{if(Math.abs(v-V*d)<0.5)return [true,`Correct: E ∈ ℝ^{V×d}, so ${V.toLocaleString()} × ${d} = ${(V*d).toLocaleString()}. One d-dimensional row per token.`];
+      if(v===V+d)return [false,`You added V + d. The embedding is a <b>matrix</b> with one row of length d for each of the V tokens, so the count is V × d = ${(V*d).toLocaleString()}.`];
+      if(v===V||v===d)return [false,`That counts only one dimension. Each of the ${V.toLocaleString()} tokens has its own ${d}-number vector, so V × d = ${(V*d).toLocaleString()}.`];
+      if(v===V*d*d)return [false,`An extra factor of d. That would be an [V, d, d] tensor. Embedding lookup is a plain [V, d] table: ${(V*d).toLocaleString()}.`];
+      return [false,`The embedding matrix has shape [V, d], so the count is V × d = ${V.toLocaleString()} × ${d} = ${(V*d).toLocaleString()}. Check it in panel 03, step 4.`];}},
+   {type:"Numerical",kind:"num",q:`In a training corpus, the word "the" is followed by: <span class="mono">cat ×${cs.cat}, dog ×${cs.dog}, bank ×${cs.bank}, model ×${cs.model}</span> (nothing else). Using a maximum-likelihood bigram model at temperature 1, what is <b>P(${target} | the)</b>? Answer as a decimal or a fraction.`,ans:cs[target]/tot,
+    check:v=>{const a=cs[target]/tot;if(Math.abs(v-a)<0.006)return [true,`Correct: ${cs[target]} / ${tot} = ${a.toFixed(3)}. Probability = count of this continuation ÷ total continuations of "the".`];
+      if(v===cs[target])return [false,`${v} is the raw count. A probability must be normalised to sum to 1: ${cs[target]} / ${tot} = ${a.toFixed(3)}.`];
+      if(Math.abs(v-cs[target]/(tot-cs[target]))<0.006)return [false,`You divided by the <i>other</i> counts (that's odds, not probability). Divide by all continuations, including this one: ${cs[target]} / ${tot} = ${a.toFixed(3)}.`];
+      if(Math.abs(v-0.25)<0.006)return [false,`0.25 assumes all 4 words are equally likely. The model learns from frequency: ${cs[target]} / ${tot} = ${a.toFixed(3)}.`];
+      return [false,`P(w | the) = count(the, w) / count(the) = ${cs[target]} / ${tot} = ${a.toFixed(3)}. Panel 02's count table shows exactly this calculation.`];}},
+   {type:"Practical",kind:"mcq",q:"Your machine: a laptop CPU with 16 GB RAM and no GPU. Which model can you realistically <b>pretrain from scratch</b> to a sensible loss in this course?",opts:shuffle([
+     {t:"About 1M parameters (d=128, 4 layers) on a few MB of text",ok:true,why:"Correct. Compute-optimal training needs ~20M tokens, so 6·N·D ≈ 6 × 10⁶ × 2×10⁷ ≈ 1.2×10¹⁴ FLOPs. That's minutes on a CPU. Check it with the CPU lab preset."},
+     {t:"About 124M parameters (GPT-2-small class), if you let it run over a weekend",why:"Misconception: <b>if it runs, it can be trained</b>. Inference is fine on a CPU, but compute-optimal pretraining needs ~2.5B tokens ≈ 1.9×10¹⁸ FLOPs. Set the GPT-2 preset in panel 04: that's months on a CPU."},
+     {t:"About 1B parameters in FP32",why:"Misconception: <b>training memory = weight memory</b>. AdamW keeps weights, gradients and two moment estimates: ≈16 bytes/param = 16 GB before activations. RAM runs out before step 1."},
+     {t:"About 7B parameters, since you only need to run one epoch",why:"Misconception: <b>fewer epochs makes big models cheap</b>. Even holding the FP32 weights takes 28 GB, and the compute is ~10²³ FLOPs. That's GPU-cluster territory."}],r)}
+  ];
+}
+function renderQuiz(){
+  quiz=makeQuiz(qSeed);qDone=false;
+  $("#quiz").innerHTML=quiz.map((q,i)=>`<div class="q" id="q${i}"><div class="qh"><span class="mono dim">Q${i+1}</span><span class="qt">${q.type}</span></div><p class="qp">${q.q}</p>
+   ${q.kind==="mcq"?q.opts.map((o,j)=>`<label class="opt" id="q${i}o${j}"><input type="radio" name="q${i}" value="${j}"><span>${o.t}</span></label>`).join(""):`<input class="txt" id="q${i}in" type="text" inputmode="decimal" placeholder="your answer" autocomplete="off" style="max-width:240px">`}
+   <div class="fb" id="q${i}fb"></div></div>`).join("");
+  $("#qSubmit").disabled=false;$("#qRetry").hidden=true;$("#qResult").className="result";$("#qResult").innerHTML="";
+  $("#qAttempts").textContent=P.attempts?`attempts so far: ${P.attempts}`:"";
+}
+function newQuiz(){qSeed=(qSeed*7919+13)%1000003;renderQuiz();}
+$("#qSubmit").addEventListener("click",()=>{
+  const missing=quiz.some((q,i)=>q.kind==="mcq"?!document.querySelector(`input[name=q${i}]:checked`):!$(`#q${i}in`).value.trim());
+  if(missing){$("#qResult").className="result show";$("#qResult").innerHTML='<span class="c-tok">Answer all 5 questions before submitting.</span>';return;}
+  let score=0;const miss=[];
+  quiz.forEach((q,i)=>{
+    const fb=$(`#q${i}fb`);let ok,msg;
+    if(q.kind==="mcq"){const j=+document.querySelector(`input[name=q${i}]:checked`).value;const o=q.opts[j];ok=!!o.ok;msg=o.why;
+      q.opts.forEach((oo,k)=>{const el=$(`#q${i}o${k}`);el.classList.toggle("right",!!oo.ok);el.classList.toggle("wrong",k===j&&!oo.ok);el.querySelector("input").disabled=true;});
+      if(!ok)msg+=`<br><br><b class="c-out" style="display:inline">Right answer:</b> ${q.opts.find(o=>o.ok).t}`;}
+    else{const v=parseNum($(`#q${i}in`).value);[ok,msg]=isNaN(v)?[false,"That isn't a number I can read. Try a form like 64000, 0.25 or 3/12."]:q.check(v);$(`#q${i}in`).disabled=true;}
+    if(ok)score++;else miss.push(i+1);
+    fb.className="fb show "+(ok?"ok":"bad");fb.innerHTML=`<b class="${ok?"c-out":"c-err"}">${ok?"Correct":"Not quite"}</b>${msg}`;
+  });
+  P.attempts++;const pass=score>=4;
+  if(pass&&!P.completed.includes(0))P.completed.push(0);
+  save();renderRail();
+  $("#qSubmit").disabled=true;$("#qRetry").hidden=false;$("#qAttempts").textContent=`attempts so far: ${P.attempts}`;
+  const R=$("#qResult");R.className="result show";R.style.borderColor=pass?"var(--out)":"var(--err)";
+  R.innerHTML=pass
+   ?`<div class="row" style="justify-content:space-between"><h3 class="c-out">Stage 0 complete · ${score}/5</h3><button class="btn primary" type="button" id="goS1">Open Stage 1</button></div><p class="muted" style="margin-top:6px">Stage 1 (Mathematical Foundations) is now unlocked on the roadmap. ${miss.length?`Look back over Q${miss.join(", Q")} above before moving on.`:"No misconceptions detected."} When you're ready, tell Claude <span class="mono c-emb">"Start Stage 1"</span> in chat and its lab will be built here.</p>`
+   :`<h3 class="c-err">${score}/5. Stage 1 stays locked (need 4/5)</h3><p class="muted" style="margin-top:6px">Read the feedback on Q${miss.join(", Q")} above, revisit the matching panel, then retry. The numbers and option order change on every attempt.</p>`;
+  if(pass)$("#goS1").addEventListener("click",()=>showStage(1));
+});
+$("#qRetry").addEventListener("click",()=>{newQuiz();$("#p-quiz").scrollIntoView({behavior:"smooth"});});
+renderQuiz();
+showStage(0);window.scrollTo(0,0);
+})();
+</script>
