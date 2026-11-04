@@ -389,6 +389,28 @@ table.mt td{min-width:44px}
 .spcol{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px;min-width:0}
 .spcol div.ln{font-family:var(--f-mono);font-size:.68rem;padding:2px 4px;border-radius:3px;margin-top:3px;background:var(--bg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .spcol div.leak{background:rgba(255,125,147,.2);color:var(--err)}
+.pipe{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.pipe .pn{position:relative;padding:10px;border:1px solid var(--line2);border-radius:10px;background:var(--bg);transition:border-color .2s,box-shadow .2s,transform .2s;min-width:0}
+.pipe .pn b{display:block;font-size:.86rem}
+.pipe .pn span{display:block;font-family:var(--f-mono);font-size:.68rem;color:var(--muted);margin-top:2px}
+.pipe .pn .ms{position:absolute;top:8px;right:8px;font-family:var(--f-mono);font-size:.66rem;color:var(--dim)}
+.pipe .pn.on{border-color:var(--pc);box-shadow:0 0 0 3px color-mix(in srgb,var(--pc) 25%,transparent);transform:translateY(-2px)}
+.pipe .pn.done{border-color:color-mix(in srgb,var(--pc) 55%,var(--line2))}
+.pipe .pn.done .ms{color:var(--pc)}
+.latbar{display:flex;height:26px;border-radius:6px;overflow:hidden;background:var(--bg);border:1px solid var(--line)}
+.latbar>span{display:block;height:100%;transition:width .4s}
+.genout{min-height:64px;line-height:1.9;font-size:1rem}
+.genout .pr{color:var(--muted)}
+.genout .gt{padding:1px 4px;border-radius:4px;margin:0 1px;border-bottom:2px solid var(--gc)}
+.mongrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.mongrid .mc{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;min-width:0}
+.mongrid .mc.alert{border-color:var(--err)}
+.mongrid .mc .k{font-family:var(--f-mono);font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.mongrid .mc .v{font-family:var(--f-mono);font-size:1.05rem;margin:2px 0}
+.mongrid svg{width:100%;height:46px;display:block}
+.donebanner{padding:6px 2px}
+.donebanner h3{font-size:1.35rem;margin:4px 0 6px}
+@media (max-width:760px){.pipe{grid-template-columns:repeat(2,minmax(0,1fr))}.mongrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 
 <header class="top">
@@ -2105,6 +2127,115 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 12 ====================== -->
+  <section id="stage12" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 12 · unlocked · final stage</div>
+      <h2>Deployment & production: serving your SLM to real users</h2>
+      <p>A trained, quantized model is a file. To be useful it needs an API around it, a fast inference loop, settings that control how it writes, enough capacity for many users at once, and monitoring that tells you when something goes wrong. This stage walks a request end to end, then teaches you to run the service.</p>
+    </div>
+    <div class="panel" id="p12-done" hidden>
+      <div class="donebanner">
+        <div class="eyebrow c-out">Course complete</div>
+        <h3 id="doneH">You've finished all 13 stages of the SLM Learning Lab</h3>
+        <p>You followed one idea from counting words all the way to a deployed, monitored small language model: tokens → embeddings → attention → training → evaluation → fine-tuning → quantization → serving.</p>
+        <div class="stats" id="doneStats" style="margin-top:12px"></div>
+        <div class="grid2" style="margin-top:14px"><div class="box"><b>Build next</b><ul style="margin:6px 0 0 18px"><li>Train the Stage 6 TinyGPT on your own domain text</li><li>LoRA fine-tune SmolLM2-135M on 500 banking Q&amp;A pairs (Stage 10)</li><li>Quantize it to INT8 and serve it with the Stage 12 FastAPI app</li></ul></div><div class="box"><b>Keep learning</b><ul style="margin:6px 0 0 18px"><li>Retrieval-augmented generation (RAG)</li><li>Preference tuning (DPO) and safety evaluation</li><li>KV-cache, speculative decoding, continuous batching</li></ul></div></div>
+      </div>
+    </div>
+    <nav class="subnav" aria-label="Stage 12 sections">
+      <button type="button" data-go="p12-arch">1 · End-to-end request</button>
+      <button type="button" data-go="p12-inf">2 · Inference simulator</button>
+      <button type="button" data-go="p12-scale">3 · Latency & throughput</button>
+      <button type="button" data-go="p12-mon">4 · Monitoring</button>
+      <button type="button" data-go="p12-code">5 · Code</button>
+      <button type="button" data-go="p12-ex">6 · Exercise</button>
+      <button type="button" data-go="p12-quiz">7 · Final assessment</button>
+    </nav>
+
+    <div class="panel" id="p12-arch">
+      <div class="phead"><span class="tag">01</span><h3>One request, end to end</h3><span class="sim illus">real tokenizer &amp; model · timings illustrative</span>
+        <p class="plain">Type a prompt and send it. Watch it travel through each part of the service. The tokens, IDs and generated words are computed for real by this page's n-gram model. The millisecond timings are typical of a 1B INT4 model on a laptop CPU.</p></div>
+      <div class="row" style="margin-bottom:12px"><label class="field" style="flex:1 1 260px">prompt<input class="txt" id="paIn" type="text" value="the bank approved the" autocomplete="off"></label><button class="btn primary" id="paGo" type="button" style="align-self:end">Send request ▶</button></div>
+      <div class="pipe" id="paPipe"></div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">What's inside the request right now</div><div id="paData" class="mono" style="font-size:.82rem;min-height:84px;overflow-wrap:anywhere">Press <b>Send request</b>.</div></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Latency breakdown</div><div id="paLat" class="latbar"></div><div id="paLatK" class="row" style="gap:10px;font-size:.72rem;font-family:var(--f-mono);margin-top:8px"></div><p class="note" id="paLatN" style="margin-top:8px"></p></div>
+      </div>
+      <div class="facts">
+        <div><b>Two phases</b><ul><li><span class="c-tok">Prefill</span>: the whole prompt is processed in one parallel pass. This sets the time to first token (TTFT).</li><li><span class="c-emb">Decode</span>: one token per pass, in a loop</li></ul></div>
+        <div><b>KV cache</b>During decoding the model keeps each past token's keys and values (Stage 5) so it never recomputes them. Each new token needs just one small pass.</div>
+        <div><b>Inside an SLM</b>The <b>decode loop</b> dominates the latency. That's why tokens/second, which is set by memory bandwidth (Stage 11), is the number everyone quotes.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p12-inf">
+      <div class="phead"><span class="tag">02</span><h3>Inference simulator: temperature, top-k, top-p</h3><span class="sim real">real model · real sampling</span>
+        <p class="plain">At every step the model gives a probability for every word. <em>Temperature</em> sharpens or flattens them. <em>Top-k</em> keeps only the k most likely words. <em>Top-p</em> keeps the smallest set whose probabilities add up to p. A word is then drawn from what's left. Step through it and watch the cuts.</p></div>
+      <div class="ctrls box" style="margin-bottom:12px">
+        <label class="field" style="grid-column:1/-1">prompt<input class="txt" id="isIn" type="text" value="the customer asked about the" autocomplete="off"></label>
+        <label class="field">temperature: <b id="isTv"></b><input id="isT" type="range" min="0" max="20" value="8"></label>
+        <label class="field">top-k: <b id="isKv"></b><input id="isK" type="range" min="1" max="20" value="20"></label>
+        <label class="field">top-p: <b id="isPv"></b><input id="isP" type="range" min="10" max="100" value="100" step="5"></label>
+        <label class="field">max new tokens: <b id="isMv"></b><input id="isM" type="range" min="1" max="20" value="12"></label>
+      </div>
+      <div class="row" style="margin-bottom:12px"><button class="btn primary" id="isStep" type="button">Next token ▶</button><button class="btn" id="isRun" type="button">Generate all</button><button class="btn" id="isReset" type="button">Reset</button><span class="mono dim" id="isInfo" style="font-size:.78rem"></span></div>
+      <div class="grid2">
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Output so far</div><div id="isOut" class="genout"></div><div class="eyebrow" style="margin:12px 0 6px">Step log</div><div id="isLog" class="mono" style="font-size:.74rem;max-height:150px;overflow:auto"></div></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px" id="isCtx">Candidates for the next token</div><div class="bars" id="isBars"></div><div class="row" style="gap:10px;font-size:.72rem;font-family:var(--f-mono);margin-top:8px"><span><i class="lg" style="background:var(--out)"></i>kept</span><span><i class="lg" style="background:var(--tok)"></i>cut by top-k</span><span><i class="lg" style="background:var(--err)"></i>cut by top-p</span><span>★ chosen</span></div></div>
+      </div>
+      <div class="grid2" style="margin-top:12px"><div class="box note" style="border-left:0"><b>Typical settings.</b> Factual Q&amp;A or code: T ≈ 0–0.3. Chat assistants: T ≈ 0.7, top-p ≈ 0.9. Creative writing: T ≈ 0.9–1.1. T = 0 means <b>greedy</b>: always the top word, so the same answer every time.</div><div class="predict" id="isPred"></div></div>
+    </div>
+
+    <div class="panel" id="p12-scale">
+      <div class="phead"><span class="tag">03</span><h3>Latency, throughput &amp; batching calculator</h3><span class="sim illus">roofline estimate</span>
+        <p class="plain">One user wants <em>low latency</em>. The business wants <em>high throughput</em>, meaning many users per machine. <em>Batching</em> serves several requests in each decode pass. Reading the weights costs the same for 1 request or 16, so total throughput climbs until compute becomes the limit. Each user's own speed drops a little along the way.</p></div>
+      <div class="ctrls box" style="margin-bottom:12px">
+        <label class="field">model<select id="scN" class="txt"><option value="1.35e8">SmolLM2-135M</option><option value="1e9" selected>1B</option><option value="3e9">3B</option><option value="7e9">7B</option></select></label>
+        <label class="field">precision<select id="scP" class="txt"><option value="2">FP16</option><option value="1">INT8</option><option value=".5" selected>INT4</option></select></label>
+        <label class="field">hardware<select id="scH" class="txt"><option value="0" selected>laptop CPU</option><option value="1">server CPU</option><option value="2">data-centre GPU</option></select></label>
+        <label class="field">batch size: <b id="scBv"></b><input id="scB" type="range" min="0" max="7" value="0"></label>
+        <label class="field">prompt tokens: <b id="scIv"></b><input id="scI" type="range" min="50" max="2000" step="50" value="300"></label>
+        <label class="field">output tokens: <b id="scOv"></b><input id="scO" type="range" min="20" max="500" step="10" value="150"></label>
+      </div>
+      <div class="grid2">
+        <div class="box"><div class="stats" id="scStats"></div><p class="note" id="scNote" style="margin-top:10px"></p></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Throughput vs batch size</div><svg class="plot" id="scSvg" viewBox="0 0 440 230" role="img" aria-label="Throughput and per-user speed by batch size"></svg></div>
+      </div>
+      <div class="facts">
+        <div><b>Formulas</b><div class="formula" style="white-space:normal">step ≈ max(model bytes ÷ bandwidth, 2·N·batch ÷ FLOPS) · TTFT ≈ 2·N·prompt ÷ FLOPS · latency = TTFT + out × step</div></div>
+        <div><b>Key metrics</b><ul><li><span class="c-tok">TTFT</span>: time to first token (how fast it feels)</li><li><span class="c-emb">tokens/s per user</span>: reading speed (aim for ≥ 10)</li><li><span class="c-out">total tokens/s</span>: cost efficiency</li></ul></div>
+        <div><b>Inside an SLM</b>Servers such as vLLM, TGI and llama.cpp's server use <b>continuous batching</b>: new requests join the running batch at any decode step, so the GPU or CPU never waits.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p12-mon">
+      <div class="phead"><span class="tag">04</span><h3>Production monitoring: diagnose the incident</h3><span class="sim illus">simulated service</span>
+        <p class="plain">Your SLM API is live. The dashboard streams requests per second, p95 latency, error rate, memory use and the share of users clicking 👎. Trigger a <em>mystery incident</em>, read the charts and the logs, and pick the right fix. Three incident types are hidden in the deck.</p></div>
+      <div class="row" style="margin-bottom:12px"><button class="btn primary" id="mnGo" type="button">Trigger mystery incident</button><span class="pill" id="mnState">status: healthy</span><span class="mono dim" id="mnScore" style="font-size:.78rem"></span></div>
+      <div class="mongrid" id="mnCharts"></div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Live logs</div><div id="mnLog" class="mono" style="font-size:.72rem;height:150px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere"></div></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Your diagnosis</div><div id="mnFix" class="po" style="display:grid;gap:6px"></div><p class="note" id="mnMsg" style="margin-top:8px">No incident right now. Trigger one.</p></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p12-code">
+      <div class="phead"><span class="tag">05</span><h3>Code: save, load, generate, serve</h3><p><code>generate.py</code> trains a tiny model, saves a checkpoint with its config and vocabulary, reloads it and samples with temperature, top-k and top-p. <code>app.py</code> wraps it in a FastAPI service with validation, structured logs, latency measurement and a health check. Both run on a CPU.</p></div>
+      <div class="code" id="code12"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <div class="panel" id="p12-ex">
+      <div class="phead"><span class="tag">06</span><h3>Hands-on exercise: run the service</h3><p>Five missions. The checks read the panels' live state.</p></div>
+      <div class="box"><div class="checks" id="ex12Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex12Btn" type="button">Check missions</button></div><p class="note" id="ex12Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <div class="panel" id="p12-quiz">
+      <div class="phead"><span class="tag">07</span><h3>Final assessment</h3><p>5 questions. Score 4/5 or better to complete the course.</p></div>
+      <div id="quiz12"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -2169,7 +2300,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8",9:"#stage9",10:"#stage10",11:"#stage11"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8",9:"#stage9",10:"#stage10",11:"#stage11",12:"#stage12"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -5964,6 +6095,309 @@ function makeQuiz11(seed){
 mountQuiz(11,$("#quiz11"),makeQuiz11);
 runEx11();
 
+/* =================== STAGE 12 =================== */
+/* ---- shared: real generation with temperature / top-k / top-p ---- */
+function filterDist(ctx,T,k,p){
+  const last=ctx[ctx.length-1],seen=FULL.bi.has(last),nc={counts:seen?FULL.bi.get(last):FULL.uni,src:seen?`bigram after “${last}”`:`“${last}” unseen: word frequency`},arr=distFrom(nc.counts,Math.max(T,.01));
+  let cum=0;arr.forEach((a,i)=>{a.cut=i>=k?"k":(cum>=p-1e-9?"p":"");if(!a.cut)cum+=a.p;});
+  const keep=arr.filter(a=>!a.cut),Z=keep.reduce((s,a)=>s+a.p,0);keep.forEach(a=>a.q=a.p/Z);
+  return {arr,keep,src:nc.src};
+}
+function drawFrom(keep,rnd,T){if(T===0)return keep[0];let r=rnd(),acc=0;for(const a of keep){acc+=a.q;if(r<=acc)return a;}return keep[keep.length-1];}
+
+/* ---- 1. end-to-end request ---- */
+const PA=[["User","types a prompt","var(--muted)"],["API server","FastAPI · auth · rate limit","var(--hid)"],["Input processing","validate · chat template","var(--hid)"],["Tokenizer","text → token IDs","var(--tok)"],["Transformer","prefill, then decode loop","var(--emb)"],["Sampling","T · top-k · top-p","var(--out)"],["Detokenizer","IDs → text","var(--tok)"],["Response","streamed back","var(--muted)"]];
+$("#paPipe").innerHTML=PA.map((s,i)=>`<div class="pn" id="pa${i}" style="--pc:${s[2]}"><span class="ms" id="paMs${i}"></span><b>${i+1}. ${s[0]}</b><span>${s[1]}</span></div>`).join("");
+let paRun=0,paDone=false;
+async function runPA(){
+  const my=++paRun,raw=$("#paIn").value.trim()||"the bank";
+  const toks=tokenize(raw),ids=toks.map(t=>ID.has(t)?ID.get(t):1);
+  const ctx=toks.slice(),gen=[],rnd=mulberry(7);
+  for(let i=0;i<10;i++){const {keep}=filterDist(ctx,.7,20,.9),c=drawFrom(keep,rnd,.7);gen.push(c.w);ctx.push(c.w);if(c.w===".")break;}
+  const gids=gen.map(t=>ID.get(t));
+  const pre=8+toks.length*3,dec=gen.length*28;
+  const ms=[20,3,1,1,pre+dec,gen.length*.2,.5,20];
+  const data=[
+    `POST /generate  {"prompt": "${esc(raw)}", "max_tokens": 10, "temperature": 0.7, "top_p": 0.9}`,
+    `✓ API key valid · rate limit 12/60 per min · request_id=req_8f3a`,
+    `✓ length ${raw.length} chars ≤ 4,000 · trimmed · wrapped in template: <span class="c-tok">&lt;|user|&gt;</span> ${esc(raw)} <span class="c-tok">&lt;|assistant|&gt;</span>`,
+    `tokens: [${toks.map(t=>`<span class="c-tok">"${esc(t)}"</span>`).join(", ")}]<br>ids: [<span class="c-emb">${ids.join(", ")}</span>]${ids.includes(1)?' <span class="c-err">(1 = &lt;unk&gt;: word not in vocabulary)</span>':""}`,
+    `prefill: ${toks.length} tokens in one pass (${pre} ms) → KV cache stored<br>decode: ${gen.length} passes × 28 ms, each reusing the KV cache`,
+    `each step: logits → softmax(÷0.7) → top-p 0.9 → draw<br>new ids: [<span class="c-out">${gids.join(", ")}</span>]`,
+    `ids → "<span class="c-out">${esc(gen.join(" "))}</span>"`,
+    `200 OK  {"text": "<span class="c-out">${esc(gen.join(" "))}</span>", "tokens": ${gen.length}, "latency_ms": ${Math.round(ms.reduce((a,b)=>a+b,0))}}`];
+  PA.forEach((_,i)=>{$("#pa"+i).classList.remove("on","done");$("#paMs"+i).textContent="";});
+  $("#paLat").innerHTML="";$("#paLatK").innerHTML="";$("#paLatN").textContent="";
+  for(let i=0;i<PA.length;i++){
+    if(my!==paRun)return;
+    $("#pa"+i).classList.add("on");$("#paData").innerHTML=`<b style="color:${PA[i][2]}">${PA[i][0]}</b><br>${data[i]}`;
+    if(i===4){for(let t=0;t<gen.length;t++){if(my!==paRun)return;$("#paData").innerHTML=`<b style="color:var(--emb)">Transformer</b> · decode step ${t+1}/${gen.length}<br>${esc(raw)} <span class="c-out">${esc(gen.slice(0,t+1).join(" "))}</span>`;await sleep(160);}}
+    else await sleep(i===0?300:520);
+    $("#pa"+i).classList.remove("on");$("#pa"+i).classList.add("done");$("#paMs"+i).textContent=ms[i]<1?"<1 ms":Math.round(ms[i])+" ms";
+    if(i===4){$("#paData").innerHTML=`<b style="color:var(--emb)">Transformer</b><br>${data[4]}`;await sleep(700);}
+  }
+  const tot=ms.reduce((a,b)=>a+b,0),segs=[["network",ms[0]+ms[7],"var(--line2)"],["API + input",ms[1]+ms[2],"var(--hid)"],["tokenize/detok",ms[3]+ms[6],"var(--tok)"],["prefill",pre,"var(--err)"],["decode loop",dec+ms[5],"var(--emb)"]];
+  $("#paLat").innerHTML=segs.map(s=>`<span style="width:${s[1]/tot*100}%;background:${s[2]}" title="${s[0]}"></span>`).join("");
+  $("#paLatK").innerHTML=segs.map(s=>`<span><i class="lg" style="background:${s[2]}"></i>${s[0]} ${Math.round(s[1])} ms</span>`).join("");
+  $("#paLatN").innerHTML=`Total <b>${Math.round(tot)} ms</b>. Time to first token ≈ ${Math.round(ms[0]+ms[1]+ms[2]+ms[3]+pre+28)} ms. The <b class="c-emb">decode loop</b> takes ${Math.round(dec/tot*100)}% of the time, and doubling the reply length roughly doubles it.`;
+  paDone=true;
+}
+$("#paGo").addEventListener("click",runPA);
+
+/* ---- 2. inference simulator ---- */
+let isCtx=[],isGen=[],isRnd=mulberry(3),isLog=[],isSaw={greedy:false,topp:false,topk:false};
+const isV=()=>({T:+$("#isT").value/10,k:+$("#isK").value,p:+$("#isP").value/100,m:+$("#isM").value});
+function isReset(){isCtx=tokenize($("#isIn").value||"the");isGen=[];isLog=[];isRnd=mulberry(3);renderIS();}
+function renderIS(){
+  const {T,k,p,m}=isV();$("#isTv").textContent=T===0?"0 (greedy)":T.toFixed(1);$("#isKv").textContent=k>=20?"off (all)":k;$("#isPv").textContent=p>=1?"off (1.0)":p.toFixed(2);$("#isMv").textContent=m;
+  const done=isGen.length>=m||(isGen.length&&isGen[isGen.length-1].w===".");
+  const ctxW=[...isCtx,...isGen.map(g=>g.w)];if(done)ctxW.pop();
+  const {arr,keep,src}=filterDist(ctxW,T,k>=20?999:k,p),chosen=done?isGen[isGen.length-1].w:null;
+  $("#isCtx").textContent=done?`Last step's candidates (${src}) · ★ = chosen`:`Next-token candidates (${src})`;
+  $("#isBars").innerHTML=arr.slice(0,10).map(a=>{const col=a.cut==="k"?"var(--tok)":a.cut==="p"?"var(--err)":"var(--out)";return `<div class="bar" style="grid-template-columns:96px minmax(0,1fr) 92px;opacity:${a.cut?.55:1}"><span class="lbl" style="${a.cut?"text-decoration:line-through;color:var(--dim)":""}">${a.w===chosen?"★ ":""}${esc(a.w)}</span><span class="trk"><span class="fill" style="display:block;width:${(a.p*100).toFixed(1)}%;background:${col}"></span></span><span class="val">${(a.p*100).toFixed(1)}%${a.cut?"":` → ${(a.q*100).toFixed(0)}%`}</span></div>`;}).join("")+(arr.length>10?`<p class="mono dim" style="font-size:.72rem;margin-top:4px">+ ${arr.length-10} more candidates · ${keep.length} kept in total</p>`:"");
+  $("#isOut").innerHTML=`<span class="pr">${esc(isCtx.join(" "))}</span> `+isGen.map(g=>`<span class="gt" style="--gc:${g.q>.6?"var(--out)":g.q>.25?"var(--tok)":"var(--err)"}" title="p=${(g.q*100).toFixed(0)}%">${esc(g.w)}</span>`).join(" ");
+  $("#isLog").innerHTML=isLog.join("<br>")||'<span class="dim">Press “Next token”.</span>';$("#isLog").scrollTop=1e6;
+  $("#isStep").disabled=done;$("#isRun").disabled=done;$("#isInfo").textContent=done?`finished: ${isGen.length&&isGen[isGen.length-1].w==="."?"end of sentence":"max tokens"}`:`${isGen.length}/${m} tokens`;
+}
+function isStep(){
+  const {T,k,p,m}=isV();if(isGen.length>=m||(isGen.length&&isGen[isGen.length-1].w==="."))return;
+  const kk=k>=20?999:k,{arr,keep}=filterDist([...isCtx,...isGen.map(g=>g.w)],T,kk,p),c=drawFrom(keep,isRnd,T);
+  const nk=arr.filter(a=>a.cut==="k").length,np=arr.filter(a=>a.cut==="p").length;
+  isGen.push({w:c.w,q:c.q});isLog.push(`step ${isGen.length}: ${arr.length} candidates${nk?`, top-k cut ${nk}`:""}${np?`, top-p cut ${np}`:""} → kept ${keep.length} → <span class="c-out">“${esc(c.w)}”</span> (${(c.q*100).toFixed(0)}%)`);
+  if(np)isSaw.topp=true;if(nk)isSaw.topk=true;
+  if(c.w==="."&&T<=.3)isSaw.greedy=true;
+  renderIS();
+}
+$("#isStep").addEventListener("click",isStep);
+$("#isRun").addEventListener("click",()=>{for(let i=0;i<20;i++)isStep();});
+$("#isReset").addEventListener("click",isReset);
+$("#isIn").addEventListener("change",isReset);
+["#isT","#isK","#isP","#isM"].forEach(s=>$(s).addEventListener("input",renderIS));
+isReset();
+predictBox($("#isPred"),{q:"Top-p = 0.5. The model says “loan” 40%, “card” 30%, “fee” 20%, “rate” 10%. Which words survive?",opts:["Only “loan”","“loan” and “card”","All four"],ok:1,
+  why:"Top-p keeps adding words, most likely first, until the running total reaches p. “loan” gives 40% (below 50%, keep going), then “card” makes 70% (stop). So 2 survive, renormalised to 57% / 43%. On a confident step, top-p keeps very few words. On an uncertain step it keeps many, which is why it adapts better than a fixed top-k.",
+  onReveal:()=>{$("#isP").value=50;renderIS();}});
+
+/* ---- 3. latency & throughput ---- */
+const SC_H=[{n:"laptop CPU",bw:50e9*.6,fl:.4e12},{n:"server CPU",bw:250e9*.6,fl:3e12},{n:"data-centre GPU",bw:2000e9*.7,fl:300e12}],SC_B=[1,2,4,8,16,32,64,128];
+let scLast={};
+function scCalc(N,by,h,b,I,O){const H=SC_H[h],mem=N*by/H.bw,cmp=2*N*b/H.fl,step=Math.max(mem,cmp)+.002,ttft=2*N*I/H.fl+step;return {step,ttft,lat:ttft+O*step,user:1/step,tot:b/step,bound:mem>=cmp?"memory":"compute"};}
+function renderSC(){
+  const N=+$("#scN").value,by=+$("#scP").value,h=+$("#scH").value,b=SC_B[+$("#scB").value],I=+$("#scI").value,O=+$("#scO").value;
+  $("#scBv").textContent=b;$("#scIv").textContent=I;$("#scOv").textContent=O;
+  const r=scCalc(N,by,h,b,I,O),f=v=>v>=100?Math.round(v).toLocaleString():v.toFixed(1),fs=s=>s<1?Math.round(s*1000)+" ms":s.toFixed(1)+" s";
+  $("#scStats").innerHTML=`<div class="stat"><span class="v c-tok">${fs(r.ttft)}</span><span class="k">time to first token</span></div><div class="stat"><span class="v ${r.user>=10?"c-emb":"c-err"}">${f(r.user)}</span><span class="k">tokens/s per user</span></div><div class="stat"><span class="v c-out">${f(r.tot)}</span><span class="k">total tokens/s</span></div><div class="stat"><span class="v">${fs(r.lat)}</span><span class="k">full reply latency</span></div><div class="stat"><span class="v c-hid">${Math.round(3600/r.lat*b).toLocaleString()}</span><span class="k">replies / hour / machine</span></div>`;
+  $("#scNote").innerHTML=`This step is <b>${r.bound}-bound</b>. ${r.bound==="memory"?"Reading the weights is the bottleneck, so a bigger batch adds throughput almost for free.":"The arithmetic is now the bottleneck, so a bigger batch mostly slows every user down."} ${r.user<10?'<span class="c-err">Below ~10 tokens/s per user, text appears slower than people read.</span>':""}`;
+  scLast={user:r.user,tot:r.tot,b};
+  const W=440,H=230,l=46,rr=46,t=14,bm=30,pts=SC_B.map(bb=>scCalc(N,by,h,bb,I,O)),mxT=Math.max(...pts.map(p=>p.tot))*1.1,mxU=Math.max(...pts.map(p=>p.user))*1.1;
+  const X=i=>l+i/(SC_B.length-1)*(W-l-rr),YT=v=>t+(1-v/mxT)*(H-t-bm),YU=v=>t+(1-v/mxU)*(H-t-bm);
+  let g=`<line x1="${l}" x2="${W-rr}" y1="${H-bm}" y2="${H-bm}" style="stroke:var(--line2)"/>`;
+  SC_B.forEach((bb,i)=>g+=`<text x="${X(i)}" y="${H-bm+14}" text-anchor="middle" font-size="9.5" style="fill:var(--muted)" font-family="IBM Plex Mono">${bb}</text>`);
+  g+=`<text x="${(l+W-rr)/2}" y="${H-3}" text-anchor="middle" font-size="9.5" style="fill:var(--dim)" font-family="IBM Plex Mono">batch size</text>`;
+  if(10<mxU)g+=`<line x1="${l}" x2="${W-rr}" y1="${YU(10)}" y2="${YU(10)}" style="stroke:var(--err)" stroke-dasharray="3 3" opacity=".6"/><text x="${W-rr-2}" y="${YU(10)-3}" text-anchor="end" font-size="9" style="fill:var(--err)" font-family="IBM Plex Mono">10 tok/s per user</text>`;
+  g+=`<polyline points="${pts.map((p,i)=>X(i)+","+YT(p.tot)).join(" ")}" style="fill:none;stroke:var(--out)" stroke-width="2.5"/><polyline points="${pts.map((p,i)=>X(i)+","+YU(p.user)).join(" ")}" style="fill:none;stroke:var(--emb)" stroke-width="2.5"/>`;
+  const bi=+$("#scB").value;g+=`<circle cx="${X(bi)}" cy="${YT(pts[bi].tot)}" r="5" style="fill:var(--out)"/><circle cx="${X(bi)}" cy="${YU(pts[bi].user)}" r="5" style="fill:var(--emb)"/>`;
+  g+=`<text x="${l-4}" y="${t+8}" text-anchor="end" font-size="9" style="fill:var(--out)" font-family="IBM Plex Mono">${f(mxT)}</text><text x="${W-rr+4}" y="${t+8}" font-size="9" style="fill:var(--emb)" font-family="IBM Plex Mono">${f(mxU)}</text>`;
+  g+=`<text x="${l+4}" y="${t+8}" font-size="9.5" font-family="IBM Plex Mono"><tspan style="fill:var(--out)">— total tok/s (left)</tspan>  <tspan style="fill:var(--emb)">— per user (right)</tspan></text>`;
+  $("#scSvg").innerHTML=g;
+}
+["#scB","#scI","#scO"].forEach(s=>$(s).addEventListener("input",renderSC));["#scN","#scP","#scH"].forEach(s=>$(s).addEventListener("change",renderSC));renderSC();
+
+/* ---- 4. monitoring ---- */
+const MN_K=[["requests/s","rps","var(--hid)",""],["p95 latency","lat","var(--tok)"," ms"],["error rate","err","var(--err)","%"],["memory","mem","var(--emb)","%"],["👎 rate","bad","var(--out)","%"]];
+const MN_INC={spike:{fix:0,name:"Traffic spike",why:"Requests per second tripled while memory and 👎 stayed normal. The one replica is saturated, so requests queue (p95 latency climbs) and then time out (errors). Fix: <b>scale out</b> with more replicas or autoscaling, plus a rate limit."},
+ leak:{fix:1,name:"Memory leak",why:"Traffic was flat but memory climbed steadily until out-of-memory errors appeared, a classic leak (for example, KV caches of finished requests never freed). Fix now: <b>restart the workers</b> (rolling). Fix for good: find the leak, and set a memory alert at 80%."},
+ drift:{fix:2,name:"Bad model deploy",why:"Latency, errors and memory all look healthy, but the 👎 rate tripled right after a deploy. The new model version answers worse. Fix: <b>roll back</b> to the previous version, then run the Stage 9 evaluation suite before redeploying. System metrics alone would never catch this."}};
+const MN_FIX=["Scale out: add replicas / autoscale","Rolling restart of the workers","Roll back to the previous model version","Lower the temperature to 0"];
+let mn={t:0,hist:{rps:[],lat:[],err:[],mem:[],bad:[]},inc:null,age:0,solved:new Set(),wrong:0,logs:[],rnd:mulberry(91)};
+$("#mnCharts").innerHTML=MN_K.map(k=>`<div class="mc" id="mc_${k[1]}"><div class="k">${k[0]}</div><div class="v" id="mv_${k[1]}" style="color:${k[2]}">–</div><svg viewBox="0 0 100 40" preserveAspectRatio="none" id="ms_${k[1]}"></svg></div>`).join("");
+function mnTick(){
+  const r=mn.rnd,j=s=>(r()-.5)*s,inc=mn.inc,a=mn.age;
+  let rps=40+j(6),lat=420+j(60),err=.3+j(.3),mem=52+j(2),bad=4+j(1.2);
+  if(inc==="spike"){const f=Math.min(1,a/6);rps=40+80*f+j(8);lat=420+1600*f*f+j(150);err=.3+(a>5?6+j(2):a);}
+  if(inc==="leak"){mem=Math.min(99,52+a*3.2+j(1));if(mem>92){err=5+j(3);lat=900+j(200);}}
+  if(inc==="drift"){bad=Math.min(16,4+a*1.5)+j(1.2);}
+  const v={rps,lat,err:Math.max(0,err),mem,bad};
+  Object.keys(v).forEach(k=>{mn.hist[k].push(v[k]);if(mn.hist[k].length>40)mn.hist[k].shift();});
+  MN_K.forEach(([_,k,c,u])=>{const h=mn.hist[k],mx=Math.max(...h,k==="mem"?100:k==="err"?2:k==="bad"?10:k==="lat"?800:60),pts=h.map((x,i)=>(i/39*100).toFixed(1)+","+(40-x/mx*38).toFixed(1)).join(" ");
+    $("#ms_"+k).innerHTML=`<polyline points="${pts}" style="fill:none;stroke:${c}" stroke-width="1.6" vector-effect="non-scaling-stroke"/>`;
+    $("#mv_"+k).textContent=(k==="rps"||k==="lat"?Math.round(v[k]):v[k].toFixed(1))+u;
+    const alert=(k==="lat"&&v.lat>1000)||(k==="err"&&v.err>2)||(k==="mem"&&v.mem>85)||(k==="bad"&&v.bad>9)||(k==="rps"&&v.rps>80);$("#mc_"+k).classList.toggle("alert",alert);});
+  const ts=new Date(Date.now()).toISOString().slice(11,19);
+  let line=`${ts} INFO  POST /generate 200 tokens=${Math.round(40+r()*120)} latency_ms=${Math.round(lat*(.6+r()*.4))}`;
+  if(inc==="spike"&&a>4&&r()<.6)line=`${ts} WARN  queue_depth=${Math.round(20+a*6)} request timed out after 30s → 504`;
+  if(inc==="leak"&&r()<.4)line=mem>92?`${ts} ERROR worker-2 CUDA/CPU out of memory → 500`:`${ts} INFO  worker-2 rss=${(mem*.16).toFixed(1)}GB kv_cache_blocks=${Math.round(200+a*40)} (never freed)`;
+  if(inc==="drift"&&r()<.45)line=`${ts} INFO  feedback=thumbs_down model=slm-banking-v2.1 reason="${["wrong rate quoted","made up a fee","off topic","repeated itself"][Math.floor(r()*4)]}"`;
+  if(inc==="drift"&&a===1)line=`${ts} INFO  deploy complete: slm-banking-v2.0 → v2.1 (canary skipped)`;
+  mn.logs.push(line);if(mn.logs.length>40)mn.logs.shift();$("#mnLog").textContent=mn.logs.join("\n");$("#mnLog").scrollTop=1e6;
+  if(inc)mn.age++;
+}
+for(let i=0;i<40;i++)mnTick();
+setInterval(()=>{if(!$("#stage12").hidden&&!document.hidden)mnTick();},700);
+function mnRender(){
+  $("#mnScore").textContent=`solved ${mn.solved.size}/3${mn.wrong?` · wrong guesses ${mn.wrong}`:""}`;
+  $("#mnState").textContent=mn.inc?"status: incident open":"status: healthy";$("#mnState").classList.toggle("bad",!!mn.inc);
+  $("#mnFix").innerHTML=MN_FIX.map((f,i)=>`<button type="button" class="btn" data-fx="${i}" ${mn.inc?"":"disabled"}>${f}</button>`).join("");
+  $$("#mnFix [data-fx]").forEach(b=>b.addEventListener("click",()=>{if(!mn.inc)return;const I=MN_INC[mn.inc];
+    if(+b.dataset.fx===I.fix){mn.solved.add(mn.inc);$("#mnMsg").innerHTML=`<b class="c-out">Resolved: ${I.name}.</b> ${I.why}`;mn.inc=null;mn.age=0;mnRender();}
+    else{mn.wrong++;b.disabled=true;b.classList.add("wrong");$("#mnMsg").innerHTML=`<b class="c-err">That didn't fix it.</b> Look again at which metric moved first, and at the log lines.`;$("#mnScore").textContent=`solved ${mn.solved.size}/3 · wrong guesses ${mn.wrong}`;}}));
+}
+$("#mnGo").addEventListener("click",()=>{if(mn.inc)return;const left=Object.keys(MN_INC).filter(k=>!mn.solved.has(k)),pool=left.length?left:Object.keys(MN_INC);mn.inc=pool[Math.floor(Math.random()*pool.length)];mn.age=0;$("#mnMsg").textContent="Something is wrong. Watch the charts for a few seconds, read the logs, then choose a fix.";mnRender();});
+mnRender();
+
+/* ---- code ---- */
+codeBox($("#code12"),{"generate.py":`import torch, torch.nn as nn, torch.nn.functional as F
+
+# ---- the model class (swap in your Stage 6 TinyGPT) -------------------------
+class Bigram(nn.Module):
+    def __init__(self, V, d=32):
+        super().__init__()
+        self.emb, self.head = nn.Embedding(V, d), nn.Linear(d, V)
+    def forward(self, x):
+        return self.head(self.emb(x))
+
+# ---- load (in the server process) -------------------------------------------
+def load(path="slm.pt"):
+    ck = torch.load(path, map_location="cpu")
+    m = Bigram(**ck["config"]); m.load_state_dict(ck["state_dict"]); m.eval()
+    return m, ck["vocab"]
+
+# ---- generate with temperature, top-k, top-p ---------------------------------
+@torch.no_grad()
+def generate(m, vocab, prompt, max_new=10, temperature=0.8, top_k=None, top_p=1.0, seed=None):
+    if seed is not None:
+        torch.manual_seed(seed)
+    s = {w: i for i, w in enumerate(vocab)}
+    toks = [s[w] for w in prompt.lower().split() if w in s] or [0]
+    for _ in range(max_new):
+        logits = m(torch.tensor([toks[-1]]))[0]
+        if temperature == 0:                                    # greedy
+            nxt = int(logits.argmax())
+        else:
+            probs = F.softmax(logits / temperature, dim=-1)
+            p, idx = probs.sort(descending=True)
+            if top_k:
+                p[top_k:] = 0
+            keep = (p.cumsum(0) - p) < top_p                    # top-p (nucleus)
+            p = p * keep
+            nxt = int(idx[torch.multinomial(p / p.sum(), 1)])
+        toks.append(nxt)
+        if vocab[nxt] == ".":
+            break
+    return " ".join(vocab[t] for t in toks)
+
+if __name__ == "__main__":
+    # ---- train a tiny model ---------------------------------------------------
+    text = ("the bank approved the loan . the customer asked about the fee . "
+            "the bank offers a savings account . the customer paid the loan . ") * 20
+    vocab = sorted(set(text.split()))
+    stoi = {w: i for i, w in enumerate(vocab)}
+    ids = torch.tensor([stoi[w] for w in text.split()])
+    torch.manual_seed(0)
+    model = Bigram(len(vocab))
+    opt = torch.optim.AdamW(model.parameters(), lr=3e-2)
+    for step in range(200):
+        loss = F.cross_entropy(model(ids[:-1]), ids[1:])
+        opt.zero_grad(); loss.backward(); opt.step()
+    print(f"trained, loss {loss.item():.3f}")
+
+    # ---- save: weights + everything needed to rebuild the model ------------
+    torch.save({"state_dict": model.state_dict(),
+                "config": {"V": len(vocab), "d": 32}, "vocab": vocab}, "slm.pt")
+
+    m, v = load()
+    print("greedy :", generate(m, v, "the customer", temperature=0))
+    # greedy can loop forever ("about the customer asked about the ..."): one
+    # reason chat models sample with temperature/top-p, plus a max_tokens cap
+    for seed in range(3):
+        print("sampled:", generate(m, v, "the bank", temperature=0.9, top_p=0.9, seed=seed))`,
+"app.py":`# pip install fastapi uvicorn · first run  python generate.py  (creates slm.pt)
+# then serve:  uvicorn app:app --port 8000
+import json, logging, time, uuid
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
+from generate import load, generate                        # the file in the other tab
+
+logging.basicConfig(level=logging.INFO, format="%(message)s")
+log = logging.getLogger("slm")
+model, vocab = load("slm.pt")                               # load ONCE at start-up
+app = FastAPI(title="Banking SLM")
+
+class Req(BaseModel):
+    prompt: str = Field(min_length=1, max_length=4000)      # input validation
+    max_tokens: int = Field(20, ge=1, le=256)
+    temperature: float = Field(0.7, ge=0, le=2)
+    top_p: float = Field(0.9, gt=0, le=1)
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+@app.post("/generate")
+def gen(r: Req):
+    rid, t0 = uuid.uuid4().hex[:8], time.perf_counter()
+    try:
+        out = generate(model, vocab, r.prompt, r.max_tokens, r.temperature, top_p=r.top_p)
+    except Exception as e:
+        log.error(json.dumps({"id": rid, "event": "error", "msg": str(e)}))
+        raise HTTPException(500, "generation failed")
+    ms = (time.perf_counter() - t0) * 1000
+    log.info(json.dumps({"id": rid, "event": "generate", "prompt_chars": len(r.prompt),
+                         "out_tokens": len(out.split()), "latency_ms": round(ms, 1)}))
+    return {"id": rid, "text": out, "latency_ms": round(ms, 1)}
+
+# test without a server:
+#   from fastapi.testclient import TestClient
+#   c = TestClient(app); print(c.post("/generate", json={"prompt": "the bank"}).json())`});
+
+/* ---- exercise ---- */
+let ex12Checked=false;
+const EX12=[
+ {t:"<b>End to end (panel 01):</b> send a request all the way through to the response",f:()=>paDone},
+ {t:"<b>Greedy (panel 02):</b> generate a complete sentence (ending in “.”) with temperature ≤ 0.3",f:()=>isSaw.greedy},
+ {t:"<b>Nucleus (panel 02):</b> make <b>top-p</b> cut at least one candidate during generation",f:()=>isSaw.topp},
+ {t:"<b>Capacity (panel 03):</b> find a setup giving <b>≥ 10 tokens/s per user</b> and <b>≥ 150 total tokens/s</b> on the <b>laptop CPU</b>",f:()=>scLast.user>=10&&scLast.tot>=150&&$("#scH").value==="0"},
+ {t:"<b>On call (panel 04):</b> diagnose and fix <b>all 3</b> incident types",f:()=>mn.solved.size===3}
+];
+function runEx12(){let ok=0;$("#ex12Checks").innerHTML=EX12.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex12Checked?(r?"ok":"no"):""}"><span class="dot">${ex12Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex12Checked)$("#ex12Msg").innerHTML=ok===EX12.length?'<span class="c-out">All 5 missions complete.</span> You can trace, tune, size and operate an SLM service.':`${ok}/5 missions complete. Hint for capacity: a small model in INT4 with a batch of 4–8.`;}
+$("#ex12Btn").addEventListener("click",()=>{ex12Checked=true;runEx12();});
+
+/* ---- quiz ---- */
+function makeQuiz12(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)];
+  const D=pick([[.5,.2,.1,.1,.1],[.4,.3,.2,.06,.04],[.6,.15,.1,.1,.05]]),K=pick([2,3]),top=D[0]/D.slice(0,K).reduce((a,b)=>a+b,0);
+  const tt=pick([200,300,500]),pt=pick([20,25,40]),no=pick([100,150,200]),lat=(tt+pt*no)/1000;
+  return [
+   {type:"Numerical",kind:"num",q:`The model's next-token probabilities are <b>${D.map(x=>Math.round(x*100)+"%").join(", ")}</b>. With <b>top-k = ${K}</b> (and T = 1), what probability does the most likely token have after renormalising? Give a decimal.`,
+    check:v=>{if(Math.abs(v-top)<.011||Math.abs(v-top*100)<1.1)return [true,`Keep the top ${K}: ${D.slice(0,K).join(" + ")} = ${D.slice(0,K).reduce((a,b)=>a+b,0).toFixed(2)}. Then ${D[0]} / that = ${top.toFixed(3)}.`];if(Math.abs(v-D[0])<.011)return [false,`${D[0]} is the probability before the cut. After removing the others, the survivors are rescaled to sum to 1: ${D[0]} / ${D.slice(0,K).reduce((a,b)=>a+b,0).toFixed(2)} = ${top.toFixed(3)}.`];return [false,`Renormalise: ${D[0]} / (${D.slice(0,K).join(" + ")}) = ${top.toFixed(3)}.`];}},
+   {type:"Numerical",kind:"num",q:`Time to first token is <b>${tt} ms</b>, then each new token takes <b>${pt} ms</b>. How many <b>seconds</b> does a <b>${no}</b>-token reply take in total?`,
+    check:v=>{if(Math.abs(v-lat)<.06)return [true,`${tt} ms + ${no} × ${pt} ms = ${tt+pt*no} ms = ${lat} s. The decode loop dominates.`];if(Math.abs(v-pt*no/1000)<.06)return [false,`Don't forget the time to first token (prefill): ${tt} ms + ${pt*no} ms = ${lat} s.`];if(Math.abs(v-(tt+pt*no))<1)return [false,`That's milliseconds. In seconds it's ${lat}.`];return [false,`latency = TTFT + tokens × per-token time = ${tt} + ${no}×${pt} = ${tt+pt*no} ms = ${lat} s.`];}},
+   {type:"Conceptual",kind:"mcq",q:"What does <b>top-p (nucleus) sampling</b> do?",opts:shuffle([
+     {t:"Keeps the smallest set of most-likely tokens whose probabilities add up to at least p, then samples from them, so the set grows when the model is unsure and shrinks when it is confident",ok:true,why:"Correct. That adaptivity is why top-p ≈ 0.9 is the common default (panel 02)."},
+     {t:"Always keeps exactly p tokens",why:"Misconception: <b>top-p = top-k</b>. A fixed number of tokens is top-k. Top-p fixes a probability mass instead."},
+     {t:"Divides the logits by p before the softmax",why:"Misconception: <b>top-p = temperature</b>. That's temperature, which reshapes the distribution rather than cutting it."},
+     {t:"Picks the single most likely token",why:"Misconception: <b>top-p = greedy</b>. Greedy decoding is T = 0 (or top-k = 1)."}],r)},
+   {type:"Conceptual",kind:"mcq",q:"Why does <b>batching</b> raise total throughput for SLM inference on a CPU or GPU?",opts:shuffle([
+     {t:"Each decode step must read all the weights from memory anyway, so serving 8 requests in one pass costs barely more time than 1, until compute becomes the limit",ok:true,why:"Correct. Decoding is memory-bound at small batches, so the weight-reading cost is shared (panel 03)."},
+     {t:"Batching makes the model smaller",why:"Misconception: <b>batching compresses the model</b>. The model is unchanged. That's quantization (Stage 11)."},
+     {t:"Batching makes each individual user's reply faster",why:"Misconception: <b>batching helps latency</b>. Per-user speed stays flat or drops slightly. Total throughput is what rises."},
+     {t:"Batching skips the prefill step",why:"Misconception: <b>batching removes prefill</b>. Every request still needs its prompt processed."}],r)},
+   {type:"Practical",kind:"mcq",q:"After deploying v2.1 of your banking SLM, latency, error rate and memory all look normal, but the 👎 feedback rate has tripled. What do you do first?",opts:shuffle([
+     {t:"Roll back to v2.0, then evaluate v2.1 offline (Stage 9 suite) to find the regression before redeploying, ideally behind a canary",ok:true,why:"Correct. Quality regressions are invisible to system metrics. Restore service first, then investigate (panel 04)."},
+     {t:"Add more replicas",why:"Misconception: <b>every problem is capacity</b>. Load is normal. More copies of a worse model won't help."},
+     {t:"Restart the servers",why:"Misconception: <b>restart fixes everything</b>. The weights are the problem, and a restart reloads the same bad model."},
+     {t:"Ignore it, since the system metrics are green",why:"Misconception: <b>green dashboards = healthy model</b>. Users are telling you answer quality dropped."}],r)}
+  ];
+}
+mountQuiz(12,$("#quiz12"),makeQuiz12);
+function renderDone(){const done=P.completed.includes(12);$("#p12-done").hidden=!done;if(done){const att=Object.values(P.att||{}).reduce((a,b)=>a+b,0);const all=P.completed.length>=13,left=[...Array(13).keys()].filter(i=>!P.completed.includes(i));
+  $("#doneH").textContent=all?"You've finished all 13 stages of the SLM Learning Lab":`Final assessment passed. Stage${left.length>1?"s":""} ${left.join(", ")} still need${left.length>1?"":"s"} a pass to complete the course`;
+  $("#doneStats").innerHTML=`<div class="stat"><span class="v c-out">${P.completed.length}/13</span><span class="k">stages passed</span></div><div class="stat"><span class="v">${att}</span><span class="k">assessments taken</span></div><div class="stat"><span class="v c-emb">≥ 52</span><span class="k">questions answered right</span></div>`;}}
+$("#quiz12").addEventListener("click",e=>{if(e.target.closest("[data-a=sub]"))setTimeout(()=>{renderDone();if(P.completed.includes(12))$("#p12-done").scrollIntoView({behavior:"smooth"});},50);});
+renderDone();
+runEx12();
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -6600,6 +7034,38 @@ Object.assign(NARR,{
  {sel:"#dsSoft",act:()=>{$("#dsT").value=30;renderDS();},en:"In distillation, a small student copies the teacher's full probabilities. They say that application and account are reasonable and cat is absurd, which a one-hot label never shows.",
   te:"డిస్టిలేషన్‌లో చిన్న స్టూడెంట్ టీచర్ పూర్తి సంభావ్యతలను అనుకరిస్తుంది. అప్లికేషన్, అకౌంట్ సహేతుకమని, క్యాట్ అసంబద్ధమని అవి చెబుతాయి, వన్-హాట్ లేబుల్ ఎప్పుడూ చూపించనిది ఇదే.",
   hn:"डिस्टिलेशन में एक छोटा छात्र शिक्षक की पूरी संभावनाओं की नकल करता है। वे बताती हैं कि एप्लिकेशन और अकाउंट उचित हैं और कैट बेतुका है, जो वन-हॉट लेबल कभी नहीं दिखाता।"}]
+});
+
+/* ---- narration for stage 12 ---- */
+NARR_INTRO[12]={en:"Welcome to Stage twelve, the final stage: deployment. Here your model becomes a real service that many people can use at once.",
+ te:"స్టేజ్ పన్నెండుకు స్వాగతం. ఇదే చివరి స్టేజ్, డిప్లాయ్‌మెంట్. ఇక్కడ మీ మోడల్ చాలా మంది ఒకేసారి వాడగలిగే నిజమైన సర్వీస్‌గా మారుతుంది.",
+ hn:"स्टेज ट्वेल्व में आपका स्वागत है, यह आख़िरी स्टेज है: डिप्लॉयमेंट। यहाँ आपका मॉडल एक असली सर्विस बनता है जिसे बहुत लोग एक साथ इस्तेमाल कर सकते हैं।"};
+Object.assign(NARR,{
+"p12-arch":[
+ {sel:"#paPipe",en:"A request passes through the API, input checks, the tokenizer, the transformer, sampling and the detokenizer, then goes back to the user. Press send to watch it travel.",
+  te:"ఒక రిక్వెస్ట్ ఏపీఐ, ఇన్‌పుట్ చెక్‌లు, టోకెనైజర్, ట్రాన్స్‌ఫార్మర్, శాంప్లింగ్, డీటోకెనైజర్ గుండా వెళ్లి యూజర్‌కు తిరిగి వస్తుంది. అది ప్రయాణించడం చూడటానికి సెండ్ నొక్కండి.",
+  hn:"एक रिक्वेस्ट एपीआई, इनपुट जाँच, टोकनाइज़र, ट्रांसफ़ॉर्मर, सैंपलिंग और डीटोकनाइज़र से होकर यूज़र तक वापस जाती है। उसे चलते देखने के लिए सेंड दबाइए।"},
+ {sel:"#paLat",en:"The prompt is processed once, in parallel. Then the model writes one token at a time, and this decode loop takes most of the time.",
+  te:"ప్రాంప్ట్ ఒక్కసారి, సమాంతరంగా ప్రాసెస్ అవుతుంది. తర్వాత మోడల్ ఒక్కో టోకెన్ రాస్తుంది, ఈ డీకోడ్ లూప్‌కే ఎక్కువ సమయం పడుతుంది.",
+  hn:"प्रॉम्प्ट एक बार, समानांतर में प्रोसेस होता है। फिर मॉडल एक-एक टोकन लिखता है, और ज़्यादातर समय यही डीकोड लूप लेता है।"}],
+"p12-inf":[
+ {sel:"#isBars",en:"These are the real probabilities for the next word. Green words are kept. Amber ones are cut by top k, and red ones by top p. One kept word is then drawn at random.",
+  te:"ఇవి తర్వాతి పదానికి నిజమైన సంభావ్యతలు. ఆకుపచ్చ పదాలు ఉంచబడతాయి. పసుపు పదాలను టాప్ కే, ఎరుపు పదాలను టాప్ పీ కట్ చేస్తాయి. తర్వాత ఉంచిన వాటిలో ఒక పదం యాదృచ్ఛికంగా ఎంచుకోబడుతుంది.",
+  hn:"ये अगले शब्द की असली संभावनाएँ हैं। हरे शब्द रखे जाते हैं। पीले शब्द टॉप के से कटते हैं, और लाल शब्द टॉप पी से। फिर रखे गए शब्दों में से एक शब्द बेतरतीब ढंग से चुना जाता है।"},
+ {sel:"#isOut",act:()=>{$("#isT").value=0;isReset();},en:"With temperature zero, the model always picks the top word, so the answer is the same every time. That suits facts and code. Raise the temperature for variety.",
+  te:"టెంపరేచర్ సున్నా అయితే మోడల్ ఎప్పుడూ టాప్ పదాన్నే ఎంచుకుంటుంది, కాబట్టి ప్రతిసారీ అదే జవాబు. ఇది వాస్తవాలు, కోడ్‌కు సరిపోతుంది. వైవిధ్యం కోసం టెంపరేచర్ పెంచండి.",
+  hn:"टेम्परेचर शून्य पर मॉडल हमेशा सबसे ऊपर वाला शब्द चुनता है, इसलिए हर बार वही जवाब आता है। यह तथ्यों और कोड के लिए ठीक है। विविधता के लिए टेम्परेचर बढ़ाइए।"}],
+"p12-scale":[
+ {sel:"#scSvg",act:()=>{$("#scB").value=3;renderSC();},en:"Batching serves several users in each pass. Total throughput, the green line, climbs. Each user's own speed, the cyan line, falls slowly. Keep it above ten tokens per second.",
+  te:"బ్యాచింగ్ ప్రతి పాస్‌లో చాలా మంది యూజర్లకు సర్వ్ చేస్తుంది. మొత్తం త్రూపుట్, అంటే ఆకుపచ్చ గీత, పెరుగుతుంది. ప్రతి యూజర్ స్వంత వేగం, సియాన్ గీత, నెమ్మదిగా తగ్గుతుంది. దాన్ని సెకనుకు పది టోకెన్ల పైన ఉంచండి.",
+  hn:"बैचिंग हर पास में कई यूज़र्स को सर्व करती है। कुल थ्रूपुट, यानी हरी लाइन, बढ़ती है। हर यूज़र की अपनी रफ़्तार, सियान लाइन, धीरे-धीरे घटती है। इसे दस टोकन प्रति सेकंड से ऊपर रखिए।"}],
+"p12-mon":[
+ {sel:"#mnCharts",en:"This dashboard streams the health of your service. Trigger a mystery incident, notice which chart moves first, read the logs, and choose the fix.",
+  te:"ఈ డాష్‌బోర్డ్ మీ సర్వీస్ ఆరోగ్యాన్ని చూపిస్తుంది. ఒక మిస్టరీ ఇన్సిడెంట్ ప్రారంభించి, ఏ చార్ట్ మొదట కదులుతుందో గమనించి, లాగ్‌లు చదివి, పరిష్కారం ఎంచుకోండి.",
+  hn:"यह डैशबोर्ड आपकी सर्विस की सेहत दिखाता है। एक मिस्ट्री इंसिडेंट शुरू कीजिए, देखिए कौन सा चार्ट पहले बदलता है, लॉग पढ़िए, और समाधान चुनिए।"},
+ {sel:"#mnFix",en:"Remember: a worse model can look perfectly healthy on system metrics. Only user feedback and evaluation reveal it.",
+  te:"గుర్తుంచుకోండి: సిస్టమ్ మెట్రిక్స్‌లో అధ్వాన్నమైన మోడల్ కూడా పూర్తిగా ఆరోగ్యంగా కనిపించవచ్చు. యూజర్ ఫీడ్‌బ్యాక్, ఎవాల్యుయేషన్ మాత్రమే దాన్ని బయటపెడతాయి.",
+  hn:"याद रखिए: सिस्टम मेट्रिक्स पर एक ख़राब मॉडल भी पूरी तरह ठीक दिख सकता है। सिर्फ़ यूज़र फ़ीडबैक और इवैल्यूएशन ही उसे पकड़ते हैं।"}]
 });
 
 /* ---- engine ---- */
