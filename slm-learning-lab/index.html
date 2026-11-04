@@ -88,7 +88,8 @@ button{cursor:pointer}
 .btn.primary:hover{filter:brightness(1.08)}
 .btn:disabled{opacity:.4;cursor:not-allowed}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.field{display:grid;gap:4px;font-size:.8rem;color:var(--muted)}
+.field{display:block;font-size:.8rem;color:var(--muted)}
+.field > input,.field > select{display:block;margin-top:5px}
 .field input[type=text],.field select,input.txt{background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--fg);font-family:var(--f-mono);font-size:.88rem;width:100%}
 input[type=range]{accent-color:var(--emb);width:100%}
 .sim{display:inline-flex;gap:6px;align-items:center;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid}
@@ -222,6 +223,74 @@ table.tbl{border-collapse:collapse;font-family:var(--f-mono);font-size:.8rem}
 .lockicon{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--panel2);border:1px solid var(--line2)}
 .spark{width:100%;height:auto;display:block}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* ---- Stage 1 instruments ---- */
+.plain{font-size:1.02rem;color:var(--fg)!important;max-width:74ch}
+.plain em{font-style:normal;color:var(--tok)}
+.facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px}
+@media (max-width:860px){.facts{grid-template-columns:minmax(0,1fr)}}
+.facts > div{background:var(--panel2);border:1px solid var(--line);border-radius:var(--r);padding:12px;min-width:0;font-size:.87rem}
+.facts > div > b:first-child{display:block;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500;margin-bottom:6px}
+.facts ul{margin:0;padding-left:16px;display:grid;gap:3px}
+.predict{border:1px dashed rgba(243,185,85,.55);background:rgba(243,185,85,.05);border-radius:var(--r);padding:12px 14px}
+.predict .pq{font-size:.92rem;margin:4px 0 8px}
+.predict .po{display:flex;gap:6px;flex-wrap:wrap}
+.predict .pw{margin-top:8px;font-size:.86rem;display:none}
+.predict .pw.show{display:block}
+.btn.right{border-color:var(--out);color:var(--out);opacity:1}
+.btn.wrong{border-color:var(--err);color:var(--err);opacity:1}
+.loop{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:6px}
+.loop button{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--lc);border-radius:8px;padding:7px 11px;font-size:.82rem;text-align:left;display:grid;gap:1px}
+.loop button span{font-family:var(--f-mono);font-size:.66rem;color:var(--muted)}
+.loop button:hover{border-color:var(--lc)}
+.loop .la{color:var(--dim);font-family:var(--f-mono)}
+.tview{min-height:250px;display:grid;place-items:center;padding:14px 4px;overflow-x:auto}
+.tcell{width:38px;height:28px;border-radius:4px;display:grid;place-items:center;font-family:var(--f-mono);font-size:.68rem;color:var(--fg);animation:pop .35s ease both;cursor:crosshair;border:1px solid rgba(255,255,255,.06)}
+.tcell:hover{outline:2px solid var(--tok)}
+.tcell.solo{width:90px;height:62px;font-size:1.15rem}
+.tgrid{display:grid;gap:3px;align-items:center}
+.tgrid .rl{font-family:var(--f-mono);font-size:.72rem;color:var(--tok);text-align:right;padding-right:6px}
+.t3{position:relative;width:232px;height:222px}
+.t3 .tgrid{position:absolute;padding:6px;background:var(--panel);border:1px solid var(--line2);border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.axis{font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+svg.dot{width:100%;max-width:400px;height:auto;touch-action:none;display:block;margin:0 auto}
+.gauge{position:relative;height:12px;border-radius:6px;background:linear-gradient(90deg,var(--err),var(--line2) 50%,var(--out));margin-top:6px}
+.gauge i{position:absolute;top:-4px;width:4px;height:20px;margin-left:-2px;background:var(--fg);border-radius:2px;transition:left .15s}
+.glabels{display:flex;justify-content:space-between;font-family:var(--f-mono);font-size:.66rem;color:var(--dim);margin-top:4px}
+.mat{display:inline-grid;gap:4px;padding:6px 8px;border-left:2px solid var(--muted);border-right:2px solid var(--muted);border-radius:6px}
+.mat input{width:44px;height:34px;text-align:center;background:var(--bg);border:1px solid var(--line2);border-radius:5px;font-family:var(--f-mono);font-size:.9rem;color:var(--fg);transition:all .2s;padding:0}
+.mat input.hiA{border-color:var(--emb);background:rgba(82,211,226,.16)}
+.mat input.hiB{border-color:var(--tok);background:rgba(243,185,85,.16)}
+.mat input.pair{transform:scale(1.18);box-shadow:0 0 14px rgba(255,255,255,.3);border-width:2px}
+.mat .cc{width:54px;height:34px;display:grid;place-items:center;border-radius:5px;background:var(--bg);border:1px solid var(--line2);font-family:var(--f-mono);font-size:.9rem;color:var(--dim)}
+.mat .cc.done{color:var(--out);border-color:rgba(98,227,162,.5);animation:pop .35s ease}
+.mat .cc.cur{border-color:var(--out);box-shadow:0 0 0 2px rgba(98,227,162,.35)}
+.mmrow{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center}
+.mmop{font-family:var(--f-display);font-size:1.6rem;color:var(--muted)}
+.mmshape{font-family:var(--f-mono);font-size:.95rem;text-align:center}
+.calc{font-family:var(--f-mono);font-size:.92rem;min-height:2.4em;padding:8px 12px;background:var(--bg);border-radius:8px;border:1px solid var(--line);overflow-x:auto;white-space:nowrap}
+.calc .t{animation:pop .3s ease both;display:inline-block}
+.shake{animation:shake .45s ease}
+@keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.scols{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.scols{grid-template-columns:minmax(0,1fr)}}
+.scol h4{margin:0 0 8px;font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.scol .bar{grid-template-columns:64px minmax(0,1fr) 62px}
+.trk2{position:relative;height:16px;background:var(--bg);border-radius:4px;display:block}
+.trk2::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line2)}
+.fill2{position:absolute;top:0;bottom:0;background:var(--hid);border-radius:3px;transition:all .35s}
+.smrow{display:grid;grid-template-columns:70px minmax(0,1fr) 46px;gap:8px;align-items:center;font-family:var(--f-mono);font-size:.82rem}
+.pstack{display:flex;height:34px;border-radius:7px;overflow:hidden}
+.pstack div{display:grid;place-items:center;font-family:var(--f-mono);font-size:.72rem;color:#071318;font-weight:500;transition:flex-grow .4s ease;min-width:0;overflow:hidden;white-space:nowrap}
+svg.plot{width:100%;height:auto;display:block;touch-action:none}
+.gdwrap{position:relative;max-width:440px;margin:0 auto}
+.gdwrap canvas{width:100%;height:auto;aspect-ratio:1;border-radius:10px;display:block;cursor:crosshair;border:1px solid var(--line2)}
+.edge{stroke:var(--line2);stroke-width:2.5;fill:none}
+.edge.ef{stroke:var(--emb);stroke-dasharray:8 6;animation:dash .5s linear infinite}
+.edge.eb{stroke:var(--err);stroke-dasharray:8 6;animation:dash .5s linear infinite reverse}
+@keyframes dash{to{stroke-dashoffset:-14}}
+.narr{font-size:.95rem;padding:10px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--line);min-height:3.2em}
+.bigloss{font-family:var(--f-display);font-size:2.6rem;font-weight:700;line-height:1.05;color:var(--err);font-variant-numeric:tabular-nums}
+.statusline{font-weight:600}
 </style>
 
 <header class="top">
@@ -431,9 +500,277 @@ table.tbl{border-collapse:collapse;font-family:var(--f-mono);font-size:.8rem}
     <div class="panel" id="p-quiz">
       <div class="phead"><span class="tag">07</span><h3>Stage 0 assessment</h3>
         <p>5 questions: conceptual, numerical and practical. Score 4/5 or better to unlock Stage 1. Each wrong answer comes with the misconception behind it. Every retry uses new numbers.</p></div>
-      <div class="qs" id="quiz"></div>
-      <div class="row" style="margin-top:14px"><button class="btn primary" id="qSubmit" type="button">Submit answers</button><button class="btn" id="qRetry" type="button" hidden>Retry with new numbers</button><span class="mono dim" id="qAttempts" style="font-size:.78rem"></span></div>
-      <div class="result" id="qResult" aria-live="polite"></div>
+      <div id="quiz0"></div>
+    </div>
+  </section>
+
+  <!-- ====================== STAGE 1 ====================== -->
+  <section id="stage1" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 01 · unlocked</div>
+      <h2>The math inside every SLM, made visible</h2>
+      <p>You don't need any math background for this stage. Each instrument starts with a picture you can move, then shows the live numbers, and only then the formula. The loop below is the whole of training. Click a step to jump to it.</p>
+    </div>
+    <div class="loop" id="s1loop" aria-label="Where each tool is used in training"></div>
+    <nav class="subnav" aria-label="Stage 1 sections">
+      <button type="button" data-go="p1-ten">1 · Tensors</button>
+      <button type="button" data-go="p1-dot">2 · Vectors & dot product</button>
+      <button type="button" data-go="p1-mm">3 · Matrix multiplication</button>
+      <button type="button" data-go="p1-soft">4 · Probability & softmax</button>
+      <button type="button" data-go="p1-ce">5 · Loss & cross-entropy</button>
+      <button type="button" data-go="p1-der">6 · Derivatives</button>
+      <button type="button" data-go="p1-gd">7 · Gradient descent</button>
+      <button type="button" data-go="p1-bp">8 · Chain rule & backprop</button>
+      <button type="button" data-go="p1-code">9 · Code</button>
+      <button type="button" data-go="p1-ex">10 · Exercise</button>
+      <button type="button" data-go="p1-quiz">11 · Assessment</button>
+    </nav>
+
+    <!-- 1 TENSORS -->
+    <div class="panel" id="p1-ten">
+      <div class="phead"><span class="tag">01</span><h3>Scalars, vectors, matrices, tensors</h3>
+        <p class="plain">Everything inside an SLM is a <em>box of numbers</em>. What changes is how many directions the box extends in. Think of it as one spreadsheet cell, then a row, then a whole sheet, then a workbook of sheets.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <div class="row" id="tBtns"></div>
+          <div class="tview" id="tView"></div>
+          <div class="mono" id="tRead" style="font-size:.85rem;text-align:center" aria-live="polite"></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="eyebrow">Shape</div><div class="big" id="tShape" style="font-size:2.2rem;color:var(--emb)"></div><p id="tEx" style="margin-top:8px"></p><p class="note" id="tCount" style="margin-top:8px"></p></div>
+          <div class="predict" id="tPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">x ∈ ℝ<sup>d₁ × d₂ × … × dₖ</sup></div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-emb">ℝ</span>: real numbers (decimals)</li><li><span class="c-emb">dᵢ</span>: size along axis i</li><li><span class="c-emb">k</span>: rank, the number of axes</li></ul></div>
+        <div><b>Inside an SLM</b>Token IDs <span class="mono">[B, T]</span> → embeddings <span class="mono">[B, T, d]</span> → attention scores <span class="mono">[B, H, T, T]</span> → logits <span class="mono">[B, T, V]</span>. Getting shapes right is most of the work in Stage 6.</div>
+      </div>
+    </div>
+
+    <!-- 2 DOT -->
+    <div class="panel" id="p1-dot">
+      <div class="phead"><span class="tag">02</span><h3>Vectors & the dot product</h3><span class="sim real">drag the arrow tips</span>
+        <p class="plain">A vector is an <em>arrow</em>. The dot product answers one question: <em>how much do two arrows point the same way?</em> Same direction gives a big positive number, perpendicular gives zero, and opposite gives a negative number.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <svg class="dot" id="dotSvg" viewBox="0 0 320 320" role="img" aria-label="Two draggable vectors on a grid"></svg>
+          <div class="row" style="justify-content:center;margin-top:8px" id="dotPresets">
+            <span class="eyebrow">Word arrows (illustrative)</span>
+            <button type="button" class="btn" data-pa="3,1" data-pb="2.6,1.7">cat · dog</button>
+            <button type="button" class="btn" data-pa="3,1" data-pb="-0.9,2.9">cat · loan</button>
+            <button type="button" class="btn" data-pa="3,0.6" data-pb="-2.8,-0.8">hot · cold</button>
+          </div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" id="dotRead" aria-live="polite"></div>
+          <div class="predict" id="dotPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">a · b = Σᵢ aᵢ bᵢ = |a| |b| cos θ</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-emb">aᵢ, bᵢ</span>: the i-th numbers of each vector</li><li><span class="c-emb">|a|</span>: length of arrow a</li><li><span class="c-emb">θ</span>: the angle between the arrows</li></ul></div>
+        <div><b>Inside an SLM</b>Attention compares tokens with <b>q · k</b>: a big dot product means "this word is relevant to me". Cosine similarity, cos θ, measures how alike two word embeddings are. Real vectors have 64–4096 numbers, and it's the same sum with more terms.</div>
+      </div>
+    </div>
+
+    <!-- 3 MATMUL -->
+    <div class="panel" id="p1-mm">
+      <div class="phead"><span class="tag">03</span><h3>Matrix multiplication, animated</h3><span class="sim real">edit any number</span>
+        <p class="plain">Matrix multiplication is <em>many dot products at once</em>: every row of A meets every column of B. Each output number is one row "dotted" with one column. Press Play and watch each one get built.</p></div>
+      <div class="row" style="margin-bottom:12px">
+        <label class="field">rows of A (m)<select id="mmM" class="txt"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+        <label class="field">shared size (n)<select id="mmN" class="txt"><option>1</option><option>2</option><option selected>3</option><option>4</option></select></label>
+        <label class="field">columns of B (p)<select id="mmP" class="txt"><option>1</option><option selected>2</option><option>3</option><option>4</option></select></label>
+        <div class="row" style="align-self:end"><button class="btn primary" id="mmPlay" type="button">Play</button><button class="btn" id="mmStep" type="button">Next cell</button><button class="btn" id="mmRand" type="button">New numbers</button><button class="btn" id="mmBad" type="button">Try a shape that fails</button></div>
+      </div>
+      <div class="box">
+        <div class="mmshape" id="mmShape"></div>
+        <div class="mmrow" style="margin-top:14px">
+          <div style="display:grid;gap:4px;justify-items:center"><span class="eyebrow c-emb">A</span><div class="mat" id="mmA"></div></div>
+          <span class="mmop">×</span>
+          <div style="display:grid;gap:4px;justify-items:center"><span class="eyebrow c-tok">B</span><div class="mat" id="mmB"></div></div>
+          <span class="mmop">=</span>
+          <div style="display:grid;gap:4px;justify-items:center"><span class="eyebrow c-out">C</span><div class="mat" id="mmCg"></div></div>
+        </div>
+        <div class="calc" id="mmCalc" style="margin-top:14px" aria-live="polite"></div>
+      </div>
+      <div class="predict" style="margin-top:12px">
+        <div class="eyebrow c-tok">Predict first</div>
+        <p class="pq">Before you press Play: what will <b class="c-out">C[0][0]</b> be? (Row 0 of A dotted with column 0 of B.)</p>
+        <div class="row"><input class="txt" id="mmGuess" type="text" inputmode="decimal" placeholder="your guess" style="max-width:140px" autocomplete="off"><button class="btn" id="mmGuessBtn" type="button">Lock in & play</button></div>
+        <div class="pw show" id="mmPredMsg" style="margin-top:8px"></div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">C[i][j] = Σₖ A[i][k] · B[k][j]</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-emb">A</span>: m × n, <span class="c-tok">B</span>: n × p, <span class="c-out">C</span>: m × p</li><li>The inner sizes (n) must match</li><li>Cost: m · n · p multiplications</li></ul></div>
+        <div><b>Inside an SLM</b><b>Q = X · W<sub>Q</sub></b>: X is [T tokens × d] and W<sub>Q</sub> is [d × d<sub>k</sub>], so Q is [T × d<sub>k</sub>]. Every linear layer, the attention scores Q·Kᵀ and the LM head are matrix multiplications. They're over 90% of an SLM's compute.</div>
+      </div>
+    </div>
+
+    <!-- 4 SOFTMAX -->
+    <div class="panel" id="p1-soft">
+      <div class="phead"><span class="tag">04</span><h3>Probability & softmax</h3><span class="sim real">live calculator</span>
+        <p class="plain">A model's raw scores (<em>logits</em>) can be any numbers: negative, huge, whatever. Softmax turns them into <em>percentages that add up to 100%</em>. It keeps the ranking but stretches the gaps. Move the scores and watch all three stages update.</p></div>
+      <div class="grid2">
+        <div class="box" style="display:grid;gap:10px;align-content:start">
+          <div class="eyebrow">Next-word scores after "the bank approved the …"</div>
+          <div id="smCtl" style="display:grid;gap:6px"></div>
+          <label class="field">Temperature T = <b id="smTv">1.0</b><input type="range" id="smT" min="1" max="50" value="10"></label>
+          <div class="row"><button class="btn" id="smEq" type="button">Make all scores equal</button><button class="btn" id="smShift" type="button">Add +2 to every score</button></div>
+          <p class="note" id="smNote"></p>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="predict" id="smPred"></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">The probability budget: always 100%</div><div class="pstack" id="smStack"></div></div>
+        </div>
+      </div>
+      <div class="scols" style="margin-top:14px">
+        <div class="box scol"><h4>① scores z / T</h4><div class="bars" id="smC1"></div></div>
+        <div class="box scol"><h4>② e<sup>z/T</sup>: all positive now</h4><div class="bars" id="smC2"></div></div>
+        <div class="box scol"><h4>③ ÷ total = probability</h4><div class="bars" id="smC3"></div></div>
+      </div>
+      <div class="scroll" style="margin-top:12px"><table class="tbl" id="smTbl"></table></div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">pᵢ = e<sup>zᵢ/T</sup> / Σⱼ e<sup>zⱼ/T</sup></div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-hid">zᵢ</span>: raw score (logit) of word i</li><li><span class="c-emb">T</span>: temperature (spread)</li><li><span class="c-out">pᵢ</span>: probability, between 0 and 1</li></ul></div>
+        <div><b>Inside an SLM</b>Used twice. (1) The LM head's [V] logits become next-token probabilities. (2) Inside attention, scores become weights that sum to 1. The temperature slider in a chat app is this T.</div>
+      </div>
+    </div>
+
+    <!-- 5 CE -->
+    <div class="panel" id="p1-ce">
+      <div class="phead"><span class="tag">05</span><h3>Loss & cross-entropy: scoring a guess</h3><span class="sim real">live</span>
+        <p class="plain">How do we tell the model how wrong it was? Look only at the <em>probability it gave to the right answer</em>. If it was high, the penalty is tiny. If it was low, the penalty is huge. That penalty is the loss, and training is the job of making it small.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <svg class="plot" id="ceSvg" viewBox="0 0 420 230" role="img" aria-label="Cross-entropy loss curve"></svg>
+          <label class="field" style="margin-top:8px">Probability the model gave to the correct word "<span class="c-out">loan</span>": <b id="cePv"></b><input type="range" id="ceP" min="1" max="99" value="30"></label>
+          <label class="row" style="font-size:.85rem;color:var(--muted);margin-top:6px"><input type="checkbox" id="ceMse"> also show squared error (1 − p)², for comparison</label>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="eyebrow">Penalty for this guess</div><div class="bigloss" id="ceL"></div><p id="ceMood" style="margin-top:6px"></p><p class="note" id="cePpl" style="margin-top:6px"></p></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">What the model predicted</div><div class="bars" id="ceBars"></div></div>
+          <div class="predict" id="cePred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">L = −log p<sub>correct</sub>  ·  averaged over all tokens</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-out">p<sub>correct</sub></span>: probability given to the true next token</li><li>log is the natural log (ln)</li><li><span class="c-err">L</span> = 0 only if p = 1</li></ul></div>
+        <div><b>Inside an SLM</b>The training loss is the mean cross-entropy over every token in a batch. Perplexity = e<sup>L</sup> (you met it in Stage 0). A random guess over V words gives L = ln V, e.g. ln 8000 ≈ 8.99 for an untrained model.</div>
+      </div>
+    </div>
+
+    <!-- 6 DERIVATIVES -->
+    <div class="panel" id="p1-der">
+      <div class="phead"><span class="tag">06</span><h3>Derivatives & gradients: measuring steepness</h3><span class="sim real">drag the dot</span>
+        <p class="plain">A derivative is the <em>steepness of a curve at one point</em>: nudge x a tiny bit, and how much does f move? Make the step h smaller and the <span class="c-tok">orange line</span> turns into the <span class="c-out">green tangent</span>. That limit is the derivative.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <div class="row" id="derFns" style="margin-bottom:8px"></div>
+          <svg class="plot" id="derSvg" viewBox="0 0 420 260" role="img" aria-label="Function with tangent and secant lines"></svg>
+          <label class="field" style="margin-top:8px">Step size h = <b id="derHv"></b><input type="range" id="derH" min="0" max="100" value="85"></label>
+          <div class="row" style="margin-top:8px"><button class="btn primary" id="derShrink" type="button">Shrink h → 0</button></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" id="derRead" aria-live="polite"></div>
+          <div class="predict" id="derPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">f′(x) = lim<sub>h→0</sub> (f(x+h) − f(x)) / h</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-tok">h</span>: a tiny nudge to x</li><li><span class="c-out">f′(x)</span>: the slope at x</li><li>∇L = [∂L/∂w₁, ∂L/∂w₂, …]: one slope per weight</li></ul></div>
+        <div><b>Inside an SLM</b>The gradient of the loss has <b>one slope per parameter</b>. A 1M-parameter model computes a million slopes on every training step. Each one tells its weight which way is downhill.</div>
+      </div>
+    </div>
+
+    <!-- 7 GD -->
+    <div class="panel" id="p1-gd">
+      <div class="phead"><span class="tag">07</span><h3>Gradient descent: rolling downhill</h3><span class="sim real">real optimisation</span>
+        <p class="plain">Training is like walking downhill blindfolded: <em>feel the slope under your feet, step downhill, repeat</em>. The map shows the loss for every combination of two weights: dark means low loss, bright means high. <b>Click anywhere on the map</b> to drop the ball there.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <div class="gdwrap"><canvas id="gdCv" width="720" height="720" aria-label="Loss landscape; click to set a start point"></canvas></div>
+          <div class="row" style="justify-content:center;margin-top:10px">
+            <button class="btn primary" id="gdPlay" type="button">Roll</button><button class="btn" id="gdStepB" type="button">One step</button><button class="btn" id="gdReset" type="button">Reset</button>
+          </div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" style="display:grid;gap:10px">
+            <div class="row" id="gdLands"></div>
+            <label class="field">Learning rate η = <b id="gdLrV"></b><input type="range" id="gdLr" min="0" max="12" value="4"></label>
+            <label class="row" style="font-size:.85rem;color:var(--muted)"><input type="checkbox" id="gdMom"> momentum: keep some speed from earlier steps (a preview of Adam)</label>
+          </div>
+          <div class="box" id="gdRead" aria-live="polite"></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">Loss after each step</div><svg class="plot" id="gdLoss" viewBox="0 0 320 130" role="img" aria-label="Loss history"></svg></div>
+          <div class="predict" id="gdPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">w ← w − η · ∇L(w)</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-hid">w</span>: the weights (here only 2)</li><li><span class="c-emb">η</span>: learning rate, the step size</li><li><span class="c-err">∇L</span>: the gradient, which points uphill</li></ul></div>
+        <div><b>Inside an SLM</b>This is <span class="mono">optimizer.step()</span>, applied to every weight at once in a space with millions of dimensions. AdamW (Stage 8) adds momentum and a separate step size for each weight.</div>
+      </div>
+    </div>
+
+    <!-- 8 BACKPROP -->
+    <div class="panel" id="p1-bp">
+      <div class="phead"><span class="tag">08</span><h3>Chain rule & backpropagation: assigning blame</h3><span class="sim real">real gradients</span>
+        <p class="plain">The <span class="c-emb">forward pass</span> makes a prediction. The <span class="c-err">backward pass</span> works out <em>how much each weight is to blame</em> for the error by multiplying local slopes along the path. That's the chain rule. Then each weight takes a small step to reduce its blame. Press the buttons in order.</p></div>
+      <div class="box">
+        <div class="scroll"><svg id="bpSvg" viewBox="0 0 790 260" style="min-width:640px;width:100%;height:auto;display:block" role="img" aria-label="Computation graph of one neuron"></svg></div>
+        <div class="narr" id="bpNarr" aria-live="polite" style="margin-top:8px"></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn primary" id="bpF" type="button">1 · Forward pass</button>
+          <button class="btn" id="bpB" type="button">2 · Backward pass</button>
+          <button class="btn" id="bpU" type="button">3 · Update weights</button>
+          <button class="btn" id="bpAuto" type="button">Train 30 steps</button>
+          <button class="btn" id="bpR" type="button">Reset</button>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="box ctrls" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+          <label class="field">input x = <b id="bpxv"></b><input type="range" id="bpx" min="-20" max="20" value="15"></label>
+          <label class="field">target y = <b id="bpyv"></b><input type="range" id="bpy" min="1" max="99" value="20"></label>
+          <label class="field">weight w = <b id="bpwv"></b><input type="range" id="bpw" min="-30" max="30" value="5"></label>
+          <label class="field">bias b = <b id="bpbv"></b><input type="range" id="bpb" min="-30" max="30" value="0"></label>
+          <label class="field">learning rate η = <b id="bplv"></b><input type="range" id="bpl" min="1" max="40" value="10"></label>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" id="bpChain"></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">Loss over updates</div><svg class="plot" id="bpLoss" viewBox="0 0 320 110" role="img" aria-label="Loss over training updates"></svg></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">∂L/∂w = ∂L/∂a · ∂a/∂z · ∂z/∂w</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-err">∂L/∂w</span>: how much L changes if w nudges</li><li>Each factor is a <b>local</b> slope of one step</li><li>Multiply them along the path back to w</li></ul></div>
+        <div><b>Inside an SLM</b><span class="mono">loss.backward()</span> runs this exact rule backwards through embeddings, attention, feed-forward layers and the LM head, for every weight. It's the same idea as here, only with millions of nodes.</div>
+      </div>
+    </div>
+
+    <!-- 9 CODE -->
+    <div class="panel" id="p1-code">
+      <div class="phead"><span class="tag">09</span><h3>Code it on your CPU</h3>
+        <p>Each file reproduces one instrument above. Run them and compare the printed numbers with the panels.</p></div>
+      <div class="code" id="code1"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <!-- 10 EXERCISE -->
+    <div class="panel" id="p1-ex">
+      <div class="phead"><span class="tag">10</span><h3>Hands-on exercise: four missions</h3>
+        <p>Each mission uses one instrument. Set it up, then press "Check missions". The checks read the panels' live state.</p></div>
+      <div class="box">
+        <div class="checks" id="ex1Checks"></div>
+        <div class="row" style="margin-top:14px"><button class="btn primary" id="ex1Btn" type="button">Check missions</button></div>
+        <p class="note" id="ex1Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p>
+      </div>
+    </div>
+
+    <!-- 11 QUIZ -->
+    <div class="panel" id="p1-quiz">
+      <div class="phead"><span class="tag">11</span><h3>Stage 1 assessment</h3>
+        <p>5 questions: numerical, conceptual and practical. Score 4/5 or better to unlock Stage 2. You'll want pen and paper or a calculator for some of them.</p></div>
+      <div id="quiz1"></div>
     </div>
   </section>
 
@@ -484,6 +821,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
+const BUILT={0:"#stage0",1:"#stage1"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -502,17 +840,19 @@ const LOCK_SVG='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stro
 const OPEN_SVG='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>';
 function showStage(i){
   current=i;renderRail();
-  if(i===0){$("#stage0").hidden=false;$("#stageOther").hidden=true;}
+  const open=unlocked(i);
+  Object.values(BUILT).forEach(s=>{$(s).hidden=true;});$("#stageOther").hidden=true;
+  if(BUILT[i]&&open){$(BUILT[i]).hidden=false;}
   else{
-    const s=STAGES[i],open=unlocked(i);
-    $("#stage0").hidden=true;$("#stageOther").hidden=false;
+    const s=STAGES[i];
+    $("#stageOther").hidden=false;
     $("#loEye").textContent=`Stage ${String(i).padStart(2,"0")} · ${open?"unlocked":"locked"}`;
     $("#loTitle").textContent=s.t;$("#loSub").textContent=s.s;
     $("#loIcon").innerHTML=open?OPEN_SVG:LOCK_SVG;$("#loIcon").style.color=open?"var(--out)":"var(--dim)";
     $("#loState").textContent=open?"Unlocked. Ready to build.":"Locked";
     $("#loMsg").textContent=open
       ?`You passed Stage ${i-1}. Tell Claude in chat "Start Stage ${i}" and this stage's lab will be built into this page, with its own assessment.`
-      :`Pass the Stage ${i-1} assessment with 4/5 or better to unlock this stage.`;
+      :`Pass the Stage ${i-1} assessment with 4/5 or better to unlock this stage.${BUILT[i]?" Its lab is already built and waiting.":""}`;
     $("#loTopics").innerHTML=s.topics.map(t=>`<span>${esc(t)}</span>`).join("");
     $("#loLabs").innerHTML=s.labs.map(t=>`<span class="c-emb" style="border-color:rgba(82,211,226,.3)">${esc(t)}</span>`).join("");
   }
@@ -521,7 +861,7 @@ function showStage(i){
 $("#loBack").addEventListener("click",()=>showStage(0));
 $("#resetBtn").addEventListener("click",()=>{$("#resetConfirm").hidden=false;});
 $("#resetNo").addEventListener("click",()=>{$("#resetConfirm").hidden=true;});
-$("#resetYes").addEventListener("click",()=>{P={completed:[],attempts:0};save();$("#resetConfirm").hidden=true;newQuiz();showStage(0);});
+$("#resetYes").addEventListener("click",()=>{P={completed:[],attempts:0,att:{}};save();$("#resetConfirm").hidden=true;QUIZZES.forEach(q=>q.reset());showStage(0);});
 $$(".subnav button").forEach(b=>b.addEventListener("click",()=>document.getElementById(b.dataset.go).scrollIntoView({behavior:"smooth"})));
 
 /* ---------------- 1. AI MAP ---------------- */
@@ -944,9 +1284,8 @@ function parseNum(s){
   if(/^-?\d+(\.\d+)?\s*\/\s*\d+(\.\d+)?$/.test(s)){const [a,b]=s.split("/");return +a/+b;}
   return Number(s);
 }
-let quiz=[],qSeed=Date.now()%100000,qDone=false;
 function shuffle(a,r){for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function makeQuiz(seed){
+function makeQuiz0(seed){
   const r=mulberry(seed);const pick=a=>a[Math.floor(r()*a.length)];
   const V=pick([1000,5000,8000,16000,32000]),d=pick([64,128,256,384,512]);
   const cs={cat:1+Math.floor(r()*8),dog:1+Math.floor(r()*8),bank:1+Math.floor(r()*6),model:1+Math.floor(r()*6)};
@@ -981,40 +1320,565 @@ function makeQuiz(seed){
      {t:"About 7B parameters, since you only need to run one epoch",why:"Misconception: <b>fewer epochs makes big models cheap</b>. Even holding the FP32 weights takes 28 GB, and the compute is ~10²³ FLOPs. That's GPU-cluster territory."}],r)}
   ];
 }
-function renderQuiz(){
-  quiz=makeQuiz(qSeed);qDone=false;
-  $("#quiz").innerHTML=quiz.map((q,i)=>`<div class="q" id="q${i}"><div class="qh"><span class="mono dim">Q${i+1}</span><span class="qt">${q.type}</span></div><p class="qp">${q.q}</p>
-   ${q.kind==="mcq"?q.opts.map((o,j)=>`<label class="opt" id="q${i}o${j}"><input type="radio" name="q${i}" value="${j}"><span>${o.t}</span></label>`).join(""):`<input class="txt" id="q${i}in" type="text" inputmode="decimal" placeholder="your answer" autocomplete="off" style="max-width:240px">`}
-   <div class="fb" id="q${i}fb"></div></div>`).join("");
-  $("#qSubmit").disabled=false;$("#qRetry").hidden=true;$("#qResult").className="result";$("#qResult").innerHTML="";
-  $("#qAttempts").textContent=P.attempts?`attempts so far: ${P.attempts}`:"";
-}
-function newQuiz(){qSeed=(qSeed*7919+13)%1000003;renderQuiz();}
-$("#qSubmit").addEventListener("click",()=>{
-  const missing=quiz.some((q,i)=>q.kind==="mcq"?!document.querySelector(`input[name=q${i}]:checked`):!$(`#q${i}in`).value.trim());
-  if(missing){$("#qResult").className="result show";$("#qResult").innerHTML='<span class="c-tok">Answer all 5 questions before submitting.</span>';return;}
-  let score=0;const miss=[];
-  quiz.forEach((q,i)=>{
-    const fb=$(`#q${i}fb`);let ok,msg;
-    if(q.kind==="mcq"){const j=+document.querySelector(`input[name=q${i}]:checked`).value;const o=q.opts[j];ok=!!o.ok;msg=o.why;
-      q.opts.forEach((oo,k)=>{const el=$(`#q${i}o${k}`);el.classList.toggle("right",!!oo.ok);el.classList.toggle("wrong",k===j&&!oo.ok);el.querySelector("input").disabled=true;});
-      if(!ok)msg+=`<br><br><b class="c-out" style="display:inline">Right answer:</b> ${q.opts.find(o=>o.ok).t}`;}
-    else{const v=parseNum($(`#q${i}in`).value);[ok,msg]=isNaN(v)?[false,"That isn't a number I can read. Try a form like 64000, 0.25 or 3/12."]:q.check(v);$(`#q${i}in`).disabled=true;}
-    if(ok)score++;else miss.push(i+1);
-    fb.className="fb show "+(ok?"ok":"bad");fb.innerHTML=`<b class="${ok?"c-out":"c-err"}">${ok?"Correct":"Not quite"}</b>${msg}`;
+/* ---------------- GENERIC ASSESSMENT ENGINE ---------------- */
+const QUIZZES=[];
+function mountQuiz(stage,root,maker){
+  let seed=(Date.now()+stage*977)%100000,quiz=[];
+  P.att=P.att||{0:P.attempts||0};
+  root.innerHTML=`<div class="qs"></div><div class="row" style="margin-top:14px"><button class="btn primary" type="button" data-a="sub">Submit answers</button><button class="btn" type="button" data-a="ret" hidden>Retry with new numbers</button><span class="mono dim" data-a="att" style="font-size:.78rem"></span></div><div class="result" aria-live="polite"></div>`;
+  const qs=root.querySelector(".qs"),sub=root.querySelector("[data-a=sub]"),ret=root.querySelector("[data-a=ret]"),att=root.querySelector("[data-a=att]"),res=root.querySelector(".result");
+  const id=i=>`s${stage}q${i}`;
+  const attTxt=()=>{const n=P.att[stage]||0;att.textContent=n?`attempts so far: ${n}`:"";};
+  function render(){
+    quiz=maker(seed);
+    qs.innerHTML=quiz.map((q,i)=>`<div class="q"><div class="qh"><span class="mono dim">Q${i+1}</span><span class="qt">${q.type}</span></div><p class="qp">${q.q}</p>
+      ${q.kind==="mcq"?q.opts.map((o,j)=>`<label class="opt" id="${id(i)}o${j}"><input type="radio" name="${id(i)}" value="${j}"><span>${o.t}</span></label>`).join(""):`<input class="txt" id="${id(i)}in" type="text" inputmode="decimal" placeholder="your answer" autocomplete="off" style="max-width:240px">`}
+      <div class="fb" id="${id(i)}fb"></div></div>`).join("");
+    sub.disabled=false;ret.hidden=true;res.className="result";res.innerHTML="";attTxt();
+  }
+  sub.addEventListener("click",()=>{
+    const missing=quiz.some((q,i)=>q.kind==="mcq"?!root.querySelector(`input[name=${id(i)}]:checked`):!$(`#${id(i)}in`).value.trim());
+    if(missing){res.className="result show";res.style.borderColor="var(--tok)";res.innerHTML='<span class="c-tok">Answer all 5 questions before submitting.</span>';return;}
+    let score=0;const miss=[];
+    quiz.forEach((q,i)=>{
+      const fb=$(`#${id(i)}fb`);let ok,msg;
+      if(q.kind==="mcq"){const j=+root.querySelector(`input[name=${id(i)}]:checked`).value;const o=q.opts[j];ok=!!o.ok;msg=o.why;
+        q.opts.forEach((oo,k)=>{const el=$(`#${id(i)}o${k}`);el.classList.toggle("right",!!oo.ok);el.classList.toggle("wrong",k===j&&!oo.ok);el.querySelector("input").disabled=true;});
+        if(!ok)msg+=`<br><br><b class="c-out" style="display:inline">Right answer:</b> ${q.opts.find(o=>o.ok).t}`;}
+      else{const v=parseNum($(`#${id(i)}in`).value);[ok,msg]=isNaN(v)?[false,"That isn't a number I can read. Try a form like 64000, 0.25 or 3/12."]:q.check(v);$(`#${id(i)}in`).disabled=true;}
+      if(ok)score++;else miss.push(i+1);
+      fb.className="fb show "+(ok?"ok":"bad");fb.innerHTML=`<b class="${ok?"c-out":"c-err"}">${ok?"Correct":"Not quite"}</b>${msg}`;
+    });
+    P.att[stage]=(P.att[stage]||0)+1;const pass=score>=4;
+    if(pass&&!P.completed.includes(stage))P.completed.push(stage);
+    save();renderRail();
+    sub.disabled=true;ret.hidden=false;attTxt();
+    res.className="result show";res.style.borderColor=pass?"var(--out)":"var(--err)";
+    const nx=STAGES[stage+1];
+    res.innerHTML=pass
+      ?`<div class="row" style="justify-content:space-between"><h3 class="c-out">Stage ${stage} complete · ${score}/5</h3>${nx?`<button class="btn primary" type="button" data-a="next">Open Stage ${stage+1}</button>`:""}</div><p class="muted" style="margin-top:6px">${nx?`Stage ${stage+1} (${esc(nx.t)}) is now unlocked on the roadmap. `:""}${miss.length?`Look back over Q${miss.join(", Q")} above before moving on.`:"No misconceptions detected."}${nx&&!BUILT[stage+1]?` When you're ready, tell Claude <span class="mono c-emb">"Start Stage ${stage+1}"</span> in chat and its lab will be built here.`:""}</p>`
+      :`<h3 class="c-err">${score}/5. Stage ${stage+1} stays locked (need 4/5)</h3><p class="muted" style="margin-top:6px">Read the feedback on Q${miss.join(", Q")} above, revisit the matching panel, then retry. The numbers and option order change on every attempt.</p>`;
+    const nb=res.querySelector("[data-a=next]");if(nb)nb.addEventListener("click",()=>showStage(stage+1));
   });
-  P.attempts++;const pass=score>=4;
-  if(pass&&!P.completed.includes(0))P.completed.push(0);
-  save();renderRail();
-  $("#qSubmit").disabled=true;$("#qRetry").hidden=false;$("#qAttempts").textContent=`attempts so far: ${P.attempts}`;
-  const R=$("#qResult");R.className="result show";R.style.borderColor=pass?"var(--out)":"var(--err)";
-  R.innerHTML=pass
-   ?`<div class="row" style="justify-content:space-between"><h3 class="c-out">Stage 0 complete · ${score}/5</h3><button class="btn primary" type="button" id="goS1">Open Stage 1</button></div><p class="muted" style="margin-top:6px">Stage 1 (Mathematical Foundations) is now unlocked on the roadmap. ${miss.length?`Look back over Q${miss.join(", Q")} above before moving on.`:"No misconceptions detected."} When you're ready, tell Claude <span class="mono c-emb">"Start Stage 1"</span> in chat and its lab will be built here.</p>`
-   :`<h3 class="c-err">${score}/5. Stage 1 stays locked (need 4/5)</h3><p class="muted" style="margin-top:6px">Read the feedback on Q${miss.join(", Q")} above, revisit the matching panel, then retry. The numbers and option order change on every attempt.</p>`;
-  if(pass)$("#goS1").addEventListener("click",()=>showStage(1));
+  ret.addEventListener("click",()=>{seed=(seed*7919+13)%1000003;render();root.scrollIntoView({behavior:"smooth"});});
+  render();
+  const api={reset(){seed=(seed*7919+13)%1000003;render();}};QUIZZES.push(api);return api;
+}
+mountQuiz(0,$("#quiz0"),makeQuiz0);
+
+/* =================== STAGE 1 =================== */
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const f2=(v,d=2)=>(Math.abs(v)<5e-13?0:v).toFixed(d);
+function predictBox(el,o){
+  const draw=()=>{
+    el.innerHTML=`<div class="eyebrow c-tok">Predict first</div><p class="pq">${o.q}</p><div class="po">${o.opts.map((t,i)=>`<button type="button" class="btn" data-i="${i}">${t}</button>`).join("")}</div><div class="pw"></div>`;
+    el.querySelectorAll("[data-i]").forEach(b=>b.addEventListener("click",()=>{
+      const i=+b.dataset.i,ok=i===o.ok;
+      el.querySelectorAll("[data-i]").forEach((bb,k)=>{bb.disabled=true;if(k===o.ok)bb.classList.add("right");else if(k===i)bb.classList.add("wrong");});
+      const w=el.querySelector(".pw");w.classList.add("show");
+      w.innerHTML=`<b class="${ok?"c-out":"c-err"}">${ok?"You predicted it.":"Surprise!"}</b> ${o.why} <button type="button" class="btn" data-again style="margin-left:6px;padding:3px 9px;font-size:.78rem">Ask me again</button>`;
+      w.querySelector("[data-again]").addEventListener("click",draw);
+      if(o.onReveal)o.onReveal();
+    }));
+  };
+  draw();
+}
+// training loop map
+const LOOP=[["Tensors","hold every number","p1-ten","var(--emb)"],["Dot products & matmul","mix vectors in layers","p1-mm","var(--hid)"],["Softmax","scores → probabilities","p1-soft","var(--out)"],["Cross-entropy","scores the guess","p1-ce","var(--err)"],["Derivatives & chain rule","find who's to blame","p1-bp","var(--err)"],["Gradient descent","nudges every weight","p1-gd","var(--tok)"]];
+$("#s1loop").innerHTML=LOOP.map((l,i)=>(i?'<span class="la">→</span>':"")+`<button type="button" style="--lc:${l[3]}" data-go="${l[2]}">${l[0]}<span>${l[1]}</span></button>`).join("")+'<span class="la">↺ repeat millions of times</span>';
+$$("#s1loop [data-go]").forEach(b=>b.addEventListener("click",()=>document.getElementById(b.dataset.go).scrollIntoView({behavior:"smooth"})));
+
+/* ---- 1. tensors ---- */
+const TEN=[
+ {n:"Scalar",shape:"[ ]",ex:"<b>Temperature T = 0.80</b>. A single number: one knob that controls how random the model's output is.",dims:[]},
+ {n:"Vector",shape:"[4]",ex:"<b>The embedding of “bank”</b>: a list of 4 numbers that describes the word. Real SLMs use 128–4096 numbers.",dims:[4]},
+ {n:"Matrix",shape:"[5, 4]",ex:"<b>A sentence of 5 tokens</b>, each turned into a 4-number vector. Rows are tokens and columns are features.",dims:[5,4]},
+ {n:"3-D tensor",shape:"[3, 5, 4]",ex:"<b>A training batch</b>: 3 sentences × 5 tokens × 4 features, processed in one go. This is the kind of input an SLM actually processes.",dims:[3,5,4]}
+];
+const TW=["the","bank","approved","a","loan"];
+let tR=1;
+const tcell=(v,ix,dl)=>`<span class="tcell" data-ix="${ix}" data-v="${v.toFixed(2)}" style="background:${cellCol(v)};animation-delay:${dl}ms">${v.toFixed(2)}</span>`;
+function renderTen(){
+  $("#tBtns").innerHTML=TEN.map((t,i)=>`<button type="button" class="btn${i===tR?" primary":""}" data-r="${i}">rank ${i} · ${t.n}</button>`).join("");
+  $$("#tBtns [data-r]").forEach(b=>b.addEventListener("click",()=>{tR=+b.dataset.r;renderTen();}));
+  const t=TEN[tR],r=mulberry(7),M=TW.map(()=>[0,1,2,3].map(()=>(r()*2-1)*1.2));
+  let h="";
+  if(tR===0)h=`<div style="display:grid;gap:10px;justify-items:center"><span class="tcell solo" data-ix="T" data-v="0.80" style="background:rgba(243,185,85,.28)">0.80</span><span class="axis">no direction, just a value</span></div>`;
+  else if(tR===1)h=`<div style="display:grid;gap:10px;justify-items:center"><div class="tgrid" style="grid-template-columns:60px repeat(4,38px)"><span class="rl">bank</span>${M[1].map((v,j)=>tcell(v,`x[${j}]`,j*90)).join("")}</div><span class="axis">→ one axis: 4 positions, index 0 to 3</span></div>`;
+  else if(tR===2)h=`<div style="display:grid;gap:10px;justify-items:center"><div class="tgrid" style="grid-template-columns:70px repeat(4,38px)">${M.map((row,i)=>`<span class="rl">${TW[i]}</span>`+row.map((v,j)=>tcell(v,`x[${i}][${j}]`,(i*4+j)*35)).join("")).join("")}</div><span class="axis">↓ axis 0: 5 tokens · → axis 1: 4 features</span></div>`;
+  else{const sents=[TW,["the","customer","paid","the","fee"],["a","small","model","is","fast"]];
+    h=`<div style="display:grid;gap:12px;justify-items:center"><div class="t3">${[2,1,0].map(k=>{const rk=mulberry(11+k);return `<div class="tgrid" title="sentence ${k}: ${sents[k].join(" ")}" style="grid-template-columns:repeat(4,38px);left:${k*28}px;top:${(2-k)*28}px;z-index:${3-k};opacity:${k===0?1:k===1?.8:.6}">`+sents[k].map((w,i)=>[0,1,2,3].map(j=>tcell((rk()*2-1)*1.2,`x[${k}][${i}][${j}]  (sentence ${k}, “${w}”, feature ${j})`,(k*20+i*4+j)*16)).join("")).join("")+`</div>`;}).join("")}</div><span class="axis">↗ axis 0: 3 sentences · ↓ axis 1: 5 tokens · → axis 2: 4 features</span></div>`;}
+  $("#tView").innerHTML=h;
+  $("#tShape").textContent=t.shape;$("#tEx").innerHTML=t.ex;
+  const n=t.dims.reduce((a,b)=>a*b,1);
+  $("#tCount").innerHTML=`Rank ${tR} · ${n} number${n>1?"s":""} · ${n*4} bytes in FP32. <span class="dim">A real batch [32, 512, 768] holds ${(32*512*768).toLocaleString()} numbers.</span>`;
+  $("#tRead").innerHTML='<span class="dim">Hover or tap any number to see its address.</span>';
+}
+const tread=e=>{const c=e.target.closest(".tcell");if(c)$("#tRead").innerHTML=`<span class="c-emb">${esc(c.dataset.ix)}</span> = <span class="c-tok">${c.dataset.v}</span>`;};
+$("#tView").addEventListener("mouseover",tread);$("#tView").addEventListener("click",tread);
+renderTen();
+predictBox($("#tPred"),{q:"A batch of 8 sentences, each 10 tokens long, each token a 16-number vector. How many numbers in total?",opts:["34","160","1,280","8 × 10 = 80"],ok:2,
+  why:"Multiply every axis size: 8 × 10 × 16 = 1,280. A tensor's size is always the product of its shape, which is why memory grows so fast.",onReveal:()=>{tR=3;renderTen();}});
+
+/* ---- 2. dot product ---- */
+let va=[3,1],vb=[1.5,2.5],dDrag=null;
+const DSC=32,DO=160,dP=v=>[DO+v[0]*DSC,DO-v[1]*DSC];
+function arrowSvg(v,col,lab){
+  const [x,y]=dP(v),ang=Math.atan2(y-DO,x-DO);if(Math.hypot(x-DO,y-DO)<3)return `<circle data-h="${lab}" cx="${x}" cy="${y}" r="13" style="fill:${col};fill-opacity:.2;stroke:${col}"/>`;
+  const hx=x-12*Math.cos(ang-.42),hy=y-12*Math.sin(ang-.42),kx=x-12*Math.cos(ang+.42),ky=y-12*Math.sin(ang+.42);
+  return `<line x1="${DO}" y1="${DO}" x2="${x}" y2="${y}" style="stroke:${col}" stroke-width="3.5" stroke-linecap="round"/><polygon points="${x},${y} ${hx},${hy} ${kx},${ky}" style="fill:${col}"/><text x="${x+(x>=DO?10:-22)}" y="${y-10}" font-size="14" font-weight="600" style="fill:${col}" font-family="IBM Plex Mono">${lab}</text><circle data-h="${lab}" cx="${x}" cy="${y}" r="14" style="fill:${col};fill-opacity:.15;stroke:${col};cursor:grab"/>`;
+}
+function renderDot(){
+  let g="";for(let i=-4;i<=4;i++){const p=DO+i*DSC;g+=`<line x1="${p}" y1="32" x2="${p}" y2="288" style="stroke:var(--line)"/><line x1="32" y1="${p}" x2="288" y2="${p}" style="stroke:var(--line)"/>`;}
+  g+=`<line x1="24" y1="${DO}" x2="296" y2="${DO}" style="stroke:var(--line2)" stroke-width="1.5"/><line x1="${DO}" y1="24" x2="${DO}" y2="296" style="stroke:var(--line2)" stroke-width="1.5"/>`;
+  const dot=va[0]*vb[0]+va[1]*vb[1],na=Math.hypot(...va),nb=Math.hypot(...vb),cos=na&&nb?dot/(na*nb):0,th=Math.acos(Math.max(-1,Math.min(1,cos)))*180/Math.PI;
+  let pr="";
+  if(na>0){const k=dot/(na*na),Pp=[va[0]*k,va[1]*k],[px,py]=dP(Pp),[bx,by]=dP(vb);
+    pr=`<line x1="${DO}" y1="${DO}" x2="${px}" y2="${py}" style="stroke:${dot>=0?"var(--out)":"var(--err)"}" stroke-width="9" stroke-opacity=".35" stroke-linecap="round"/><line x1="${bx}" y1="${by}" x2="${px}" y2="${py}" style="stroke:var(--muted)" stroke-dasharray="4 4"/><text x="${(DO+px)/2}" y="${(DO+py)/2+18}" font-size="10" text-anchor="middle" style="fill:var(--muted)" font-family="IBM Plex Mono">shadow of b on a</text>`;}
+  const a1=Math.atan2(va[1],va[0]),a2=Math.atan2(vb[1],vb[0]);let da=a2-a1;while(da>Math.PI)da-=2*Math.PI;while(da<-Math.PI)da+=2*Math.PI;
+  const pts=[];for(let i=0;i<=24;i++){const a=a1+da*i/24;pts.push(`${(DO+28*Math.cos(a)).toFixed(1)},${(DO-28*Math.sin(a)).toFixed(1)}`);}
+  const am=a1+da/2;
+  $("#dotSvg").innerHTML=g+pr+`<polyline points="${pts.join(" ")}" style="fill:none;stroke:var(--tok)" stroke-width="1.5"/><text x="${DO+44*Math.cos(am)}" y="${DO-44*Math.sin(am)+4}" font-size="11" text-anchor="middle" style="fill:var(--tok)" font-family="IBM Plex Mono">θ=${th.toFixed(0)}°</text>`+arrowSvg(va,"var(--emb)","a")+arrowSvg(vb,"var(--tok)","b");
+  const verdict=cos>0.75?["Pointing the same way: very similar. Attention would focus here.","var(--out)"]:cos>0.25?["Partly aligned: somewhat related.","var(--out)"]:cos>-0.25?["Roughly perpendicular: unrelated.","var(--muted)"]:["Pointing opposite ways: opposites.","var(--err)"];
+  $("#dotRead").innerHTML=`<div class="eyebrow" style="margin-bottom:6px">Live calculation</div>
+   <div class="kv"><dt>a</dt><dd class="mono c-emb">[${f2(va[0],1)}, ${f2(va[1],1)}]</dd><dt>b</dt><dd class="mono c-tok">[${f2(vb[0],1)}, ${f2(vb[1],1)}]</dd></div>
+   <div class="formula" style="margin-top:10px">a·b = (<span class="c-emb">${f2(va[0],1)}</span>×<span class="c-tok">${f2(vb[0],1)}</span>) + (<span class="c-emb">${f2(va[1],1)}</span>×<span class="c-tok">${f2(vb[1],1)}</span>) = ${f2(va[0]*vb[0])} + ${f2(va[1]*vb[1])} = <b class="c-out">${f2(dot)}</b></div>
+   <div class="stats" style="margin-top:10px"><div class="stat"><span class="v c-out">${f2(dot)}</span><span class="k">dot product</span></div><div class="stat"><span class="v">${f2(na)}</span><span class="k">|a| length</span></div><div class="stat"><span class="v">${f2(nb)}</span><span class="k">|b| length</span></div><div class="stat"><span class="v c-tok">${f2(cos)}</span><span class="k">cos θ</span></div></div>
+   <div class="gauge"><i style="left:${((cos+1)/2*100).toFixed(1)}%"></i></div><div class="glabels"><span>−1 opposite</span><span>0 unrelated</span><span>+1 identical</span></div>
+   <p style="margin-top:8px;color:${verdict[1]};font-weight:600">${verdict[0]}</p>`;
+}
+const dSvg=$("#dotSvg");
+function dCoord(e){const r=dSvg.getBoundingClientRect(),sx=(e.clientX-r.left)/r.width*320,sy=(e.clientY-r.top)/r.height*320;return [Math.max(-4.4,Math.min(4.4,Math.round((sx-DO)/DSC*10)/10)),Math.max(-4.4,Math.min(4.4,Math.round((DO-sy)/DSC*10)/10))];}
+dSvg.addEventListener("pointerdown",e=>{const h=e.target.closest("[data-h]");if(h){dDrag=h.dataset.h;dSvg.setPointerCapture(e.pointerId);e.preventDefault();}});
+dSvg.addEventListener("pointermove",e=>{if(!dDrag)return;const c=dCoord(e);if(dDrag==="a")va=c;else vb=c;renderDot();});
+dSvg.addEventListener("pointerup",()=>{dDrag=null;});dSvg.addEventListener("pointercancel",()=>{dDrag=null;});
+$$("#dotPresets [data-pa]").forEach(b=>b.addEventListener("click",()=>{va=b.dataset.pa.split(",").map(Number);vb=b.dataset.pb.split(",").map(Number);renderDot();}));
+renderDot();
+predictBox($("#dotPred"),{q:"Arrows a = [2, 0] and b = [0, 3] form a right angle. What is a · b?",opts:["6","0","5","−6"],ok:1,
+  why:"(2×0) + (0×3) = 0. Perpendicular arrows always give 0: they share nothing. Drag the arrows to that position and watch the gauge sit in the middle.",onReveal:()=>{va=[2,0];vb=[0,3];renderDot();}});
+
+/* ---- 3. matmul ---- */
+const mm={m:2,n:3,p:2,A:[],B:[],done:new Set()};let mmRun=0,mmGuess=null;
+function mmRand(){const r=()=>Math.floor(Math.random()*6);mm.A=Array.from({length:mm.m},()=>Array.from({length:mm.n},r));mm.B=Array.from({length:mm.n},()=>Array.from({length:mm.p},r));mmInputs();mmClear();}
+function mmVal(i,j){let s=0;for(let k=0;k<mm.n;k++)s+=mm.A[i][k]*mm.B[k][j];return s;}
+function mmInputs(){
+  const A=$("#mmA"),B=$("#mmB");A.style.gridTemplateColumns=`repeat(${mm.n},44px)`;B.style.gridTemplateColumns=`repeat(${mm.p},44px)`;
+  A.innerHTML=mm.A.map((row,i)=>row.map((v,k)=>`<input id="mA-${i}-${k}" value="${v}" inputmode="numeric" aria-label="A row ${i} col ${k}">`).join("")).join("");
+  B.innerHTML=mm.B.map((row,k)=>row.map((v,j)=>`<input id="mB-${k}-${j}" value="${v}" inputmode="numeric" aria-label="B row ${k} col ${j}">`).join("")).join("");
+  $$("#mmA input,#mmB input").forEach(inp=>inp.addEventListener("input",()=>{const [t,a,b]=inp.id.split("-");const v=parseFloat(inp.value);(t==="mA"?mm.A:mm.B)[+a][+b]=isNaN(v)?0:v;mmClear();}));
+  mmShape();
+}
+function mmShape(bad){
+  const el=$("#mmShape");
+  if(bad){el.innerHTML=`<span class="c-emb">A</span> [2 × <b class="c-err">3</b>] · <span class="c-tok">B</span> [<b class="c-err">2</b> × 2] = <b class="c-err">✕ impossible</b><div class="note" style="margin:8px auto 0;max-width:60ch;text-align:left">Each row of A has 3 numbers but each column of B has only 2, so the 3rd number has no partner to multiply with. <b>The inner sizes must match.</b> PyTorch gives the error "mat1 and mat2 shapes cannot be multiplied".</div>`;el.classList.remove("shake");void el.offsetWidth;el.classList.add("shake");return;}
+  el.innerHTML=`<span class="c-emb">A</span> [${mm.m} × <b class="c-out">${mm.n}</b>] · <span class="c-tok">B</span> [<b class="c-out">${mm.n}</b> × ${mm.p}] = <span class="c-out">C</span> [${mm.m} × ${mm.p}] <span class="dim" style="font-size:.8rem">· inner sizes match ✓ · ${mm.m*mm.n*mm.p} multiplications</span>`;
+}
+function mmDrawC(cur){
+  const C=$("#mmCg");C.style.gridTemplateColumns=`repeat(${mm.p},54px)`;
+  let h="";for(let i=0;i<mm.m;i++)for(let j=0;j<mm.p;j++){const k=i+","+j,d=mm.done.has(k);h+=`<span class="cc${d?" done":""}${cur===k?" cur":""}" id="mC-${i}-${j}">${d?mmVal(i,j):"?"}</span>`;}
+  C.innerHTML=h;
+}
+function mmClearHi(){$$("#mmA input,#mmB input").forEach(x=>x.classList.remove("hiA","hiB","pair"));}
+function mmClear(){mmRun++;mm.done=new Set();mmClearHi();mmDrawC();$("#mmCalc").innerHTML='<span class="dim">Press Play to watch each output number being built from one row of A and one column of B.</span>';}
+async function mmCell(i,j,id,fast){
+  mmClearHi();
+  for(let k=0;k<mm.n;k++){$(`#mA-${i}-${k}`).classList.add("hiA");$(`#mB-${k}-${j}`).classList.add("hiB");}
+  mmDrawC(i+","+j);
+  const calc=$("#mmCalc");calc.innerHTML=`<span class="c-out">C[${i}][${j}]</span> = <span class="dim">row ${i} of A · column ${j} of B</span> = `;
+  let s=0;
+  for(let k=0;k<mm.n;k++){
+    if(id!==mmRun)return false;
+    const a=$(`#mA-${i}-${k}`),b=$(`#mB-${k}-${j}`);a.classList.add("pair");b.classList.add("pair");
+    s+=mm.A[i][k]*mm.B[k][j];
+    calc.insertAdjacentHTML("beforeend",`<span class="t">${k?" + ":""}<span class="c-emb">${mm.A[i][k]}</span>×<span class="c-tok">${mm.B[k][j]}</span></span>`);
+    await sleep(fast?150:620);
+    if(id!==mmRun)return false;
+    a.classList.remove("pair");b.classList.remove("pair");
+  }
+  calc.insertAdjacentHTML("beforeend",`<span class="t"> = <b class="c-out">${s}</b></span>`);
+  mm.done.add(i+","+j);mmDrawC(i+","+j);
+  if(i===0&&j===0&&mmGuess!==null){const ok=Math.abs(mmGuess-s)<1e-9;$("#mmPredMsg").innerHTML=ok?`<b class="c-out">Spot on!</b> You computed ${s} the same way the computer does.`:`<b class="c-err">You guessed ${mmGuess}, the answer is ${s}.</b> Pair the 1st number of row 0 with the 1st number of column 0, the 2nd with the 2nd, and so on. Multiply each pair, then add them all up.`;mmGuess=null;}
+  await sleep(fast?200:750);
+  return true;
+}
+async function mmPlay(){const id=++mmRun;mm.done=new Set();mmDrawC();for(let i=0;i<mm.m;i++)for(let j=0;j<mm.p;j++){if(!(await mmCell(i,j,id)))return;}if(id===mmRun){mmClearHi();mmDrawC();$("#mmCalc").insertAdjacentHTML("beforeend",' <span class="dim"> · done: every row met every column.</span>');}}
+$("#mmPlay").addEventListener("click",mmPlay);
+$("#mmStep").addEventListener("click",async()=>{for(let i=0;i<mm.m;i++)for(let j=0;j<mm.p;j++)if(!mm.done.has(i+","+j)){const id=++mmRun;await mmCell(i,j,id,true);if(id===mmRun){mmClearHi();}return;}mmClear();});
+$("#mmRand").addEventListener("click",mmRand);
+$("#mmBad").addEventListener("click",()=>{mmShape(true);setTimeout(()=>mmShape(),5000);});
+["#mmM","#mmN","#mmP"].forEach(s=>$(s).addEventListener("change",()=>{mm.m=+$("#mmM").value;mm.n=+$("#mmN").value;mm.p=+$("#mmP").value;mmRand();}));
+$("#mmGuessBtn").addEventListener("click",()=>{const v=parseNum($("#mmGuess").value);if(isNaN(v)){$("#mmPredMsg").innerHTML='<span class="c-tok">Type a number first.</span>';return;}mmGuess=v;$("#mmPredMsg").innerHTML='<span class="dim">Locked in. Watch the first cell…</span>';mmPlay();});
+mm.A=[[1,2,3],[4,5,6]];mm.B=[[2,0],[1,3],[0,1]];mmInputs();mmClear();
+
+/* ---- 4. softmax ---- */
+const SW=["loan","account","fee","cat"],SCOL=["var(--out)","var(--emb)","var(--tok)","var(--hid)"],SHEX=["#62e3a2","#52d3e2","#f3b955","#a993ff"];
+let sz=[2,1,0.1,-1],sT=1;
+$("#smCtl").innerHTML=SW.map((w,i)=>`<div class="smrow"><span style="color:${SCOL[i]}">${w}</span><input type="range" id="sz${i}" min="-100" max="100" value="${sz[i]*10}" aria-label="score for ${w}"><b class="mono" id="szv${i}"></b></div>`).join("");
+SW.forEach((_,i)=>$("#sz"+i).addEventListener("input",e=>{sz[i]=+e.target.value/10;renderSoft();}));
+$("#smT").addEventListener("input",e=>{sT=+e.target.value/10;renderSoft();});
+const fe=v=>v>=1e5?v.toExponential(1):v>=100?v.toFixed(0):v.toFixed(3);
+function renderSoft(){
+  const s=sz.map(v=>v/sT),m=Math.max(...s),en=s.map(v=>Math.exp(v-m)),S=en.reduce((a,b)=>a+b,0),p=en.map(v=>v/S),ex=s.map(v=>Math.exp(v));
+  SW.forEach((_,i)=>{$("#szv"+i).textContent=sz[i].toFixed(1);$("#sz"+i).value=Math.round(sz[i]*10);});
+  $("#smTv").textContent=sT.toFixed(1);$("#smT").value=Math.round(sT*10);
+  const lim=10;
+  $("#smC1").innerHTML=SW.map((w,i)=>{const v=Math.max(-lim,Math.min(lim,s[i]));return `<div class="bar"><span class="lbl" style="color:${SCOL[i]}">${w}</span><span class="trk2"><span class="fill2" style="left:${v>=0?50:50+v/lim*50}%;width:${Math.abs(v)/lim*50}%"></span></span><span class="val">${s[i].toFixed(2)}</span></div>`;}).join("");
+  const mx=Math.max(...en);
+  $("#smC2").innerHTML=SW.map((w,i)=>`<div class="bar"><span class="lbl" style="color:${SCOL[i]}">${w}</span><span class="trk"><span class="fill" style="display:block;width:${(en[i]/mx*100).toFixed(1)}%;background:var(--emb)"></span></span><span class="val">${fe(ex[i])}</span></div>`).join("");
+  $("#smC3").innerHTML=SW.map((w,i)=>`<div class="bar"><span class="lbl" style="color:${SCOL[i]}">${w}</span><span class="trk"><span class="fill" style="display:block;width:${(p[i]*100).toFixed(1)}%"></span></span><span class="val">${(p[i]*100).toFixed(1)}%</span></div>`).join("");
+  $("#smStack").innerHTML=SW.map((w,i)=>`<div style="flex-grow:${Math.max(p[i],1e-6)};background:${SHEX[i]}" title="${w}: ${(p[i]*100).toFixed(1)}%">${p[i]>.09?`${w} ${(p[i]*100).toFixed(0)}%`:""}</div>`).join("");
+  $("#smTbl").innerHTML=`<tr><th>word</th><th>score z</th><th>z / T</th><th>e^(z/T)</th><th>÷ ${fe(ex.reduce((a,b)=>a+b,0))}</th></tr>`+SW.map((w,i)=>`<tr><td style="color:${SCOL[i]}">${w}</td><td class="c-hid">${sz[i].toFixed(2)}</td><td>${s[i].toFixed(2)}</td><td class="c-emb">${fe(ex[i])}</td><td class="c-out">${p[i].toFixed(4)}</td></tr>`).join("")+`<tr><td class="dim">total</td><td></td><td></td><td class="c-emb">${fe(ex.reduce((a,b)=>a+b,0))}</td><td class="c-out">${p.reduce((a,b)=>a+b,0).toFixed(4)}</td></tr>`;
+  const top=p.indexOf(Math.max(...p));
+  $("#smNote").innerHTML=sT<0.5?`Low temperature: <b style="color:${SCOL[top]}">${SW[top]}</b> takes almost everything. The model becomes predictable.`:sT>2.5?"High temperature: the bars even out, and the model starts picking unlikely words (more creative, more mistakes).":`Notice: a gap of 1 point in score means a factor of e ≈ 2.72 in probability (at T = 1).`;
+}
+$("#smEq").addEventListener("click",()=>{sz=[1,1,1,1];renderSoft();$("#smNote").innerHTML="All scores equal → all probabilities equal (25% each). Softmax only cares about <b>differences</b> between scores.";});
+$("#smShift").addEventListener("click",()=>{if(Math.max(...sz)>8){sz=sz.map(v=>v-4);}else sz=sz.map(v=>v+2);renderSoft();$("#smNote").innerHTML="Every score moved, yet the probabilities <b>did not change at all</b>. Softmax is shift-invariant: adding the same number to every score cancels out in the division. Real code subtracts the max score for exactly this reason (numerical stability).";});
+renderSoft();
+predictBox($("#smPred"),{q:"What happens to the probabilities if you turn the temperature down to T = 0.2?",opts:["The top word grabs nearly 100%","All words become equal","Nothing changes"],ok:0,
+  why:"Dividing by a small T multiplies the gaps between scores, and e<sup>x</sup> blows up big gaps. The top word dominates. T → 0 becomes 'always pick the top word' (greedy decoding).",onReveal:()=>{sT=0.2;renderSoft();}});
+
+/* ---- 5. cross-entropy ---- */
+let ceP=0.3;
+function renderCE(){
+  const W=420,H=230,l=38,r=14,t=12,b=30,X=p=>l+p*(W-l-r),Y=v=>t+(5-Math.min(5,v))/5*(H-t-b);
+  let g="";for(let v=0;v<=5;v++)g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l-6}" y="${Y(v)+3}" text-anchor="end" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text>`;
+  [0,.25,.5,.75,1].forEach(p=>g+=`<text x="${X(p)}" y="${H-12}" text-anchor="middle" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono">${p}</text>`);
+  g+=`<text x="${(l+W-r)/2}" y="${H-1}" text-anchor="middle" font-size="10" style="fill:var(--muted)" font-family="IBM Plex Mono">probability given to the correct word</text><text x="${l+4}" y="${t+10}" font-size="10" style="fill:var(--muted)" font-family="IBM Plex Mono">loss</text>`;
+  const pts=[];for(let i=1;i<=200;i++){const p=i/200;pts.push(`${X(p).toFixed(1)},${Y(-Math.log(p)).toFixed(1)}`);}
+  let mse="";if($("#ceMse").checked){const q=[];for(let i=0;i<=100;i++){const p=i/100;q.push(`${X(p).toFixed(1)},${Y((1-p)**2).toFixed(1)}`);}mse=`<polyline points="${q.join(" ")}" style="fill:none;stroke:var(--emb)" stroke-width="2" stroke-dasharray="5 4"/><text x="${X(.06)}" y="${Y(1)-6}" font-size="10" style="fill:var(--emb)" font-family="IBM Plex Mono">(1−p)²: never above 1</text>`;}
+  const L=-Math.log(ceP),px=X(ceP),py=Y(L);
+  $("#ceSvg").innerHTML=g+`<polygon points="${X(.005)},${Y(0)} ${pts.join(" ")} ${X(1)},${Y(0)}" style="fill:var(--err);opacity:.08"/><polyline points="${pts.join(" ")}" style="fill:none;stroke:var(--err)" stroke-width="2.5"/>${mse}
+    <line x1="${px}" y1="${py}" x2="${px}" y2="${Y(0)}" style="stroke:var(--muted)" stroke-dasharray="3 3"/><line x1="${l}" y1="${py}" x2="${px}" y2="${py}" style="stroke:var(--muted)" stroke-dasharray="3 3"/>
+    <circle cx="${px}" cy="${py}" r="7" style="fill:var(--err);stroke:var(--bg)" stroke-width="2"/><text x="${Math.min(px+10,W-90)}" y="${py-10}" font-size="11" style="fill:var(--fg)" font-family="IBM Plex Mono">−ln ${ceP.toFixed(2)} = ${L.toFixed(2)}</text>`;
+  $("#cePv").textContent=(ceP*100).toFixed(0)+"%";$("#ceL").textContent=L.toFixed(3);
+  $("#ceMood").innerHTML=ceP>=.8?'<b class="c-out">Confident and right: tiny penalty.</b>':ceP>=.4?'<b class="c-tok">Unsure: moderate penalty.</b>':ceP>=.1?'<b class="c-err">Mostly wrong: big penalty.</b>':'<b class="c-err">Confident and wrong: huge penalty.</b> The curve shoots up towards infinity as p → 0.';
+  $("#cePpl").innerHTML=`Perplexity e<sup>L</sup> = ${Math.exp(L).toFixed(2)}: the model acts as if it's choosing between about ${Math.exp(L).toFixed(1)} equally likely words.`;
+  const rest=1-ceP,dist=[["loan",ceP],["account",rest*.5],["fee",rest*.3],["cat",rest*.2]];
+  $("#ceBars").innerHTML=dist.map(([w,p],i)=>`<div class="bar"><span class="lbl" style="color:${i?"var(--muted)":"var(--out)"}">${i?w:"✓ "+w}</span><span class="trk"><span class="fill" style="display:block;width:${(p*100).toFixed(1)}%;background:${i?"var(--line2)":"var(--out)"}"></span></span><span class="val">${(p*100).toFixed(1)}%</span></div>`).join("")+'<p class="note" style="margin-top:6px">Only the green bar counts for the loss. The others just share what’s left.</p>';
+  $("#ceP").value=Math.round(ceP*100);
+}
+$("#ceP").addEventListener("input",e=>{ceP=+e.target.value/100;renderCE();});$("#ceMse").addEventListener("change",renderCE);
+renderCE();
+predictBox($("#cePred"),{q:"The probability for the correct word halves, from 0.10 to 0.05. What happens to the loss?",opts:["It doubles","It goes up by the same amount every time p halves (+0.69)","It barely changes"],ok:1,
+  why:"−ln 0.10 = 2.30 and −ln 0.05 = 3.00, a difference of ln 2 ≈ 0.69. Logs turn multiplication into addition, so every halving adds the same penalty, wherever you start.",onReveal:()=>{ceP=0.05;renderCE();}});
+
+/* ---- 6. derivatives ---- */
+const FN=[{n:"x²",dn:"2x",f:x=>x*x,d:x=>2*x},{n:"x³/3 − x",dn:"x² − 1",f:x=>x**3/3-x,d:x=>x*x-1},{n:"sin 2x + x²/4",dn:"2 cos 2x + x/2",f:x=>Math.sin(2*x)+x*x/4,d:x=>2*Math.cos(2*x)+x/2}];
+let fI=0,fx=1.2,fhv=85,derDrag=false;
+const hOf=v=>Math.max(0.0005,2*Math.pow(10,-(100-v)/40));
+$("#derFns").innerHTML='<span class="eyebrow">f(x) =</span>'+FN.map((F,i)=>`<button type="button" class="btn" data-f="${i}">${F.n}</button>`).join("");
+$$("#derFns [data-f]").forEach(b=>b.addEventListener("click",()=>{fI=+b.dataset.f;renderDer();}));
+const DW=420,DH=260,dl=34,dr=12,dt=12,db=26;
+function derRange(){const F=FN[fI];let mn=Infinity,mx=-Infinity;for(let i=0;i<=120;i++){const v=F.f(-3+6*i/120);mn=Math.min(mn,v);mx=Math.max(mx,v);}const pad=(mx-mn)*.12;return [mn-pad,mx+pad];}
+function renderDer(){
+  const F=FN[fI],[y0,y1]=derRange(),X=x=>dl+(x+3)/6*(DW-dl-dr),Y=y=>dt+(y1-y)/(y1-y0)*(DH-dt-db);
+  $$("#derFns [data-f]").forEach(b=>b.classList.toggle("primary",+b.dataset.f===fI));
+  let g=`<defs><clipPath id="dclip"><rect x="${dl}" y="${dt}" width="${DW-dl-dr}" height="${DH-dt-db}"/></clipPath></defs>`;
+  for(let x=-3;x<=3;x++)g+=`<line x1="${X(x)}" x2="${X(x)}" y1="${dt}" y2="${DH-db}" style="stroke:var(--line)"/><text x="${X(x)}" y="${DH-10}" text-anchor="middle" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono">${x}</text>`;
+  const step=(y1-y0)>8?2:(y1-y0)>3?1:0.5;for(let v=Math.ceil(y0/step)*step;v<=y1;v+=step)g+=`<line x1="${dl}" x2="${DW-dr}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${dl-5}" y="${Y(v)+3}" text-anchor="end" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono">${+v.toFixed(1)}</text>`;
+  const pts=[];for(let i=0;i<=160;i++){const x=-3+6*i/160;pts.push(`${X(x).toFixed(1)},${Y(F.f(x)).toFixed(1)}`);}
+  const h=hOf(fhv),x0=fx,y0v=F.f(x0),x1=x0+h,y1v=F.f(x1),sec=(y1v-y0v)/h,d=F.d(x0);
+  const line=(s,col,w,dash)=>`<line x1="${X(-3)}" y1="${Y(y0v+s*(-3-x0))}" x2="${X(3)}" y2="${Y(y0v+s*(3-x0))}" style="stroke:${col}" stroke-width="${w}" ${dash?'stroke-dasharray="6 4"':""}/>`;
+  const dir=d>1e-9?-1:d<-1e-9?1:0,ax=X(x0),ay=Y(y0v)+22;
+  const arrow=dir?`<line x1="${ax}" y1="${ay}" x2="${ax+dir*46}" y2="${ay}" style="stroke:var(--err)" stroke-width="3"/><polygon points="${ax+dir*54},${ay} ${ax+dir*44},${ay-6} ${ax+dir*44},${ay+6}" style="fill:var(--err)"/><text x="${ax+dir*30}" y="${ay+16}" text-anchor="middle" font-size="10" style="fill:var(--err)" font-family="IBM Plex Mono">downhill</text>`:`<text x="${ax}" y="${ay+6}" text-anchor="middle" font-size="10" style="fill:var(--out)" font-family="IBM Plex Mono">flat: a minimum or maximum</text>`;
+  $("#derSvg").innerHTML=g+`<g clip-path="url(#dclip)"><polyline points="${pts.join(" ")}" style="fill:none;stroke:var(--fg)" stroke-width="2.5"/>${line(sec,"var(--tok)",2,true)}${line(d,"var(--out)",2.5)}
+    <polyline points="${X(x0)},${Y(y0v)} ${X(x1)},${Y(y0v)} ${X(x1)},${Y(y1v)}" style="fill:none;stroke:var(--tok)" stroke-width="1.5"/>
+    <circle cx="${X(x1)}" cy="${Y(y1v)}" r="4.5" style="fill:var(--tok)"/></g>${arrow}
+    <circle cx="${X(x0)}" cy="${Y(y0v)}" r="8" style="fill:var(--out);stroke:var(--bg);cursor:ew-resize" stroke-width="2"/>`;
+  $("#derHv").textContent=h<0.01?h.toFixed(4):h.toFixed(3);$("#derH").value=Math.round(fhv);
+  $("#derRead").innerHTML=`<div class="eyebrow" style="margin-bottom:6px">At x = ${x0.toFixed(2)}</div>
+   <div class="kv"><dt>f(x)</dt><dd class="mono">${y0v.toFixed(4)}</dd><dt>f(x + h)</dt><dd class="mono">${y1v.toFixed(4)}</dd></div>
+   <div class="formula" style="margin-top:10px;white-space:normal"><span class="c-tok">rise / run</span> = (f(x+h) − f(x)) / h = ${(y1v-y0v).toFixed(4)} / ${h.toFixed(4)} = <b class="c-tok">${sec.toFixed(4)}</b></div>
+   <div class="formula" style="margin-top:6px"><span class="c-out">true slope</span> f′(x) = ${F.dn} = <b class="c-out">${d.toFixed(4)}</b></div>
+   <p class="note" style="margin-top:8px">Gap between them: ${Math.abs(sec-d).toFixed(4)}. ${Math.abs(sec-d)<0.01?"With h this small they agree: that limit <b>is</b> the derivative.":"Shrink h and watch the gap close."}</p>
+   <p style="margin-top:8px;font-weight:600;color:${dir?"var(--err)":"var(--out)"}">${dir?`Slope ${d>0?"positive":"negative"} → downhill is to the ${dir<0?"LEFT":"RIGHT"}. Gradient descent moves x that way.`:"Slope ≈ 0: you're at the bottom (or top). Gradient descent stops here."}</p>`;
+}
+const derSvg=$("#derSvg");
+function derMove(e){const r=derSvg.getBoundingClientRect(),sx=(e.clientX-r.left)/r.width*DW;fx=Math.max(-2.9,Math.min(2.9,(sx-dl)/(DW-dl-dr)*6-3));renderDer();}
+derSvg.addEventListener("pointerdown",e=>{derDrag=true;derSvg.setPointerCapture(e.pointerId);derMove(e);});
+derSvg.addEventListener("pointermove",e=>{if(derDrag)derMove(e);});
+derSvg.addEventListener("pointerup",()=>derDrag=false);derSvg.addEventListener("pointercancel",()=>derDrag=false);
+$("#derH").addEventListener("input",e=>{fhv=+e.target.value;renderDer();});
+$("#derShrink").addEventListener("click",()=>{const s=fhv,t0=performance.now();const tick=t=>{const k=Math.min(1,(t-t0)/1800);fhv=s*(1-k);renderDer();if(k<1)requestAnimationFrame(tick);};requestAnimationFrame(tick);});
+renderDer();
+predictBox($("#derPred"),{q:"On f(x) = x², at x = −0.75 the slope is −1.5. To go downhill, which way should x move?",opts:["Left (more negative)","Right (towards 0)","Stay put"],ok:1,
+  why:"Negative slope means the curve goes down as x increases, so step right. Gradient descent's minus sign does this automatically: x − η·(−1.5) increases x.",onReveal:()=>{fI=0;fx=-0.75;renderDer();}});
+
+/* ---- 7. gradient descent ---- */
+const LAND={
+ bowl:{n:"Round bowl",f:(x,y)=>x*x+y*y,g:(x,y)=>[2*x,2*y],mins:[[0,0,"minimum"]]},
+ valley:{n:"Narrow valley",f:(x,y)=>0.1*x*x+2*y*y,g:(x,y)=>[0.2*x,4*y],mins:[[0,0,"minimum"]]},
+ twin:{n:"Two valleys",f:(x,y)=>0.8*(x*x-1)**2+0.6*y*y+0.3*x,g:(x,y)=>[3.2*x*(x*x-1)+0.3,1.2*y],mins:[[-1.04,0,"deep"],[0.95,0,"shallow"]]}
+};
+const LRS=[0.005,0.01,0.02,0.05,0.1,0.2,0.3,0.4,0.45,0.5,0.55,0.7,0.9];
+const gd={land:"valley",start:[2.5,1.5],pts:[[2.5,1.5]],v:[0,0],timer:null,status:"ready"};
+const heatCache={};
+function lerp3(t){const s=[[8,20,30],[22,70,92],[60,140,150],[170,180,120],[230,160,80]];const x=Math.min(.999,Math.max(0,t))*(s.length-1),i=Math.floor(x),f=x-i;return s[i].map((v,k)=>Math.round(v+(s[i+1][k]-v)*f));}
+function heat(k){
+  if(heatCache[k])return heatCache[k];
+  const N=200,c=document.createElement("canvas");c.width=c.height=N;const ctx=c.getContext("2d"),im=ctx.createImageData(N,N),L=LAND[k];
+  const vals=new Float64Array(N*N);let mn=Infinity,mx=-Infinity;
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const v=L.f(-3+6*(i+.5)/N,3-6*(j+.5)/N);vals[j*N+i]=v;if(v<mn)mn=v;if(v>mx)mx=v;}
+  const lm=Math.log(1+mx-mn);
+  for(let q=0;q<N*N;q++){const t=Math.log(1+vals[q]-mn)/lm;let col=lerp3(t);if((t*14)%1<0.08)col=col.map(v=>Math.min(255,v+38));im.data[q*4]=col[0];im.data[q*4+1]=col[1];im.data[q*4+2]=col[2];im.data[q*4+3]=255;}
+  ctx.putImageData(im,0,0);heatCache[k]={c,mn};return heatCache[k];
+}
+const gcv=$("#gdCv"),gx=gcv.getContext("2d"),toC=(x,y)=>[(x+3)/6*720,(3-y)/6*720];
+function drawGD(){
+  const L=LAND[gd.land];gx.imageSmoothingEnabled=true;gx.drawImage(heat(gd.land).c,0,0,720,720);
+  gx.font="500 22px IBM Plex Mono, monospace";gx.textAlign="center";
+  L.mins.forEach(([x,y,n])=>{const [cx,cy]=toC(x,y);gx.strokeStyle="rgba(255,255,255,.8)";gx.lineWidth=3;gx.beginPath();gx.moveTo(cx-9,cy-9);gx.lineTo(cx+9,cy+9);gx.moveTo(cx+9,cy-9);gx.lineTo(cx-9,cy+9);gx.stroke();gx.fillStyle="rgba(255,255,255,.85)";gx.fillText(n,cx,cy+36);});
+  const pts=gd.pts.filter(p=>Math.abs(p[0])<8&&Math.abs(p[1])<8);
+  if(pts.length>1){gx.strokeStyle="rgba(255,255,255,.9)";gx.lineWidth=3;gx.beginPath();pts.forEach((p,i)=>{const [cx,cy]=toC(...p);i?gx.lineTo(cx,cy):gx.moveTo(cx,cy);});gx.stroke();}
+  pts.forEach(p=>{const [cx,cy]=toC(...p);gx.fillStyle="#f3b955";gx.beginPath();gx.arc(cx,cy,5,0,7);gx.fill();});
+  const [sx,sy]=toC(...gd.start);gx.strokeStyle="#f3b955";gx.lineWidth=3;gx.beginPath();gx.arc(sx,sy,15,0,7);gx.stroke();
+  const last=gd.pts[gd.pts.length-1];
+  if(Math.abs(last[0])<3.2&&Math.abs(last[1])<3.2){
+    const [cx,cy]=toC(...last),g=L.g(...last),gn=Math.hypot(...g);
+    if(gn>1e-6&&gd.status!=="converged"){const len=Math.min(110,30+gn*14),ux=-g[0]/gn,uy=g[1]/gn,ex=cx+ux*len,ey=cy+uy*len,an=Math.atan2(uy,ux);
+      gx.strokeStyle="#ff7d93";gx.lineWidth=5;gx.beginPath();gx.moveTo(cx,cy);gx.lineTo(ex,ey);gx.stroke();
+      gx.fillStyle="#ff7d93";gx.beginPath();gx.moveTo(ex+Math.cos(an)*14,ey+Math.sin(an)*14);gx.lineTo(ex+Math.cos(an+2.4)*14,ey+Math.sin(an+2.4)*14);gx.lineTo(ex+Math.cos(an-2.4)*14,ey+Math.sin(an-2.4)*14);gx.fill();}
+    gx.fillStyle="#ffffff";gx.strokeStyle="#091015";gx.lineWidth=4;gx.beginPath();gx.arc(cx,cy,13,0,7);gx.fill();gx.stroke();
+  }
+  gx.textAlign="left";gx.fillStyle="rgba(255,255,255,.7)";gx.font="500 20px IBM Plex Mono, monospace";gx.fillText("w₁ →",640,708);gx.fillText("↑ w₂",10,26);
+  // readout
+  const lr=LRS[+$("#gdLr").value],lv=L.f(...last),gg=L.g(...last);
+  const prev=gd.pts.length>1?gd.pts[gd.pts.length-2]:null;
+  const msg={ready:["Ready. Press Roll, or click the map to choose a new start.","var(--muted)"],running:["Rolling downhill…","var(--emb)"],paused:["Paused.","var(--muted)"],
+    converged:[gd.land==="twin"?(last[0]<0?`Reached the deep valley in ${gd.pts.length-1} steps. That's the global minimum.`:`Stuck in the shallow valley after ${gd.pts.length-1} steps: a local minimum. The ball can't see the deeper valley. Try another start point or momentum.`):`Reached the minimum in ${gd.pts.length-1} steps.`,gd.land==="twin"&&last[0]>0?"var(--tok)":"var(--out)"],
+    diverged:["Diverged! Every step overshot further than the last. The learning rate is too big for this landscape.","var(--err)"],stopped:["Stopped after 400 steps. Too slow: try a bigger learning rate.","var(--tok)"]}[gd.status];
+  $("#gdRead").innerHTML=`<div class="stats"><div class="stat"><span class="v">${gd.pts.length-1}</span><span class="k">steps</span></div><div class="stat"><span class="v c-err">${isFinite(lv)?(Math.abs(lv)>1e4?lv.toExponential(1):lv.toFixed(4)):"∞"}</span><span class="k">loss</span></div><div class="stat"><span class="v c-hid" style="font-size:1.05rem">(${f2(last[0])}, ${f2(last[1])})</span><span class="k">weights w₁, w₂</span></div></div>
+    ${prev?`<div class="formula" style="margin-top:10px;white-space:normal;font-size:.8rem">w ← (${f2(prev[0])}, ${f2(prev[1])}) − ${lr} × ∇L = (${f2(last[0])}, ${f2(last[1])})</div>`:`<div class="formula" style="margin-top:10px;font-size:.8rem">∇L here = (${f2(gg[0])}, ${f2(gg[1])}) <span class="dim">· the rose arrow is −∇L</span></div>`}
+    <p class="statusline" style="margin-top:8px;color:${msg[1]}">${msg[0]}</p>`;
+  $("#gdPlay").textContent=gd.status==="running"?"Pause":"Roll";
+  $$("#gdLands [data-l]").forEach(b=>b.classList.toggle("primary",b.dataset.l===gd.land));
+  $("#gdLrV").textContent=lr;
+  // loss chart
+  const hist=gd.pts.map(p=>L.f(...p)).filter(isFinite),W=320,H=130,l=40,t=10,b=20,r=8;
+  const top=Math.max(hist[0]*1.15,hist[0]+0.05),bot=Math.min(0,...hist);
+  const XX=i=>l+i/Math.max(1,hist.length-1)*(W-l-r),YY=v=>t+(top-Math.min(top,v))/(top-bot||1)*(H-t-b);
+  const pl=hist.map((v,i)=>`${XX(i).toFixed(1)},${YY(v).toFixed(1)}`).join(" ");
+  $("#gdLoss").innerHTML=`<line x1="${l}" x2="${W-r}" y1="${YY(0)}" y2="${YY(0)}" style="stroke:var(--line2)"/><text x="${l-5}" y="${YY(0)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">0</text><text x="${l-5}" y="${t+6}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${top.toFixed(2)}</text><text x="${W-r}" y="${H-5}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">step ${hist.length-1}</text>`+(hist.length>1?`<polyline points="${pl}" style="fill:none;stroke:var(--err)" stroke-width="2"/>`:"")+`<circle cx="${XX(hist.length-1)}" cy="${YY(hist[hist.length-1])}" r="4" style="fill:var(--err)"/>`;
+}
+function gdStep(){
+  const L=LAND[gd.land],[x,y]=gd.pts[gd.pts.length-1],g=L.g(x,y),lr=LRS[+$("#gdLr").value];
+  gd.v=$("#gdMom").checked?[0.85*gd.v[0]+g[0],0.85*gd.v[1]+g[1]]:g;
+  const n=[x-lr*gd.v[0],y-lr*gd.v[1]];gd.pts.push(n);
+  if(!isFinite(n[0])||!isFinite(n[1])||Math.abs(n[0])>40||Math.abs(n[1])>40)gd.status="diverged";
+  else if(Math.hypot(...L.g(...n))<2e-3&&Math.hypot(n[0]-x,n[1]-y)<2e-3)gd.status="converged";
+  else if(gd.pts.length>400)gd.status="stopped";
+}
+function gdStop(){clearInterval(gd.timer);gd.timer=null;}
+function gdReset(){gdStop();gd.pts=[gd.start.slice()];gd.v=[0,0];gd.status="ready";drawGD();}
+function gdRoll(){if(["converged","diverged","stopped"].includes(gd.status))gdReset();gd.status="running";gdStop();gd.timer=setInterval(()=>{gdStep();if(gd.status!=="running")gdStop();drawGD();},70);drawGD();}
+$("#gdLands").innerHTML='<span class="eyebrow">Landscape</span>'+Object.entries(LAND).map(([k,v])=>`<button type="button" class="btn" data-l="${k}">${v.n}</button>`).join("");
+$$("#gdLands [data-l]").forEach(b=>b.addEventListener("click",()=>{gd.land=b.dataset.l;gdReset();}));
+$("#gdPlay").addEventListener("click",()=>{if(gd.status==="running"){gdStop();gd.status="paused";drawGD();}else gdRoll();});
+$("#gdStepB").addEventListener("click",()=>{if(["converged","diverged","stopped"].includes(gd.status))return;gdStop();gd.status="paused";gdStep();drawGD();});
+$("#gdReset").addEventListener("click",gdReset);
+$("#gdLr").addEventListener("input",()=>{if(gd.status!=="running")gdReset();else drawGD();});
+$("#gdMom").addEventListener("change",gdReset);
+gcv.addEventListener("click",e=>{const r=gcv.getBoundingClientRect();gd.start=[+(((e.clientX-r.left)/r.width*6-3).toFixed(2)),+((3-(e.clientY-r.top)/r.height*6).toFixed(2))];gdReset();});
+drawGD();
+predictBox($("#gdPred"),{q:"Narrow valley, learning rate 0.55. What will the ball do?",opts:["Slide smoothly to the bottom","Zig-zag, then settle","Bounce out of control (diverge)"],ok:2,
+  why:"In the steep direction each step multiplies the distance from the bottom by (1 − 0.55×4) = −1.2. It flips side and grows 20% every step. Try 0.45: the factor becomes −0.8, so it zig-zags but settles. Too high a learning rate is the most common reason training 'explodes' to NaN.",
+  onReveal:()=>{gd.land="valley";$("#gdLr").value=LRS.indexOf(0.55);$("#gdMom").checked=false;gd.start=[2.5,1.5];gdReset();gdRoll();}});
+
+/* ---- 8. backprop ---- */
+const bp={x:1.5,y:0.2,w:0.5,b:0,lr:1,phase:4,act:null,hist:[],run:0};
+const sg=z=>1/(1+Math.exp(-z));
+function bpV(){const m=bp.w*bp.x,z=m+bp.b,a=sg(z),L=(a-bp.y)**2,ga=2*(a-bp.y),da=a*(1-a),gz=ga*da;return {m,z,a,L,ga,da,gz,gw:gz*bp.x,gb:gz,gx:gz*bp.w};}
+const BN={x:[55,60,"x","var(--tok)"],w:[55,180,"w","var(--hid)"],mul:[200,120,"×","var(--muted)"],b:[310,205,"b","var(--hid)"],add:[340,120,"+","var(--muted)"],sig:[485,120,"σ","var(--muted)"],y:[620,205,"y","var(--tok)"],loss:[630,120,"(a−y)²","var(--err)"],L:[745,120,"L","var(--err)"]};
+const BE=[["x","mul"],["w","mul"],["mul","add"],["b","add"],["add","sig"],["sig","loss"],["y","loss"],["loss","L"]];
+const F3=v=>v.toFixed(3);
+const FST=[{e:[0,1],c:v=>`<b class="c-emb">Forward 1 · multiply.</b> m = w · x = ${F3(bp.w)} × ${F3(bp.x)} = <b>${F3(v.m)}</b>`},
+ {e:[2,3],c:v=>`<b class="c-emb">Forward 2 · add the bias.</b> z = m + b = ${F3(v.m)} + ${F3(bp.b)} = <b>${F3(v.z)}</b>`},
+ {e:[4],c:v=>`<b class="c-emb">Forward 3 · activation.</b> a = σ(z) = 1 / (1 + e<sup>−z</sup>) = <b>${F3(v.a)}</b>. This is the network's prediction. The target is ${F3(bp.y)}.`},
+ {e:[5,6,7],c:v=>`<b class="c-err">Forward 4 · measure the error.</b> L = (a − y)² = (${F3(v.a)} − ${F3(bp.y)})² = <b>${v.L.toFixed(5)}</b>. Now: whose fault is it?`}];
+const BST=[{e:[7,5],c:v=>`<b class="c-err">Backward 1.</b> ∂L/∂a = 2(a − y) = <b>${F3(v.ga)}</b>. ${v.ga>0?"Positive: the prediction is too high, so a should go down.":"Negative: the prediction is too low, so a should go up."}`},
+ {e:[4],c:v=>`<b class="c-err">Backward 2 · through σ.</b> Local slope σ′(z) = a(1 − a) = ${F3(v.da)}. Chain rule, multiply: ∂L/∂z = ${F3(v.ga)} × ${F3(v.da)} = <b>${F3(v.gz)}</b>`},
+ {e:[2,3],c:v=>`<b class="c-err">Backward 3 · through +.</b> Addition passes the gradient through unchanged: ∂L/∂b = ∂L/∂m = <b>${F3(v.gb)}</b>`},
+ {e:[0,1],c:v=>`<b class="c-err">Backward 4 · through ×.</b> Multiplication hands each input the <i>other</i> input: ∂L/∂w = ∂L/∂m × x = ${F3(v.gz)} × ${F3(bp.x)} = <b>${F3(v.gw)}</b>. Every weight now knows its share of the blame.`}];
+function renderBP(){
+  const v=bpV(),ph=bp.phase;
+  const val={x:F3(bp.x),w:F3(bp.w),b:F3(bp.b),y:F3(bp.y),mul:ph>=1?"m="+F3(v.m):"",add:ph>=2?"z="+F3(v.z):"",sig:ph>=3?"a="+F3(v.a):"",loss:"",L:ph>=4?v.L.toFixed(4):""};
+  const grad={L:ph>=5?"∂=1":"",sig:ph>=5?"∂L/∂a="+F3(v.ga):"",add:ph>=6?"∂L/∂z="+F3(v.gz):"",b:ph>=7?"∂L/∂b="+F3(v.gb):"",mul:ph>=7?"∂L/∂m="+F3(v.gz):"",w:ph>=8?"∂L/∂w="+F3(v.gw):"",x:ph>=8?"∂L/∂x="+F3(v.gx):""};
+  let h=BE.map(([a,b],i)=>{const A=BN[a],B=BN[b],cls=bp.act&&bp.act.e.includes(i)?(bp.act.d==="f"?" ef":" eb"):"";return `<line class="edge${cls}" x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}"/>`;}).join("");
+  h+=Object.entries(BN).map(([k,[x,y,lab,col]])=>{const wide=k==="loss";return `${wide?`<rect x="${x-38}" y="${y-22}" width="76" height="44" rx="12" style="fill:var(--panel2);stroke:${col}" stroke-width="2"/>`:`<circle cx="${x}" cy="${y}" r="23" style="fill:var(--panel2);stroke:${col}" stroke-width="2"/>`}<text x="${x}" y="${y+5}" text-anchor="middle" font-size="${wide?12:15}" font-weight="600" style="fill:${col}" font-family="IBM Plex Mono">${lab}</text>${val[k]?`<text x="${x}" y="${y-31}" text-anchor="middle" font-size="12" style="fill:var(--emb)" font-family="IBM Plex Mono">${val[k]}</text>`:""}${grad[k]?`<text x="${x}" y="${y+42}" text-anchor="middle" font-size="11.5" style="fill:var(--err)" font-family="IBM Plex Mono">${grad[k]}</text>`:""}`;}).join("");
+  h+=`<text x="10" y="252" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono"><tspan style="fill:var(--emb)">cyan = values (forward)</tspan>  ·  <tspan style="fill:var(--err)">rose = gradients (backward)</tspan>  ·  violet nodes = weights it can learn</text>`;
+  $("#bpSvg").innerHTML=h;
+  $("#bpChain").innerHTML=ph>=8?`<div class="eyebrow" style="margin-bottom:6px">The chain rule, with your numbers</div><div class="formula" style="white-space:normal">∂L/∂w = <span class="c-err">∂L/∂a</span> × <span class="c-hid">∂a/∂z</span> × <span class="c-tok">∂z/∂w</span><br>= <span class="c-err">2(a−y)</span> × <span class="c-hid">a(1−a)</span> × <span class="c-tok">x</span><br>= <span class="c-err">${F3(v.ga)}</span> × <span class="c-hid">${F3(v.da)}</span> × <span class="c-tok">${F3(bp.x)}</span> = <b>${F3(v.gw)}</b></div><p class="note" style="margin-top:8px">A long chain of small local slopes, multiplied together. Deep networks just have longer chains.</p>`
+    :`<div class="eyebrow" style="margin-bottom:6px">The chain rule</div><p class="muted" style="font-size:.9rem">Run the backward pass to fill in the chain with live numbers.</p>`;
+  ["x","y","w","b","l"].forEach(k=>{const val=k==="l"?bp.lr:bp[k];$("#bp"+k+"v").textContent=val.toFixed(2);});
+  $("#bpB").disabled=ph<4||ph>=8||!!bp.act;$("#bpU").disabled=ph!==8||!!bp.act;$("#bpF").disabled=!!bp.act;
+  const hs=bp.hist.length?bp.hist:[v.L],W=320,H=110,l=40,t=10,b=18,r=8,top=Math.max(...hs)*1.1+1e-9;
+  const X=i=>l+i/Math.max(1,hs.length-1)*(W-l-r),Y=q=>t+(top-q)/top*(H-t-b);
+  $("#bpLoss").innerHTML=`<line x1="${l}" x2="${W-r}" y1="${Y(0)}" y2="${Y(0)}" style="stroke:var(--line2)"/><text x="${l-5}" y="${Y(0)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">0</text><text x="${l-5}" y="${t+6}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${top.toFixed(3)}</text><text x="${W-r}" y="${H-4}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${hs.length-1} updates · L=${hs[hs.length-1].toFixed(5)}</text>`+(hs.length>1?`<polyline points="${hs.map((q,i)=>`${X(i).toFixed(1)},${Y(q).toFixed(1)}`).join(" ")}" style="fill:none;stroke:var(--err)" stroke-width="2"/>`:"")+`<circle cx="${X(hs.length-1)}" cy="${Y(hs[hs.length-1])}" r="4" style="fill:var(--err)"/>`;
+}
+async function bpAnim(steps,startPhase,dir){
+  const id=++bp.run;
+  for(let i=0;i<steps.length;i++){if(id!==bp.run)return;bp.act={e:steps[i].e,d:dir};bp.phase=startPhase+i+1;renderBP();$("#bpNarr").innerHTML=steps[i].c(bpV());await sleep(1500);}
+  if(id!==bp.run)return;bp.act=null;renderBP();
+  if(dir==="b")$("#bpNarr").insertAdjacentHTML("beforeend",' <span class="c-tok">→ Now press "Update weights".</span>');
+  else $("#bpNarr").insertAdjacentHTML("beforeend",' <span class="c-tok">→ Now press "Backward pass".</span>');
+}
+$("#bpF").addEventListener("click",()=>{bp.phase=0;bpAnim(FST,0,"f");});
+$("#bpB").addEventListener("click",()=>{bp.phase=4;bpAnim(BST,4,"b");});
+$("#bpU").addEventListener("click",()=>{
+  const v=bpV(),ow=bp.w,ob=bp.b,oL=v.L;if(!bp.hist.length)bp.hist.push(oL);
+  bp.w-=bp.lr*v.gw;bp.b-=bp.lr*v.gb;const nL=bpV().L;bp.hist.push(nL);syncBpSliders();bp.phase=4;renderBP();
+  $("#bpNarr").innerHTML=`<b class="c-tok">Update (gradient descent).</b> w ← w − η·∂L/∂w = ${F3(ow)} − ${bp.lr.toFixed(2)}×${F3(v.gw)} = <b>${F3(bp.w)}</b>; b ← ${F3(ob)} − ${bp.lr.toFixed(2)}×${F3(v.gb)} = <b>${F3(bp.b)}</b>. Loss went from ${oL.toFixed(5)} to <b class="${nL<oL?"c-out":"c-err"}">${nL.toFixed(5)}</b>. ${nL<oL?"The network learned a little.":"Loss went up: the learning rate is too large."} Repeat Forward → Backward → Update, or press "Train 30 steps".`;
 });
-$("#qRetry").addEventListener("click",()=>{newQuiz();$("#p-quiz").scrollIntoView({behavior:"smooth"});});
-renderQuiz();
+$("#bpAuto").addEventListener("click",async()=>{
+  const id=++bp.run;bp.act=null;if(!bp.hist.length)bp.hist.push(bpV().L);
+  for(let i=0;i<30;i++){if(id!==bp.run)return;const v=bpV();bp.w-=bp.lr*v.gw;bp.b-=bp.lr*v.gb;bp.hist.push(bpV().L);bp.phase=8;syncBpSliders();renderBP();$("#bpNarr").innerHTML=`<b class="c-tok">Training step ${i+1}/30:</b> forward → backward → update. w = ${F3(bp.w)}, b = ${F3(bp.b)}, prediction a = ${F3(bpV().a)} (target ${F3(bp.y)}), loss = ${bpV().L.toFixed(6)}`;await sleep(110);}
+  bp.phase=4;renderBP();$("#bpNarr").insertAdjacentHTML("beforeend"," · <span class=\"c-out\">This loop, run over millions of weights, is how an SLM is trained.</span>");
+});
+function syncBpSliders(){$("#bpw").value=Math.round(Math.max(-30,Math.min(30,bp.w*10)));$("#bpb").value=Math.round(Math.max(-30,Math.min(30,bp.b*10)));}
+function bpReset(){bp.run++;bp.act=null;bp.x=1.5;bp.y=0.2;bp.w=0.5;bp.b=0;bp.lr=1;bp.hist=[];bp.phase=4;$("#bpx").value=15;$("#bpy").value=20;$("#bpw").value=5;$("#bpb").value=0;$("#bpl").value=10;renderBP();$("#bpNarr").innerHTML='One neuron: prediction a = σ(w·x + b), error L = (a − y)². Press <b class="c-emb">1 · Forward pass</b> to watch the numbers flow.';}
+[["x",10,"bpx"],["y",100,"bpy"],["w",10,"bpw"],["b",10,"bpb"],["lr",10,"bpl"]].forEach(([k,d,idn])=>$("#"+idn).addEventListener("input",e=>{bp.run++;bp.act=null;bp[k]=+e.target.value/d;bp.hist=[];bp.phase=4;renderBP();$("#bpNarr").innerHTML="Values changed. Run the forward and backward passes again to see the new gradients.";}));
+$("#bpR").addEventListener("click",bpReset);
+bpReset();
+
+/* ---- 9. code ---- */
+const CODE1={
+"tensors_and_matmul.py":`import torch
+
+x = torch.tensor(0.8)                 # scalar   shape []
+v = torch.tensor([0.2, -1.1, 0.5, 0.9])  # vector shape [4]
+M = torch.randn(5, 4)                 # matrix   shape [5, 4]
+batch = torch.randn(3, 5, 4)          # tensor   shape [3, 5, 4]
+print(batch.shape, batch.numel())     # torch.Size([3, 5, 4]) 60
+
+a, b = torch.tensor([3., 1.]), torch.tensor([1.5, 2.5])
+print(a @ b)                          # dot product: 3*1.5 + 1*2.5 = 7.0
+print(torch.cosine_similarity(a, b, dim=0))
+
+A = torch.tensor([[1., 2., 3.], [4., 5., 6.]])   # [2, 3]
+B = torch.tensor([[2., 0.], [1., 3.], [0., 1.]]) # [3, 2]
+print(A @ B)                          # [[4., 9.], [13., 21.]]  -> [2, 2]
+
+# In an SLM: Q = X @ W_q   (X: [T, d], W_q: [d, d_k]) -> Q: [T, d_k]
+X, W_q = torch.randn(10, 64), torch.randn(64, 16)
+print((X @ W_q).shape)                # torch.Size([10, 16])`,
+"softmax_and_loss.py":`import math, torch
+
+def softmax(z, T=1.0):
+    m = max(z)                                 # subtract max: same result, no overflow
+    e = [math.exp((v - m) / T) for v in z]
+    s = sum(e)
+    return [v / s for v in e]
+
+logits = [2.0, 1.0, 0.1, -1.0]                 # loan, account, fee, cat
+print(softmax(logits))                         # [0.638, 0.235, 0.095, 0.032]
+print(softmax(logits, T=0.2))                  # top word takes ~99%
+
+# cross-entropy: penalty = -log(probability of the correct token)
+p = softmax(logits)
+print(-math.log(p[0]))                         # correct = "loan" -> 0.449
+
+# PyTorch does softmax + cross-entropy in one stable call
+loss = torch.nn.functional.cross_entropy(torch.tensor([logits]), torch.tensor([0]))
+print(loss.item())                             # 0.449`,
+"gradient_descent.py":`# Narrow valley from panel 07: L(w1, w2) = 0.1*w1^2 + 2*w2^2
+def loss(w1, w2): return 0.1 * w1**2 + 2 * w2**2
+def grad(w1, w2): return 0.2 * w1, 4 * w2      # the derivatives
+
+w1, w2, lr = 2.5, 1.5, 0.1
+for step in range(60):
+    g1, g2 = grad(w1, w2)
+    w1, w2 = w1 - lr * g1, w2 - lr * g2        # w <- w - lr * gradient
+    if step % 10 == 0:
+        print(step, round(loss(w1, w2), 5))
+# try lr = 0.55: the loss explodes (diverges), exactly like the panel`,
+"backprop_autograd.py":`import torch
+
+# The single neuron from panel 08; PyTorch computes the chain rule for us
+x, y = torch.tensor(1.5), torch.tensor(0.2)
+w = torch.tensor(0.5, requires_grad=True)
+b = torch.tensor(0.0, requires_grad=True)
+lr = 1.0
+
+for step in range(30):
+    a = torch.sigmoid(w * x + b)      # forward pass
+    L = (a - y) ** 2                  # loss
+    L.backward()                      # backward pass: fills w.grad and b.grad
+    if step == 0:
+        print("dL/dw =", round(w.grad.item(), 3))   # 0.313, same as the panel
+    with torch.no_grad():
+        w -= lr * w.grad              # update
+        b -= lr * b.grad
+    w.grad.zero_(); b.grad.zero_()    # reset gradients before the next step
+
+print(round(L.item(), 6), round(w.item(), 3), round(b.item(), 3))`
+};
+function codeBox(root,CODE){
+  let cur=Object.keys(CODE)[0];const tabs=root.querySelector(".tabs"),pre=root.querySelector("pre");
+  const draw=()=>{
+    tabs.innerHTML=Object.keys(CODE).map(k=>`<button type="button" class="${k===cur?"on":""}" data-f="${k}">${k}</button>`).join("")+`<button type="button" class="copy" data-copy>Copy</button>`;
+    tabs.querySelectorAll("[data-f]").forEach(b=>b.addEventListener("click",()=>{cur=b.dataset.f;draw();}));
+    const cb=tabs.querySelector("[data-copy]");
+    cb.addEventListener("click",()=>{navigator.clipboard.writeText(CODE[cur]).then(()=>{cb.textContent="Copied";setTimeout(()=>cb.textContent="Copy",1500);}).catch(()=>{const r=document.createRange();r.selectNodeContents(pre);const s=getSelection();s.removeAllRanges();s.addRange(r);cb.textContent="Selected, press Ctrl+C";});});
+    pre.innerHTML=hl(CODE[cur]);
+  };
+  draw();
+}
+codeBox($("#code1"),CODE1);
+
+/* ---- 10. exercise ---- */
+let ex1Checked=false;
+const EX1=[
+ {t:"<b>Matrix (panel 03):</b> edit A and B so that C[0][0] equals exactly 10",f:()=>Math.abs(mmVal(0,0)-10)<1e-9},
+ {t:"<b>Softmax (panel 04):</b> make <span class=\"c-tok\">fee</span> the most likely word, with at least 50% probability",f:()=>{const s=sz.map(v=>v/sT),m=Math.max(...s),e=s.map(v=>Math.exp(v-m)),S=e.reduce((a,b)=>a+b,0);return e[2]/S>=0.5;}},
+ {t:"<b>Gradient descent (panel 07):</b> on Two valleys, land the ball in the <b>deep</b> valley (final loss below 0)",f:()=>gd.land==="twin"&&gd.status==="converged"&&LAND.twin.f(...gd.pts[gd.pts.length-1])<0},
+ {t:"<b>Backprop (panel 08):</b> set the target y to 0.95 or more, then train until the loss is below 0.0005",f:()=>bp.y>=0.95&&bpV().L<0.0005}
+];
+function runEx1(){
+  let ok=0;
+  $("#ex1Checks").innerHTML=EX1.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex1Checked?(r?"ok":"no"):""}"><span class="dot">${ex1Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex1Checked)$("#ex1Msg").innerHTML=ok===EX1.length?'<span class="c-out">All 4 missions complete.</span> You used matrix multiplication, softmax, gradient descent and backpropagation with your own hands.':`${ok}/4 missions complete. Hint for the deep valley: drop the ball on the left half, or switch on momentum.`;
+}
+$("#ex1Btn").addEventListener("click",()=>{ex1Checked=true;runEx1();});
+runEx1();
+
+/* ---- 11. quiz ---- */
+function makeQuiz1(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)],ri=(lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
+  const a=[ri(-2,4),ri(-2,4),ri(1,4)],b=[ri(-2,4),ri(1,4),ri(-2,3)],dot=a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+  const T=pick([6,10,12,20]),d=pick([64,128,256]),dk=pick([16,32]);
+  const zl=pick([1,2,3]),psm=1/(1+Math.exp(-zl));
+  const x=pick([2,3]),w=pick([1,2,3]),y=pick([1,2,4,5]),gw=2*(w*x-y)*x;
+  return [
+   {type:"Numerical",kind:"num",q:`Compute the dot product of <span class="mono c-emb">a = [${a.join(", ")}]</span> and <span class="mono c-tok">b = [${b.join(", ")}]</span>.`,
+    check:v=>{if(Math.abs(v-dot)<1e-9)return [true,`(${a[0]}×${b[0]}) + (${a[1]}×${b[1]}) + (${a[2]}×${b[2]}) = ${dot}. Multiply matching positions, then add.`];
+      const add=a.reduce((s,q,i)=>s+q+b[i],0);if(Math.abs(v-add)<1e-9)return [false,`You added every number. A dot product <b>multiplies</b> matching positions first, then sums: (${a[0]}×${b[0]}) + (${a[1]}×${b[1]}) + (${a[2]}×${b[2]}) = ${dot}.`];
+      return [false,`Pair position by position: (${a[0]}×${b[0]}) + (${a[1]}×${b[1]}) + (${a[2]}×${b[2]}) = ${a[0]*b[0]} + ${a[1]*b[1]} + ${a[2]*b[2]} = ${dot}. Watch the signs of negative numbers.`];}},
+   {type:"Conceptual",kind:"mcq",q:`In attention, X has shape <span class="mono">[${T}, ${d}]</span> (${T} tokens, ${d} features) and W<sub>Q</sub> has shape <span class="mono">[${d}, ${dk}]</span>. What is the shape of Q = X · W<sub>Q</sub>?`,opts:shuffle([
+     {t:`[${T}, ${dk}]`,ok:true,why:`Correct. [m × n]·[n × p] → [m × p]: the shared ${d} disappears, and you keep the outer sizes. Every token gets its own ${dk}-number query.`},
+     {t:`[${d}, ${dk}]`,why:`Misconception: <b>the result has W's shape</b>. The rows come from X (one per token), so the result has ${T} rows: [${T}, ${dk}].`},
+     {t:`[${T}, ${d}]`,why:`Misconception: <b>multiplication keeps X's shape</b>. The columns come from W<sub>Q</sub>, so each token is projected down to ${dk} numbers: [${T}, ${dk}].`},
+     {t:"Error: the shapes cannot be multiplied",why:`Misconception about the rule: only the <b>inner</b> sizes must match. Here they are ${d} and ${d}, so it works and gives [${T}, ${dk}].`}],r)},
+   {type:"Numerical",kind:"num",q:`A model has two possible next words with logits <span class="mono">z = [${zl}, 0]</span>. Using softmax at T = 1, what is the probability of the first word? (Give 3 decimals; e ≈ 2.718.)`,
+    check:v=>{if(Math.abs(v-psm)<0.006)return [true,`e<sup>${zl}</sup> / (e<sup>${zl}</sup> + e<sup>0</sup>) = ${Math.exp(zl).toFixed(3)} / ${(Math.exp(zl)+1).toFixed(3)} = ${psm.toFixed(3)}.`];
+      if(Math.abs(v-1)<1e-6||Math.abs(v-zl/(zl+0))<1e-6)return [false,`You divided the raw scores (${zl} / (${zl} + 0) = 1). Softmax exponentiates first: e<sup>${zl}</sup> / (e<sup>${zl}</sup> + e<sup>0</sup>) = ${psm.toFixed(3)}. Note e<sup>0</sup> = 1, not 0.`];
+      if(Math.abs(v-0.5)<0.006)return [false,`0.5 ignores the scores. A higher logit means a higher probability: e<sup>${zl}</sup> / (e<sup>${zl}</sup> + 1) = ${psm.toFixed(3)}.`];
+      if(Math.abs(v-Math.exp(zl))<0.01)return [false,`That's e<sup>${zl}</sup> before dividing. Divide by the total so the probabilities sum to 1: ${Math.exp(zl).toFixed(3)} / ${(Math.exp(zl)+1).toFixed(3)} = ${psm.toFixed(3)}.`];
+      return [false,`p = e<sup>${zl}</sup> / (e<sup>${zl}</sup> + e<sup>0</sup>) = ${Math.exp(zl).toFixed(3)} / ${(Math.exp(zl)+1).toFixed(3)} = ${psm.toFixed(3)}. Rebuild it in panel 04 by setting two scores.`];}},
+   {type:"Numerical",kind:"num",q:`A one-weight model predicts ŷ = w · x with loss L = (ŷ − y)². With <span class="mono">x = ${x}, y = ${y}, w = ${w}</span>, use the chain rule to compute <b>∂L/∂w</b>.`,
+    check:v=>{if(Math.abs(v-gw)<1e-6)return [true,`∂L/∂w = ∂L/∂ŷ · ∂ŷ/∂w = 2(ŷ − y) · x = 2(${w*x} − ${y}) · ${x} = ${gw}.`];
+      if(Math.abs(v-2*(w*x-y))<1e-6)return [false,`You found ∂L/∂ŷ = 2(ŷ − y) = ${2*(w*x-y)} but stopped there. The chain continues through ŷ = w·x, whose slope with respect to w is x = ${x}. So ${2*(w*x-y)} × ${x} = ${gw}.`];
+      if(Math.abs(v-(w*x-y)*x)<1e-6)return [false,`The 2 is missing. The derivative of u² is 2u, so ∂L/∂ŷ = 2(ŷ − y). Then 2(${w*x} − ${y}) × ${x} = ${gw}.`];
+      if(Math.abs(v-(w*x-y)**2)<1e-6)return [false,`That's the loss L itself, not its slope. The gradient is 2(ŷ − y)·x = ${gw}.`];
+      return [false,`ŷ = ${w}×${x} = ${w*x}. ∂L/∂ŷ = 2(ŷ − y) = ${2*(w*x-y)}. ∂ŷ/∂w = x = ${x}. Multiply: ${gw}. Panel 08 does exactly this, one link at a time.`];}},
+   {type:"Practical",kind:"mcq",q:"You start training your SLM. After 50 steps the loss jumps from 4.1 to 9.8 and then shows NaN. What is the most likely fix?",opts:shuffle([
+     {t:"Lower the learning rate",ok:true,why:"Correct. That's the divergence you saw in panel 07 at η = 0.55: every step overshoots and grows. Lowering η (or adding warm-up and gradient clipping, Stage 8) is the standard fix."},
+     {t:"Raise the learning rate so it escapes faster",why:"Misconception: <b>a bigger step always means faster progress</b>. Past a threshold every step overshoots further, and that's what produces NaN. Try η = 0.9 in panel 07."},
+     {t:"Remove the softmax from the output",why:"Misconception: <b>softmax causes the blow-up</b>. Softmax keeps outputs between 0 and 1. Removing it breaks the probabilities and does nothing for oversized update steps."},
+     {t:"Train for more epochs",why:"Misconception: <b>more training fixes everything</b>. A diverging run gets worse with every extra step. The step size has to come down first."}],r)}
+  ];
+}
+mountQuiz(1,$("#quiz1"),makeQuiz1);
+
 showStage(0);window.scrollTo(0,0);
 })();
 </script>
