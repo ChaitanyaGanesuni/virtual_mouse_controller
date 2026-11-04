@@ -362,6 +362,9 @@ body.narrating main{padding-bottom:190px}
 .nb-c label{font-size:.78rem;color:var(--muted);display:inline-flex;gap:4px;align-items:center}
 .nb-p{grid-column:1/-1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
 .nb-p i{display:block;height:100%;background:var(--tok);width:0;transition:width .4s}
+.pg tr.hirow th{color:#fff!important;text-decoration:underline}
+.pg tr.hirow td{box-shadow:inset 0 0 0 1.5px rgba(243,185,85,.85)}
+table.mt td{min-width:44px}
 </style>
 
 <header class="top">
@@ -1426,6 +1429,161 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 5 ====================== -->
+  <section id="stage5" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 05 · unlocked</div>
+      <h2>The Transformer: attention is how words talk to each other</h2>
+      <p>Every modern SLM is a stack of Transformer blocks. This stage shows why they replaced older designs, and lets you click every part of the architecture. Then it walks through self-attention one matrix at a time, with real numbers, from Q, K and V to the final mixed vectors.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 5 sections">
+      <button type="button" data-go="p5-why">1 · Why Transformers?</button>
+      <button type="button" data-go="p5-types">2 · Encoder vs decoder</button>
+      <button type="button" data-go="p5-arch">3 · The architecture</button>
+      <button type="button" data-go="p5-attn">4 · Self-attention, step by step</button>
+      <button type="button" data-go="p5-mha">5 · Multi-head attention</button>
+      <button type="button" data-go="p5-res">6 · Residuals & LayerNorm</button>
+      <button type="button" data-go="p5-ctx">7 · Context window</button>
+      <button type="button" data-go="p5-code">8 · Code</button>
+      <button type="button" data-go="p5-ex">9 · Exercise</button>
+      <button type="button" data-go="p5-quiz">10 · Assessment</button>
+    </nav>
+
+    <!-- 1 WHY -->
+    <div class="panel" id="p5-why">
+      <div class="phead"><span class="tag">01</span><h3>Why Transformers replaced RNNs and LSTMs</h3><span class="sim illus">illustrative timing & memory</span>
+        <p class="plain">An <em>RNN</em> reads one word at a time and squeezes everything so far into a single memory vector, like passing a whispered message down a line. Early words fade, and nothing can run in parallel. A <em>Transformer</em> lets every word look at every other word directly, all at once. Press Race.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:1 1 280px">Sentence<input class="txt" id="whIn" type="text" value="the customer who opened the savings account last year asked about the loan" autocomplete="off"></label><div class="row" style="align-self:end"><button class="btn primary" id="whRace" type="button">Race</button></div></div>
+      <div class="grid2">
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">RNN / LSTM: one step per word</div><svg class="plot" id="whRnn" viewBox="0 0 480 190" role="img" aria-label="RNN processing sequentially"></svg><div class="mono" id="whRnnT" style="font-size:.8rem;margin-top:6px"></div></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Transformer: all words in one step</div><svg class="plot" id="whTf" viewBox="0 0 480 190" role="img" aria-label="Transformer attending to all words at once"></svg><div class="mono" id="whTfT" style="font-size:.8rem;margin-top:6px"></div></div>
+      </div>
+      <div class="grid2" style="margin-top:12px"><div class="box"><table class="tbl"><tr><th></th><th>RNN / LSTM</th><th>Transformer</th></tr><tr><td>steps to read T tokens</td><td class="c-err">T (sequential)</td><td class="c-out">1 (parallel)</td></tr><tr><td>path from word 1 to word T</td><td class="c-err">T − 1 hops (fades)</td><td class="c-out">1 hop (direct)</td></tr><tr><td>uses GPU/CPU cores well</td><td class="c-err">poorly</td><td class="c-out">very well</td></tr><tr><td>cost with long text</td><td class="c-out">grows like T</td><td class="c-tok">grows like T² (attention)</td></tr></table></div><div class="predict" id="whPred"></div></div>
+      <div class="facts">
+        <div><b>RNN update</b><div class="formula">hₜ = tanh(W hₜ₋₁ + U xₜ)</div></div>
+        <div><b>The two problems</b><ul><li><span class="c-err">Sequential</span>: step t must wait for step t − 1</li><li><span class="c-err">Fading memory</span>: gradients shrink over many steps (vanishing gradients)</li><li>LSTMs add gates that help, but don't remove the bottleneck</li></ul></div>
+        <div><b>Inside an SLM</b>The 2017 paper "Attention Is All You Need" dropped recurrence entirely. Training on whole sequences in parallel is what made today's language models practical to train.</div>
+      </div>
+    </div>
+
+    <!-- 2 TYPES -->
+    <div class="panel" id="p5-types">
+      <div class="phead"><span class="tag">02</span><h3>Encoder, decoder, and decoder-only</h3><span class="sim real">attention masks</span>
+        <p class="plain">The difference between Transformer families is <em>who is allowed to look at whom</em>. Each grid shows which words (columns) each word (rows) can attend to. A bright cell means allowed.</p></div>
+      <div class="row" id="tyBtns" style="margin-bottom:10px"></div>
+      <div class="grid2"><div class="box"><div class="scroll" id="tyGrid"></div></div><div class="box" id="tyInfo"></div></div>
+      <div class="facts">
+        <div><b>The three families</b><ul><li><span class="c-emb">Encoder-only</span> (BERT): sees both sides, good at understanding</li><li><span class="c-hid">Encoder-decoder</span> (T5): reads input, writes output</li><li><span class="c-out">Decoder-only</span> (GPT, Llama, Phi): sees only the past, generates text</li></ul></div>
+        <div><b>Causal rule</b><div class="formula">token i may attend to token j only if j ≤ i</div></div>
+        <div><b>Inside an SLM</b>Almost every SLM is <b>decoder-only</b>. One simple objective (predict the next token) and one stack of identical blocks. That's what we build in Stage 6.</div>
+      </div>
+    </div>
+
+    <!-- 3 ARCH -->
+    <div class="panel" id="p5-arch">
+      <div class="phead"><span class="tag">03</span><h3>The decoder-only Transformer, part by part</h3><span class="sim real">exact shapes & parameter counts</span>
+        <p class="plain">This is the full architecture of a GPT-style SLM. <em>Click any part</em> to see what it does, its input and output shapes, and its parameters. Press <em>Play data flow</em> to follow a sentence from the bottom to the top.</p></div>
+      <div class="ctrls box" style="margin-bottom:12px">
+        <label class="field">d_model: <b id="arDv"></b><input id="arD" type="range" min="0" max="5" value="1"></label>
+        <label class="field">blocks N: <b id="arNv"></b><input id="arN" type="range" min="1" max="12" value="4"></label>
+        <label class="field">heads H: <b id="arHv"></b><input id="arH" type="range" min="0" max="3" value="2"></label>
+        <label class="field">tokens in input T: <b id="arTv"></b><input id="arT" type="range" min="1" max="7" value="3"></label>
+      </div>
+      <div class="grid2">
+        <div class="box"><svg id="arSvg" viewBox="0 0 440 700" style="width:100%;height:auto;display:block" role="img" aria-label="Clickable Transformer architecture"></svg><div class="row" style="justify-content:center;margin-top:8px"><button class="btn primary" id="arPlay" type="button">Play data flow</button></div></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" id="arInfo" aria-live="polite"></div>
+          <div class="box"><div class="stats" id="arStats"></div></div>
+          <div class="predict" id="arPred"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 ATTENTION -->
+    <div class="panel" id="p5-attn">
+      <div class="phead"><span class="tag">04</span><h3>Self-attention, one step at a time</h3><span class="sim illus">illustrative weights · every number really computed</span>
+        <p class="plain">Each word asks a question (<em>Query</em>), advertises what it contains (<em>Key</em>), and offers information (<em>Value</em>). Matching queries to keys decides how much each word listens to every earlier word. Step through all 8 stages. <em>Click a word</em> to follow its row, and <em>click a score cell</em> to see how it was computed.</p></div>
+      <div class="row" style="margin-bottom:10px">
+        <label class="field" style="flex:1 1 260px">Sentence (up to 6 words)<input class="txt" id="atIn" type="text" value="the bank approved the loan" autocomplete="off"></label>
+        <label class="row" style="align-self:end;font-size:.85rem;color:var(--muted)"><input type="checkbox" id="atMask" checked> causal mask</label>
+        <div class="row" style="align-self:end"><button class="btn primary" id="atPlay" type="button">Play</button><button class="btn" id="atPrev" type="button">Back</button><button class="btn" id="atNext" type="button">Next</button></div>
+      </div>
+      <div class="pipe" id="atPipe"></div>
+      <div class="box"><div class="row" style="margin-bottom:8px;gap:6px" id="atToks"></div><div id="atOut" class="stage-out" aria-live="polite"></div></div>
+      <div class="grid2" style="margin-top:12px"><div class="box"><div class="eyebrow" style="margin-bottom:4px">Who is <span id="atWho" class="c-tok"></span> listening to?</div><svg class="plot" id="atArcs" viewBox="0 0 480 170" role="img" aria-label="Attention arcs"></svg></div><div class="predict" id="atPred"></div></div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula" style="white-space:normal">Attention(Q, K, V) = softmax( QKᵀ / √d<sub>k</sub> + M ) · V</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-tok">Q = XW<sub>Q</sub></span>: what each word is looking for</li><li><span class="c-emb">K = XW<sub>K</sub></span>: what each word offers to be matched on</li><li><span class="c-hid">V = XW<sub>V</sub></span>: the information actually passed along</li><li><span class="c-err">M</span>: mask, −∞ above the diagonal</li></ul></div>
+        <div><b>Inside an SLM</b>Here d = 4 and the weights are hand-picked so similar words attract. A trained SLM learns W<sub>Q</sub>, W<sub>K</sub>, W<sub>V</sub> (each [d, d]) by backprop, and runs this in every block for every head.</div>
+      </div>
+    </div>
+
+    <!-- 5 MHA -->
+    <div class="panel" id="p5-mha">
+      <div class="phead"><span class="tag">05</span><h3>Multi-head attention: several ways of listening at once</h3><span class="sim illus">illustrative heads</span>
+        <p class="plain">One attention pattern can't capture everything. <em>Multi-head attention</em> runs several smaller attentions side by side. Each head can specialise: one tracks the previous word, one finds related words, one keeps an eye on the start. Their outputs are glued together and mixed by W<sub>O</sub>.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:1 1 260px">Sentence<input class="txt" id="mhIn" type="text" value="the customer paid the loan fee" autocomplete="off"></label><label class="field" style="flex:0 1 200px">heads H: <b id="mhHv"></b><input id="mhH" type="range" min="0" max="2" value="2"></label></div>
+      <div class="box"><div id="mhGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px"></div></div>
+      <div class="grid2" style="margin-top:12px"><div class="box" id="mhShapes"></div><div class="predict" id="mhPred"></div></div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula" style="white-space:normal">MHA(X) = Concat(head₁, …, head<sub>H</sub>) · W<sub>O</sub>, head<sub>h</sub> = Attention(XW<sub>Q</sub><sup>h</sup>, XW<sub>K</sub><sup>h</sup>, XW<sub>V</sub><sup>h</sup>)</div></div>
+        <div><b>Shapes</b><ul><li>each head works in d<sub>k</sub> = d / H dims</li><li>concat: [T, H·d<sub>k</sub>] = [T, d]</li><li>W<sub>O</sub>: [d, d]. Total params 4d², whatever H is</li></ul></div>
+        <div><b>Inside an SLM</b>Researchers really do find heads like these in trained models: "previous-token" heads, heads that copy repeated patterns (induction heads), and heads that attend to the first token as a resting place.</div>
+      </div>
+    </div>
+
+    <!-- 6 RESIDUAL + LN -->
+    <div class="panel" id="p5-res">
+      <div class="phead"><span class="tag">06</span><h3>Residual connections & layer normalisation</h3><span class="sim real">exact LayerNorm · illustrative gradients</span>
+        <p class="plain">Two small tricks make deep stacks trainable. A <em>residual connection</em> adds each block's input back to its output (x + f(x)), creating a highway that gradients can travel straight down. <em>LayerNorm</em> rescales each token's vector to a standard size so numbers never explode or vanish.</p></div>
+      <div class="grid2">
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">LayerNorm on one token's vector (d = 8)</div>
+          <div class="ctrls" style="grid-template-columns:repeat(3,minmax(0,1fr))"><label class="field">input scale ×<b id="lnSv"></b><input id="lnS" type="range" min="-10" max="10" value="0"></label><label class="field">input shift +<b id="lnMv"></b><input id="lnM" type="range" min="-50" max="50" value="10"></label><label class="field">γ (learned gain) <b id="lnGv"></b><input id="lnG" type="range" min="1" max="30" value="10"></label></div>
+          <svg class="plot" id="lnSvg" viewBox="0 0 440 250" role="img" aria-label="LayerNorm stages"></svg><p class="note" id="lnNote"></p></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Gradient reaching each block, from the loss at the top</div>
+          <label class="field">number of blocks: <b id="rsLv"></b><input id="rsL" type="range" min="2" max="48" value="24"></label>
+          <svg class="plot" id="rsSvg" viewBox="0 0 440 230" role="img" aria-label="Gradient magnitude with and without residuals"></svg><p class="note" id="rsNote"></p></div>
+      </div>
+      <div class="grid2" style="margin-top:12px"><div class="box"><div class="formula" style="white-space:normal">LN(x) = γ · (x − μ) / √(σ² + ε) + β &nbsp;·&nbsp; block: x ← x + MHA(LN(x)); x ← x + FFN(LN(x))</div></div><div class="predict" id="rsPred"></div></div>
+    </div>
+
+    <!-- 7 CONTEXT -->
+    <div class="panel" id="p5-ctx">
+      <div class="phead"><span class="tag">07</span><h3>The context window: how much the model can see</h3><span class="sim real">exact memory arithmetic</span>
+        <p class="plain">A model can only attend to its last <em>C tokens</em>, its context window. Anything older is simply gone. And because every token attends to every other, the attention grid costs <em>C × C</em>: double the window and that grid is 4× bigger.</p></div>
+      <div class="grid2">
+        <div class="box"><label class="field">context window C = <b id="cxCv"></b> words<input id="cxC" type="range" min="4" max="40" value="12"></label><div class="tkrow" id="cxToks" style="margin-top:10px"></div><p class="note" id="cxNote" style="margin-top:10px"></p></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><label class="field">real model context: <b id="cxRv"></b> tokens<input id="cxR" type="range" min="0" max="7" value="3"></label><svg class="plot" id="cxSvg" viewBox="0 0 420 180" role="img" aria-label="Attention memory versus context length"></svg><div class="stats" id="cxStats" style="margin-top:8px"></div></div>
+          <div class="predict" id="cxPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formulas</b><div class="formula" style="white-space:normal">attention scores per layer = B · H · C² · bytes &nbsp;·&nbsp; KV cache = 2 · N · C · d · bytes</div></div>
+        <div><b>Assumed model</b><ul><li>d = 768, N = 12, H = 12 (GPT-2 small size)</li><li>FP16 (2 bytes), batch B = 1</li></ul></div>
+        <div><b>Inside an SLM</b>Small models typically use C = 512–4096. Learned position embeddings simply have no row beyond C. Tricks like sliding windows, FlashAttention and RoPE scaling stretch it.</div>
+      </div>
+    </div>
+
+    <!-- 8 CODE -->
+    <div class="panel" id="p5-code">
+      <div class="phead"><span class="tag">08</span><h3>Code it on your CPU</h3><p>Attention from scratch in NumPy (the same steps as panel 04), a multi-head causal self-attention module, and a full Transformer block in PyTorch.</p></div>
+      <div class="code" id="code5"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <!-- 9 EXERCISE -->
+    <div class="panel" id="p5-ex">
+      <div class="phead"><span class="tag">09</span><h3>Hands-on exercise: four missions</h3><p>The checks read the panels' live state.</p></div>
+      <div class="box"><div class="checks" id="ex5Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex5Btn" type="button">Check missions</button></div><p class="note" id="ex5Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <!-- 10 QUIZ -->
+    <div class="panel" id="p5-quiz">
+      <div class="phead"><span class="tag">10</span><h3>Stage 5 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 6, where you build a Transformer in PyTorch.</p></div>
+      <div id="quiz5"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -1490,7 +1648,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -3641,6 +3799,343 @@ function makeQuiz4(seed){
 mountQuiz(4,$("#quiz4"),makeQuiz4);
 
 
+/* =================== STAGE 5 =================== */
+const mmul=(A,B)=>A.map(r=>B[0].map((_,j)=>r.reduce((s,v,k)=>s+v*B[k][j],0)));
+const mT=A=>A[0].map((_,j)=>A.map(r=>r[j]));
+const wordsOf=s=>(s.toLowerCase().match(/[a-z']+/g)||[]);
+const fmtc=v=>v===-Infinity?"−∞":(Math.abs(v)>=100?v.toFixed(0):v.toFixed(2));
+function mtab(M,rl,cl,o={}){
+  const col=o.col||(v=>cellCol(v));
+  return `<table class="pg mt"><tr><th></th>${cl.map((c,j)=>`<th style="text-align:center;color:${o.colC||"var(--emb)"}">${esc(c)}</th>`).join("")}${o.sum?'<th style="text-align:center">Σ row</th>':""}</tr>${M.map((r,i)=>`<tr${o.hiRow===i?' class="hirow"':""}><th style="color:${o.colR||"var(--tok)"}">${esc(rl[i])}</th>${r.map((v,j)=>{const mk=v===-Infinity,hc=o.hiCell&&o.hiCell[0]===i&&o.hiCell[1]===j;return `<td ${o.click?`data-c="${i},${j}"`:""} style="background:${mk?"#05090c":col(v)};color:${mk?"var(--dim)":"var(--fg)"};${hc?"outline:2px solid #fff;":""}${o.click?"cursor:pointer;":""}">${fmtc(v)}</td>`;}).join("")}${o.sum?`<td style="color:var(--out)">${r.reduce((a,b)=>a+(b===-Infinity?0:b),0).toFixed(2)}</td>`:""}</tr>`).join("")}</table>`;
+}
+const probCol=v=>`rgba(98,227,162,${(.06+.9*Math.min(1,v)).toFixed(2)})`;
+
+/* ---- 1. why: RNN vs Transformer race ---- */
+const wh={step:0,timer:null};
+function whTok(){return wordsOf($("#whIn").value).slice(0,14);}
+function renderWhy5(){
+  const t=whTok(),T=t.length,W=480,x=i=>24+i*((W-48)/Math.max(1,T-1));
+  // RNN
+  let g="";const k=wh.step;
+  t.forEach((w,i)=>{const done=i<k,cur=i===k-1;g+=`<rect x="${x(i)-15}" y="148" width="30" height="20" rx="4" style="fill:${done?"rgba(243,185,85,.25)":"var(--panel2)"};stroke:${cur?"var(--tok)":"var(--line2)"}"/><text x="${x(i)}" y="185" text-anchor="middle" font-size="8.5" style="fill:var(--muted)" font-family="IBM Plex Mono" transform="rotate(0)">${esc(w.slice(0,6))}</text>`;
+    if(i>0)g+=`<line x1="${x(i-1)+11}" y1="95" x2="${x(i)-11}" y2="95" style="stroke:${i<k?"var(--hid)":"var(--line2)"}" stroke-width="2"/>`;
+    const mem=Math.pow(.72,Math.max(0,i));g+=`<line x1="${x(i)}" y1="148" x2="${x(i)}" y2="106" style="stroke:var(--line2)"/><circle cx="${x(i)}" cy="95" r="11" style="fill:${done?"rgba(169,147,255,.35)":"var(--panel2)"};stroke:${cur?"#fff":"var(--hid)"}" stroke-width="${cur?2.5:1.2}"/>`;
+    if(done)g+=`<rect x="${x(i)-4}" y="${60-28*mem}" width="8" height="${28*mem}" style="fill:var(--tok)"/>`;});
+  g+=`<text x="4" y="14" font-size="10" style="fill:var(--tok)" font-family="IBM Plex Mono">amber bars: how much of word 1 ("${esc(t[0]||"")}") is still remembered</text><text x="4" y="125" font-size="9" style="fill:var(--hid)" font-family="IBM Plex Mono">hidden state h →</text>`;
+  $("#whRnn").innerHTML=g;
+  $("#whRnnT").innerHTML=`step <b>${k}</b> / ${T}${k>=T&&T?` · memory of "${esc(t[0])}" left: <b class="c-err">${(Math.pow(.72,T-1)*100).toFixed(1)}%</b>`:""}`;
+  // Transformer: all arcs at once after step 1
+  let h="";const on=k>=1;
+  t.forEach((w,i)=>{h+=`<rect x="${x(i)-15}" y="148" width="30" height="20" rx="4" style="fill:${on?"rgba(243,185,85,.25)":"var(--panel2)"};stroke:var(--line2)"/><text x="${x(i)}" y="185" text-anchor="middle" font-size="8.5" style="fill:var(--muted)" font-family="IBM Plex Mono">${esc(w.slice(0,6))}</text>`;});
+  if(on&&T>1){const L=T-1;for(let j=0;j<L;j++){const mx=(x(L)+x(j))/2,hh=Math.min(130,18+(x(L)-x(j))*.42);h+=`<path d="M${x(L)} 146 Q${mx} ${146-hh} ${x(j)} 146" style="fill:none;stroke:var(--out);opacity:.75" stroke-width="1.6"/>`;}
+    h+=`<text x="${W-4}" y="14" text-anchor="end" font-size="10" style="fill:var(--out)" font-family="IBM Plex Mono">"${esc(t[L])}" sees "${esc(t[0])}" directly: 1 hop</text>`;}
+  $("#whTf").innerHTML=h;$("#whTfT").innerHTML=on?`step <b>1</b> / 1 · all ${T} words processed together <span class="c-out">✓ done</span>`:"step 0 / 1";
+}
+$("#whRace").addEventListener("click",()=>{clearInterval(wh.timer);wh.step=0;renderWhy5();const T=whTok().length;wh.timer=setInterval(()=>{wh.step++;renderWhy5();if(wh.step>=T)clearInterval(wh.timer);},380);});
+$("#whIn").addEventListener("input",()=>{clearInterval(wh.timer);wh.step=whTok().length;renderWhy5();});
+wh.step=whTok().length;renderWhy5();
+predictBox($("#whPred"),{q:"In a 14-word sentence, how many sequential steps does an RNN need before the last word's state exists? And a Transformer?",opts:["14 and 14","14 and 1","1 and 1"],ok:1,
+  why:"The RNN must finish word 13 before word 14 (14 dependent steps), while the Transformer handles all positions in one parallel step. On real hardware this is the difference between using a few cores and all of them."});
+
+/* ---- 2. types ---- */
+const TY={enc:{n:"Encoder-only",ex:"BERT, sentence classifiers, search embedders",use:"Understanding: classify a banking complaint, find similar documents. Each word sees the <b>whole</b> sentence, both left and right."},
+ dec:{n:"Decoder-only",ex:"GPT-2, Llama, Phi, Gemma, almost every SLM",use:"Generation: each word sees only itself and earlier words, so the model can learn to predict the next one honestly. The grid is a lower triangle."},
+ encdec:{n:"Encoder-decoder",ex:"T5, original Transformer, translation models",use:"Input → output tasks like translation. The encoder reads the input fully; the decoder writes the output causally and also <b>cross-attends</b> to every input word."}};
+let tyK="dec";
+$("#tyBtns").innerHTML=Object.entries(TY).map(([k,v])=>`<button type="button" class="btn" data-ty="${k}">${v.n}</button>`).join("");
+$$("#tyBtns [data-ty]").forEach(b=>b.addEventListener("click",()=>{tyK=b.dataset.ty;renderTy();}));
+function grid01(rows,cols,ok,title){return `<div style="margin-bottom:10px"><div class="eyebrow" style="margin-bottom:4px">${title}</div><table class="pg"><tr><th></th>${cols.map(c=>`<th style="text-align:center;color:var(--emb)">${esc(c)}</th>`).join("")}</tr>${rows.map((r,i)=>`<tr><th style="color:var(--tok)">${esc(r)}</th>${cols.map((_,j)=>`<td style="background:${ok(i,j)?"rgba(98,227,162,.45)":"#05090c"};color:${ok(i,j)?"var(--fg)":"var(--dim)"}">${ok(i,j)?"✓":"·"}</td>`).join("")}</tr>`).join("")}</table></div>`;}
+function renderTy(){
+  $$("#tyBtns [data-ty]").forEach(b=>b.classList.toggle("primary",b.dataset.ty===tyK));
+  const s=["the","bank","approved","the","loan"],src=["the","loan","was","approved"],tgt=["<bos>","ऋण","मंज़ूर","हुआ"];
+  $("#tyGrid").innerHTML=tyK==="enc"?grid01(s,s,()=>true,"self-attention: everyone sees everyone"):tyK==="dec"?grid01(s,s,(i,j)=>j<=i,"masked self-attention: only the past"):
+    grid01(src,src,()=>true,"encoder self-attention (input)")+grid01(tgt,tgt,(i,j)=>j<=i,"decoder masked self-attention (output so far)")+grid01(tgt,src,()=>true,"cross-attention: output rows look at input columns");
+  const v=TY[tyK];$("#tyInfo").innerHTML=`<h3 style="margin-bottom:6px">${v.n}</h3><p style="margin-bottom:8px">${v.use}</p><p class="note">Examples: ${v.ex}</p>`;
+}
+renderTy();
+
+/* ---- 3. architecture ---- */
+const AR_DS=[64,128,256,384,512,768],AR_HS=[1,2,4,8],AR_TS=[1,2,3,5,8,16,64,256],AR_V=8000,AR_C=256;
+const arVisited=new Set();let arSel="mha",arRun=0;
+const ARC=[["in","Input token IDs",650,"tok"],["tok","Token embedding",592,"emb",-1],["pos","Position embedding",592,"emb",1],["add0","+",542,"emb"],["ln1","LayerNorm 1",474,"hid"],["mha","Masked multi-head self-attention",422,"hid"],["res1","+",372,"out"],["ln2","LayerNorm 2",330,"hid"],["ffn","Feed-forward (d → 4d → d, GELU)",280,"hid"],["res2","+",232,"out"],["lnf","Final LayerNorm",168,"hid"],["head","LM head (linear d → V)",118,"out"],["soft","Softmax → next-token probabilities",62,"out"]];
+function arCfg(){return {d:AR_DS[+$("#arD").value],N:+$("#arN").value,H:AR_HS[+$("#arH").value],T:AR_TS[+$("#arT").value]};}
+function arInfo(id,c){const {d,N,H,T}=c,V=AR_V,C=AR_C,f=n=>n.toLocaleString();
+  return ({in:["The tokenizer's output (Stage 2): one integer per token.",`[${T}] integers`,`[${T}]`,0,"Stage 2"],
+   tok:["Looks up each ID's row in the embedding matrix E (Stage 3).",`[${T}]`,`[${T}, ${d}]`,V*d,"Stage 3 · panel 02"],
+   pos:["Adds where each token sits. GPT-style SLMs learn a [C, d] table.",`positions 0…${T-1}`,`[${T}, ${d}]`,C*d,"Stage 3 · panel 05"],
+   add0:["Token vector + position vector. This starts the residual stream, the running vector that each block reads from and adds to.",`2 × [${T}, ${d}]`,`[${T}, ${d}]`,0,"Stage 3 · panel 06"],
+   ln1:["Rescales each token's vector to mean 0, spread 1 (then a learned γ, β), so attention gets well-behaved inputs.",`[${T}, ${d}]`,`[${T}, ${d}]`,2*d,"panel 06"],
+   mha:[`Each token gathers information from earlier tokens. ${H} heads each work in ${d/H} dims; the causal mask hides the future. Score grid per head: [${T}, ${T}].`,`[${T}, ${d}]`,`[${T}, ${d}]`,4*d*d+4*d,"panels 04 and 05"],
+   res1:["Residual add: the block's input is added back to the attention output (x + MHA(LN(x))). This gives gradients a direct highway down through the stack.",`2 × [${T}, ${d}]`,`[${T}, ${d}]`,0,"panel 06"],
+   ln2:["A second LayerNorm, before the feed-forward network.",`[${T}, ${d}]`,`[${T}, ${d}]`,2*d,"panel 06"],
+   ffn:["Processes each token separately: widen to 4d, GELU, shrink back. Holds about two-thirds of the block's parameters.",`[${T}, ${d}]`,`[${T}, ${d}] (via [${T}, ${4*d}])`,8*d*d+5*d,"Stage 4 · panel 05"],
+   res2:["Residual add around the FFN. Then the whole block repeats: this box stacks N times.",`2 × [${T}, ${d}]`,`[${T}, ${d}]`,0,"panel 06"],
+   lnf:["One last normalisation after all N blocks.",`[${T}, ${d}]`,`[${T}, ${d}]`,2*d,"panel 06"],
+   head:["A linear layer that scores every vocabulary word. It's usually tied to (shares weights with) the token embedding E, so no new parameters.",`[${T}, ${d}]`,`[${T}, ${V}] logits`,0,"Stage 0 · panel 03"],
+   soft:["Turns the last position's logits into probabilities. Sampling picks the next token, it's appended, and everything runs again.",`[${V}] logits`,`[${V}] probabilities → 1 token`,0,"Stage 1 · panel 04 and Stage 12"]})[id];}
+function renderArch(){
+  const c=arCfg();$("#arDv").textContent=c.d;$("#arNv").textContent=c.N;$("#arHv").textContent=`${c.H} (d_k = ${c.d/c.H})`;$("#arTv").textContent=c.T;
+  let g="";
+  // block frame and shadows
+  for(let s=Math.min(c.N,4)-1;s>0;s--)g+=`<rect x="${70+s*6}" y="${186-s*6}" width="330" height="332" rx="14" style="fill:var(--panel);stroke:var(--line2);opacity:${.5-s*.1}"/>`;
+  g+=`<rect x="70" y="186" width="330" height="332" rx="14" style="fill:rgba(169,147,255,.05);stroke:rgba(169,147,255,.5)" stroke-dasharray="5 4"/><text x="392" y="204" text-anchor="end" font-size="12" font-weight="700" style="fill:var(--hid)" font-family="IBM Plex Mono">Transformer block × ${c.N}</text>`;
+  // main spine
+  g+=`<line x1="250" y1="635" x2="250" y2="80" style="stroke:var(--line2)" stroke-width="3"/>`;
+  // residual skips
+  g+=`<path d="M250 505 H105 V372 H232" style="fill:none;stroke:var(--out)" stroke-width="2" stroke-dasharray="6 4"/><path d="M250 356 H105 V232 H232" style="fill:none;stroke:var(--out)" stroke-width="2" stroke-dasharray="6 4"/><text x="98" y="440" text-anchor="middle" font-size="9.5" style="fill:var(--out)" font-family="IBM Plex Mono" transform="rotate(-90 98 440)">residual</text><text x="98" y="294" text-anchor="middle" font-size="9.5" style="fill:var(--out)" font-family="IBM Plex Mono" transform="rotate(-90 98 294)">residual</text>`;
+  ARC.forEach(([id,lab,y,col,side])=>{const sel=id===arSel,vis=arVisited.has(id),C=`var(--${col})`;
+    if(lab==="+"){g+=`<g data-ar="${id}" style="cursor:pointer"><circle cx="250" cy="${y}" r="16" style="fill:var(--panel2);stroke:${sel?"#fff":C}" stroke-width="${sel?3:2}"/><text x="250" y="${y+6}" text-anchor="middle" font-size="18" font-weight="700" style="fill:${C}">+</text></g>`;return;}
+    const w=side?160:300,x=side?(side<0?75:255)+0:250-w/2;
+    g+=`<g data-ar="${id}" style="cursor:pointer"><rect x="${x}" y="${y-19}" width="${w}" height="38" rx="9" style="fill:${sel?"rgba(255,255,255,.08)":"var(--panel2)"};stroke:${sel?"#fff":C}" stroke-width="${sel?2.5:1.6}"/><text x="${x+w/2}" y="${y+4}" text-anchor="middle" font-size="${w<200?11:12}" font-weight="600" style="fill:${C}" font-family="IBM Plex Sans, sans-serif">${esc(lab)}</text>${vis?`<circle cx="${x+w-8}" cy="${y-11}" r="3" style="fill:var(--out)"/>`:""}</g>`;});
+  g+=`<circle id="arDot" cx="250" cy="650" r="9" style="fill:var(--tok);opacity:0;transition:cy .6s ease,opacity .3s;filter:drop-shadow(0 0 6px var(--tok))"/>`;
+  $("#arSvg").innerHTML=g;
+  const [what,inS,outS,par,where]=arInfo(arSel,c),lab=ARC.find(a=>a[0]===arSel)[1];
+  $("#arInfo").innerHTML=`<div class="eyebrow">Selected part</div><h3 style="margin:4px 0 8px">${esc(lab==="+"?"Residual add (+)":lab)}</h3><p style="margin-bottom:10px">${what}</p><dl class="kv"><dt>input shape</dt><dd class="mono c-emb">${inS}</dd><dt>output shape</dt><dd class="mono c-out">${outS}</dd><dt>parameters</dt><dd class="mono c-hid">${par.toLocaleString()}${["ln1","mha","ln2","ffn","res1","res2"].includes(arSel)?` per block × ${c.N} = ${(par*c.N).toLocaleString()}`:""}</dd><dt>covered in</dt><dd>${where}</dd></dl>`;
+  const P=params(AR_V,c.d,c.N,AR_C);
+  $("#arStats").innerHTML=`<div class="stat"><span class="v c-hid">${fmtN(P.total)}</span><span class="k">total parameters (V = 8,000, C = 256)</span></div><div class="stat"><span class="v">${arVisited.size}/13</span><span class="k">parts explored</span></div>`;
+}
+$("#arSvg").addEventListener("click",e=>{const g=e.target.closest("[data-ar]");if(g){arSel=g.dataset.ar;arVisited.add(arSel);renderArch();}});
+["#arD","#arN","#arH","#arT"].forEach(s=>$(s).addEventListener("input",renderArch));
+$("#arPlay").addEventListener("click",async()=>{const id=++arRun;for(const [cid,,y] of ARC){if(id!==arRun)return;arSel=cid;arVisited.add(cid);renderArch();const d=$("#arDot");d.style.opacity=1;d.setAttribute("cy",y);await sleep(1100);}});
+arVisited.add("mha");renderArch();
+predictBox($("#arPred"),{q:"A token vector enters a block with shape [T, d]. What shape leaves the block?",opts:["[T, 4d]","[T, d]","[T, T]"],ok:1,
+  why:"Every block keeps [T, d] in and out, even though it goes through [T, T] attention scores and [T, 4d] inside the FFN. That's what lets you stack N identical blocks like Lego."});
+
+/* ---- 4. self-attention step by step ---- */
+const atR=mulberry(505),AT_D=4;
+const AT_WQ=Array.from({length:4},(_,i)=>Array.from({length:4},(_,j)=>(i===j?1:0)+gauss(atR)*.22));
+const AT_WK=AT_WQ.map(r=>r.slice());
+const AT_WV=Array.from({length:4},()=>Array.from({length:4},()=>gauss(atR)*.7));
+const at={step:0,qi:4,cell:null,timer:null};
+let atD=null;
+function atCompute(){
+  const toks=wordsOf($("#atIn").value).slice(0,6);if(!toks.length)toks.push("the");
+  const X=toks.map((w,p)=>s3Emb(w,4).map((v,i)=>.55*v+.45*peSinV(p,i,4)));
+  const Q=mmul(X,AT_WQ),K=mmul(X,AT_WK),V=mmul(X,AT_WV),S=mmul(Q,mT(K)),Ss=S.map(r=>r.map(v=>v/Math.sqrt(AT_D)));
+  const mask=$("#atMask").checked,Sm=Ss.map((r,i)=>r.map((v,j)=>mask&&j>i?-Infinity:v));
+  const A=Sm.map(r=>{const m=Math.max(...r),e=r.map(v=>v===-Infinity?0:Math.exp(v-m)),s=e.reduce((a,b)=>a+b,0);return e.map(v=>v/s);});
+  const O=mmul(A,V);atD={toks,X,Q,K,V,S,Ss,Sm,A,O,mask};if(at.qi>=toks.length)at.qi=toks.length-1;
+}
+const AT_STEPS=[{l:"Input X",c:"var(--emb)",s:"[T, d]"},{l:"Q, K, V",c:"var(--tok)",s:"3 × [T, d]"},{l:"Scores QKᵀ",c:"var(--hid)",s:"[T, T]"},{l:"Scale ÷ √dₖ",c:"var(--hid)",s:"[T, T]"},{l:"Causal mask",c:"var(--err)",s:"[T, T]"},{l:"Softmax",c:"var(--out)",s:"[T, T]"},{l:"Weights × V",c:"var(--out)",s:"[T, d]"},{l:"Output",c:"var(--out)",s:"[T, d]"}];
+$("#atPipe").innerHTML=AT_STEPS.map((s,i)=>(i?`<span class="arrow" id="atar${i}"></span>`:"")+`<button type="button" class="step" data-i="${i}" style="--sc:${s.c}"><span class="sn">${i+1}</span><span class="sl" style="color:${s.c}">${s.l}</span><span class="ss">${s.s}</span></button>`).join("");
+$$("#atPipe .step").forEach(b=>b.addEventListener("click",()=>{atStop();atSet(+b.dataset.i);}));
+function atSet(i,quiet){
+  at.step=Math.max(0,Math.min(7,i));atCompute();const D=atD,T=D.toks.length,qi=at.qi,dl=["d0","d1","d2","d3"];
+  $$("#atPipe .step").forEach((b,k)=>{b.classList.toggle("on",k===at.step);b.classList.toggle("past",k<at.step);});
+  if(!quiet){const ar=$("#atar"+at.step);if(ar){ar.classList.remove("flow");void ar.offsetWidth;ar.classList.add("flow");}}
+  $("#atToks").innerHTML='<span class="eyebrow">follow word</span>'+D.toks.map((w,k)=>`<button type="button" class="btn${k===qi?" primary":""}" data-q="${k}">${k} · ${esc(w)}</button>`).join("");
+  $$("#atToks [data-q]").forEach(b=>b.addEventListener("click",()=>{at.qi=+b.dataset.q;at.cell=null;atSet(at.step,true);}));
+  const head=(t,s)=>`<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>${t}</h3><span class="shape">${s}</span></div>`;
+  const cell=at.cell||[qi,Math.min(qi,T-1)];let h="";
+  const dotTxt=(i,j)=>`q<sub>${i}</sub>·k<sub>${j}</sub> = ${D.Q[i].map((v,k)=>`(${v.toFixed(2)})(${D.K[j][k].toFixed(2)})`).join(" + ")} = <b>${D.S[i][j].toFixed(3)}</b>`;
+  switch(at.step){
+   case 0:h=head("1 · Each word enters as a vector (embedding + position)",`X: [${T}, 4]`)+`<div class="scroll">${mtab(D.X,D.toks,dl,{hiRow:qi})}</div><p class="note" style="margin-top:10px">These are Stage 3's vectors: x = E[word] + PE[position], with d = 4 so every number fits on screen. Row ${qi} is "${esc(D.toks[qi])}".</p>`;break;
+   case 1:h=head("2 · Three projections: Query, Key, Value","Q, K, V: [T, 4] each")+`<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px"><div><div class="eyebrow c-tok">Q = X W<sub>Q</sub>: what am I looking for?</div><div class="scroll">${mtab(D.Q,D.toks,dl,{hiRow:qi})}</div></div><div><div class="eyebrow c-emb">K = X W<sub>K</sub>: what do I contain?</div><div class="scroll">${mtab(D.K,D.toks,dl)}</div></div><div><div class="eyebrow c-hid">V = X W<sub>V</sub>: what will I share?</div><div class="scroll">${mtab(D.V,D.toks,dl)}</div></div></div><p class="note" style="margin-top:10px">Same X, three different learned weight matrices ([4, 4] each), three different roles. Like a library: the query is your search, keys are book titles, values are the books' contents.</p>`;break;
+   case 2:h=head("3 · Scores: every query dotted with every key",`QKᵀ: [${T}, ${T}]`)+`<div class="scroll">${mtab(D.S,D.toks,D.toks,{hiRow:qi,hiCell:cell,click:true,col:v=>cellCol(v/2)})}</div><div class="formula" style="margin-top:10px;white-space:normal">${dotTxt(cell[0],cell[1])}</div><p class="note" style="margin-top:8px">Click any cell. A big score means "this key matches what that query is looking for", like the dot product from Stage 1. Rows are listeners and columns are speakers.</p>`;break;
+   case 3:h=head("4 · Scale down by √dₖ = √4 = 2",`[${T}, ${T}]`)+`<div class="scroll">${mtab(D.Ss,D.toks,D.toks,{hiRow:qi,hiCell:cell,click:true,col:v=>cellCol(v)})}</div><p class="note" style="margin-top:10px">Dot products grow with the number of dimensions. Without scaling, a 64-dim head would produce huge scores, softmax would put ~100% on one word, and gradients would vanish. Dividing by √d<sub>k</sub> keeps scores in a healthy range.</p>`;break;
+   case 4:h=head(D.mask?"5 · Causal mask: hide the future":"5 · Mask is OFF: the future is visible",`[${T}, ${T}]`)+`<div class="scroll">${mtab(D.Sm,D.toks,D.toks,{hiRow:qi,hiCell:cell,click:true,col:v=>cellCol(v)})}</div><p class="note" style="margin-top:10px">${D.mask?"Every cell above the diagonal becomes −∞, so a word can't look at words after it. During training the model must predict each next word <b>without</b> seeing it. Without the mask, it would simply copy the answer.":"<span class='c-err'>Without the mask, word 0 can read word 4.</span> Fine for an encoder (BERT), but a decoder trained this way learns to cheat and can't generate text. Switch the mask back on."}</p>`;break;
+   case 5:h=head("6 · Softmax each row: scores → attention weights",`A: [${T}, ${T}], rows sum to 1`)+`<div class="scroll">${mtab(D.A,D.toks,D.toks,{hiRow:qi,sum:true,col:probCol})}</div><p class="note" style="margin-top:10px">Stage 1's softmax, applied to each row separately. e<sup>−∞</sup> = 0, so masked cells get exactly 0%. Row "${esc(D.toks[qi])}" spends its 100% of attention like this: ${D.A[qi].map((a,j)=>a>0?`${esc(D.toks[j])} ${(a*100).toFixed(0)}%`:"").filter(Boolean).join(", ")}.</p>`;break;
+   case 6:{const rows=D.A[qi].map((a,j)=>({a,j})).filter(o=>o.a>0);
+     h=head(`7 · Mix the values: output for "${esc(D.toks[qi])}" = Σ weight × value`,"[1, 4] for this row")+`<div class="vecs">${rows.map(o=>`<div class="vrow" style="grid-template-columns:160px repeat(4,minmax(40px,1fr));min-width:0"><span class="lbl">${(o.a*100).toFixed(0)}% × v(${esc(D.toks[o.j])})</span>${D.V[o.j].map(v=>`<span class="cell" style="background:${cellCol(v*o.a*2)}">${(v*o.a).toFixed(2)}</span>`).join("")}</div>`).join("")}<div class="vrow last" style="grid-template-columns:160px repeat(4,minmax(40px,1fr));min-width:0;border-top:1px solid var(--line2);padding-top:4px"><span class="lbl">= output o(${esc(D.toks[qi])})</span>${D.O[qi].map(v=>`<span class="cell" style="background:${cellCol(v)}">${v.toFixed(2)}</span>`).join("")}</div></div><p class="note" style="margin-top:10px">The new vector for "${esc(D.toks[qi])}" is a blend of the value vectors it attended to, mostly from the words it found most relevant. This is how context flows into a word.</p>`;break;}
+   case 7:h=head("8 · Output: every word, now context-aware",`O = A·V: [${T}, 4]`)+`<div class="grid2" style="gap:12px"><div><div class="eyebrow">before (X)</div><div class="scroll">${mtab(D.X,D.toks,dl,{hiRow:qi})}</div></div><div><div class="eyebrow c-out">after attention (O)</div><div class="scroll">${mtab(D.O,D.toks,dl,{hiRow:qi})}</div></div></div><p class="note" style="margin-top:10px">Same shape in and out. In the real block, O goes through W<sub>O</sub>, is <b>added</b> to X (residual), then on to the FFN (panel 03). Stack N of these and each word's vector carries more and more context.</p>`;break;
+  }
+  $("#atOut").innerHTML=h;
+  $$("#atOut [data-c]").forEach(td=>td.addEventListener("click",()=>{const [i,j]=td.dataset.c.split(",").map(Number);at.cell=[i,j];at.qi=i;atSet(at.step,true);}));
+  // arcs
+  $("#atWho").textContent=`"${D.toks[qi]}"`;
+  const W=480,x=k=>30+k*((W-60)/Math.max(1,T-1));let g="";
+  D.toks.forEach((w,k)=>{g+=`<rect x="${x(k)-30}" y="128" width="60" height="24" rx="5" style="fill:${k===qi?"rgba(243,185,85,.3)":"var(--panel2)"};stroke:${k===qi?"var(--tok)":"var(--line2)"}"/><text x="${x(k)}" y="145" text-anchor="middle" font-size="11" style="fill:var(--fg)" font-family="IBM Plex Mono">${esc(w.slice(0,8))}</text>`;});
+  if(at.step>=5){D.A[qi].forEach((a,j)=>{if(a<=0.005)return;if(j===qi){g+=`<circle cx="${x(j)}" cy="114" r="${4+a*14}" style="fill:none;stroke:var(--out);opacity:${.3+.7*a}" stroke-width="${1+a*6}"/>`;}else{const mx=(x(qi)+x(j))/2,hh=Math.min(110,20+Math.abs(x(qi)-x(j))*.4);g+=`<path d="M${x(qi)} 126 Q${mx} ${126-hh} ${x(j)} 126" style="fill:none;stroke:var(--out);opacity:${.25+.75*a}" stroke-width="${1+a*9}"/>`;}
+    g+=`<text x="${x(j)}" y="166" text-anchor="middle" font-size="10" style="fill:var(--out)" font-family="IBM Plex Mono">${(a*100).toFixed(0)}%</text>`;});}
+  else g+=`<text x="${W/2}" y="60" text-anchor="middle" font-size="11" style="fill:var(--dim)" font-family="IBM Plex Mono">arcs appear after softmax (step 6)</text>`;
+  $("#atArcs").innerHTML=g;
+}
+function atStop(){clearInterval(at.timer);at.timer=null;$("#atPlay").textContent="Play";}
+$("#atPlay").addEventListener("click",()=>{if(at.timer){atStop();return;}if(at.step>=7)at.step=-1;$("#atPlay").textContent="Pause";atSet(at.step+1);at.timer=setInterval(()=>{if(at.step>=7){atStop();return;}atSet(at.step+1);},2200);});
+$("#atNext").addEventListener("click",()=>{atStop();atSet(at.step+1);});$("#atPrev").addEventListener("click",()=>{atStop();atSet(at.step-1);});
+$("#atIn").addEventListener("input",()=>{at.cell=null;atSet(at.step,true);});$("#atMask").addEventListener("change",()=>atSet(at.step,true));
+atSet(5,true);
+predictBox($("#atPred"),{q:"With the causal mask on, how much attention can the <b>first</b> word give to itself?",opts:["100%","About 50%","It depends on the scores"],ok:0,
+  why:"The first word can only see itself, since every other cell in its row is −∞, which becomes 0 after softmax. So its row is always 100% on itself. Its output is just its own value vector.",onReveal:()=>{at.qi=0;atSet(5);}});
+
+/* ---- 5. multi-head ---- */
+const MH_HS=[1,2,4];
+const MH_DEF=[{n:"related words",bias:()=>0,col:"var(--out)"},{n:"previous word",bias:(i,j)=>j===i-1?4:0,col:"var(--tok)"},{n:"first word",bias:(i,j)=>j===0?3.5:0,col:"var(--hid)"},{n:"itself",bias:(i,j)=>j===i?4:0,col:"var(--emb)"}];
+function renderMHA(){
+  const H=MH_HS[+$("#mhH").value],dk=8/H,toks=wordsOf($("#mhIn").value).slice(0,7);if(!toks.length)toks.push("the");
+  $("#mhHv").textContent=`${H} (d_k = ${dk})`;
+  const X=toks.map((w,p)=>s3Emb(w,8).map((v,i)=>.55*v+.45*peSinV(p,i,8)));
+  let html="";
+  for(let h=0;h<H;h++){const r=mulberry(900+h),Wq=Array.from({length:8},(_,i)=>Array.from({length:dk},(_,j)=>(i%dk===j?1:0)+gauss(r)*.2)),Q=mmul(X,Wq);
+    const def=MH_DEF[h],S=Q.map((q,i)=>Q.map((k,j)=>j>i?-Infinity:dotv(q,k)/Math.sqrt(dk)*.6+def.bias(i,j))),A=S.map(rw=>{const m=Math.max(...rw),e=rw.map(v=>v===-Infinity?0:Math.exp(v-m)),s=e.reduce((a,b)=>a+b,0);return e.map(v=>v/s);});
+    html+=`<div><div class="eyebrow" style="color:${def.col};margin-bottom:4px">head ${h+1}${H>1?`: attends to <b>${def.n}</b>`:": must do everything alone"}</div><div class="scroll">${mtab(A,toks,toks.map((_,j)=>j),{col:probCol})}</div></div>`;}
+  $("#mhGrid").innerHTML=html;
+  $("#mhShapes").innerHTML=`<div class="eyebrow" style="margin-bottom:6px">Shapes (d = 8 here; GPT-2 small: d = 768, H = 12)</div><table class="tbl"><tr><th></th><th>this demo</th><th>GPT-2 small</th></tr><tr><td>d<sub>k</sub> per head = d / H</td><td>${dk}</td><td>64</td></tr><tr><td>Q, K, V per head</td><td>[${toks.length}, ${dk}]</td><td>[T, 64]</td></tr><tr><td>score grids</td><td>${H} × [${toks.length}, ${toks.length}]</td><td>12 × [T, T]</td></tr><tr><td>concat of heads</td><td>[${toks.length}, 8]</td><td>[T, 768]</td></tr><tr><td>parameters (W<sub>Q,K,V,O</sub>)</td><td>4 × 8² = 256</td><td>4 × 768² ≈ 2.36M</td></tr></table>`;
+}
+["#mhIn","#mhH"].forEach(s=>$(s).addEventListener("input",renderMHA));renderMHA();
+predictBox($("#mhPred"),{q:"Going from 1 head to 4 heads (same d), what happens to the number of attention parameters?",opts:["×4","Stays the same","÷4"],ok:1,
+  why:"Each head gets a d/H-wide slice, so the H heads together still use [d, d] matrices for Q, K, V and O, which is 4d² total. Multi-head attention gives more patterns for free, at the cost of narrower heads."});
+
+/* ---- 6. residual + layernorm ---- */
+const LN_V0=[.8,-.3,1.5,.2,-1.1,.6,-.4,.9];
+function renderLN(){
+  const s=Math.pow(10,+$("#lnS").value/10),m=+$("#lnM").value/10,ga=+$("#lnG").value/10;$("#lnSv").textContent=s.toFixed(2);$("#lnMv").textContent=m.toFixed(1);$("#lnGv").textContent=ga.toFixed(1);
+  const x=LN_V0.map(v=>v*s+m),mu=x.reduce((a,b)=>a+b,0)/8,sd=Math.sqrt(x.reduce((a,b)=>a+(b-mu)**2,0)/8+1e-5),n=x.map(v=>(v-mu)/sd),y=n.map(v=>v*ga);
+  const W=440,rows=[["input x",x,"var(--tok)"],["(x − μ) / σ",n,"var(--emb)"],["γ · … + β",y,"var(--out)"]];let g="";
+  rows.forEach(([lab,v,col],r)=>{const y0=10+r*80,mx=Math.max(...v.map(Math.abs))||1;g+=`<text x="0" y="${y0+10}" font-size="10" style="fill:${col}" font-family="IBM Plex Mono">${lab}</text><text x="${W}" y="${y0+10}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">max |v| = ${mx.toFixed(2)}</text><line x1="0" x2="${W}" y1="${y0+45}" y2="${y0+45}" style="stroke:var(--line2)"/>`;
+    v.forEach((q,i)=>{const h=q/mx*28,bx=20+i*52;g+=`<rect x="${bx}" y="${h>=0?y0+45-h:y0+45}" width="36" height="${Math.abs(h)}" rx="2" style="fill:${col};opacity:.85"/><text x="${bx+18}" y="${y0+74}" text-anchor="middle" font-size="8.5" style="fill:var(--muted)" font-family="IBM Plex Mono">${q.toFixed(2)}</text>`;});});
+  $("#lnSvg").innerHTML=g;
+  $("#lnNote").innerHTML=`μ = ${mu.toFixed(2)}, σ = ${sd.toFixed(2)}. Whatever the input's scale or shift, the middle row is always the same: mean 0, spread 1. Only the learned γ (and β) decide the final size. Try a scale of ×10 or ×0.1.`;
+}
+["#lnS","#lnM","#lnG"].forEach(s=>$(s).addEventListener("input",renderLN));renderLN();
+let rsNoRes1=1;
+function renderRes(){
+  const L=+$("#rsL").value;$("#rsLv").textContent=L;const r=mulberry(61),f=Array.from({length:L},()=>.45+r()*.45);
+  const no=[],yes=[];let p=1,q=1;for(let l=L-1;l>=0;l--){p*=f[l];q*=1+.12*(f[l]-.68);no[l]=p;yes[l]=q;}rsNoRes1=no[0];
+  const W=440,H=230,l0=40,t=12,bm=26,lo=-12,hi=1,Y=v=>t+(hi-Math.log10(Math.max(v,1e-12)))/(hi-lo)*(H-t-bm),bw=(W-l0-6)/L;
+  let g="";[1,1e-3,1e-6,1e-9,1e-12].forEach(v=>g+=`<line x1="${l0}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l0-4}" y="${Y(v)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${v===1?"1":"1e"+Math.log10(v)}</text>`);
+  for(let l=0;l<L;l++){const x=l0+l*bw;g+=`<rect x="${x+1}" y="${Y(yes[l])}" width="${Math.max(1,bw/2-1)}" height="${H-bm-Y(yes[l])}" style="fill:var(--out)"/><rect x="${x+bw/2}" y="${Y(no[l])}" width="${Math.max(1,bw/2-1)}" height="${Math.max(0,H-bm-Y(no[l]))}" style="fill:var(--err)"/>`;}
+  g+=`<text x="${l0}" y="${H-8}" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">block 1 (bottom)</text><text x="${W}" y="${H-8}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">block ${L} (top, near the loss)</text>`;
+  $("#rsSvg").innerHTML=g;
+  $("#rsNote").innerHTML=`<span class="c-out">With residuals</span>: block 1 still receives <b>${yes[0].toFixed(2)}</b> of the gradient. <span class="c-err">Without</span>: only <b>${no[0].toExponential(1)}</b>. Each block multiplies the gradient by a slope below 1, and ${L} of them in a row make it vanish (log scale). With x + f(x), the "+ x" passes the gradient through unchanged.`;
+}
+$("#rsL").addEventListener("input",renderRes);renderRes();
+predictBox($("#rsPred"),{q:"You multiply a token's input vector by 10 before LayerNorm. What happens to LayerNorm's output?",opts:["It gets 10× bigger","It stays exactly the same","It becomes 0"],ok:1,
+  why:"Scaling by 10 multiplies both (x − μ) and σ by 10, so they cancel. That's why LayerNorm stabilises deep stacks: each block always sees inputs of a standard size.",onReveal:()=>{$("#lnS").value=10;renderLN();}});
+
+/* ---- 7. context window ---- */
+const CX_TEXT="the customer called the bank on monday to ask why the loan fee was charged twice . the agent checked the account , found the duplicate charge , apologised and promised a refund within three days . then the customer asked about the interest rate on";
+const CX_R=[256,512,1024,2048,4096,8192,16384,32768];
+function renderCtx(){
+  const t=CX_TEXT.split(" "),C=+$("#cxC").value,start=Math.max(0,t.length-C);$("#cxCv").textContent=C;
+  $("#cxToks").innerHTML=t.map((w,i)=>`<span class="tk ${i<start?"":"tk"+(i%4)}" style="${i<start?"opacity:.25;text-decoration:line-through":""}">${esc(w)}</span>`).join("")+`<span class="tk spec">→ next?</span>`;
+  const lost=t.slice(0,start).filter(w=>["monday","bank","twice","duplicate","refund","customer","loan","fee"].includes(w));
+  $("#cxNote").innerHTML=start?`The model predicting the next word sees only the last ${C} words. <span class="c-err">Forgotten: ${[...new Set(lost)].join(", ")||"only filler words so far"}</span>. If the answer depends on them, the model can't know it.`:`All ${t.length} words fit in the window.`;
+  const R=CX_R[+$("#cxR").value];$("#cxRv").textContent=R.toLocaleString();
+  const att=c=>12*c*c*2,kv=c=>2*12*c*768*2,W=420,H=180,l=50,t0=10,bm=28,bw=(W-l-10)/CX_R.length,lo=4,hi=11,Y=v=>t0+(hi-Math.log10(v))/(hi-lo)*(H-t0-bm);
+  let g="";[1e4,1e6,1e8,1e10].forEach(v=>g+=`<line x1="${l}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l-4}" y="${Y(v)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${fmtB(v)}</text>`);
+  CX_R.forEach((c,i)=>{const x=l+i*bw,on=c===R;g+=`<rect x="${x+3}" y="${Y(att(c))}" width="${bw/2-3}" height="${H-bm-Y(att(c))}" style="fill:${on?"var(--err)":"rgba(255,125,147,.4)"}"/><rect x="${x+bw/2}" y="${Y(kv(c))}" width="${bw/2-3}" height="${H-bm-Y(kv(c))}" style="fill:${on?"var(--emb)":"rgba(82,211,226,.4)"}"/><text x="${x+bw/2}" y="${H-12}" text-anchor="middle" font-size="8.5" style="fill:${on?"var(--fg)":"var(--dim)"}" font-family="IBM Plex Mono">${c>=1024?c/1024+"K":c}</text>`;});
+  $("#cxSvg").innerHTML=g;
+  $("#cxStats").innerHTML=`<div class="stat"><span class="v c-err">${fmtB(att(R))}</span><span class="k">attention scores, one layer (12 heads × C²)</span></div><div class="stat"><span class="v c-emb">${fmtB(kv(R))}</span><span class="k">KV cache, all 12 layers</span></div>`;
+}
+["#cxC","#cxR"].forEach(s=>$(s).addEventListener("input",renderCtx));renderCtx();
+predictBox($("#cxPred"),{q:"You double the context window from 2,048 to 4,096 tokens. The attention score grid becomes…",opts:["2× bigger","4× bigger","the same size"],ok:1,
+  why:"It's C × C: (2C)² = 4C². The KV cache only doubles, since it's linear in C. This T² cost is the price of every word seeing every other word, and why long context is expensive.",onReveal:()=>{$("#cxR").value=4;renderCtx();}});
+
+/* ---- code ---- */
+const CODE5={
+"attention_numpy.py":`import numpy as np
+
+np.random.seed(0)
+T, d = 5, 4                                    # 5 tokens, 4-dim vectors
+X = np.random.randn(T, d)                      # token + position embeddings  [T, d]
+W_q, W_k, W_v = (np.random.randn(d, d) * 0.5 for _ in range(3))
+
+Q, K, V = X @ W_q, X @ W_k, X @ W_v            # step 2: [T, d] each
+scores = Q @ K.T                               # step 3: [T, T]  every query . every key
+scores = scores / np.sqrt(d)                   # step 4: scale by sqrt(d_k)
+mask = np.triu(np.ones((T, T)), k=1).astype(bool)
+scores[mask] = -np.inf                         # step 5: causal mask, no peeking ahead
+weights = np.exp(scores - scores.max(-1, keepdims=True))
+weights = weights / weights.sum(-1, keepdims=True)    # step 6: softmax per row
+out = weights @ V                              # steps 7-8: weighted mix of values [T, d]
+
+print(weights.round(2))     # lower-triangular, every row sums to 1
+print(out.shape)            # (5, 4)`,
+"causal_attention.py":`import math, torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+class CausalSelfAttention(nn.Module):
+    def __init__(self, d_model, n_heads, context):
+        super().__init__()
+        assert d_model % n_heads == 0
+        self.h, self.dk = n_heads, d_model // n_heads
+        self.qkv = nn.Linear(d_model, 3 * d_model)       # W_Q, W_K, W_V in one matrix
+        self.proj = nn.Linear(d_model, d_model)          # W_O
+        self.register_buffer("mask", torch.tril(torch.ones(context, context)).bool())
+
+    def forward(self, x):                                # x: [B, T, d]
+        B, T, d = x.shape
+        q, k, v = self.qkv(x).split(d, dim=-1)           # each [B, T, d]
+        # split into heads -> [B, H, T, dk]
+        q, k, v = (t.view(B, T, self.h, self.dk).transpose(1, 2) for t in (q, k, v))
+        att = q @ k.transpose(-2, -1) / math.sqrt(self.dk)          # [B, H, T, T]
+        att = att.masked_fill(~self.mask[:T, :T], float("-inf"))    # causal mask
+        att = F.softmax(att, dim=-1)
+        y = att @ v                                                 # [B, H, T, dk]
+        y = y.transpose(1, 2).contiguous().view(B, T, d)            # concat heads
+        return self.proj(y)                                         # [B, T, d]
+
+attn = CausalSelfAttention(d_model=64, n_heads=4, context=128)
+x = torch.randn(2, 10, 64)
+print(attn(x).shape)                                  # torch.Size([2, 10, 64])
+print(sum(p.numel() for p in attn.parameters()))     # 16640 = 4*64^2 + 4*64`,
+"transformer_block.py":`import torch
+import torch.nn as nn
+from causal_attention import CausalSelfAttention     # the previous tab
+
+class Block(nn.Module):
+    def __init__(self, d_model, n_heads, context):
+        super().__init__()
+        self.ln1 = nn.LayerNorm(d_model)
+        self.attn = CausalSelfAttention(d_model, n_heads, context)
+        self.ln2 = nn.LayerNorm(d_model)
+        self.ffn = nn.Sequential(nn.Linear(d_model, 4 * d_model), nn.GELU(),
+                                 nn.Linear(4 * d_model, d_model))
+
+    def forward(self, x):                   # x: [B, T, d]
+        x = x + self.attn(self.ln1(x))      # residual around attention (pre-LN)
+        x = x + self.ffn(self.ln2(x))       # residual around the feed-forward network
+        return x                            # same shape: [B, T, d]
+
+blk = Block(64, 4, 128)
+print(blk(torch.randn(2, 10, 64)).shape)              # torch.Size([2, 10, 64])
+print(sum(p.numel() for p in blk.parameters()))       # 49984 = 12*64^2 + 13*64`
+};
+codeBox($("#code5"),CODE5);
+
+/* ---- exercise ---- */
+let ex5Checked=false;
+const EX5=[
+ {t:"<b>Attention (panel 04):</b> with the mask on, follow a word whose <b>largest</b> attention weight goes to a <b>different, earlier</b> word",f:()=>{atCompute();const r=atD.A[at.qi];const j=r.indexOf(Math.max(...r));return atD.mask&&j!==at.qi;}},
+ {t:"<b>Mask (panel 04):</b> switch the mask off and find any word that puts <b>more than 30%</b> of its attention on a <b>future</b> word",f:()=>{atCompute();return !atD.mask&&atD.A.some((r,i)=>r.some((a,j)=>j>i&&a>.3));}},
+ {t:"<b>Architecture (panel 03):</b> click every one of the <b>13 parts</b> of the diagram",f:()=>arVisited.size>=13},
+ {t:"<b>Residuals (panel 06):</b> make the network deep enough that, <b>without</b> residuals, less than 0.001 of the gradient reaches block 1",f:()=>rsNoRes1<1e-3}
+];
+function runEx5(){let ok=0;$("#ex5Checks").innerHTML=EX5.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex5Checked?(r?"ok":"no"):""}"><span class="dot">${ex5Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex5Checked)$("#ex5Msg").innerHTML=ok===EX5.length?'<span class="c-out">All 4 missions complete.</span> You traced attention, broke the mask on purpose, explored the whole block and saw why residuals matter.':`${ok}/4 missions complete. Hint: "Play data flow" visits every part for you.`;}
+$("#ex5Btn").addEventListener("click",()=>{ex5Checked=true;runEx5();});runEx5();
+
+/* ---- quiz ---- */
+function makeQuiz5(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)],ri=(lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
+  const q=[ri(-2,3),ri(-1,3),ri(0,3),ri(-2,2)],k=[ri(-1,3),ri(-2,3),ri(0,2),ri(-1,3)],dq=dotv(q,k),sc=dq/2;
+  const a=pick([1,2,0]),b=pick([0,1,-1]),c=pick([3,4]),w0=Math.exp(a)/(Math.exp(a)+Math.exp(b));
+  const H=pick([4,8,12]),T=pick([128,256,512]),nH=H*T*T;
+  return [
+   {type:"Numerical",kind:"num",q:`A query <span class="mono c-tok">q = [${q.join(", ")}]</span> and a key <span class="mono c-emb">k = [${k.join(", ")}]</span>, with d<sub>k</sub> = 4. What is the <b>scaled</b> attention score q·k / √d<sub>k</sub>?`,
+    check:v=>{if(Math.abs(v-sc)<.006)return [true,`q·k = ${dq}, √4 = 2, so ${dq} / 2 = ${sc}.`];if(Math.abs(v-dq)<1e-9)return [false,`${dq} is the raw dot product. Scaled attention divides by √d<sub>k</sub> = 2: ${sc}.`];if(Math.abs(v-dq/4)<1e-9)return [false,`You divided by d<sub>k</sub> = 4. The scale is the <b>square root</b>, √4 = 2: ${sc}.`];return [false,`q·k = ${q.map((x,i)=>`(${x})(${k[i]})`).join(" + ")} = ${dq}; ÷ √4 = ${sc}.`];}},
+   {type:"Numerical",kind:"num",q:`Word 1 (the second word) has scaled scores <span class="mono">[${a}, ${b}, ${c}]</span> against words 0, 1, 2, and the causal mask is on. What attention weight does it give to <b>word 0</b>? (2 decimals)`,
+    check:v=>{if(Math.abs(v-w0)<.006)return [true,`Word 2 is in the future, so it's masked to −∞ → 0. Softmax over the rest: e<sup>${a}</sup> / (e<sup>${a}</sup> + e<sup>${b}</sup>) = ${w0.toFixed(3)}.`];
+      const nomask=Math.exp(a)/(Math.exp(a)+Math.exp(b)+Math.exp(c));if(Math.abs(v-nomask)<.006)return [false,`You included word 2 (score ${c}), but it's in the future and masked to −∞, which contributes 0. Only words 0 and 1 count: ${w0.toFixed(3)}.`];
+      return [false,`Mask word 2, then softmax the rest: e<sup>${a}</sup> / (e<sup>${a}</sup> + e<sup>${b}</sup>) = ${w0.toFixed(3)}.`];}},
+   {type:"Conceptual",kind:"mcq",q:"Why does a decoder-only SLM use a causal mask during training?",opts:shuffle([
+     {t:"So each position can't see the words after it. Otherwise predicting the next word would be trivial copying, and the model couldn't generate text on its own.",ok:true,why:"Correct. Training predicts every position's next token in parallel; the mask ensures each prediction only uses the past (panel 04, step 5)."},
+     {t:"To save memory by skipping half the score grid",why:"Misconception: <b>the mask is an optimisation</b>. Standard implementations still compute the full grid and then mask it. The purpose is honesty about the future, not speed."},
+     {t:"To stop words from attending to themselves",why:"Misconception: <b>the mask hides the diagonal</b>. The diagonal is allowed: a word can attend to itself. Only cells above the diagonal (the future) are masked."},
+     {t:"Because softmax can't handle negative scores",why:"Misconception: <b>softmax needs positive inputs</b>. Softmax handles any real numbers. The mask uses −∞ precisely so that softmax sends those cells to 0."}],r)},
+   {type:"Numerical",kind:"num",q:`One attention layer has <b>H = ${H}</b> heads and processes a sequence of <b>T = ${T}</b> tokens. How many attention weights (softmax outputs) does it compute for this one sequence?`,
+    check:v=>{if(v===nH)return [true,`Each head has a T × T grid: ${H} × ${T} × ${T} = ${nH.toLocaleString()}.`];if(v===T*T)return [false,`That's one head. There are ${H} heads, each with its own [T, T] grid: ${nH.toLocaleString()}.`];if(v===H*T)return [false,`Each head compares every token with every token: T × T per head, so ${nH.toLocaleString()} in total.`];return [false,`H × T × T = ${H} × ${T} × ${T} = ${nH.toLocaleString()}.`];}},
+   {type:"Practical",kind:"mcq",q:"Your SLM was trained with a 512-token context and learned position embeddings. A user pastes a 2,000-token document and asks a question about its first paragraph. What should your system do?",opts:shuffle([
+     {t:"Keep each input within 512 tokens: chunk the document (or retrieve the relevant part) and feed only what fits, with the question.",ok:true,why:"Correct. Positions beyond 512 have no learned embedding, and naive truncation would drop the first paragraph the user is asking about. Chunking and retrieval (RAG) are the standard fixes."},
+     {t:"Feed all 2,000 tokens; attention can handle any length",why:"Misconception: <b>attention has no length limit</b>. The maths works for any T, but learned position embeddings only exist for positions 0–511, and quality collapses beyond the trained length."},
+     {t:"Keep the last 512 tokens (standard truncation)",why:"Misconception: <b>truncation is always safe</b>. Here it removes the first paragraph, exactly the text the question is about (panel 07)."},
+     {t:"Add more attention heads so it can see further",why:"Misconception: <b>heads extend the context</b>. More heads change how the window is used, not how long it is."}],r)}
+  ];
+}
+mountQuiz(5,$("#quiz5"),makeQuiz5);
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -3979,6 +4474,89 @@ Object.assign(NARR,{
  {sel:"#ffnStats",en:"The same weights are used for every token. This block holds about two thirds of each layer's parameters, and much of the model's knowledge.",
   te:"ప్రతి టోకెన్‌కు అవే వెయిట్లు వాడతారు. ప్రతి పొర పారామీటర్లలో సుమారు మూడింట రెండు వంతులు, మోడల్ జ్ఞానంలో చాలా భాగం ఈ బ్లాక్‌లోనే ఉంటాయి.",
   hn:"हर टोकन के लिए वही वेट इस्तेमाल होते हैं। हर परत के लगभग दो-तिहाई पैरामीटर, और मॉडल का बहुत सारा ज्ञान, इसी ब्लॉक में होता है।"}]
+});
+
+/* ---- narration for stage 5 ---- */
+NARR_INTRO[5]={en:"Welcome to Stage five, the transformer. This is the heart of every small language model. We will see why it replaced older designs, explore every part of it, and then follow self-attention one matrix at a time.",
+ te:"స్టేజ్ ఐదుకు స్వాగతం. ఇది ట్రాన్స్‌ఫార్మర్, ప్రతి చిన్న లాంగ్వేజ్ మోడల్ గుండె. ఇది పాత డిజైన్లను ఎందుకు భర్తీ చేసిందో చూద్దాం, దానిలోని ప్రతి భాగాన్ని పరిశీలిద్దాం, తర్వాత సెల్ఫ్-అటెన్షన్‌ను ఒక్కో మ్యాట్రిక్స్‌గా అనుసరిద్దాం.",
+ hn:"स्टेज फ़ाइव में आपका स्वागत है, यानी ट्रांसफ़ॉर्मर। यह हर छोटे लैंग्वेज मॉडल का दिल है। हम देखेंगे कि इसने पुराने डिज़ाइन की जगह क्यों ली, इसके हर हिस्से को समझेंगे, और फिर सेल्फ़-अटेंशन को एक-एक मैट्रिक्स करके देखेंगे।"};
+Object.assign(NARR,{
+"p5-why":[
+ {sel:"#whRnn",act:"#whRace",en:"An RNN reads one word at a time and squeezes everything into a single memory. Watch the amber bars: the first word fades with every step.",
+  te:"ఆర్ఎన్ఎన్ ఒక్కో పదాన్ని చదివి, అంతటినీ ఒకే జ్ఞాపకంలో కుదిస్తుంది. నారింజ బార్లను చూడండి: ప్రతి అడుగుకూ మొదటి పదం మసకబారుతుంది.",
+  hn:"आरएनएन एक बार में एक शब्द पढ़ता है और सब कुछ एक ही याद में दबा देता है। नारंगी पट्टियाँ देखिए: हर कदम के साथ पहला शब्द धुंधला होता जाता है।"},
+ {sel:"#whTf",en:"A transformer connects every word to every other word in a single step. The last word reaches the first one directly, and all positions are computed in parallel.",
+  te:"ట్రాన్స్‌ఫార్మర్ ప్రతి పదాన్ని మిగతా ప్రతి పదంతో ఒకే అడుగులో కలుపుతుంది. చివరి పదం మొదటి పదాన్ని నేరుగా చేరుతుంది, అన్ని స్థానాలు సమాంతరంగా లెక్కించబడతాయి.",
+  hn:"ट्रांसफ़ॉर्मर हर शब्द को बाकी हर शब्द से एक ही कदम में जोड़ता है। आखिरी शब्द पहले तक सीधे पहुँचता है, और सारी स्थितियाँ एक साथ गणना होती हैं।"},
+ {sel:"#p5-why table",en:"That is why transformers train so much faster. The price is that attention cost grows with the square of the length.",
+  te:"అందుకే ట్రాన్స్‌ఫార్మర్లు చాలా వేగంగా ట్రైన్ అవుతాయి. దానికి చెల్లించే ధర: అటెన్షన్ ఖర్చు పొడవు యొక్క వర్గంతో పెరుగుతుంది.",
+  hn:"इसीलिए ट्रांसफ़ॉर्मर बहुत तेज़ी से ट्रेन होते हैं। कीमत यह है कि अटेंशन की लागत लंबाई के वर्ग के साथ बढ़ती है।"}],
+"p5-types":[
+ {sel:"#tyGrid",act:'#tyBtns [data-ty="enc"]',en:"In an encoder, every word can see every other word, both before and after it. That is good for understanding text.",
+  te:"ఎన్‌కోడర్‌లో ప్రతి పదం ముందు, వెనుక ఉన్న ప్రతి పదాన్ని చూడగలదు. టెక్స్ట్‌ను అర్థం చేసుకోవడానికి ఇది మంచిది.",
+  hn:"एनकोडर में हर शब्द अपने आगे और पीछे के हर शब्द को देख सकता है। टेक्स्ट समझने के लिए यह अच्छा है।"},
+ {sel:"#tyGrid",act:'#tyBtns [data-ty="dec"]',en:"In a decoder, each word sees only itself and earlier words. The grid becomes a triangle. This is how small language models work, because it lets them learn to predict the next word.",
+  te:"డీకోడర్‌లో ప్రతి పదం తనను, ముందు పదాలను మాత్రమే చూస్తుంది. గ్రిడ్ త్రిభుజంగా మారుతుంది. చిన్న లాంగ్వేజ్ మోడల్స్ ఇలాగే పనిచేస్తాయి, ఎందుకంటే దీనివల్ల అవి తర్వాతి పదాన్ని ఊహించడం నేర్చుకుంటాయి.",
+  hn:"डिकोडर में हर शब्द सिर्फ़ खुद को और पिछले शब्दों को देखता है। ग्रिड त्रिकोण बन जाता है। छोटे लैंग्वेज मॉडल ऐसे ही काम करते हैं, क्योंकि इससे वे अगला शब्द अनुमान लगाना सीखते हैं।"},
+ {sel:"#tyGrid",act:'#tyBtns [data-ty="encdec"]',en:"An encoder decoder combines both, plus cross attention, where every output word looks at every input word. It is common for translation.",
+  te:"ఎన్‌కోడర్-డీకోడర్ రెండింటినీ కలుపుతుంది, దానికి క్రాస్ అటెన్షన్ జోడిస్తుంది. అందులో ప్రతి అవుట్‌పుట్ పదం ప్రతి ఇన్‌పుట్ పదాన్ని చూస్తుంది. అనువాదానికి ఇది సాధారణం.",
+  hn:"एनकोडर-डिकोडर दोनों को जोड़ता है, साथ में क्रॉस अटेंशन, जिसमें हर आउटपुट शब्द हर इनपुट शब्द को देखता है। अनुवाद में यह आम है।"}],
+"p5-arch":[
+ {sel:"#arSvg",en:"This is the whole decoder-only transformer. Token IDs enter at the bottom and next-word probabilities come out at the top.",
+  te:"ఇది మొత్తం డీకోడర్-ఓన్లీ ట్రాన్స్‌ఫార్మర్. టోకెన్ ఐడీలు కింద ప్రవేశిస్తాయి, తర్వాతి పదం సంభావ్యతలు పైన బయటకు వస్తాయి.",
+  hn:"यह पूरा डिकोडर-ओनली ट्रांसफ़ॉर्मर है। टोकन आईडी नीचे से आती हैं और अगले शब्द की संभावनाएँ ऊपर से निकलती हैं।"},
+ {sel:"#arInfo",act:"#arPlay",en:"Watch the data flow. Embeddings and positions are added, then each block normalises, applies attention, adds the residual, normalises again, applies the feed-forward network, and adds again.",
+  te:"డేటా ప్రవాహాన్ని చూడండి. ఎంబెడింగ్స్, స్థానాలు కలుస్తాయి. తర్వాత ప్రతి బ్లాక్ నార్మలైజ్ చేసి, అటెన్షన్ వర్తింపజేసి, రెసిడ్యువల్ కలిపి, మళ్లీ నార్మలైజ్ చేసి, ఫీడ్-ఫార్వర్డ్ నెట్‌వర్క్ వర్తింపజేసి, మళ్లీ కలుపుతుంది.",
+  hn:"डेटा का बहाव देखिए। एम्बेडिंग और स्थितियाँ जुड़ती हैं, फिर हर ब्लॉक नॉर्मलाइज़ करता है, अटेंशन लगाता है, रेज़िडुअल जोड़ता है, फिर नॉर्मलाइज़ करता है, फ़ीड-फ़ॉरवर्ड नेटवर्क लगाता है, और फिर जोड़ता है।"},
+ {sel:"#arStats",en:"The block repeats N times, and its shape never changes: T tokens by d numbers in, and the same out. Click any part to see its shapes and parameters.",
+  te:"బ్లాక్ ఎన్ సార్లు పునరావృతమవుతుంది, దాని షేప్ ఎప్పుడూ మారదు: టీ టోకెన్లు గుణించి డీ సంఖ్యలు లోపలికి, అదే బయటకు. ఏ భాగాన్నైనా నొక్కి దాని షేప్‌లు, పారామీటర్లు చూడండి.",
+  hn:"ब्लॉक एन बार दोहराता है, और इसका शेप कभी नहीं बदलता: टी टोकन गुणा डी नंबर अंदर, और वही बाहर। किसी भी हिस्से पर क्लिक करके उसके शेप और पैरामीटर देखिए।"}],
+"p5-attn":[
+ {sel:"#atOut",act:()=>{atStop();at.qi=4;atSet(0);},en:"Each word enters as a vector: its embedding plus its position. Here each vector has just four numbers so everything fits on screen.",
+  te:"ప్రతి పదం ఒక వెక్టర్‌గా ప్రవేశిస్తుంది: దాని ఎంబెడింగ్ ప్లస్ స్థానం. ఇక్కడ అంతా తెరపై సరిపోయేలా ప్రతి వెక్టర్‌లో నాలుగు సంఖ్యలే ఉన్నాయి.",
+  hn:"हर शब्द एक वेक्टर बनकर आता है: उसकी एम्बेडिंग प्लस उसकी स्थिति। यहाँ हर वेक्टर में सिर्फ़ चार नंबर हैं ताकि सब स्क्रीन पर आ जाए।"},
+ {sel:"#atOut",act:()=>atSet(1),en:"Three weight matrices turn each vector into a query, what am I looking for, a key, what do I contain, and a value, what will I share.",
+  te:"మూడు వెయిట్ మ్యాట్రిక్స్‌లు ప్రతి వెక్టర్‌ను మూడుగా మారుస్తాయి: క్వెరీ, నేను దేని కోసం వెతుకుతున్నాను; కీ, నాలో ఏముంది; వాల్యూ, నేను ఏమి పంచుకుంటాను.",
+  hn:"तीन वेट मैट्रिक्स हर वेक्टर को तीन चीज़ों में बदलते हैं: क्वेरी, मैं क्या ढूँढ रहा हूँ; की, मेरे अंदर क्या है; और वैल्यू, मैं क्या बाँटूँगा।"},
+ {sel:"#atOut",act:()=>atSet(2),en:"Every query is dotted with every key. A big score means a good match. Click any cell to see its calculation.",
+  te:"ప్రతి క్వెరీకి ప్రతి కీతో డాట్ ప్రోడక్ట్ తీసుకుంటారు. పెద్ద స్కోర్ అంటే మంచి సరిపోలిక. ఏ గడినైనా నొక్కి దాని లెక్క చూడండి.",
+  hn:"हर क्वेरी का हर की से डॉट प्रोडक्ट लिया जाता है। बड़ा स्कोर यानी अच्छा मेल। किसी भी खाने पर क्लिक करके उसका हिसाब देखिए।"},
+ {sel:"#atOut",act:()=>atSet(4),en:"The scores are scaled down, then the causal mask blanks out the future, so no word can peek at words that come after it.",
+  te:"స్కోర్లను తగ్గిస్తారు, తర్వాత కాజల్ మాస్క్ భవిష్యత్తును ఖాళీ చేస్తుంది, కాబట్టి ఏ పదమూ తన తర్వాతి పదాలను చూడలేదు.",
+  hn:"स्कोर छोटे किए जाते हैं, फिर कॉज़ल मास्क भविष्य को मिटा देता है, ताकि कोई शब्द अपने बाद वाले शब्दों को न देख सके।"},
+ {sel:"#atArcs",act:()=>atSet(5),en:"Softmax turns each row into attention weights that add up to one hundred percent. The arcs show who this word is listening to.",
+  te:"సాఫ్ట్‌మాక్స్ ప్రతి వరుసను వంద శాతానికి కలిసే అటెన్షన్ వెయిట్లుగా మారుస్తుంది. ఈ పదం ఎవరి మాట వింటోందో వంపులు చూపిస్తాయి.",
+  hn:"सॉफ़्टमैक्स हर पंक्ति को ऐसे अटेंशन वेट में बदलता है जिनका जोड़ सौ प्रतिशत है। चाप दिखाते हैं कि यह शब्द किसकी बात सुन रहा है।"},
+ {sel:"#atOut",act:()=>atSet(6),en:"Finally, the word's new vector is a blend of the value vectors, weighted by attention. Context has flowed into the word.",
+  te:"చివరగా, పదం యొక్క కొత్త వెక్టర్ వాల్యూ వెక్టర్ల మిశ్రమం, అటెన్షన్ బరువుతో. సందర్భం ఆ పదంలోకి ప్రవహించింది.",
+  hn:"आखिर में, शब्द का नया वेक्टर वैल्यू वेक्टरों का मिश्रण है, अटेंशन के हिसाब से। संदर्भ उस शब्द में बह आया है।"}],
+"p5-mha":[
+ {sel:"#mhGrid",en:"Multi-head attention runs several smaller attentions side by side. Each head can learn a different habit.",
+  te:"మల్టీ-హెడ్ అటెన్షన్ ఎన్నో చిన్న అటెన్షన్‌లను పక్కపక్కనే నడుపుతుంది. ప్రతి హెడ్ వేరే అలవాటు నేర్చుకోగలదు.",
+  hn:"मल्टी-हेड अटेंशन कई छोटे अटेंशन साथ-साथ चलाता है। हर हेड अलग आदत सीख सकता है।"},
+ {sel:"#mhGrid",en:"Here, one head follows related words, one looks at the previous word, one rests on the first word, and one looks at itself.",
+  te:"ఇక్కడ ఒక హెడ్ సంబంధిత పదాలను, ఒకటి ముందు పదాన్ని, ఒకటి మొదటి పదాన్ని, మరొకటి తనను తాను చూస్తాయి.",
+  hn:"यहाँ एक हेड जुड़े शब्दों को, एक पिछले शब्द को, एक पहले शब्द को, और एक खुद को देखता है।"},
+ {sel:"#mhShapes",en:"Each head works in a smaller slice, so the total number of parameters stays the same, four times d squared, however many heads you use.",
+  te:"ప్రతి హెడ్ చిన్న భాగంలో పనిచేస్తుంది, కాబట్టి ఎన్ని హెడ్‌లు వాడినా మొత్తం పారామీటర్లు అలాగే ఉంటాయి, నాలుగు గుణించి డీ వర్గం.",
+  hn:"हर हेड एक छोटे हिस्से में काम करता है, इसलिए कितने भी हेड हों, कुल पैरामीटर वही रहते हैं, चार गुणा डी का वर्ग।"}],
+"p5-res":[
+ {sel:"#lnSvg",act:()=>{$("#lnS").value=10;renderLN();},en:"Layer normalisation rescales each token's vector. Even if the input is ten times bigger, the normalised middle row stays exactly the same.",
+  te:"లేయర్ నార్మలైజేషన్ ప్రతి టోకెన్ వెక్టర్‌ను తిరిగి స్కేల్ చేస్తుంది. ఇన్‌పుట్ పది రెట్లు పెద్దదైనా, నార్మలైజ్ అయిన మధ్య వరుస సరిగ్గా అలాగే ఉంటుంది.",
+  hn:"लेयर नॉर्मलाइज़ेशन हर टोकन के वेक्टर को फिर से स्केल करता है। इनपुट दस गुना बड़ा हो, तब भी नॉर्मलाइज़ की गई बीच की पंक्ति बिल्कुल वैसी ही रहती है।"},
+ {sel:"#rsSvg",act:()=>{$("#lnS").value=0;renderLN();$("#rsL").value=24;renderRes();},en:"Now gradients. Without residual connections, shown in rose, the gradient shrinks at every block and almost nothing reaches the bottom.",
+  te:"ఇప్పుడు గ్రేడియెంట్లు. గులాబీ రంగులో చూపిన రెసిడ్యువల్ కనెక్షన్లు లేకుండా, ప్రతి బ్లాక్‌లో గ్రేడియెంట్ తగ్గి, కిందికి దాదాపు ఏమీ చేరదు.",
+  hn:"अब ग्रेडिएंट। गुलाबी रंग में, रेज़िडुअल कनेक्शन के बिना, हर ब्लॉक पर ग्रेडिएंट घटता है और नीचे लगभग कुछ नहीं पहुँचता।"},
+ {sel:"#rsNote",en:"With residuals, shown in green, each block adds its result to its input, and that addition passes the gradient straight down. That is how models with dozens of layers can still learn.",
+  te:"ఆకుపచ్చలో చూపిన రెసిడ్యువల్స్‌తో, ప్రతి బ్లాక్ తన ఫలితాన్ని ఇన్‌పుట్‌కు కలుపుతుంది, ఆ కూడిక గ్రేడియెంట్‌ను నేరుగా కిందికి పంపుతుంది. అందుకే డజన్ల పొరలున్న మోడల్స్ కూడా నేర్చుకోగలవు.",
+  hn:"हरे रंग में, रेज़िडुअल के साथ, हर ब्लॉक अपना नतीजा अपने इनपुट में जोड़ता है, और यह जोड़ ग्रेडिएंट को सीधे नीचे पहुँचाता है। इसीलिए दर्जनों परतों वाले मॉडल भी सीख पाते हैं।"}],
+"p5-ctx":[
+ {sel:"#cxToks",act:()=>{$("#cxC").value=12;renderCtx();},en:"A model can only see its last C tokens. With a window of twelve words, everything earlier, like Monday, the bank and the duplicate charge, is gone.",
+  te:"మోడల్ తన చివరి సీ టోకెన్లను మాత్రమే చూడగలదు. పన్నెండు పదాల విండోతో, సోమవారం, బ్యాంక్, రెండుసార్లు వేసిన ఛార్జ్ లాంటి ముందు విషయాలన్నీ పోతాయి.",
+  hn:"मॉडल सिर्फ़ अपने आखिरी सी टोकन देख सकता है। बारह शब्दों की खिड़की में, उससे पहले का सब, जैसे सोमवार, बैंक और दोहरा चार्ज, गायब हो जाता है।"},
+ {sel:"#cxSvg",act:()=>{$("#cxR").value=4;renderCtx();},en:"Because every token attends to every other, the score grid grows with the square of the context. Double the window and that grid is four times bigger.",
+  te:"ప్రతి టోకెన్ మిగతా ప్రతి టోకెన్‌ను చూస్తుంది కాబట్టి, స్కోర్ గ్రిడ్ కాంటెక్స్ట్ వర్గంతో పెరుగుతుంది. విండోను రెట్టింపు చేస్తే ఆ గ్రిడ్ నాలుగు రెట్లు పెద్దదవుతుంది.",
+  hn:"क्योंकि हर टोकन बाकी हर टोकन को देखता है, स्कोर ग्रिड संदर्भ के वर्ग के साथ बढ़ता है। खिड़की दोगुनी करें, तो वह ग्रिड चार गुना बड़ा हो जाता है।"}]
 });
 
 /* ---- engine ---- */
