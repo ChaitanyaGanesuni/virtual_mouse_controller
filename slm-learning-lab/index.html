@@ -91,6 +91,7 @@ button{cursor:pointer}
 .field{display:block;font-size:.8rem;color:var(--muted)}
 .field > input,.field > select{display:block;margin-top:5px}
 .field > textarea{display:block;width:100%;margin-top:5px}
+textarea.txt{background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--fg);font-family:var(--f-mono);font-size:.84rem;line-height:1.5}
 .field input[type=text],.field select,input.txt{background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--fg);font-family:var(--f-mono);font-size:.88rem;width:100%}
 input[type=range]{accent-color:var(--emb);width:100%}
 .sim{display:inline-flex;gap:6px;align-items:center;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid}
@@ -371,6 +372,23 @@ table.mt td{min-width:44px}
 .tnode.on{border-color:var(--emb);background:rgba(82,211,226,.08)}
 .hlline{background:rgba(243,185,85,.16);display:inline-block;width:100%;box-shadow:inset 3px 0 0 var(--tok)}
 .newcode{display:block;background:rgba(98,227,162,.08);box-shadow:inset 3px 0 0 var(--out);animation:pop .4s ease}
+.dpflow{display:flex;flex-wrap:wrap;gap:6px;align-items:stretch}
+.dpstage{flex:1 1 90px;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 9px;display:grid;gap:2px}
+.dpstage .n{font-family:var(--f-mono);font-size:.64rem;color:var(--dim)}
+.dpstage .l{font-size:.78rem;font-weight:600}
+.dpstage .c{font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+.dpstage.on{border-color:var(--emb);box-shadow:0 0 0 1px var(--emb)}
+.dpstage.off{opacity:.45}
+.dplines{display:grid;gap:3px;max-height:340px;overflow:auto;font-family:var(--f-mono);font-size:.8rem}
+.dplines div{padding:3px 8px;border-radius:4px;background:var(--bg);white-space:pre-wrap;word-break:break-word}
+.dplines .rm{color:var(--err);text-decoration:line-through;opacity:.75}
+.dplines .ch{color:var(--tok)}
+.dplines .why{float:right;font-size:.66rem;color:var(--dim);text-decoration:none;margin-left:8px}
+.splitbar{display:flex;height:28px;border-radius:7px;overflow:hidden;font-family:var(--f-mono);font-size:.72rem}
+.splitbar div{display:grid;place-items:center;color:#071318;font-weight:600;transition:flex-grow .3s}
+.spcol{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px;min-width:0}
+.spcol div.ln{font-family:var(--f-mono);font-size:.68rem;padding:2px 4px;border-radius:3px;margin-top:3px;background:var(--bg);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.spcol div.leak{background:rgba(255,125,147,.2);color:var(--err)}
 </style>
 
 <header class="top">
@@ -1667,6 +1685,81 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 7 ====================== -->
+  <section id="stage7" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 07 · unlocked</div>
+      <h2>Preparing the dataset: garbage in, garbage out</h2>
+      <p>A model can only be as good as its data. This stage takes messy, real-world banking text through a full preparation pipeline: cleaning, privacy masking, deduplication, quality filtering, next-token sequences, and leak-free train/validation/test splits. Paste or upload your own text to see what happens to it.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 7 sections">
+      <button type="button" data-go="p7-pipe">1 · The pipeline</button>
+      <button type="button" data-go="p7-seq">2 · Sequences</button>
+      <button type="button" data-go="p7-split">3 · Splits & leakage</button>
+      <button type="button" data-go="p7-domain">4 · Domain datasets</button>
+      <button type="button" data-go="p7-code">5 · Code</button>
+      <button type="button" data-go="p7-ex">6 · Exercise</button>
+      <button type="button" data-go="p7-quiz">7 · Assessment</button>
+    </nav>
+
+    <div class="panel" id="p7-pipe">
+      <div class="phead"><span class="tag">01</span><h3>The data pipeline: raw text → clean training data</h3><span class="sim real">runs on your text</span>
+        <p class="plain">Real data is messy: HTML tags, copies of the same message, phone numbers and account numbers, junk lines. Each stage below fixes one problem. <em>Click a stage</em> to see exactly which lines it changed or removed. Switch stages off to see what slips through.</p></div>
+      <div class="grid2">
+        <div class="box" style="display:grid;gap:10px;align-content:start">
+          <label class="field">Raw dataset (one record per line; paste your own)<textarea id="dpText" class="txt" rows="9" style="resize:vertical"></textarea></label>
+          <div class="row"><label class="btn" style="cursor:pointer">Upload a .txt file<input type="file" id="dpFile" accept=".txt,.csv,.md,text/plain" hidden></label><button class="btn" id="dpReset" type="button">Restore the sample</button><span class="mono dim" id="dpFileMsg" style="font-size:.75rem"></span></div>
+          <div class="row" id="dpOpts"></div>
+          <label class="field">minimum line length: <b id="dpMinV"></b> characters<input id="dpMin" type="range" min="0" max="40" value="12"></label>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start;min-width:0">
+          <div class="box"><div id="dpFlow" class="dpflow"></div></div>
+          <div class="box"><div class="stats" id="dpStats"></div></div>
+          <div class="predict" id="dpPred"></div>
+        </div>
+      </div>
+      <div class="box" style="margin-top:12px"><div class="row" style="justify-content:space-between;margin-bottom:8px"><span class="eyebrow" id="dpViewT"></span><span class="mono dim" style="font-size:.72rem"><span class="c-err">struck = removed</span> · <span class="c-tok">amber = changed</span></span></div><div id="dpView" class="dplines"></div></div>
+    </div>
+
+    <div class="panel" id="p7-seq">
+      <div class="phead"><span class="tag">02</span><h3>From clean text to training examples</h3><span class="sim real">exact windows</span>
+        <p class="plain">The clean text becomes one long row of tokens. A window of <em>T tokens</em> slides along it. Each window is an input <em>x</em>, and the same window shifted one token right is the target <em>y</em>. Every position inside a window is one next-token example.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:0 1 220px">block size T: <b id="sqTv"></b><input id="sqT" type="range" min="2" max="16" value="6"></label><label class="field" style="flex:0 1 220px">stride (step between windows): <b id="sqSv"></b><input id="sqS" type="range" min="1" max="16" value="6"></label><label class="field" style="flex:0 1 220px">show window #<b id="sqKv"></b><input id="sqK" type="range" min="0" max="20" value="0"></label></div>
+      <div class="box"><div class="tkrow" id="sqStrip"></div><div id="sqXY" style="margin-top:14px"></div></div>
+      <div class="grid2" style="margin-top:12px"><div class="box"><div class="stats" id="sqStats"></div></div><div class="predict" id="sqPred"></div></div>
+    </div>
+
+    <div class="panel" id="p7-split">
+      <div class="phead"><span class="tag">03</span><h3>Train / validation / test splits and data leakage</h3><span class="sim real">real leakage check</span>
+        <p class="plain"><em>Train</em> data teaches, <em>validation</em> data tunes your choices, and <em>test</em> data gives the final honest grade. If a test line also appears in training (a <em>leak</em>), the model just remembers the answer and your scores lie. Red lines below are leaks.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:0 1 200px">train: <b id="spTrV"></b>%<input id="spTr" type="range" min="50" max="90" value="70"></label><label class="field" style="flex:0 1 200px">validation: <b id="spVaV"></b>%<input id="spVa" type="range" min="5" max="25" value="15"></label><label class="row" style="align-self:end;font-size:.85rem;color:var(--muted)"><input type="checkbox" id="spDedupe"> remove duplicates <b>before</b> splitting</label><button class="btn" id="spShuffle" type="button" style="align-self:end">Reshuffle</button></div>
+      <div class="splitbar" id="spBar"></div>
+      <div class="grid2" style="margin-top:12px"><div id="spCols" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;min-width:0"></div><div style="display:grid;gap:12px;align-content:start"><div class="box" id="spLeak"></div><div class="predict" id="spPred"></div></div></div>
+    </div>
+
+    <div class="panel" id="p7-domain">
+      <div class="phead"><span class="tag">04</span><h3>What data does a domain SLM need?</h3><span class="sim illus">example records</span>
+        <p class="plain">Different jobs need different data. <em>Pick a use case</em> to see the data it needs, the format of one training record, a sensible amount to start with, and the traps to avoid.</p></div>
+      <div class="row" id="dmBtns" style="margin-bottom:10px"></div>
+      <div class="grid2"><div class="box" id="dmInfo"></div><div class="code" style="min-width:0"><div class="tabs"><button type="button" class="on" id="dmFmt">example record</button></div><pre id="dmCode"></pre></div></div>
+    </div>
+
+    <div class="panel" id="p7-code">
+      <div class="phead"><span class="tag">05</span><h3>Code it on your CPU</h3><p>The whole pipeline in one script: clean → mask PII → dedupe → filter → split → a PyTorch Dataset of (x, y) windows. It runs as-is with a built-in sample, or point it at your own file.</p></div>
+      <div class="code" id="code7"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <div class="panel" id="p7-ex">
+      <div class="phead"><span class="tag">06</span><h3>Hands-on exercise: four missions</h3><p>The checks read the panels' live state.</p></div>
+      <div class="box"><div class="checks" id="ex7Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex7Btn" type="button">Check missions</button></div><p class="note" id="ex7Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <div class="panel" id="p7-quiz">
+      <div class="phead"><span class="tag">07</span><h3>Stage 7 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 8, training the SLM.</p></div>
+      <div id="quiz7"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -1731,7 +1824,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -4497,6 +4590,234 @@ function makeQuiz6(seed){
 mountQuiz(6,$("#quiz6"),makeQuiz6);
 renderBuild();renderT6();runEx6();
 
+/* =================== STAGE 7 =================== */
+const DP_SAMPLE=`<p>How do I reset my net banking password?</p>
+How do I reset my net banking password?
+how do i reset my  net banking password??
+My account 1234567890 was charged twice, mail me at ravi.k@example.com
+Call me on +91 98765 43210 about the credit card fee.
+ok
+thanks
+The bank approved the home loan at 8.5% interest.
+The bank approved the home loan at 8.5% interest.
+Visit https://bank.example/rates for the latest savings rates.
+<div>How can I block my lost debit card?</div>
+asdf qwerty zzzz
+Customer asked about overdraft fees on the current account.
+The agent explained fixed deposit interest rates for senior citizens.
+I want to close my savings account and transfer the balance.
+What is the EMI for a 20 lakh home loan over 15 years?
+My UPI payment failed but money was debited from my account.
+Please send the account statement for last month to my email.`;
+const DP_KNOWN=new Set([...T2WORDS,..."i my me you your how do can what why want to is was please help need reset password net banking block lost debit card credit close move transfer money charged twice call mail email phone number about for on in at of a an the and or not no yes thanks thank hello hi interest rate rates senior citizens fixed deposit overdraft fees fee savings current account loan home emi balance approved agent customer explained visit latest send statement last month payment failed but was debited upi over years lakh".split(" ")]);
+const DP_OPTS=[["html","Strip HTML"],["norm","Normalise text"],["pii","Mask personal data"],["dedupe","Remove duplicates"],["filter","Quality filter"]];
+const dp={on:{html:true,norm:true,pii:true,dedupe:true,filter:true},view:4,res:null};
+const nearKey=s=>s.toLowerCase().replace(/[^a-z0-9]/g,"");
+function maskPII(s){let n=0;s=s.replace(/[\w.+-]+@[\w-]+\.[\w.]+/g,()=>(n++,"<EMAIL>")).replace(/https?:\/\/\S+/g,()=>"<URL>").replace(/\b\d{9,18}\b/g,()=>(n++,"<ACCOUNT>")).replace(/\+?\d[\d\s-]{8,}\d/g,()=>(n++,"<PHONE>"));return [s,n];}
+function runPipe(){
+  const raw=$("#dpText").value.split("\n").map(s=>s.replace(/\r/g,"")).filter(s=>s.trim()).slice(0,2000),minL=+$("#dpMin").value;
+  const stages=[{n:"Raw",rows:raw.map(t=>({t,st:"kept"}))}];let cur=raw.map(t=>({t}));let pii=0,dups=0,junk=0,short=0;
+  // clean
+  cur=cur.map(r=>{let t=r.t;if(dp.on.html)t=t.replace(/<[^>]+>/g," ");if(dp.on.norm)t=t.normalize("NFKC").replace(/([!?.])\1+/g,"$1").replace(/\s+/g," ").trim();return {t,ch:t!==r.t};});
+  stages.push({n:"Clean",rows:cur.map(r=>({t:r.t,st:r.ch?"changed":"kept"}))});
+  cur=cur.map(r=>{if(!dp.on.pii)return {t:r.t};const [t,k]=maskPII(r.t);pii+=k;return {t,ch:t!==r.t};});
+  stages.push({n:"Mask PII",rows:cur.map(r=>({t:r.t,st:r.ch?"changed":"kept"}))});
+  const afterPII=cur.map(r=>r.t);
+  const seen=new Set();const dd=cur.map(r=>{const k=dp.on.norm?nearKey(r.t):r.t;if(dp.on.dedupe&&seen.has(k)){dups++;return {t:r.t,rm:"duplicate"};}seen.add(k);return {t:r.t};});
+  stages.push({n:"Dedupe",rows:dd.map(r=>({t:r.t,st:r.rm?"removed":"kept",why:r.rm}))});
+  const fl=dd.filter(r=>!r.rm).map(r=>{if(!dp.on.filter)return {t:r.t};const ws=r.t.toLowerCase().match(/[a-z]+/g)||[],known=ws.filter(w=>DP_KNOWN.has(w)).length;
+    if(r.t.length<minL){short++;return {t:r.t,rm:`shorter than ${minL} chars`};}if(ws.length&&known/ws.length<.4){junk++;return {t:r.t,rm:"looks like junk"};}return {t:r.t};});
+  stages.push({n:"Filter",rows:fl.map(r=>({t:r.t,st:r.rm?"removed":"kept",why:r.rm}))});
+  const final=fl.filter(r=>!r.rm).map(r=>r.t);
+  dp.res={stages,final,afterPII,raw,pii,dups,junk,short};return dp.res;
+}
+function renderPipe7(){
+  $("#dpMinV").textContent=$("#dpMin").value;const R=runPipe(),toks=dpTokens(R.final),c=seqCount(toks.length);
+  const boxes=[...R.stages.map((s,i)=>({n:s.n,c:`${s.rows.filter(r=>r.st!=="removed").length} lines`,i,off:i>0&&!dp.on[["","html","pii","dedupe","filter"][i]]&&!(i===1&&dp.on.norm)})),{n:"Tokens",c:`${toks.length} tokens`,i:5},{n:"Sequences",c:`${c.toLocaleString()} windows`,i:6},{n:"Splits",c:"train / val / test",i:7}];
+  $("#dpFlow").innerHTML=boxes.map((b,k)=>`${k?'<span class="dim" style="align-self:center">→</span>':""}<button type="button" class="dpstage${dp.view===b.i?" on":""}${b.off?" off":""}" data-v="${b.i}"><span class="n">${k+1}</span><span class="l">${b.n}</span><span class="c">${b.c}</span></button>`).join("");
+  $$("#dpFlow [data-v]").forEach(b=>b.addEventListener("click",()=>{const v=+b.dataset.v;if(v>=5){document.getElementById(v===7?"p7-split":"p7-seq").scrollIntoView({behavior:"smooth"});return;}dp.view=v;renderPipe7();}));
+  const S=R.stages[dp.view];$("#dpViewT").textContent=`Stage ${dp.view+1}: ${S.n}, showing ${S.rows.length} lines`;
+  $("#dpView").innerHTML=S.rows.map(r=>`<div class="${r.st==="removed"?"rm":r.st==="changed"?"ch":""}">${esc(r.t)}${r.why?`<span class="why">${esc(r.why)}</span>`:""}</div>`).join("")||'<p class="muted">No lines.</p>';
+  const left=R.final.length,score=Math.round(100*(1-((dp.on.pii?0:4)+(dp.on.dedupe?0:3)+(dp.on.filter?0:2)+(dp.on.html?0:1))/10));
+  $("#dpStats").innerHTML=`<div class="stat"><span class="v c-tok">${R.raw.length} → ${left}</span><span class="k">lines raw → clean</span></div><div class="stat"><span class="v c-err">${R.dups}</span><span class="k">duplicates removed</span></div><div class="stat"><span class="v c-hid">${R.pii}</span><span class="k">personal details masked</span></div><div class="stat"><span class="v">${R.junk+R.short}</span><span class="k">junk / too short</span></div><div class="stat"><span class="v ${score>=90?"c-out":score>=60?"c-tok":"c-err"}">${score}</span><span class="k">data health / 100</span></div>`;
+  $$("#dpOpts input").forEach(i=>i.checked=dp.on[i.dataset.o]);
+  renderSeq();renderSplit();
+}
+$("#dpOpts").innerHTML=DP_OPTS.map(([k,n])=>`<label class="tog"><input type="checkbox" data-o="${k}" checked>${n}</label>`).join("");
+$$("#dpOpts input").forEach(i=>i.addEventListener("change",()=>{dp.on[i.dataset.o]=i.checked;renderPipe7();}));
+$("#dpText").value=DP_SAMPLE;$("#dpText").addEventListener("input",renderPipe7);$("#dpMin").addEventListener("input",renderPipe7);
+$("#dpReset").addEventListener("click",()=>{$("#dpText").value=DP_SAMPLE;$("#dpFileMsg").textContent="";renderPipe7();});
+$("#dpFile").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;if(f.size>3e6){$("#dpFileMsg").textContent="That file is over 3 MB. Please use a smaller sample.";return;}const r=new FileReader();r.onload=()=>{$("#dpText").value=String(r.result).split("\n").slice(0,2000).join("\n");$("#dpFileMsg").textContent=`Loaded ${f.name} (first 2,000 lines at most). It stays in your browser and is not uploaded anywhere.`;renderPipe7();};r.readAsText(f);});
+predictBox($("#dpPred"),{q:"Turn <b>off</b> “Remove duplicates”. What happens if you train on this data?",opts:["Nothing important","The model over-learns the repeated lines and may recite them","Training fails with an error"],ok:1,
+  why:"Duplicated lines get extra weight, so the model memorises them. It wastes compute and can leak repeated private text word for word. Deduplication is one of the most effective data-quality steps.",onReveal:()=>{dp.on.dedupe=false;dp.view=3;renderPipe7();}});
+
+/* ---- sequences ---- */
+function dpTokens(lines){const t=[];lines.forEach(l=>{preTok(l.replace(/<(EMAIL|PHONE|ACCOUNT|URL)>/g,"$1")).forEach(w=>t.push(w));t.push("⏎");});return t;}
+function seqCount(N){const T=+$("#sqT").value,S=+$("#sqS").value;return N>T?Math.floor((N-T-1)/S)+1:0;}
+function renderSeq(){
+  const toks=dpTokens(dp.res.final),T=+$("#sqT").value,S=+$("#sqS").value,N=toks.length,cnt=seqCount(N);
+  $("#sqTv").textContent=T;$("#sqSv").textContent=S;$("#sqK").max=Math.max(0,Math.min(cnt-1,60));const k=Math.min(+$("#sqK").value,Math.max(0,cnt-1));$("#sqKv").textContent=k;
+  const st=k*S,show=Math.min(N,Math.max(70,st+T+8));
+  $("#sqStrip").innerHTML=toks.slice(0,show).map((w,i)=>{const inX=i>=st&&i<st+T,inY=i>=st+1&&i<=st+T;return `<span class="tk ${inX&&inY?"tk1":inX?"tk0":inY?"tk3":""}" style="${!inX&&!inY?"opacity:.4":""}">${esc(w)}</span>`;}).join("")+(N>show?`<span class="dim mono" style="font-size:.75rem">… ${N-show} more</span>`:"");
+  if(cnt){const x=toks.slice(st,st+T),y=toks.slice(st+1,st+T+1);
+    $("#sqXY").innerHTML=`<div class="scroll"><table class="pg"><tr><th>position</th>${x.map((_,i)=>`<td class="dim">${i}</td>`).join("")}</tr><tr><th style="color:var(--tok)">x (input)</th>${x.map(w=>`<td class="c-t">${esc(w)}</td>`).join("")}</tr><tr><th style="color:var(--out)">y (target)</th>${y.map(w=>`<td style="background:rgba(98,227,162,.16);color:var(--out)">${esc(w)}</td>`).join("")}</tr></table></div><p class="note" style="margin-top:8px">Read each column: after seeing x up to that position, the model must predict the y below it. That's ${T} examples in this one window.</p>`;}
+  else $("#sqXY").innerHTML='<p class="c-err">The text is shorter than the block size. Lower T or add more text.</p>';
+  $("#sqStats").innerHTML=`<div class="stat"><span class="v c-tok">${N.toLocaleString()}</span><span class="k">tokens of clean text</span></div><div class="stat"><span class="v c-emb">${cnt.toLocaleString()}</span><span class="k">windows (x, y pairs)</span></div><div class="stat"><span class="v c-out">${(cnt*T).toLocaleString()}</span><span class="k">next-token examples</span></div><div class="stat"><span class="v">${S<T?`${Math.round((1-S/T)*100)}%`:"0%"}</span><span class="k">overlap between windows</span></div>`;
+}
+["#sqT","#sqS","#sqK"].forEach(s=>$(s).addEventListener("input",renderSeq));
+predictBox($("#sqPred"),{q:"1,000 tokens, block size T = 10, stride 10 (no overlap). About how many windows?",opts:["1,000","99","10"],ok:1,
+  why:"Each window needs T + 1 = 11 tokens (x plus the one-step-shifted y), stepping 10 at a time: ⌊(1000 − 11) / 10⌋ + 1 = 99. With stride 1 you'd get 990 overlapping windows from the same text, which is how small datasets are stretched."});
+
+/* ---- splits & leakage ---- */
+let spSeed=3;
+function renderSplit(){
+  const tr=+$("#spTr").value,va=+$("#spVa").value,te=Math.max(0,100-tr-va);$("#spTrV").textContent=tr;$("#spVaV").textContent=va;
+  let src=dp.res.afterPII.filter(s=>s.trim());if($("#spDedupe").checked){const s=new Set();src=src.filter(l=>{const k=nearKey(l);if(s.has(k))return false;s.add(k);return true;});}
+  const lines=shuffle(src.slice(),mulberry(spSeed)),n=lines.length,nTr=Math.round(n*tr/100),nVa=Math.round(n*va/100);
+  const parts={train:lines.slice(0,nTr),val:lines.slice(nTr,nTr+nVa),test:lines.slice(nTr+nVa)},trK=new Set(parts.train.map(nearKey));
+  let leak=0,evalN=0;
+  $("#spBar").innerHTML=`<div style="flex-grow:${tr};background:var(--emb)">train ${tr}%</div><div style="flex-grow:${va};background:var(--tok)">val ${va}%</div><div style="flex-grow:${Math.max(te,.001)};background:var(--hid)">${te?`test ${te}%`:""}</div>`;
+  $("#spCols").innerHTML=Object.entries(parts).map(([k,arr])=>`<div class="spcol"><div class="eyebrow" style="color:${k==="train"?"var(--emb)":k==="val"?"var(--tok)":"var(--hid)"}">${k} · ${arr.length}</div>${arr.map(l=>{const lk=k!=="train"&&trK.has(nearKey(l));if(k!=="train"){evalN++;if(lk)leak++;}return `<div class="ln${lk?" leak":""}" title="${esc(l)}">${lk?"⚠ ":""}${esc(l)}</div>`;}).join("")}</div>`).join("");
+  $("#spLeak").innerHTML=leak?`<div class="big c-err" style="font-size:2rem">${leak} leak${leak>1?"s":""}</div><p style="margin-top:6px">${leak} of ${evalN} validation/test lines also appear in training. The model has seen these answers, so its scores will look <b>better than reality</b>. Tick “remove duplicates before splitting”.</p>`
+    :`<div class="big c-out" style="font-size:2rem">0 leaks</div><p style="margin-top:6px">No validation or test line appears in training, so the evaluation is honest. Always deduplicate <b>before</b> you split, and split by customer or document when you can.</p>`;
+  dp.leak=leak;dp.te=te;
+}
+["#spTr","#spVa"].forEach(s=>$(s).addEventListener("input",renderSplit));$("#spDedupe").addEventListener("change",renderSplit);$("#spShuffle").addEventListener("click",()=>{spSeed++;renderSplit();});
+predictBox($("#spPred"),{q:"A test question also appears in the training data. What happens to the test score?",opts:["It's more accurate","It's inflated, so it looks better than real-world performance","It's unaffected"],ok:1,
+  why:"The model may simply remember the answer, so you measure memory, not ability. That's data leakage, and it's why the test set must be kept strictly separate from training."});
+
+/* ---- domain gallery ---- */
+const DOMAINS={general:{n:"General language model",need:"Broad, clean, varied text: books, encyclopedia-style articles, news, filtered web pages.",size:"For a CPU SLM: 10 MB – 1 GB of text. Real LLMs use trillions of tokens.",pit:"Web junk, duplicated boilerplate, toxic content, copyrighted material.",fmt:`{"text": "The Reserve Bank of India regulates the country's banking system. It was established in 1935 ..."}`},
+ banking:{n:"Banking & financial terminology",need:"Product pages, policy documents, glossaries (EMI, KYC, NEFT, overdraft), regulatory circulars and FAQs.",size:"1 – 50 MB of domain text on top of a general base model.",pit:"Outdated rates and policies, customer PII, numbers stated without context.",fmt:`{"text": "EMI (Equated Monthly Instalment) is the fixed amount a borrower pays each month. It covers both principal and interest."}`},
+ support:{n:"Customer service",need:"Anonymised chat and email transcripts, ideal agent responses, escalation rules.",size:"Thousands to tens of thousands of conversations.",pit:"Names, account and phone numbers left unmasked; rude or wrong agent replies used as targets.",fmt:`{"messages": [
+  {"role": "user", "content": "My debit card is lost, what should I do?"},
+  {"role": "assistant", "content": "I'm sorry to hear that. Please block it right away in the app under Cards > Block, or call 1800-XXX-XXXX. A replacement arrives in 5-7 days."}]}`},
+ docs:{n:"Document understanding",need:"Documents paired with what to extract: statements, forms, invoices, KYC documents (synthetic or consented).",size:"Hundreds to thousands of labelled documents.",pit:"Real identity documents (privacy), OCR errors, inconsistent labels.",fmt:`{"input": "Statement period: 01-03-2025 to 31-03-2025 ... Closing balance: Rs 45,210.50",
+ "output": {"period_end": "2025-03-31", "closing_balance": 45210.50}}`},
+ qa:{n:"Question answering",need:"Question–answer pairs grounded in trusted documents, including 'I don't know' cases.",size:"A few thousand high-quality pairs beat 100K noisy ones.",pit:"Answers not supported by the source, which teaches the model to hallucinate.",fmt:`{"context": "Senior citizens get an extra 0.50% on fixed deposits of 1-5 years.",
+ "question": "What extra interest do senior citizens get on a 3-year FD?",
+ "answer": "An extra 0.50%."}`}};
+let dmK="banking";
+$("#dmBtns").innerHTML=Object.entries(DOMAINS).map(([k,v])=>`<button type="button" class="btn" data-dm="${k}">${v.n}</button>`).join("");
+$$("#dmBtns [data-dm]").forEach(b=>b.addEventListener("click",()=>{dmK=b.dataset.dm;renderDom();}));
+function renderDom(){$$("#dmBtns [data-dm]").forEach(b=>b.classList.toggle("primary",b.dataset.dm===dmK));const d=DOMAINS[dmK];
+  $("#dmInfo").innerHTML=`<h3 style="margin-bottom:10px">${d.n}</h3><dl class="kv"><dt>what you need</dt><dd>${d.need}</dd><dt>how much</dt><dd>${d.size}</dd><dt>traps to avoid</dt><dd class="c-err">${d.pit}</dd></dl><p class="note" style="margin-top:10px">Store records as JSON Lines (.jsonl): one record per line. It's easy to stream, deduplicate and split.</p>`;
+  $("#dmCode").innerHTML=hl(d.fmt);}
+renderDom();
+
+/* ---- code ---- */
+codeBox($("#code7"),{"data_prep.py":`import re, random, hashlib, unicodedata
+import torch
+from torch.utils.data import Dataset, DataLoader
+
+SAMPLE = """<p>How do I reset my net banking password?</p>
+How do I reset my net banking password?
+My account 1234567890 was charged twice, mail me at ravi.k@example.com
+Call me on +91 98765 43210 about the credit card fee.
+ok
+The bank approved the home loan at 8.5% interest.
+The bank approved the home loan at 8.5% interest.
+Customer asked about overdraft fees on the current account.
+The agent explained fixed deposit interest rates for senior citizens.
+I want to close my savings account and transfer the balance.
+My UPI payment failed but money was debited from my account.
+What is the EMI for a 20 lakh home loan over 15 years?"""
+
+try:
+    raw = open("raw_support_logs.txt", encoding="utf-8").read().splitlines()
+except FileNotFoundError:
+    raw = SAMPLE.splitlines()                  # runs as-is with the built-in sample
+
+def clean(line):                               # 1. strip HTML, normalise, tidy spaces
+    line = re.sub(r"<[^>]+>", " ", line)
+    line = unicodedata.normalize("NFKC", line)
+    line = re.sub(r"([!?.])\\1+", r"\\1", line)
+    return re.sub(r"\\s+", " ", line).strip()
+
+def mask_pii(line):                            # 2. never train on personal data
+    line = re.sub(r"[\\w.+-]+@[\\w-]+\\.[\\w.]+", "<EMAIL>", line)
+    line = re.sub(r"https?://\\S+", "<URL>", line)
+    line = re.sub(r"\\b\\d{9,18}\\b", "<ACCOUNT>", line)
+    line = re.sub(r"\\+?\\d[\\d\\s-]{8,}\\d", "<PHONE>", line)
+    return line
+
+def key(line):                                 # 3. near-duplicate key
+    return hashlib.md5(re.sub(r"[^a-z0-9]", "", line.lower()).encode()).hexdigest()
+
+lines, seen = [], set()
+for line in raw:
+    line = mask_pii(clean(line))
+    if len(line) < 12 or key(line) in seen:    # 4. quality filter + dedupe
+        continue
+    seen.add(key(line))
+    lines.append(line)
+
+random.seed(0)                                 # 5. split AFTER dedupe -> no leakage
+random.shuffle(lines)
+n = len(lines); n_tr = int(0.8 * n); n_va = max(1, int(0.1 * n))
+splits = {"train": lines[:n_tr], "val": lines[n_tr:n_tr + n_va], "test": lines[n_tr + n_va:]}
+for name, part in splits.items():
+    open(f"{name}.txt", "w", encoding="utf-8").write("\\n".join(part))
+    print(f"{name:5s} {len(part)} lines")
+
+class NextTokenDataset(Dataset):               # 6. (x, y) windows for next-token prediction
+    def __init__(self, text, stoi, block_size):
+        self.data = torch.tensor([stoi[c] for c in text], dtype=torch.long)
+        self.T = block_size
+    def __len__(self):
+        return len(self.data) - self.T         # each window needs T + 1 tokens
+    def __getitem__(self, i):
+        chunk = self.data[i : i + self.T + 1]
+        return chunk[:-1], chunk[1:]           # x and y, shifted by one
+
+text = "\\n".join(splits["train"])
+stoi = {c: i for i, c in enumerate(sorted(set(text)))}
+ds = NextTokenDataset(text, stoi, block_size=32)
+x, y = next(iter(DataLoader(ds, batch_size=4, shuffle=True)))
+print(len(ds), "training windows; batch shapes", tuple(x.shape), tuple(y.shape))`});
+
+/* ---- exercise ---- */
+let ex7Checked=false;
+const EX7=[
+ {t:"<b>Pipeline (panel 01):</b> the final clean data contains <b>no personal data</b> (emails, phones, account numbers) and <b>no duplicates</b>",f:()=>{const f=dp.res.final;return f.length>0&&!f.some(l=>/[\w.+-]+@[\w-]+\.[\w.]+|\b\d{9,18}\b|\+?\d[\d\s-]{8,}\d/.test(l))&&new Set(f.map(nearKey)).size===f.length;}},
+ {t:"<b>Your data (panel 01):</b> paste or upload <b>your own</b> text (at least 5 lines) and run it through the pipeline",f:()=>$("#dpText").value!==DP_SAMPLE&&dp.res.raw.length>=5},
+ {t:"<b>Sequences (panel 02):</b> with block size <b>T ≥ 8</b>, make <b>at least 100</b> windows from the clean text",f:()=>+$("#sqT").value>=8&&seqCount(dpTokens(dp.res.final).length)>=100},
+ {t:"<b>Splits (panel 03):</b> reach <b>0 leaks</b> while keeping a test set of <b>at least 10%</b>",f:()=>dp.leak===0&&dp.te>=10}
+];
+function runEx7(){let ok=0;$("#ex7Checks").innerHTML=EX7.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex7Checked?(r?"ok":"no"):""}"><span class="dot">${ex7Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex7Checked)$("#ex7Msg").innerHTML=ok===EX7.length?'<span class="c-out">All 4 missions complete.</span> You built a clean, private-safe, leak-free dataset.':`${ok}/4 missions complete. Hint: stride 1 makes many overlapping windows.`;}
+$("#ex7Btn").addEventListener("click",()=>{ex7Checked=true;runEx7();});
+
+/* ---- quiz ---- */
+function makeQuiz7(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)];
+  const N=pick([500,1000,2000]),T=pick([8,10,20]),S=T,win=Math.floor((N-T-1)/S)+1;
+  const raw=pick([1000,2000,5000]),kept=Math.round(raw*pick([.64,.72,.85])),dupPct=Math.round((1-kept/raw)*100);
+  return [
+   {type:"Numerical",kind:"num",q:`You have <b>${N.toLocaleString()} tokens</b>. Each window uses block size <b>T = ${T}</b> (plus one extra token for the shifted target) and windows don't overlap (stride ${S}). How many (x, y) windows can you make?`,
+    check:v=>{if(v===win)return [true,`⌊(${N} − ${T+1}) / ${S}⌋ + 1 = ${win}. Each window needs T + 1 tokens.`];if(v===Math.floor(N/T))return [false,`Close. N / T = ${Math.floor(N/T)} forgets that each window needs <b>T + 1</b> tokens (y is shifted by one): ⌊(N − T − 1) / S⌋ + 1 = ${win}.`];return [false,`Windows = ⌊(N − (T + 1)) / stride⌋ + 1 = ⌊(${N} − ${T+1}) / ${S}⌋ + 1 = ${win}.`];}},
+   {type:"Numerical",kind:"num",q:`Deduplication shrinks a dataset from <b>${raw.toLocaleString()}</b> lines to <b>${kept.toLocaleString()}</b>. What <b>percentage</b> of the lines were duplicates? (whole number)`,
+    check:v=>{if(Math.abs(v-dupPct)<=1)return [true,`(${raw} − ${kept}) / ${raw} = ${dupPct}%. Real scraped datasets often have 20–40% duplicates.`];if(Math.abs(v-(100-dupPct))<=1)return [false,`${100-dupPct}% is the share <b>kept</b>. Duplicates = 100 − ${100-dupPct} = ${dupPct}%.`];return [false,`(${raw} − ${kept}) / ${raw} × 100 = ${dupPct}%.`];}},
+   {type:"Conceptual",kind:"mcq",q:"What is <b>data leakage</b> between training and test sets?",opts:shuffle([
+     {t:"Test examples (or near-copies) also appear in training, so test scores overstate real performance",ok:true,why:"Correct. Panel 03's red lines. Deduplicate before splitting, and split by customer or document."},
+     {t:"Training data being stolen by hackers",why:"Misconception: <b>leakage = a security breach</b>. In ML it means test information getting into training and inflating scores."},
+     {t:"Losing data when the disk fills up",why:"Misconception: <b>leakage = data loss</b>. It's about contamination between splits, not lost files."},
+     {t:"Having too little validation data",why:"Misconception: <b>leakage = small splits</b>. Small splits give noisy scores. Leakage gives falsely <i>good</i> ones."}],r)},
+   {type:"Conceptual",kind:"mcq",q:"Why must a bank mask personal data <b>before</b> training an SLM on support chats?",opts:shuffle([
+     {t:"Models can memorise and reproduce training text, so unmasked phone or account numbers could be revealed to other users. It also breaks privacy laws.",ok:true,why:"Correct. Memorisation of rare strings is well documented. Masking (and minimising data) is both a legal and a safety requirement."},
+     {t:"Numbers make the model train more slowly",why:"Misconception: <b>it's about speed</b>. The reason is privacy and memorisation."},
+     {t:"Tokenizers can't handle digits",why:"Misconception: <b>digits break tokenizers</b>. They handle digits fine, which is exactly why the model can learn and repeat them."},
+     {t:"It isn't needed if the model is only used internally",why:"Misconception: <b>internal use is safe</b>. Employees, logs and future reuse still expose the data, and laws apply regardless."}],r)},
+   {type:"Practical",kind:"mcq",q:"You're building a customer-service SLM for a bank. Which dataset plan is best?",opts:shuffle([
+     {t:"Anonymised past chats with ideal agent replies, plus FAQs and policy documents. Cleaned, deduplicated and split by conversation.",ok:true,why:"Correct. Relevant, high-quality, privacy-safe and leak-free. Splitting by conversation stops one chat leaking into both train and test."},
+     {t:"Scrape as many random web pages as possible: more data is always better",why:"Misconception: <b>quantity beats quality</b>. Off-topic noisy data teaches the wrong style and facts. A few thousand clean, relevant examples beat millions of junk lines for a focused SLM."},
+     {t:"Raw chat logs exactly as stored, including names and account numbers, for realism",why:"Misconception: <b>realism needs raw PII</b>. Masked data keeps the realism without the privacy risk."},
+     {t:"Only the bank's marketing brochures",why:"Misconception: <b>any bank text will do</b>. Brochures don't show how to answer real customer questions. Conversations and policies do."}],r)}
+  ];
+}
+mountQuiz(7,$("#quiz7"),makeQuiz7);
+renderPipe7();runEx7();
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -4959,6 +5280,44 @@ Object.assign(NARR,{
  {sel:"#rnStats",en:"The estimator shows roughly how long training takes. A few hundred thousand parameters train in minutes on a normal laptop.",
   te:"ట్రైనింగ్‌కు సుమారు ఎంత సమయం పడుతుందో అంచనా చూపిస్తుంది. కొన్ని లక్షల పారామీటర్లు సాధారణ ల్యాప్‌టాప్‌లో నిమిషాల్లో ట్రైన్ అవుతాయి.",
   hn:"अनुमानक बताता है कि ट्रेनिंग में लगभग कितना समय लगेगा। कुछ लाख पैरामीटर एक आम लैपटॉप पर मिनटों में ट्रेन हो जाते हैं।"}]
+});
+
+/* ---- narration for stage 7 ---- */
+NARR_INTRO[7]={en:"Welcome to Stage seven, preparing the dataset. A model can only be as good as its data, so this stage turns messy, real banking text into clean, private-safe training examples.",
+ te:"స్టేజ్ ఏడుకు స్వాగతం. ఇది డేటాసెట్ తయారీ. మోడల్ దాని డేటా అంత మాత్రమే మంచిది, కాబట్టి ఈ స్టేజ్ గజిబిజి బ్యాంకింగ్ టెక్స్ట్‌ను శుభ్రమైన, గోప్యత-సురక్షితమైన ట్రైనింగ్ ఉదాహరణలుగా మారుస్తుంది.",
+ hn:"स्टेज सेवन में आपका स्वागत है, यानी डेटासेट तैयार करना। मॉडल उतना ही अच्छा होता है जितना उसका डेटा, इसलिए यह स्टेज गंदे असली बैंकिंग टेक्स्ट को साफ़, निजता-सुरक्षित ट्रेनिंग उदाहरणों में बदलता है।"};
+Object.assign(NARR,{
+"p7-pipe":[
+ {sel:"#dpFlow",en:"Raw text goes through five cleaning stages: strip HTML, normalise, mask personal data, remove duplicates, and filter junk. Click any stage to see exactly what changed.",
+  te:"ముడి టెక్స్ట్ ఐదు శుభ్రపరిచే దశల గుండా వెళ్తుంది: హెచ్‌టీఎంఎల్ తీసేయడం, నార్మలైజ్ చేయడం, వ్యక్తిగత డేటాను దాచడం, నకళ్లు తొలగించడం, చెత్తను వడపోయడం. ఏ దశనైనా నొక్కి సరిగ్గా ఏమి మారిందో చూడండి.",
+  hn:"कच्चा टेक्स्ट पाँच सफ़ाई चरणों से गुज़रता है: एचटीएमएल हटाना, नॉर्मलाइज़ करना, निजी डेटा छिपाना, दोहराव हटाना, और कचरा छाँटना। किसी भी चरण पर क्लिक करके देखिए कि ठीक क्या बदला।"},
+ {sel:"#dpView",act:()=>{dp.view=2;renderPipe7();},en:"Here, email addresses, phone numbers and account numbers are replaced with tags. A model can memorise private details, so they must never reach training.",
+  te:"ఇక్కడ ఈమెయిల్ చిరునామాలు, ఫోన్ నంబర్లు, ఖాతా నంబర్లు ట్యాగ్‌లతో భర్తీ అవుతాయి. మోడల్ ప్రైవేట్ వివరాలను గుర్తుంచుకోగలదు, కాబట్టి అవి ఎప్పుడూ ట్రైనింగ్‌కు చేరకూడదు.",
+  hn:"यहाँ ईमेल पते, फ़ोन नंबर और खाता नंबर टैग से बदल दिए जाते हैं। मॉडल निजी जानकारी याद कर सकता है, इसलिए वह कभी ट्रेनिंग तक नहीं पहुँचनी चाहिए।"},
+ {sel:"#dpStats",act:()=>{dp.view=4;renderPipe7();},en:"Eighteen raw lines become a smaller, clean set. You can paste or upload your own text to see what happens to it. It stays in your browser.",
+  te:"పద్దెనిమిది ముడి లైన్లు చిన్న, శుభ్రమైన సెట్‌గా మారతాయి. మీ సొంత టెక్స్ట్‌ను పేస్ట్ లేదా అప్‌లోడ్ చేసి ఏమవుతుందో చూడవచ్చు. అది మీ బ్రౌజర్‌లోనే ఉంటుంది.",
+  hn:"अठारह कच्ची लाइनें एक छोटे, साफ़ सेट में बदल जाती हैं। आप अपना टेक्स्ट पेस्ट या अपलोड करके देख सकते हैं कि उसका क्या होता है। वह आपके ब्राउज़र में ही रहता है।"}],
+"p7-seq":[
+ {sel:"#sqStrip",en:"The clean text becomes one long row of tokens. A window of T tokens slides along it. Amber is the input and green is the target, the same window shifted by one.",
+  te:"శుభ్రమైన టెక్స్ట్ టోకెన్ల పొడవైన వరుసగా మారుతుంది. టీ టోకెన్ల విండో దానిపై జారుతుంది. నారింజ ఇన్‌పుట్, ఆకుపచ్చ లక్ష్యం, అదే విండో ఒకటి జరిపినది.",
+  hn:"साफ़ टेक्स्ट टोकनों की एक लंबी पंक्ति बन जाता है। टी टोकन की एक खिड़की उस पर सरकती है। नारंगी इनपुट है और हरा लक्ष्य, यानी वही खिड़की एक कदम खिसकी हुई।"},
+ {sel:"#sqStats",act:()=>{$("#sqS").value=1;renderSeq();},en:"With a stride of one, windows overlap and the same text gives many more training examples.",
+  te:"స్ట్రైడ్ ఒకటి అయితే విండోలు ఒకదానిపై ఒకటి వస్తాయి, అదే టెక్స్ట్ చాలా ఎక్కువ ట్రైనింగ్ ఉదాహరణలను ఇస్తుంది.",
+  hn:"स्ट्राइड एक होने पर खिड़कियाँ एक-दूसरे पर चढ़ती हैं, और उसी टेक्स्ट से कहीं ज़्यादा ट्रेनिंग उदाहरण मिलते हैं।"}],
+"p7-split":[
+ {sel:"#spCols",act:()=>{$("#spDedupe").checked=false;renderSplit();},en:"We split data into train, validation and test. Red lines are leaks: copies of training lines that ended up in the test set. They make scores look better than reality.",
+  te:"డేటాను ట్రైన్, వాలిడేషన్, టెస్ట్‌గా విభజిస్తాం. ఎరుపు లైన్లు లీక్‌లు: టెస్ట్ సెట్‌లోకి వచ్చిన ట్రైనింగ్ లైన్ల నకళ్లు. అవి స్కోర్లను వాస్తవం కంటే మెరుగ్గా చూపిస్తాయి.",
+  hn:"हम डेटा को ट्रेन, वैलिडेशन और टेस्ट में बाँटते हैं। लाल लाइनें लीक हैं: ट्रेनिंग लाइनों की नकलें जो टेस्ट सेट में पहुँच गईं। ये स्कोर को असलियत से बेहतर दिखाती हैं।"},
+ {sel:"#spLeak",act:()=>{$("#spDedupe").checked=true;renderSplit();},en:"Remove duplicates before splitting, and the leaks disappear. Now the test score is honest.",
+  te:"విభజించే ముందు నకళ్లు తొలగిస్తే లీక్‌లు మాయమవుతాయి. ఇప్పుడు టెస్ట్ స్కోర్ నిజాయితీగా ఉంటుంది.",
+  hn:"बाँटने से पहले दोहराव हटाइए, तो लीक गायब हो जाते हैं। अब टेस्ट स्कोर ईमानदार है।"}],
+"p7-domain":[
+ {sel:"#dmInfo",act:'#dmBtns [data-dm="support"]',en:"Each use case needs different data. A customer service model learns best from anonymised conversations with ideal replies, stored one record per line.",
+  te:"ప్రతి ఉపయోగానికి వేర్వేరు డేటా కావాలి. కస్టమర్ సర్వీస్ మోడల్ ఆదర్శ జవాబులతో ఉన్న అనామక సంభాషణల నుంచి బాగా నేర్చుకుంటుంది, ఒక్కో లైన్‌కు ఒక రికార్డుగా నిల్వ చేసి.",
+  hn:"हर काम के लिए अलग डेटा चाहिए। कस्टमर सर्विस मॉडल आदर्श जवाबों वाली गुमनाम बातचीत से सबसे अच्छा सीखता है, हर लाइन में एक रिकॉर्ड के रूप में रखी हुई।"},
+ {sel:"#dmCode",act:'#dmBtns [data-dm="qa"]',en:"For question answering, every answer should be supported by its source text, including honest I don't know cases. Otherwise the model learns to make things up.",
+  te:"ప్రశ్నోత్తరాల కోసం ప్రతి జవాబుకు దాని మూల టెక్స్ట్ ఆధారం ఉండాలి, నిజాయితీగా తెలియదు అనే సందర్భాలతో సహా. లేకపోతే మోడల్ కల్పించడం నేర్చుకుంటుంది.",
+  hn:"सवाल-जवाब के लिए हर जवाब का आधार उसका स्रोत टेक्स्ट होना चाहिए, ईमानदार मुझे नहीं पता वाले मामलों समेत। वरना मॉडल बातें गढ़ना सीख जाता है।"}]
 });
 
 /* ---- engine ---- */
