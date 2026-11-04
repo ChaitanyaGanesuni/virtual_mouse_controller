@@ -1,0 +1,839 @@
+<title>SLM From Zero</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap">
+<style>
+/* Layout: a friendly journey. A home map of 15 stops, then one chapter at a time with four tabs: Imagine, Play, Real life, Quick check. */
+:root{
+  color-scheme:dark;
+  --bg:#0a1116;--panel:#101a21;--panel2:#15232c;--line:#21333e;--line2:#2e4653;
+  --fg:#e2edf2;--muted:#8fa8b4;--dim:#5f7884;
+  --tok:#f3b955;--emb:#52d3e2;--hid:#a993ff;--out:#62e3a2;--err:#ff7d93;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Noto Sans Telugu","Noto Sans Devanagari",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:12px;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  background-image:radial-gradient(ellipse at 50% -20%,rgba(82,211,226,.10),transparent 55%),radial-gradient(ellipse at 100% 100%,rgba(169,147,255,.06),transparent 50%);background-attachment:fixed}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 60px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--emb);outline-offset:2px}
+.mono{font-family:var(--f-mono)}.muted{color:var(--muted)}.dim{color:var(--dim)}
+.c-tok{color:var(--tok)}.c-emb{color:var(--emb)}.c-hid{color:var(--hid)}.c-out{color:var(--out)}.c-err{color:var(--err)}
+.eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:rgba(10,17,22,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:21;background:#0a1116}
+.top .wrap{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;color:var(--fg)}
+.brand .logo{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--tok),var(--emb));display:grid;place-items:center;color:#0a1116;font-family:var(--f-display);font-weight:700;font-size:.9rem}
+.brand h1{font-size:1.2rem}
+.prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.pbar{width:140px;height:8px;border-radius:4px;background:var(--line2);overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--out),var(--emb));transition:width .5s}
+.btn{background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:8px 14px;font-size:.92rem}
+.btn:hover{border-color:var(--emb)}
+.btn.primary{background:var(--tok);border-color:var(--tok);color:#1a1206;font-weight:600}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.on{border-color:var(--emb);color:var(--emb)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:820px){.grid2{grid-template-columns:minmax(0,1fr)}}
+.txt{background:var(--bg);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;width:100%;font-size:1rem}
+input[type=range]{accent-color:var(--tok);width:100%}
+label.f{display:grid;gap:4px;font-size:.88rem;color:var(--muted)}
+label.f b{color:var(--fg);font-family:var(--f-mono);font-weight:500}
+/* home */
+.hero{padding-block:36px 18px;display:grid;gap:14px}
+.hero h2{font-size:clamp(1.9rem,5vw,3rem);line-height:1.08;max-width:20ch}
+.hero h2 em{font-style:normal;color:var(--tok)}
+.hero p{max-width:62ch;color:var(--muted);font-size:1.05rem}
+.road{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:8px}
+.stop{text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;gap:6px;position:relative;transition:transform .2s,border-color .2s}
+.stop:hover{transform:translateY(-2px);border-color:var(--line2)}
+.stop .num{font-family:var(--f-mono);font-size:.7rem;color:var(--dim)}
+.stop .t{font-weight:600;font-size:1rem;line-height:1.25}
+.stop .an{font-size:.82rem;color:var(--muted)}
+.stop .st{font-family:var(--f-mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase}
+.stop.locked{opacity:.5}.stop.locked .st{color:var(--dim)}
+.stop.open .st{color:var(--tok)}.stop.done .st{color:var(--out)}
+.stop.done{border-color:rgba(98,227,162,.45)}
+.stop.open{border-color:rgba(243,185,85,.5);box-shadow:0 0 0 1px rgba(243,185,85,.2)}
+.ic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--panel2);color:var(--tok)}
+.ic svg{width:26px;height:26px}
+/* chapter */
+.chead{padding-block:24px 10px;display:grid;gap:10px}
+.chead h2{font-size:clamp(1.6rem,4vw,2.4rem)}
+.chead .sub{color:var(--muted);max-width:64ch}
+.tabs4{display:flex;gap:6px;flex-wrap:wrap;margin-block:6px 16px}
+.tabs4 button{flex:1 1 140px;display:flex;align-items:center;gap:10px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;text-align:left}
+.tabs4 button .k{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:.8rem;background:var(--panel2);color:var(--muted);flex:none}
+.tabs4 button.on{border-color:var(--tok);background:rgba(243,185,85,.07)}
+.tabs4 button.on .k{background:var(--tok);color:#1a1206}
+.tabs4 button.seen .k{background:rgba(98,227,162,.25);color:var(--out)}
+.story{display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:600px){.story{grid-template-columns:minmax(0,1fr)}}
+.bigic{width:110px;height:110px;border-radius:28px;display:grid;place-items:center;background:linear-gradient(145deg,rgba(243,185,85,.18),rgba(82,211,226,.12));border:1px solid var(--line2);color:var(--tok)}
+.bigic svg{width:64px;height:64px}
+.story h3{font-size:1.5rem;margin-bottom:8px}
+.story .tale{font-size:1.08rem;max-width:62ch}
+.map{display:grid;gap:8px;margin-top:16px}
+.map .mr{display:grid;grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr);gap:8px;align-items:center}
+.map .l,.map .r{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:.95rem}
+.map .l{border-left:3px solid var(--tok)}.map .r{border-left:3px solid var(--emb)}
+.map .ar{text-align:center;color:var(--muted);font-family:var(--f-mono)}
+.map .hd{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding:0 4px}
+.oneline{margin-top:16px;padding:14px 16px;border-radius:12px;background:rgba(98,227,162,.07);border:1px solid rgba(98,227,162,.3);font-size:1.02rem}
+.oneline b{color:var(--out)}
+.realgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.real{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:6px}
+.real h4{margin:0;font-size:1rem;color:var(--tok)}
+.real p{font-size:.92rem;color:var(--fg)}
+.inside{margin-top:14px;padding:14px 16px;border-radius:12px;border:1px dashed rgba(169,147,255,.55);background:rgba(169,147,255,.06)}
+.inside b{color:var(--hid)}
+.navrow{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+.q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:8px}
+.q .qq{font-size:1.02rem;font-weight:600}
+.q .op{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.95rem}
+.q .op:hover{border-color:var(--line2)}
+.q .op.right{border-color:var(--out);background:rgba(98,227,162,.1)}
+.q .op.wrong{border-color:var(--err);background:rgba(255,125,147,.08)}
+.q .fb{font-size:.92rem;padding:8px 12px;border-radius:8px}
+.q .fb.ok{background:rgba(98,227,162,.1);color:var(--fg)}
+.q .fb.bad{background:rgba(255,125,147,.1);color:var(--fg)}
+.done-banner{padding:16px;border-radius:12px;border:1px solid var(--out);background:rgba(98,227,162,.08)}
+.chip{display:inline-block;font-family:var(--f-mono);font-size:.85rem;padding:4px 9px;border-radius:7px;background:rgba(243,185,85,.13);border:1px solid rgba(243,185,85,.35);color:var(--tok);animation:pop .3s ease both}
+.chip.b{background:rgba(82,211,226,.12);border-color:rgba(82,211,226,.35);color:var(--emb)}
+.chip.g{background:rgba(98,227,162,.13);border-color:rgba(98,227,162,.4);color:var(--out)}
+.chip.p{background:rgba(169,147,255,.14);border-color:rgba(169,147,255,.4);color:var(--hid)}
+.chip.r{background:rgba(255,125,147,.13);border-color:rgba(255,125,147,.4);color:var(--err)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.bars{display:grid;gap:6px}
+.bar{display:grid;grid-template-columns:110px minmax(0,1fr) 54px;gap:8px;align-items:center;font-size:.88rem}
+.bar .lb{text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bar .tr{height:18px;background:var(--bg);border-radius:5px;overflow:hidden}
+.bar .fl{display:block;height:100%;border-radius:5px;background:var(--out);transition:width .4s ease}
+.bar .v{font-family:var(--f-mono);font-size:.8rem;color:var(--muted);text-align:right}
+.meter{height:14px;border-radius:7px;background:var(--bg);overflow:hidden;border:1px solid var(--line)}
+.meter i{display:block;height:100%;transition:width .5s ease,background .5s}
+.big{font-family:var(--f-display);font-size:2.2rem;font-weight:700;line-height:1}
+.note{font-size:.9rem;color:var(--muted);border-left:2px solid var(--line2);padding-left:10px}
+.say{font-size:1rem;padding:10px 14px;border-radius:10px;background:var(--bg);border:1px solid var(--line);min-height:2.6em}
+.lbtn{display:inline-flex;align-items:center;gap:7px;background:rgba(243,185,85,.1);border:1px solid rgba(243,185,85,.5);color:var(--tok);border-radius:999px;padding:7px 14px;font-size:.88rem;font-weight:600}
+.lbtn:hover{background:rgba(243,185,85,.2)}
+.narr-hi{outline:2px solid var(--tok)!important;outline-offset:4px;border-radius:10px}
+body.narrating main{padding-bottom:200px}
+.narrbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(16,26,33,.97);backdrop-filter:blur(8px);border-top:1px solid rgba(243,185,85,.45);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.narrbar .in{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 18px;align-items:center}
+@media (max-width:760px){.narrbar .in{grid-template-columns:minmax(0,1fr)}}
+.nb-t{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--tok)}
+.nb-x{font-size:1.04rem;margin-top:2px}
+.nb-s{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);margin-top:3px}.nb-s:empty{display:none}
+.nb-c{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.nb-c button,.nb-c select{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:5px 9px;font-size:.82rem;max-width:190px}
+.nb-c button.pri{background:var(--tok);color:#1a1206;border-color:var(--tok);font-weight:600;min-width:74px}
+.nb-p{grid-column:1/-1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}.nb-p i{display:block;height:100%;background:var(--tok);width:0;transition:width .4s}
+svg.v{width:100%;height:auto;display:block}
+.toy{display:grid;gap:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<header class="top"><div class="wrap">
+  <button class="brand" id="homeBtn" type="button" aria-label="Back to the journey map"><span class="logo">AI</span><h1>SLM From Zero</h1></button>
+  <div class="prog"><span id="progTxt">0 of 15 chapters</span><span class="pbar"><i id="progBar" style="width:0"></i></span></div>
+</div></header>
+
+<main class="wrap">
+  <section id="home">
+    <div class="hero">
+      <div class="eyebrow">No maths or coding needed to start</div>
+      <h2>Build your own <em>small AI language model</em>, starting from zero</h2>
+      <p>15 short chapters, about 5 minutes each. Every idea starts with something you already know (a phone keyboard, Lego bricks, a restaurant), then you play with it, see it in real life, and answer three friendly questions to unlock the next chapter. Press <b>Listen</b> in any chapter to hear it in English, Telugu or Hindi.</p>
+      <div class="row"><button class="btn primary" id="startBtn" type="button">Start the journey</button><button class="btn" id="resetBtn" type="button">Start over</button><span class="muted" id="resetMsg" style="font-size:.85rem"></span></div>
+    </div>
+    <div class="eyebrow" style="margin-top:8px">Your journey</div>
+    <div class="road" id="road"></div>
+  </section>
+  <section id="chap" hidden></section>
+</main>
+
+<div class="narrbar" id="narrBar" hidden role="region" aria-label="Narrator">
+  <div class="in">
+    <div style="min-width:0"><div class="nb-t" id="nbTitle"></div><div class="nb-x" id="nbText" aria-live="polite"></div><div class="nb-s" id="nbStat"></div></div>
+    <div class="nb-c">
+      <button type="button" id="nbPrev" aria-label="Previous sentence">◀◀</button>
+      <button type="button" id="nbPlay" class="pri">Pause</button>
+      <button type="button" id="nbNext" aria-label="Next sentence">▶▶</button>
+      <select id="nbLang" aria-label="Language"><option value="en">English</option><option value="te">తెలుగు</option><option value="hn">हिन्दी</option></select>
+      <select id="nbRate" aria-label="Speed"><option value="0.8">0.8×</option><option value="1" selected>1×</option><option value="1.2">1.2×</option></select>
+      <select id="nbVoice" aria-label="Voice"></select>
+      <button type="button" id="nbTest">Test voice</button>
+      <button type="button" id="nbStop">Close</button>
+    </div>
+    <div class="nb-p"><i id="nbProg"></i></div>
+  </div>
+</div>
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(a,r){r=r||Math.random;for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const fmtB=b=>b>=1e12?(b/1e12).toFixed(1)+" TB":b>=1e9?(b/1e9).toFixed(1)+" GB":b>=1e6?(b/1e6).toFixed(0)+" MB":(b/1e3).toFixed(0)+" KB";
+
+/* ---------- a real, tiny word-prediction model (counts which word follows which) ---------- */
+const GENERAL=`the cat sat on the mat .
+the dog sat on the rug .
+the cat chased the mouse .
+the dog chased the ball in the park .
+the children played in the park after school .
+the sun rises in the east .
+the train was late this morning .
+she drank a cup of hot tea .
+he reads the newspaper every morning .
+we watched a movie on sunday .
+the teacher asked the students a question .
+the students answered the question correctly .
+my mother cooked rice and dal for dinner .
+the phone battery is low .
+the weather is hot in summer .
+it rained heavily in the evening .
+the shop opens at nine in the morning .
+a language model predicts the next word .
+the model learns patterns from text .
+the model reads the text one word at a time .`.split("\n");
+const BANKING=`the customer opened a savings account .
+the customer asked about the loan .
+the customer asked about the interest rate .
+the customer asked about the account balance .
+the bank approved the home loan .
+the bank approved the loan application .
+the bank rejected the loan application .
+the bank charged a small fee .
+the customer paid the fee online .
+the agent helped the customer with the account .
+the agent explained the interest rate .
+the loan has a low interest rate .
+the account balance is low .
+the customer reported a lost debit card .
+the bank blocked the lost card .
+the customer transferred money using upi .
+the salary was credited to the account .
+the emi was debited from the account .
+the customer asked about the emi .
+the customer wants to close the account .`.split("\n");
+const words=s=>s.toLowerCase().replace(/([.,!?])/g," $1 ").replace(/[^a-z0-9.,!?'\s]/g," ").split(/\s+/).filter(Boolean);
+function trainLM(lines,weight){const m={bi:new Map(),tri:new Map(),uni:new Map()};addLM(m,lines,weight||1);return m;}
+function addLM(m,lines,w){const inc=(mp,k,x)=>{if(!mp.has(k))mp.set(k,new Map());const q=mp.get(k);q.set(x,(q.get(x)||0)+w);};
+  lines.forEach(s=>{const t=["<s>","<s>",...words(s)];for(let i=2;i<t.length;i++){m.uni.set(t[i],(m.uni.get(t[i])||0)+w);inc(m.bi,t[i-1],t[i]);inc(m.tri,t[i-2]+" "+t[i-1],t[i]);}});return m;}
+function nextCounts(m,ctx){const c=["<s>","<s>",...ctx],a=c[c.length-2],b=c[c.length-1];
+  if(m.tri.has(a+" "+b))return {src:"last two words",counts:m.tri.get(a+" "+b)};if(m.bi.has(b))return {src:"last word",counts:m.bi.get(b)};return {src:"never seen, guessing common words",counts:m.uni,unk:true};}
+function dist(m,ctx,T){const {counts,src,unk}=nextCounts(m,ctx);const arr=[...counts.entries()].map(([w,c])=>({w,l:Math.log(c)/(T||1)}));const mx=Math.max(...arr.map(a=>a.l));let z=0;arr.forEach(a=>{a.e=Math.exp(a.l-mx);z+=a.e;});arr.forEach(a=>a.p=a.e/z);arr.sort((x,y)=>y.p-x.p);arr.src=src;arr.unk=unk;return arr;}
+function pick(arr,r){let x=(r||Math.random)(),acc=0;for(const a of arr){acc+=a.p;if(x<=acc)return a;}return arr[arr.length-1];}
+const LM_ALL=trainLM([...GENERAL,...BANKING]);
+
+/* ---------- simple icons ---------- */
+const ICON={
+ robot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 3v4M9 12h.01M15 12h.01M9 16h6"/></svg>',
+ keyboard:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg>',
+ scale:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="15" r="5"/><path d="M6 14V8m12 2V4"/></svg>',
+ book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M9 8h6M9 12h6"/></svg>',
+ lego:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="10" width="18" height="10" rx="1"/><rect x="6" y="6" width="4" height="4" rx="1"/><rect x="14" y="6" width="4" height="4" rx="1"/></svg>',
+ map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2z"/><path d="M9 4v14M15 6v14"/></svg>',
+ team:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M2 20c0-3 3-5 6-5s6 2 6 5M12 20c0-3 2-5 4-5 3 0 6 2 6 5"/></svg>',
+ spot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v4M5 5l2.5 2.5M19 5l-2.5 2.5"/><path d="M7 21l5-12 5 12z"/></svg>',
+ factory:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 21V10l6 4V10l6 4V6l6 4v11z"/><path d="M7 18h2M12 18h2M17 18h2"/></svg>',
+ pot:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10h16v6a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4z"/><path d="M2 10h20M9 6c0-1 1-1 1-2M14 6c0-1 1-1 1-2"/></svg>',
+ mountain:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 20 9 7l4 7 3-4 6 10z"/><circle cx="17" cy="5" r="2"/></svg>',
+ exam:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="m8 9 2 2 4-4M8 15h8"/></svg>',
+ doctor:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-7 8-7s8 3 8 7M12 14v4M10 16h4"/></svg>',
+ photo:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 8"/></svg>',
+ shop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 10h16l-1-5H5zM5 10v10h14V10"/><path d="M10 20v-5h4v5"/></svg>'
+};
+
+/* ---------- progress ---------- */
+let P={done:[]};
+try{const s=localStorage.getItem("slm0.v1");if(s)P=Object.assign(P,JSON.parse(s));}catch(e){}
+const saveP=()=>{try{localStorage.setItem("slm0.v1",JSON.stringify(P));}catch(e){}};
+const CH=[];
+const unlocked=i=>i===0||P.done.includes(i-1);
+function renderProgress(){const n=P.done.length;$("#progTxt").textContent=`${n} of ${CH.length} chapters`;$("#progBar").style.width=(n/CH.length*100).toFixed(1)+"%";}
+function renderRoad(){
+  $("#road").innerHTML=CH.map((c,i)=>{const done=P.done.includes(i),open=unlocked(i);return `<button type="button" class="stop ${done?"done":open?"open":"locked"}" data-i="${i}"><div class="row" style="justify-content:space-between;align-items:flex-start"><span class="ic">${ICON[c.icon]}</span><span class="num">${String(i+1).padStart(2,"0")}</span></div><span class="t">${esc(c.title)}</span><span class="an">${esc(c.like)}</span><span class="st">${done?"✓ done":open?"● start here":"locked"}</span></button>`;}).join("");
+  $$("#road .stop").forEach(b=>b.addEventListener("click",()=>{const i=+b.dataset.i;if(unlocked(i))openChapter(i);else{b.animate([{transform:"translateX(-4px)"},{transform:"translateX(4px)"},{transform:"none"}],{duration:250});}}));
+  renderProgress();
+}
+
+/* ---------- chapter view ---------- */
+let cur={i:-1,tab:0,seen:new Set(),cleanup:[]};
+const TABS=["Imagine","Play","Real life","Quick check"];
+function ctxFor(){const c={every:(fn,ms)=>{const t=setInterval(fn,ms);cur.cleanup.push(()=>clearInterval(t));return t;},after:(fn,ms)=>{const t=setTimeout(fn,ms);cur.cleanup.push(()=>clearTimeout(t));return t;}};return c;}
+function unmount(){cur.cleanup.forEach(f=>{try{f();}catch(e){}});cur.cleanup=[];}
+function openChapter(i,tab){
+  narrStop();unmount();cur={i,tab:tab||0,seen:new Set(),cleanup:[]};
+  const c=CH[i];$("#home").hidden=true;$("#chap").hidden=false;
+  $("#chap").innerHTML=`<div class="chead"><div class="row" style="justify-content:space-between"><div class="eyebrow">Chapter ${i+1} of ${CH.length} · about ${c.mins} minutes</div><button class="btn" type="button" id="backHome">All chapters</button></div>
+    <div class="row" style="gap:14px;align-items:center"><span class="ic" style="width:52px;height:52px">${ICON[c.icon]}</span><div><h2>${esc(c.title)}</h2><p class="sub">Think of it like: <b class="c-tok">${esc(c.like)}</b></p></div></div>
+    <div class="row"><button class="lbtn" type="button" id="listenBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>Listen to this chapter</button><span class="muted" style="font-size:.85rem">English · తెలుగు · हिन्दी</span></div></div>
+    <div class="tabs4" id="tabs4">${TABS.map((t,k)=>`<button type="button" data-t="${k}"><span class="k">${k+1}</span><span>${t}</span></button>`).join("")}</div>
+    <div id="tabBody"></div>`;
+  $("#backHome").addEventListener("click",goHome);
+  $("#listenBtn").addEventListener("click",()=>narrStart(i));
+  $$("#tabs4 button").forEach(b=>b.addEventListener("click",()=>setTab(+b.dataset.t)));
+  setTab(cur.tab);window.scrollTo({top:0,behavior:"smooth"});
+}
+function setTab(k,fromNarr){
+  if(k===cur.tab&&$("#tabBody").childElementCount&&!fromNarr)return;
+  unmount();cur.tab=k;cur.seen.add(k);const c=CH[cur.i],body=$("#tabBody");
+  $$("#tabs4 button").forEach((b,j)=>{b.classList.toggle("on",j===k);b.classList.toggle("seen",cur.seen.has(j)&&j!==k);});
+  const nav=`<div class="navrow">${k>0?`<button class="btn" type="button" data-go="${k-1}">← ${TABS[k-1]}</button>`:"<span></span>"}${k<3?`<button class="btn primary" type="button" data-go="${k+1}">Next: ${TABS[k+1]} →</button>`:""}</div>`;
+  if(k===0){body.innerHTML=`<div class="box"><div class="story"><div class="bigic">${ICON[c.icon]}</div><div><h3>${c.story.h}</h3><p class="tale">${c.story.p}</p></div></div>
+    <div class="map" id="anMap"><div class="mr"><span class="hd">In everyday life</span><span></span><span class="hd">In AI</span></div>${c.story.map.map(([a,b])=>`<div class="mr"><span class="l">${a}</span><span class="ar">→</span><span class="r">${b}</span></div>`).join("")}</div>
+    <div class="oneline" id="oneLine">${c.story.one}</div></div>`+nav;}
+  else if(k===1){body.innerHTML=`<div class="box"><h3 style="font-size:1.3rem;margin-bottom:6px">${c.play.h}</h3><p class="muted" style="margin-bottom:14px">${c.play.intro}</p><div class="toy" id="toy"></div></div>`+nav;c.play.mount($("#toy"),ctxFor());}
+  else if(k===2){body.innerHTML=`<div class="box"><h3 style="font-size:1.3rem;margin-bottom:12px">Where you already meet this</h3><div class="realgrid" id="realGrid">${c.real.map(([t,p])=>`<div class="real"><h4>${t}</h4><p>${p}</p></div>`).join("")}</div><div class="inside" id="insideBox"><div class="eyebrow" style="margin-bottom:4px;color:var(--hid)">Inside a real SLM</div>${c.inside}</div></div>`+nav;}
+  else{renderQuiz(body,c);body.insertAdjacentHTML("beforeend",nav);}
+  $$("#tabBody [data-go]").forEach(b=>b.addEventListener("click",()=>{setTab(+b.dataset.go);window.scrollTo({top:$("#tabs4").offsetTop-70,behavior:"smooth"});}));
+}
+function goHome(){narrStop();unmount();$("#chap").hidden=true;$("#home").hidden=false;renderRoad();window.scrollTo({top:0});}
+function renderQuiz(body,c){
+  const state=c.quiz.map(()=>({ok:false}));
+  body.innerHTML=`<div class="box"><h3 style="font-size:1.3rem;margin-bottom:4px">Quick check</h3><p class="muted" style="margin-bottom:14px">Three easy questions. Pick an answer and you'll see why it's right or wrong. You can try again as many times as you like.</p><div style="display:grid;gap:12px" id="qWrap">${c.quiz.map((q,qi)=>`<div class="q"><div class="qq">${qi+1}. ${q.q}</div>${q.opts.map((o,oi)=>`<button type="button" class="op" data-q="${qi}" data-o="${oi}">${o.t}</button>`).join("")}<div class="fb" id="fb${qi}" hidden></div></div>`).join("")}</div><div id="qDone" style="margin-top:14px"></div></div>`;
+  $$("#qWrap .op").forEach(b=>b.addEventListener("click",()=>{const qi=+b.dataset.q,oi=+b.dataset.o,o=c.quiz[qi].opts[oi],fb=$("#fb"+qi);
+    $$(`#qWrap .op[data-q="${qi}"]`).forEach(x=>x.classList.remove("right","wrong"));b.classList.add(o.ok?"right":"wrong");
+    fb.hidden=false;fb.className="fb "+(o.ok?"ok":"bad");fb.innerHTML=(o.ok?"<b class='c-out'>Yes! </b>":"<b class='c-err'>Not quite. </b>")+o.why+(o.ok?"":" Try another answer.");
+    if(o.ok)state[qi].ok=true;
+    if(state.every(s=>s.ok)){const i=cur.i;if(!P.done.includes(i)){P.done.push(i);saveP();}renderProgress();
+      const nx=CH[i+1];$("#qDone").innerHTML=`<div class="done-banner"><h3 class="c-out" style="margin-bottom:6px">Chapter complete!</h3><p>${nx?`Chapter ${i+2}, <b>${esc(nx.title)}</b>, is now unlocked.`:"You've finished the whole journey. You now understand, at a high level, every step of building a small language model."}</p><div class="row" style="margin-top:10px">${nx?`<button class="btn primary" type="button" id="nextCh">Go to chapter ${i+2} →</button>`:""}<button class="btn" type="button" id="toMap">Back to the journey map</button></div></div>`;
+      if(nx)$("#nextCh").addEventListener("click",()=>openChapter(i+1));$("#toMap").addEventListener("click",goHome);}}));
+}
+
+/* ---------- narrator (browser voices; English, Telugu, Hindi) ---------- */
+const NV={lang:"en",rate:1,voice:"",queue:[],i:0,tok:0,playing:false,safety:null};
+try{const s=JSON.parse(localStorage.getItem("slm0.narr")||"{}");Object.assign(NV,{lang:s.lang||"en",rate:s.rate||1,voice:s.voice||""});}catch(e){}
+const saveNV=()=>{try{localStorage.setItem("slm0.narr",JSON.stringify({lang:NV.lang,rate:NV.rate,voice:NV.voice}));}catch(e){}};
+const synth=("speechSynthesis" in window)?window.speechSynthesis:null;
+const LCODE={en:"en",te:"te",hn:"hi"},BCP={en:"en-US",te:"te-IN",hn:"hi-IN"},LNAME={en:"English",te:"Telugu",hn:"Hindi"};
+const TESTP={en:"Hello! The narrator is working.",te:"నమస్కారం! వ్యాఖ్యాత పని చేస్తోంది.",hn:"नमस्ते! नैरेटर काम कर रहा है।"};
+const badVoices=new Set();let voices=[],lastHush=-1e9,liveUtts=[];
+const IS_SAFARI=/^((?!chrome|chromium|crios|android|edg).)*safari/i.test(navigator.userAgent);
+function loadVoices(){try{voices=synth?synth.getVoices():[];}catch(e){voices=[];}fillVoices();}
+const voicesFor=l=>voices.filter(v=>(v.lang||"").toLowerCase().replace("_","-").startsWith(LCODE[l]));
+function vKey(v){return v?v.voiceURI:"__default";}
+function vLabel(v){return v?`${v.name} (${v.localService?"offline":"online"})`:`device default ${BCP[NV.lang]}`;}
+function candidates(l){const vs=voicesFor(l),pref=vs.find(v=>v.voiceURI===NV.voice);return [...(pref?[pref]:[]),...vs.filter(v=>v.localService&&v!==pref),...vs.filter(v=>!v.localService&&v!==pref),null].filter(v=>!badVoices.has(vKey(v)));}
+function fillVoices(){const sel=$("#nbVoice");if(!sel)return;const vs=voicesFor(NV.lang),c0=candidates(NV.lang)[0];sel.innerHTML=vs.map(v=>`<option value="${esc(v.voiceURI)}"${c0&&v.voiceURI===c0.voiceURI?" selected":""}>${esc(v.name)} · ${v.localService?"offline":"online"}</option>`).join("")+`<option value=""${vs.length?"":" selected"}>device default (${BCP[NV.lang]})</option>`;}
+if(synth){loadVoices();try{synth.addEventListener?synth.addEventListener("voiceschanged",loadVoices):(synth.onvoiceschanged=loadVoices);}catch(e){}setTimeout(loadVoices,700);setTimeout(loadVoices,2500);}
+function setStat(m,bad){const s=$("#nbStat");s.textContent=m;s.style.color=bad?"var(--err)":"var(--muted)";}
+function hush(){try{if(synth&&(synth.speaking||synth.pending)){synth.cancel();lastHush=performance.now();}}catch(e){}}
+const chunksOf=t=>t.split(/(?<=[.!?।])\s+/).map(s=>s.trim()).filter(Boolean);
+function speakText(text,tok,onDone,est,tried){
+  tried=tried||[];if(!synth){NV.safety=setTimeout(onDone,est);return;}
+  const cands=candidates(NV.lang),giveUp=m=>{if(tok!==NV.tok)return;setStat(m,true);clearTimeout(NV.safety);NV.safety=setTimeout(onDone,est);};
+  if(!cands.length){giveUp(`No voice produced sound${tried.length?" (tried: "+tried.join(", ")+")":""}. Captions continue.${NV.lang!=="en"?` For ${LNAME[NV.lang]}, open this page in Microsoft Edge, or add a ${LNAME[NV.lang]} voice in your device's speech settings.`:""}`);return;}
+  const v=cands[0],parts=chunksOf(text);let started=false,doneN=0,dead=false;
+  const retry=why=>{if(dead)return;dead=true;badVoices.add(vKey(v));tried.push(`${vLabel(v)}: ${why}`);hush();clearTimeout(NV.safety);setTimeout(()=>{if(tok===NV.tok)speakText(text,tok,onDone,est,tried);},200);};
+  const go=()=>{if(tok!==NV.tok)return;try{synth.resume();}catch(e){}
+    liveUtts=parts.map(p=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.lang=v?v.lang:BCP[NV.lang];u.rate=NV.rate;
+      u.onstart=()=>{if(!started){started=true;if(v)NV.voice=v.voiceURI;setStat(`Speaking with ${vLabel(v)}`);}};
+      u.onend=()=>{if(tok!==NV.tok||dead)return;if(++doneN===parts.length){clearTimeout(NV.safety);setTimeout(onDone,300);}};
+      u.onerror=e=>{if(e.error==="interrupted"||e.error==="canceled"||dead||tok!==NV.tok)return;if(e.error==="not-allowed"){dead=true;giveUp("The browser blocked speech. Tap ▶ or Test voice.");return;}if(!started)retry("error "+e.error);};return u;});
+    liveUtts.forEach(u=>synth.speak(u));NV.safety=setTimeout(onDone,est*2.5+6000);
+    setTimeout(()=>{if(tok===NV.tok&&!started&&!dead)retry("no sound");},v&&!v.localService?4000:2500);};
+  hush();const since=performance.now()-lastHush;if(!IS_SAFARI&&since<250)setTimeout(go,250-since);else go();
+}
+function narrHalt(){NV.tok++;clearTimeout(NV.safety);hush();}
+function narrStart(i){narrHalt();const c=CH[i];NV.queue=c.narr.map(s=>({...s,done:false}));NV.i=0;NV.playing=true;$("#narrBar").hidden=false;document.body.classList.add("narrating");loadVoices();runSeg();}
+function narrStop(){narrHalt();NV.playing=false;$$(".narr-hi").forEach(e=>e.classList.remove("narr-hi"));$("#narrBar").hidden=true;document.body.classList.remove("narrating");}
+function runSeg(){
+  const tok=++NV.tok;clearTimeout(NV.safety);const it=NV.queue[NV.i];
+  if(!it){NV.playing=false;hush();$("#nbPlay").textContent="Replay";$("#nbText").textContent={en:"Finished. Now try the Quick check!",te:"పూర్తయింది. ఇప్పుడు క్విక్ చెక్ ప్రయత్నించండి!",hn:"पूरा हुआ। अब क्विक चेक आज़माइए!"}[NV.lang];return;}
+  $("#nbPlay").textContent="Pause";const text=it[NV.lang]||it.en;
+  $("#nbTitle").textContent=`${CH[cur.i].title} · ${TABS[it.tab]} · ${NV.i+1}/${NV.queue.length}`;$("#nbText").textContent=text;$("#nbText").lang=BCP[NV.lang];
+  $("#nbProg").style.width=((NV.i+1)/NV.queue.length*100)+"%";
+  const est=Math.max(2500,text.length/(NV.lang==="en"?14:11)/NV.rate*1000);
+  speakText(text,tok,()=>{if(tok!==NV.tok||!NV.playing)return;NV.i++;runSeg();},est);
+  if(cur.tab!==it.tab)setTab(it.tab,true);
+  $$(".narr-hi").forEach(e=>e.classList.remove("narr-hi"));
+  const el=it.sel?document.querySelector(it.sel):null;if(el){el.classList.add("narr-hi");el.scrollIntoView({behavior:"smooth",block:"center"});}
+  if(it.act&&!it.done){it.done=true;setTimeout(()=>{try{it.act();}catch(e){}},150);}
+}
+$("#nbLang").value=NV.lang;$("#nbRate").value=String(NV.rate);
+const restartSeg=()=>{if(NV.playing&&NV.i<NV.queue.length){narrHalt();runSeg();}};
+$("#nbLang").addEventListener("change",e=>{NV.lang=e.target.value;NV.voice="";saveNV();fillVoices();restartSeg();});
+$("#nbRate").addEventListener("change",e=>{NV.rate=+e.target.value;saveNV();restartSeg();});
+$("#nbVoice").addEventListener("change",e=>{NV.voice=e.target.value;badVoices.delete(e.target.value||"__default");saveNV();restartSeg();});
+$("#nbPlay").addEventListener("click",()=>{if(NV.playing){narrHalt();NV.playing=false;$("#nbPlay").textContent="Resume";}else{if(NV.i>=NV.queue.length){NV.i=0;NV.queue.forEach(q=>q.done=false);}NV.playing=true;runSeg();}});
+$("#nbPrev").addEventListener("click",()=>{narrHalt();NV.i=Math.max(0,NV.i-1);if(NV.queue[NV.i])NV.queue[NV.i].done=false;NV.playing=true;runSeg();});
+$("#nbNext").addEventListener("click",()=>{narrHalt();NV.i=Math.min(NV.queue.length,NV.i+1);NV.playing=true;runSeg();});
+$("#nbStop").addEventListener("click",narrStop);
+$("#nbTest").addEventListener("click",()=>{if(!synth){setStat("This browser has no speech engine. Try Chrome, Edge or Safari.",true);return;}if(NV.playing){NV.playing=false;$("#nbPlay").textContent="Resume";}narrHalt();badVoices.clear();loadVoices();const t=NV.tok;setStat(`Testing ${LNAME[NV.lang]} voices…`);speakText(TESTP[NV.lang],t,()=>{},3500);});
+
+/* ---------- small UI helpers used by chapters ---------- */
+function barsHTML(items,o={}){return `<div class="bars">${items.map(it=>`<div class="bar"><span class="lb" style="color:${it.c||"var(--tok)"}">${esc(it.l)}</span><span class="tr"><span class="fl" style="width:${Math.max(0,Math.min(100,it.v*100)).toFixed(1)}%;background:${it.fc||o.fc||"var(--out)"}"></span></span><span class="v">${it.t!==undefined?it.t:(it.v*100).toFixed(0)+"%"}</span></div>`).join("")}</div>`;}
+/* =================== CHAPTERS 1–8 =================== */
+
+/* ---- 1. What is AI? ---- */
+const SMS_TRAIN=[["Congratulations you won a free prize click the link to claim",1],["Your OTP is 4821 do not share it with anyone",0],["Urgent your account will be blocked verify your KYC now at this link",1],["Your salary of Rs 45000 has been credited to your account",0],["Claim your cashback reward now click the link",1],["EMI of Rs 5200 debited from your account for home loan",0],["Your KYC is pending update urgently or your card will be blocked",1],["Rs 1500 credited to your account from UPI transfer",0]];
+const SMS_TEST=[["Verify your KYC urgently or your account will be blocked",1],["Rs 2000 credited to your account",0],["Click the link to claim your reward",1],["Your EMI for the home loan is due this month",0]];
+const smsWords=s=>s.toLowerCase().match(/[a-z]+/g)||[];
+function nbTrain(data){const c=[new Map(),new Map()],n=[0,0];data.forEach(([s,y])=>smsWords(s).forEach(w=>{c[y].set(w,(c[y].get(w)||0)+1);n[y]++;}));const V=new Set([...c[0].keys(),...c[1].keys()]).size;
+  const score=s=>smsWords(s).reduce((a,w)=>a+Math.log(((c[1].get(w)||0)+1)/(n[1]+V))-Math.log(((c[0].get(w)||0)+1)/(n[0]+V)),0);
+  const clues=[...V?new Set([...c[0].keys(),...c[1].keys()]):[]].map(w=>({w,s:Math.log(((c[1].get(w)||0)+1)/(n[1]+V))-Math.log(((c[0].get(w)||0)+1)/(n[0]+V))}));
+  return {pred:s=>score(s)>0?1:0,conf:s=>1/(1+Math.exp(-score(s))),clues};}
+const ruleBot=s=>/\b(free|won)\b/i.test(s)?1:0;
+CH.push({icon:"robot",title:"What is AI?",like:"Teaching a child with examples, not rules",mins:4,
+ story:{h:"Two ways to teach a robot",p:"Imagine teaching a child what a <b>fraud SMS</b> looks like. You could hand them a rule book (“if it says FREE, it’s fraud”), but scammers simply change their words. Or you could show them <b>many real examples</b> of fraud and safe messages, and let them spot the patterns themselves. That second way is <b>Machine Learning</b>, and it’s how modern AI works.",
+  map:[["A child learning from examples","Machine learning"],["The examples you show","Training data"],["Spotting the hidden patterns","The model learning"],["Judging a brand-new message","Prediction"]],
+  one:"<b>In one line:</b> AI is software that does smart tasks. Machine learning is the kind that <b>learns from examples</b> instead of following hand-written rules."},
+ play:{h:"Rule robot vs learning robot",intro:"Both robots must judge 4 messages they have never seen. The rule robot follows one fixed rule. The learning robot studied the 8 examples on the left. Click a label to flip it, or type your own message.",mount(el){
+   const data=SMS_TRAIN.map(x=>x.slice());
+   el.innerHTML=`<div class="grid2"><div class="box"><div class="eyebrow" style="margin-bottom:8px">Examples the learning robot studies (click a label to flip it)</div><div id="aiTrain" style="display:grid;gap:6px"></div></div>
+     <div style="display:grid;gap:12px;align-content:start"><div class="box"><div class="eyebrow" style="margin-bottom:8px">Exam: 4 brand-new messages</div><div id="aiTest"></div></div>
+     <div class="box"><label class="f">Test your own message<input class="txt" id="aiOwn" value="Your loan is approved, click link to get free gift"></label><div id="aiOwnOut" style="margin-top:10px"></div></div>
+     <div class="box"><div class="eyebrow" style="margin-bottom:6px">Clues the learning robot found by itself</div><div class="row" id="aiClues" style="gap:6px"></div></div></div></div>`;
+   const lab=y=>y?'<span class="chip r">fraud</span>':'<span class="chip g">safe</span>';
+   function draw(){const bot=nbTrain(data);
+     $("#aiTrain").innerHTML=data.map(([s,y],i)=>`<div class="row" style="gap:8px;flex-wrap:nowrap;align-items:flex-start"><button type="button" class="btn" data-f="${i}" style="padding:2px 6px;flex:none">${lab(y)}</button><span style="font-size:.9rem">${esc(s)}</span></div>`).join("");
+     $$("#aiTrain [data-f]").forEach(b=>b.addEventListener("click",()=>{data[+b.dataset.f][1]^=1;draw();}));
+     let rs=0,ls=0;
+     $("#aiTest").innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:.9rem"><tr class="muted"><td>message</td><td>rule robot</td><td>learning robot</td></tr>${SMS_TEST.map(([s,y])=>{const r=ruleBot(s),l=bot.pred(s);rs+=r===y;ls+=l===y;return `<tr style="border-top:1px solid var(--line)"><td style="padding:6px 4px">${esc(s)} <span class="dim">(really ${y?"fraud":"safe"})</span></td><td>${lab(r)} ${r===y?"✓":"✗"}</td><td>${lab(l)} ${l===y?"✓":"✗"}</td></tr>`;}).join("")}</table><div class="row" style="margin-top:10px;gap:24px"><div><div class="big c-err">${rs}/4</div><div class="muted" style="font-size:.85rem">rule robot</div></div><div><div class="big c-out">${ls}/4</div><div class="muted" style="font-size:.85rem">learning robot</div></div></div>`;
+     const cl=bot.clues.sort((a,b)=>b.s-a.s);$("#aiClues").innerHTML=cl.slice(0,6).map(c=>`<span class="chip r">${c.w}</span>`).join("")+cl.slice(-6).map(c=>`<span class="chip g">${c.w}</span>`).join("");
+     const own=$("#aiOwn").value,c=bot.conf(own);$("#aiOwnOut").innerHTML=`Rule robot: ${lab(ruleBot(own))} &nbsp; Learning robot: ${lab(c>.5?1:0)} <span class="muted">(${((c>.5?c:1-c)*100).toFixed(0)}% sure)</span>`;
+     window.__aiScore={rs,ls};}
+   draw();$("#aiOwn").addEventListener("input",draw);}},
+ real:[["UPI & card fraud alerts","Banks flag a payment as suspicious because a model learned from millions of past frauds."],["YouTube & Netflix","They learned what people like you watched next, and recommend it."],["Google Maps traffic","Learned from past travel times to predict how long your trip will take."]],
+ inside:"An SLM is a machine-learning model too. Its “examples” are <b>billions of sentences</b>, and the pattern it learns is <b>which word tends to come next</b>.",
+ quiz:[{q:"What makes machine learning different from a normal program?",opts:[{t:"It learns patterns from examples instead of following hand-written rules",ok:1,why:"Exactly. You show it data, and it works out the rules itself."},{t:"It runs faster",why:"Speed isn’t the difference. A learning model can even be slower. What matters is that it learns from examples."},{t:"It never makes mistakes",why:"Learning models can be wrong, especially on unusual cases. They are just usually right more often than fixed rules."}]},
+  {q:"In the fraud robot game, why did the rule robot fail on “Verify your KYC urgently…”?",opts:[{t:"Its fixed rule only looks for “free” or “won”, so new wording fools it",ok:1,why:"Right. Rules can’t keep up when scammers change their words. Learning from examples generalises better."},{t:"Because the message was too short",why:"Length wasn’t the problem. The rule simply didn’t contain those words."},{t:"Because robots can’t read",why:"Both robots read the message. The rule robot just had a too-narrow rule."}]},
+  {q:"If you flip many example labels to the wrong answer, what happens to the learning robot?",opts:[{t:"It learns the wrong patterns and makes worse predictions",ok:1,why:"Yes: garbage in, garbage out. A model is only as good as its examples (Chapter 10 is all about this)."},{t:"Nothing, because it ignores bad examples",why:"It can’t tell which examples are wrong. It trusts the data you give it."},{t:"It becomes a rule robot",why:"It still learns, but it learns the wrong lessons."}]}],
+ narr:[{tab:0,en:"Imagine teaching a child to spot fraud messages. You could give rules, but scammers change their words. Or you could show many examples and let the child learn the patterns. That second way is machine learning.",te:"మోసపు మెసేజ్‌లను గుర్తించడం ఒక పిల్లవాడికి నేర్పిస్తున్నారని ఊహించుకోండి. నియమాలు ఇవ్వవచ్చు, కానీ మోసగాళ్లు పదాలు మార్చేస్తారు. లేదా ఎన్నో ఉదాహరణలు చూపించి, పిల్లవాడే నమూనాలు నేర్చుకునేలా చేయవచ్చు. ఆ రెండో పద్ధతే మెషిన్ లెర్నింగ్.",hn:"सोचिए आप किसी बच्चे को धोखाधड़ी वाले मैसेज पहचानना सिखा रहे हैं। आप नियम दे सकते हैं, पर ठग अपने शब्द बदल लेते हैं। या आप बहुत सारे उदाहरण दिखाकर बच्चे को खुद पैटर्न सीखने दे सकते हैं। यही दूसरा तरीका मशीन लर्निंग है।"},
+  {tab:1,sel:"#aiTest",en:"Here, the rule robot only looks for the words free or won. The learning robot studied eight examples. On new messages, the learning robot wins, because it found clues like KYC, urgent and blocked by itself.",te:"ఇక్కడ రూల్ రోబో ఫ్రీ లేదా వన్ అనే పదాల కోసం మాత్రమే చూస్తుంది. లెర్నింగ్ రోబో ఎనిమిది ఉదాహరణలు చదివింది. కొత్త మెసేజ్‌లపై లెర్నింగ్ రోబో గెలుస్తుంది, ఎందుకంటే కేవైసీ, అర్జెంట్, బ్లాక్డ్ లాంటి ఆధారాలను అదే స్వయంగా కనుగొంది.",hn:"यहाँ नियम वाला रोबोट सिर्फ़ फ़्री या वन शब्द ढूँढता है। सीखने वाले रोबोट ने आठ उदाहरण पढ़े। नए मैसेज पर सीखने वाला रोबोट जीतता है, क्योंकि उसने केवाईसी, अर्जेंट और ब्लॉक्ड जैसे सुराग खुद ढूँढे।"},
+  {tab:2,en:"You already use machine learning every day: fraud alerts on UPI, video recommendations and traffic predictions on maps. A small language model learns the same way, from billions of sentences.",te:"మీరు ఇప్పటికే ప్రతిరోజూ మెషిన్ లెర్నింగ్ వాడుతున్నారు: యూపీఐ మోసం హెచ్చరికలు, వీడియో సిఫార్సులు, మ్యాప్స్‌లో ట్రాఫిక్ అంచనాలు. చిన్న లాంగ్వేజ్ మోడల్ కూడా కోట్ల వాక్యాల నుంచి ఇలాగే నేర్చుకుంటుంది.",hn:"आप रोज़ मशीन लर्निंग इस्तेमाल करते हैं: यूपीआई पर धोखाधड़ी की चेतावनी, वीडियो सुझाव, और मैप्स पर ट्रैफ़िक का अनुमान। छोटा लैंग्वेज मॉडल भी अरबों वाक्यों से इसी तरह सीखता है।"}]});
+
+/* ---- 2. Language model ---- */
+CH.push({icon:"keyboard",title:"What is a language model?",like:"Your phone keyboard’s next-word suggestions",mins:4,
+ story:{h:"The keyboard in your pocket",p:"When you type “Happy” on your phone, it suggests “birthday”. How? It has seen <b>millions of messages</b> and learned which word usually comes next. A <b>language model</b> is exactly that idea, made much smarter: it reads text and guesses the <b>next word</b>, again and again. ChatGPT-style assistants write whole answers this way, one word at a time.",
+  map:[["Keyboard suggesting the next word","Next-word prediction"],["Messages it has seen before","Training text"],["Tapping a suggestion, then another","Generating text word by word"],["The top suggestion is the most likely","Probability"]],
+  one:"<b>In one line:</b> a language model is a <b>next-word guesser</b>. Keep guessing and adding words, and it writes sentences."},
+ play:{h:"A real tiny keyboard brain",intro:"This little model read 40 sentences (everyday life and banking). Type a few words, or tap a suggestion to add it. The bars show how sure it is about each possible next word.",mount(el,ctx){
+   el.innerHTML=`<div class="grid2"><div class="box" style="max-width:420px;justify-self:center;width:100%;border-radius:26px;border:2px solid var(--line2);padding:18px"><div class="eyebrow" style="margin-bottom:6px">Message</div><textarea class="txt" id="kbIn" rows="3">the customer asked about the</textarea><div class="row" id="kbSug" style="margin-top:10px;gap:6px"></div><div class="row" style="margin-top:12px"><button class="btn primary" type="button" id="kbAuto">Write 8 words for me</button><button class="btn" type="button" id="kbClear">Start again</button></div></div>
+     <div class="box"><div class="eyebrow" style="margin-bottom:8px">How sure is it about the next word?</div><div id="kbBars"></div><p class="note" id="kbSrc" style="margin-top:10px"></p></div></div>`;
+   function draw(){const d=dist(LM_ALL,words($("#kbIn").value));$("#kbSug").innerHTML=d.slice(0,3).map(a=>`<button type="button" class="btn on" data-w="${esc(a.w)}">${esc(a.w)}</button>`).join("");
+     $$("#kbSug [data-w]").forEach(b=>b.addEventListener("click",()=>{add(b.dataset.w);}));
+     $("#kbBars").innerHTML=barsHTML(d.slice(0,6).map(a=>({l:a.w,v:a.p})));$("#kbSrc").innerHTML=`It looked at the <b>${d.src}</b> to make these guesses. Notice it never sees the future, only what you've typed so far.`;}
+   function add(w){const t=$("#kbIn");t.value=(t.value.trim()+" "+w).trim();draw();}
+   $("#kbIn").addEventListener("input",draw);
+   $("#kbAuto").addEventListener("click",()=>{let k=0;const go=()=>{const d=dist(LM_ALL,words($("#kbIn").value));const a=pick(d);add(a.w);if(++k<8&&a.w!==".")ctx.after(go,450);};go();});
+   $("#kbClear").addEventListener("click",()=>{$("#kbIn").value="the bank";draw();});draw();}},
+ real:[["Phone keyboards","Gboard and SwiftKey suggest your next word using a small language model on your phone."],["Gmail Smart Compose","Greys out the rest of your sentence as you type."],["Chat assistants","ChatGPT, Gemini and Claude write replies one word-piece at a time, using the same next-word idea at huge scale."]],
+ inside:"Technically, a language model computes a <b>probability for every possible next token</b> given the text so far, then picks one and repeats. This is called <b>autoregressive generation</b>.",
+ quiz:[{q:"What is the one job a language model is trained to do?",opts:[{t:"Guess the next word, given the words before it",ok:1,why:"Yes. Everything else, like answering questions or writing emails, comes from repeating that one skill."},{t:"Look up answers in a database",why:"It doesn’t look things up. It predicts likely next words from patterns it learned."},{t:"Translate every sentence into numbers and stop",why:"Turning words into numbers is a step inside, but the goal is predicting the next word."}]},
+  {q:"How does a language model write a whole paragraph?",opts:[{t:"It predicts one word, adds it, and repeats",ok:1,why:"Exactly, like tapping keyboard suggestions over and over."},{t:"It copies a paragraph it memorised",why:"It mostly generates new combinations from patterns, not copies (although it can sometimes repeat things it saw a lot)."},{t:"It writes the last word first",why:"It always goes forward, one word after another."}]},
+  {q:"Why did the model suggest banking words after “the customer asked about the”?",opts:[{t:"Because in its training sentences, those words often came next",ok:1,why:"Right. The suggestions come from patterns in the text it learned from."},{t:"Because someone programmed that rule",why:"No one wrote that rule. It came from counting examples."},{t:"Because it understands money like a person",why:"It doesn’t understand like a person. It recognises patterns in text."}]}],
+ narr:[{tab:0,en:"When your phone suggests the next word, it is using a tiny language model. A language model is simply a next word guesser. Keep guessing and adding words, and it writes whole sentences.",te:"మీ ఫోన్ తర్వాతి పదాన్ని సూచించినప్పుడు, అది ఒక చిన్న లాంగ్వేజ్ మోడల్‌ను వాడుతోంది. లాంగ్వేజ్ మోడల్ అంటే తర్వాతి పదాన్ని ఊహించేది. ఊహిస్తూ, పదాలు జోడిస్తూ ఉంటే, అది పూర్తి వాక్యాలు రాస్తుంది.",hn:"जब आपका फ़ोन अगला शब्द सुझाता है, तो वह एक छोटे लैंग्वेज मॉडल का इस्तेमाल कर रहा होता है। लैंग्वेज मॉडल बस अगला शब्द अनुमान लगाने वाला है। अनुमान लगाते और शब्द जोड़ते रहिए, तो वह पूरे वाक्य लिख देता है।"},
+  {tab:1,sel:"#kbBars",act:()=>$("#kbAuto")&&$("#kbAuto").click(),en:"This tiny model read forty sentences. The bars show how sure it is about each next word. Watch it write eight words by itself, one at a time.",te:"ఈ చిన్న మోడల్ నలభై వాక్యాలు చదివింది. ప్రతి తర్వాతి పదం గురించి అది ఎంత నమ్మకంగా ఉందో బార్లు చూపిస్తాయి. అది ఒక్కో పదంగా ఎనిమిది పదాలు స్వయంగా రాయడం చూడండి.",hn:"इस छोटे मॉडल ने चालीस वाक्य पढ़े हैं। पट्टियाँ दिखाती हैं कि वह हर अगले शब्द के बारे में कितना पक्का है। देखिए, वह खुद एक-एक करके आठ शब्द लिखता है।"},
+  {tab:2,en:"Phone keyboards, Gmail and chat assistants all work like this. The big ones simply learned from far more text.",te:"ఫోన్ కీబోర్డులు, జీమెయిల్, చాట్ అసిస్టెంట్లు అన్నీ ఇలాగే పనిచేస్తాయి. పెద్దవి చాలా ఎక్కువ టెక్స్ట్ నుంచి నేర్చుకున్నాయి అంతే.",hn:"फ़ोन कीबोर्ड, जीमेल और चैट असिस्टेंट सब ऐसे ही काम करते हैं। बड़े वाले बस कहीं ज़्यादा टेक्स्ट से सीखे हैं।"}]});
+
+/* ---- 3. SLM vs LLM ---- */
+const SIZES=[[1e7,"10 million"],[1e8,"100 million"],[5e8,"500 million"],[1e9,"1 billion"],[3e9,"3 billion"],[7e9,"7 billion"],[1.3e10,"13 billion"],[7e10,"70 billion"],[4e11,"400 billion"]];
+CH.push({icon:"scale",title:"Small vs large language models",like:"A scooter vs a passenger plane",mins:4,
+ story:{h:"Pick the right vehicle",p:"A <b>plane</b> can fly anywhere, but it needs an airport, fuel and a big budget. A <b>scooter</b> can’t cross oceans, but it’s cheap, fast in the city and it’s yours. <b>Large language models</b> (LLMs) are planes: they know a bit about everything but need huge computers. <b>Small language models</b> (SLMs) are scooters: focused, cheap and able to run on a laptop or phone.",
+  map:[["Plane: goes anywhere, needs an airport","LLM: broad knowledge, needs data centres"],["Scooter: local trips, parks anywhere","SLM: one job done well, runs on your device"],["Engine size","Number of parameters (the model’s “knobs”)"],["Fuel cost","Computing cost and electricity"]],
+  one:"<b>In one line:</b> SLMs and LLMs use the <b>same design</b>; SLMs are just much smaller, so they’re cheaper, faster and more private, but know less."},
+ play:{h:"Slide the model size",intro:"The size of a model is measured in parameters: the number of adjustable knobs inside it. Slide to see what each size can run on and what you trade.",mount(el){
+   el.innerHTML=`<div class="box"><label class="f">Model size: <b id="szV"></b> parameters<input type="range" id="sz" min="0" max="8" value="3"></label><div class="row" id="szZone" style="margin-top:10px"></div></div>
+   <div class="grid2"><div class="box"><div class="eyebrow" style="margin-bottom:8px">Can it run on…</div><div id="szDev" style="display:grid;gap:8px"></div></div><div class="box"><div class="eyebrow" style="margin-bottom:8px">Trade-offs</div><div id="szBars"></div></div></div>`;
+   const DEV=[["Phone (8 GB)",4e9],["Laptop (16 GB)",10e9],["Gaming PC (24 GB GPU)",20e9],["Server (80 GB GPU)",70e9],["Data centre (many GPUs)",1e15]];
+   function draw(){const [n,lab]=SIZES[+$("#sz").value],mem=n*.6;$("#szV").textContent=lab;
+     $("#szZone").innerHTML=n<=3e9?'<span class="chip g">SLM zone: this is what we will build</span>':n<=1.3e10?'<span class="chip">in between</span>':'<span class="chip r">LLM zone</span>';
+     $("#szDev").innerHTML=DEV.map(([d,cap])=>{const ok=mem<cap*.75;return `<div class="row" style="justify-content:space-between"><span>${d}</span><span class="chip ${ok?"g":"r"}">${ok?"✓ runs":"✗ too big"}</span></div>`;}).join("")+`<p class="note">Memory needed (compressed to 4-5 bits per knob): about <b>${fmtB(mem)}</b></p>`;
+     const t=Math.log10(n/1e7)/Math.log10(400e9/1e7);
+     $("#szBars").innerHTML=barsHTML([{l:"General knowledge",v:.12+.85*t,t:""},{l:"Speed",v:1-.88*t,t:"",fc:"var(--emb)"},{l:"Privacy (on-device)",v:n<=1e10?.95:.15,t:"",fc:"var(--hid)"},{l:"Running cost",v:.05+.95*t,t:"",fc:"var(--err)"}]);}
+   $("#sz").addEventListener("input",draw);draw();}},
+ real:[["On your phone","Phones now ship with small models (around 1–3 billion knobs) for offline replies and summaries, so your data never leaves the phone."],["Bank helpdesk bot","A small model trained only on a bank’s FAQs can answer customers quickly and cheaply, inside the bank’s own servers."],["Big chat assistants","Huge LLMs answer almost anything, but run in giant data centres."]],
+ inside:"Both are <b>Transformers</b> (Chapter 9). An SLM has fewer and narrower layers, typically <b>1 million to a few billion parameters</b>, versus hundreds of billions for the biggest LLMs.",
+ quiz:[{q:"What mainly makes a model “small” or “large”?",opts:[{t:"Its number of parameters (adjustable knobs)",ok:1,why:"Yes. More knobs means more memory, more computing, and usually broader knowledge."},{t:"How many languages it speaks",why:"Language coverage depends on its training data, not what makes it small or large."},{t:"Whether it is free",why:"Price isn’t the definition. Size is."}]},
+  {q:"Why might a bank choose an SLM for its customer helpdesk?",opts:[{t:"Cheaper and faster, and can run inside the bank so customer data stays private",ok:1,why:"Exactly the reasons SLMs are popular for focused business tasks."},{t:"Because SLMs know more than LLMs",why:"They know less in general. They win on cost, speed and privacy for focused jobs."},{t:"Because SLMs never need training",why:"SLMs still need training. They’re just cheaper to train and run."}]},
+  {q:"A 70-billion-parameter model on a normal phone would…",opts:[{t:"Not fit, because it needs far more memory than a phone has",ok:1,why:"Right. Even compressed, it needs about 40 GB."},{t:"Run, just a bit slowly",why:"It doesn’t fit in memory at all, so it can’t even start."},{t:"Run faster than a small model",why:"Bigger models are slower, not faster."}]}],
+ narr:[{tab:0,en:"A large language model is like a plane: it goes anywhere but needs an airport and lots of fuel. A small language model is like a scooter: it is focused, cheap, and runs on your own laptop or phone.",te:"పెద్ద లాంగ్వేజ్ మోడల్ విమానం లాంటిది: ఎక్కడికైనా వెళ్తుంది కానీ విమానాశ్రయం, చాలా ఇంధనం కావాలి. చిన్న లాంగ్వేజ్ మోడల్ స్కూటర్ లాంటిది: ఒక పనిపై దృష్టి, తక్కువ ఖర్చు, మీ ల్యాప్‌టాప్ లేదా ఫోన్‌లోనే నడుస్తుంది.",hn:"बड़ा लैंग्वेज मॉडल हवाई जहाज़ जैसा है: कहीं भी जाता है, पर हवाई अड्डा और बहुत ईंधन चाहिए। छोटा लैंग्वेज मॉडल स्कूटर जैसा है: एक काम पर केंद्रित, सस्ता, और आपके अपने लैपटॉप या फ़ोन पर चलता है।"},
+  {tab:1,sel:"#szDev",act:()=>{const s=$("#sz");if(s){s.value=7;s.dispatchEvent(new Event("input"));}},en:"Slide the size up. A seventy billion model is far too big for a phone or laptop. Slide back to one billion and it fits on a phone.",te:"సైజును పెంచండి. డెబ్బై బిలియన్ల మోడల్ ఫోన్‌కు లేదా ల్యాప్‌టాప్‌కు చాలా పెద్దది. తిరిగి ఒక బిలియన్‌కు జరిపితే ఫోన్‌లో సరిపోతుంది.",hn:"साइज़ बढ़ाइए। सत्तर बिलियन वाला मॉडल फ़ोन या लैपटॉप के लिए बहुत बड़ा है। वापस एक बिलियन पर लाइए, तो फ़ोन में आ जाता है।"},
+  {tab:2,en:"Small models already run on phones and inside banks, giving fast, private and cheap answers for one focused job.",te:"చిన్న మోడల్స్ ఇప్పటికే ఫోన్లలో, బ్యాంకుల లోపల నడుస్తున్నాయి, ఒక ప్రత్యేక పనికి వేగంగా, గోప్యంగా, తక్కువ ఖర్చుతో జవాబులిస్తున్నాయి.",hn:"छोटे मॉडल पहले से फ़ोन में और बैंकों के अंदर चल रहे हैं, एक खास काम के लिए तेज़, निजी और सस्ते जवाब दे रहे हैं।"}]});
+
+/* ---- 4. How it learns ---- */
+const READ_ORDER=[];for(let i=0;i<20;i++){READ_ORDER.push(GENERAL[i]);READ_ORDER.push(BANKING[i]);}
+const BLANKS=[["the bank approved the home","loan"],["the cat sat on the","mat"],["the customer opened a savings","account"],["the shop opens at nine in the","morning"],["the bank blocked the lost","card"],["the students answered the question","correctly"]];
+CH.push({icon:"book",title:"How does it learn?",like:"A student doing fill-in-the-blank practice",mins:5,
+ story:{h:"Practice, practice, practice",p:"Think of a student preparing for an exam with <b>fill-in-the-blank</b> worksheets. At first they guess randomly. After each answer they check the key and adjust. After thousands of worksheets, they’re good. A language model learns exactly like that: it hides the next word, guesses, checks the real word, and <b>adjusts itself a tiny bit</b> after every guess.",
+  map:[["Fill-in-the-blank worksheet","A sentence with the next word hidden"],["Checking the answer key","Comparing the guess with the real word"],["Learning from a mistake","Adjusting the model’s knobs (training)"],["Reading more books","More training data"]],
+  one:"<b>In one line:</b> training means <b>guess → check → adjust</b>, repeated millions of times. More (good) text means better guesses."},
+ play:{h:"Watch the model get smarter as it reads",intro:"The model starts knowing nothing. Press “Read 4 more sentences” and see how its fill-in-the-blank score improves. The “confusion meter” shows how unsure it is about the right answers.",mount(el,ctx){
+   let n=0;
+   el.innerHTML=`<div class="row"><button class="btn primary" type="button" id="lrMore">Read 4 more sentences</button><button class="btn" type="button" id="lrAll">Read everything</button><button class="btn" type="button" id="lrZero">Forget everything</button><span class="chip b" id="lrRead"></span></div>
+    <div class="grid2"><div class="box"><div class="eyebrow" style="margin-bottom:8px">The worksheet</div><div id="lrQ" style="display:grid;gap:8px"></div></div>
+    <div style="display:grid;gap:12px;align-content:start"><div class="box"><div class="row" style="gap:26px"><div><div class="big c-out" id="lrScore"></div><div class="muted" style="font-size:.85rem">blanks correct</div></div><div style="flex:1;min-width:160px"><div class="muted" style="font-size:.85rem;margin-bottom:4px">confusion meter</div><div class="meter"><i id="lrConf"></i></div></div></div></div>
+    <div class="box"><div class="eyebrow" style="margin-bottom:6px">Last sentences it read</div><div id="lrLast" class="muted" style="font-size:.88rem"></div></div></div></div>`;
+   function draw(){const m=trainLM(READ_ORDER.slice(0,n));let ok=0,conf=0;
+     $("#lrQ").innerHTML=BLANKS.map(([s,ans])=>{let g="?",p=0,pa=0;if(n){const d=dist(m,words(s));g=d[0].w;p=d[0].p;const f=d.find(a=>a.w===ans);pa=f?f.p:0;}else pa=0;const hit=g===ans;ok+=hit;conf+=-Math.log(Math.max(pa,.02));
+       return `<div style="font-size:.95rem">${esc(s)} <span class="chip ${n?(hit?"g":"r"):""}">${esc(g)}</span> ${n?(hit?"✓":`<span class="dim">(answer: ${ans})</span>`):""}</div>`;}).join("");
+     $("#lrScore").textContent=`${ok}/6`;const c=Math.min(1,conf/6/3.9);$("#lrConf").style.width=(c*100).toFixed(0)+"%";$("#lrConf").style.background=c>.6?"var(--err)":c>.3?"var(--tok)":"var(--out)";
+     $("#lrRead").textContent=`read ${n} of ${READ_ORDER.length} sentences`;$("#lrLast").innerHTML=n?READ_ORDER.slice(Math.max(0,n-4),n).map(esc).join("<br>"):"Nothing yet: it guesses blindly.";window.__lrN=n;window.__lrOk=ok;}
+   $("#lrMore").addEventListener("click",()=>{n=Math.min(READ_ORDER.length,n+4);draw();});
+   $("#lrAll").addEventListener("click",()=>{const go=()=>{n=Math.min(READ_ORDER.length,n+4);draw();if(n<READ_ORDER.length)ctx.after(go,350);};go();});
+   $("#lrZero").addEventListener("click",()=>{n=0;draw();});draw();}},
+ real:[["Learning a new language","You get better by reading and listening a lot. Models get better with more text."],["Spell-check that adapts","Your phone learns your nicknames after you type them a few times."],["Cricket practice","Thousands of balls in the nets, a small correction after each one, and the technique improves."]],
+ inside:"The “confusion” is called the <b>loss</b>. Training uses <b>gradient descent</b> to nudge millions of parameters so the loss goes down a little after each batch of examples.",
+ quiz:[{q:"What happens in each tiny learning step?",opts:[{t:"The model guesses the next word, compares with the real word, and adjusts itself slightly",ok:1,why:"Yes: guess, check, adjust. Repeat millions of times."},{t:"A person corrects every answer by hand",why:"No human checks each guess. The real next word in the text is the answer key, automatically."},{t:"The model memorises the whole book at once",why:"It learns gradually, a little from each example."}]},
+  {q:"Why did the score improve as the model read more sentences?",opts:[{t:"It saw more examples of which words follow which",ok:1,why:"Exactly. More good data gives more patterns to learn from."},{t:"The questions got easier",why:"The questions stayed the same. The model got better."},{t:"It started cheating by looking at the answers",why:"It only learns from the sentences it read, not from the worksheet."}]},
+  {q:"The “confusion meter” going down means…",opts:[{t:"The model is more confident about the correct answers (lower loss)",ok:1,why:"Right. This is exactly what training tries to achieve."},{t:"The model has stopped learning",why:"It means learning is working."},{t:"The model has become bigger",why:"Its size didn’t change. Its knowledge did."}]}],
+ narr:[{tab:0,en:"A model learns like a student doing fill in the blank worksheets. It guesses the hidden word, checks the real answer, and adjusts itself a tiny bit. Then it repeats this millions of times.",te:"మోడల్ ఖాళీలు పూరించే వర్క్‌షీట్లు చేసే విద్యార్థిలా నేర్చుకుంటుంది. దాచిన పదాన్ని ఊహించి, నిజమైన జవాబు చూసి, తనను తాను కొద్దిగా సరిదిద్దుకుంటుంది. ఇలా లక్షల సార్లు చేస్తుంది.",hn:"मॉडल ऐसे सीखता है जैसे कोई छात्र खाली जगह भरने वाली वर्कशीट करता है। वह छिपे शब्द का अनुमान लगाता है, असली जवाब देखता है, और खुद को थोड़ा सुधारता है। फिर यह लाखों बार दोहराता है।"},
+  {tab:1,sel:"#lrScore",act:()=>$("#lrAll")&&$("#lrAll").click(),en:"Watch the model read more and more sentences. Its fill in the blank score goes up, and the confusion meter goes down.",te:"మోడల్ మరిన్ని వాక్యాలు చదవడం చూడండి. దాని స్కోర్ పెరుగుతుంది, అయోమయ మీటర్ తగ్గుతుంది.",hn:"देखिए मॉडल और वाक्य पढ़ता जा रहा है। उसका स्कोर बढ़ता है, और उलझन वाला मीटर घटता है।"},
+  {tab:2,en:"It's just like learning a language or practising cricket: lots of practice, small corrections, steady improvement. In AI, the confusion is called the loss.",te:"ఇది ఒక భాష నేర్చుకోవడం లేదా క్రికెట్ ప్రాక్టీస్ లాంటిదే: ఎక్కువ సాధన, చిన్న సవరణలు, క్రమంగా మెరుగుదల. ఏఐలో ఆ అయోమయాన్ని లాస్ అంటారు.",hn:"यह भाषा सीखने या क्रिकेट की प्रैक्टिस जैसा है: खूब अभ्यास, छोटे सुधार, लगातार बेहतरी। एआई में इस उलझन को लॉस कहते हैं।"}]});
+
+/* ---- 5. Tokens ---- */
+const BPE_M=(function(){const f=new Map();[...GENERAL,...BANKING].forEach(s=>words(s).forEach(w=>{if(/^[a-z]+$/.test(w))f.set(w,(f.get(w)||0)+1);}));
+  let st=[...f.entries()].map(([w,c])=>({c,s:["▁"+w[0],...w.slice(1)]}));const merges=[];
+  for(let k=0;k<160;k++){const m=new Map();st.forEach(x=>{for(let i=0;i<x.s.length-1;i++){const key=x.s[i]+"|"+x.s[i+1];m.set(key,(m.get(key)||0)+x.c);}});let best=null,bv=1;m.forEach((v,key)=>{if(v>bv){bv=v;best=key;}});if(!best)break;const [a,b]=best.split("|");merges.push([a,b]);
+    st.forEach(x=>{const n=[];for(let i=0;i<x.s.length;i++){if(i<x.s.length-1&&x.s[i]===a&&x.s[i+1]===b){n.push(a+b);i++;}else n.push(x.s[i]);}x.s=n;});}return merges;})();
+function bpeWord(w){let s=["▁"+w[0],...w.slice(1)];for(const [a,b] of BPE_M){if(s.length<2)break;const n=[];for(let i=0;i<s.length;i++){if(i<s.length-1&&s[i]===a&&s[i+1]===b){n.push(a+b);i++;}else n.push(s[i]);}s=n;}return s;}
+const WORDSET=new Set([...GENERAL,...BANKING].flatMap(words));
+CH.push({icon:"lego",title:"Tokens: cutting text into pieces",like:"Lego bricks with locker numbers",mins:4,
+ story:{h:"Computers only understand numbers",p:"A computer can’t read letters. It only does maths on numbers. So first we cut text into small pieces called <b>tokens</b>, like breaking a sentence into <b>Lego bricks</b>. Each kind of brick gets a fixed <b>number</b>, like a locker number, so the model sees a list of numbers. Smart cutting means common words are one brick, and rare words are built from a few common bricks.",
+  map:[["Breaking a model into Lego bricks","Tokenization"],["Each brick type has a locker number","Token ID"],["The box of all brick types","Vocabulary"],["Building a rare shape from common bricks","Splitting a rare word into sub-word pieces"]],
+  one:"<b>In one line:</b> tokens are the <b>pieces</b> text is cut into, and each piece becomes a <b>number</b> the model can work with."},
+ play:{h:"Cut any sentence into bricks",intro:"Type anything and choose how to cut it. Each coloured brick is one token, and the small number under it is its locker number (ID). Try a word the model has never seen, like “cryptocurrency”.",mount(el){
+   el.innerHTML=`<div class="box"><input class="txt" id="tkIn" value="the customer paid the emi using cryptocurrency"><div class="row" id="tkMode" style="margin-top:10px"><button type="button" class="btn" data-m="c">Letters</button><button type="button" class="btn" data-m="w">Whole words</button><button type="button" class="btn" data-m="b">Smart pieces (what SLMs use)</button></div></div>
+    <div class="box"><div id="tkBricks" class="row" style="gap:6px;align-items:flex-start"></div><div class="row" style="margin-top:14px;gap:24px" id="tkStats"></div></div>`;
+   let mode="b";const COLS=["","b","g","p"];
+   function draw(){$$("#tkMode [data-m]").forEach(b=>b.classList.toggle("on",b.dataset.m===mode));const text=$("#tkIn").value.toLowerCase();let toks=[];
+     if(mode==="c")toks=[...text].map(c=>({t:c===" "?"␣":c}));
+     else if(mode==="w")toks=words(text).map(w=>({t:WORDSET.has(w)?w:"?",unk:!WORDSET.has(w),orig:w}));
+     else words(text).forEach(w=>/^[a-z]+$/.test(w)?bpeWord(w).forEach(p=>toks.push({t:p})):toks.push({t:w}));
+     const id=t=>t==="?"?0:(Math.abs([...t].reduce((h,c)=>(h*31+c.charCodeAt(0))|0,7))%4900)+100;
+     $("#tkBricks").innerHTML=toks.map((t,i)=>`<div style="display:grid;justify-items:center;gap:2px"><span class="chip ${t.unk?"r":COLS[i%4]}" style="animation-delay:${Math.min(i,40)*25}ms">${esc(t.t)}</span><span class="mono dim" style="font-size:.66rem">#${id(t.t)}</span></div>`).join("");
+     const unk=toks.filter(t=>t.unk).length;
+     $("#tkStats").innerHTML=`<div><div class="big c-tok">${toks.length}</div><div class="muted" style="font-size:.85rem">tokens</div></div><div style="max-width:440px" class="note">${mode==="c"?"Letters: a tiny brick box, but way too many bricks per sentence. The model has to work hard.":mode==="w"?(unk?`Whole words: short, but <b class="c-err">${unk} word${unk>1?"s":""} never seen before became “?”</b>. That information is lost.`:"Whole words: short, but any brand-new word would become “?”."):"Smart pieces: common words stay whole, and rare words are built from known pieces (▁ marks the start of a word). Nothing is ever unknown."}</div>`;
+     window.__tkMode=mode;}
+   $$("#tkMode [data-m]").forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.m;draw();}));$("#tkIn").addEventListener("input",draw);draw();}},
+ real:[["Chat apps count tokens","When an AI app says “4,000 token limit”, it means about 3,000 words of these pieces."],["Pricing","AI services charge per token: your question plus the answer."],["Indian languages","Telugu or Hindi text often needs more tokens per word than English, because the bricks were mostly learned from English."]],
+ inside:"Real SLMs use <b>Byte Pair Encoding (BPE)</b>, which learns the brick box by repeatedly gluing the most common neighbouring pieces together. A typical vocabulary has <b>8,000–50,000</b> token types.",
+ quiz:[{q:"Why do we cut text into tokens at all?",opts:[{t:"Because a model can only do maths on numbers, so text must become a list of numbers",ok:1,why:"Yes. Each token gets an ID number."},{t:"To make the text shorter to read",why:"It’s not for humans. It’s so the model can compute with numbers."},{t:"To remove spelling mistakes",why:"Tokenization doesn’t fix spelling. It just cuts text into pieces."}]},
+  {q:"What happens to a brand-new word with “smart pieces” tokenization?",opts:[{t:"It’s built from smaller known pieces, so nothing is lost",ok:1,why:"Right. That’s why SLMs use sub-word pieces."},{t:"It becomes “?” and the meaning is lost",why:"That’s the problem with whole-word cutting, which smart pieces avoid."},{t:"The model crashes",why:"No crash. Unknown words are simply split into known pieces."}]},
+  {q:"A token ID is like…",opts:[{t:"A locker number that always means the same brick",ok:1,why:"Exactly. The same piece always gets the same number."},{t:"The position of the word in the sentence",why:"Position is tracked separately (Chapter 9). The ID identifies which piece it is."},{t:"How important the word is",why:"IDs carry no importance. They’re just labels."}]}],
+ narr:[{tab:0,en:"Computers only understand numbers. So we cut text into small pieces called tokens, like Lego bricks, and give each kind of brick a locker number.",te:"కంప్యూటర్లకు సంఖ్యలు మాత్రమే అర్థమవుతాయి. కాబట్టి టెక్స్ట్‌ను లెగో ఇటుకల్లా టోకెన్లు అనే చిన్న ముక్కలుగా కోసి, ప్రతి రకం ఇటుకకు ఒక లాకర్ నంబర్ ఇస్తాం.",hn:"कंप्यूटर सिर्फ़ नंबर समझते हैं। इसलिए हम टेक्स्ट को लेगो ईंटों की तरह टोकन नाम के छोटे टुकड़ों में काटते हैं, और हर तरह की ईंट को एक लॉकर नंबर देते हैं।"},
+  {tab:1,sel:"#tkBricks",act:()=>{const b=document.querySelector('#tkMode [data-m="w"]');if(b)b.click();setTimeout(()=>{const c=document.querySelector('#tkMode [data-m="b"]');if(c)c.click();},5000);},en:"Cutting by whole words, the new word cryptocurrency becomes a question mark and is lost. Smart pieces build it from known bricks instead, so nothing is ever unknown.",te:"పూర్తి పదాలుగా కోస్తే, క్రిప్టోకరెన్సీ అనే కొత్త పదం ప్రశ్నార్థకంగా మారి పోతుంది. స్మార్ట్ ముక్కలు దాన్ని తెలిసిన ఇటుకలతో నిర్మిస్తాయి, కాబట్టి ఏదీ తెలియనిది కాదు.",hn:"पूरे शब्दों में काटने पर नया शब्द क्रिप्टोकरेंसी एक प्रश्नचिह्न बनकर खो जाता है। स्मार्ट टुकड़े उसे जानी-पहचानी ईंटों से बनाते हैं, इसलिए कुछ भी अनजान नहीं रहता।"},
+  {tab:2,en:"When an AI app talks about token limits or prices per token, these are the pieces it means.",te:"ఏఐ యాప్ టోకెన్ పరిమితులు లేదా టోకెన్‌కు ధర గురించి చెప్పినప్పుడు, అది ఈ ముక్కల గురించే.",hn:"जब कोई एआई ऐप टोकन सीमा या प्रति टोकन कीमत की बात करता है, तो उसका मतलब इन्हीं टुकड़ों से है।"}]});
+
+/* ---- 6. Embeddings ---- */
+const CITY={cat:[22,22],dog:[12,22],mouse:[31,30],puppy:[12,12],kitten:[22,12],bank:[78,18],loan:[86,26],account:[72,28],fee:[88,13],interest:[80,35],emi:[92,33],king:[62,62],queen:[62,78],prince:[70,56],princess:[70,84],man:[36,62],woman:[36,78],boy:[44,56],girl:[44,84],customer:[52,42],agent:[46,34],rice:[9,70],dal:[16,79],tea:[7,88],coffee:[17,92]};
+const HOODS=[["Animal park",[20,21],17,"var(--tok)"],["Money market",[83,24],16,"var(--out)"],["Royal palace",[66,70],15,"var(--hid)"],["People street",[42,62],19,"var(--emb)"],["Food corner",[12,82],12,"var(--err)"]];
+const hoodOf=w=>{let best=null,bd=1e9;HOODS.forEach(h=>{const d=Math.hypot(CITY[w][0]-h[1][0],CITY[w][1]-h[1][1]);if(d<bd){bd=d;best=h;}});return best;};
+CH.push({icon:"map",title:"Embeddings: words on a map",like:"A city map where similar places are neighbours",mins:5,
+ story:{h:"Every word gets an address",p:"Imagine a city where <b>similar things live close together</b>: all animals in one park, all money words in the market area, royalty in the palace. Each word gets a <b>map address</b> (a list of numbers). Now the model can tell that “loan” and “EMI” are related, because they are neighbours. Even directions work: walk from “man” to “woman”, take the same walk from “king”, and you arrive at “queen”.",
+  map:[["A word’s address on the map","Its embedding (a list of numbers)"],["Neighbours on the map","Words with similar meaning"],["Walking directions between places","Relationships between words"],["The map is drawn by experience","Embeddings are learned from text"]],
+  one:"<b>In one line:</b> an embedding turns each token into <b>coordinates</b>, so that <b>similar meanings sit close together</b>."},
+ play:{h:"Explore the word city",intro:"Tap any word to see its closest neighbours. Then try the walking puzzles: they really work using map coordinates. This map is illustrative, since real models use hundreds of directions, not 2.",mount(el,ctx){
+   el.innerHTML=`<div class="grid2"><div class="box"><svg class="v" id="cityS" viewBox="0 0 600 420" role="img" aria-label="Map of words"></svg></div>
+    <div style="display:grid;gap:12px;align-content:start"><div class="box"><div class="eyebrow" style="margin-bottom:8px">Neighbours of <span class="c-tok" id="cityW"></span></div><div id="cityNN"></div></div>
+    <div class="box"><div class="eyebrow" style="margin-bottom:8px">Walking puzzles</div><div class="row" id="cityPz"><button type="button" class="btn" data-p="king,man,woman">king − man + woman</button><button type="button" class="btn" data-p="puppy,dog,cat">puppy − dog + cat</button><button type="button" class="btn" data-p="prince,boy,girl">prince − boy + girl</button></div><p class="say" id="citySay" style="margin-top:10px">Pick a puzzle.</p></div></div></div>`;
+   let sel="loan",arrow=null;const X=x=>20+x*5.6,Y=y=>20+y*3.8;
+   function draw(){let g=HOODS.map(([n,c,r,col])=>`<circle cx="${X(c[0])}" cy="${Y(c[1])}" r="${r*5.2}" style="fill:${col};opacity:.08;stroke:${col};stroke-opacity:.35"/><text x="${X(c[0])}" y="${Y(c[1])-r*3.8+6}" text-anchor="middle" font-size="12" font-weight="600" style="fill:${col}" font-family="IBM Plex Sans">${n}</text>`).join("");
+     const nn=Object.keys(CITY).filter(w=>w!==sel).map(w=>({w,d:Math.hypot(CITY[w][0]-CITY[sel][0],CITY[w][1]-CITY[sel][1])})).sort((a,b)=>a.d-b.d).slice(0,3);
+     nn.forEach(o=>g+=`<line x1="${X(CITY[sel][0])}" y1="${Y(CITY[sel][1])}" x2="${X(CITY[o.w][0])}" y2="${Y(CITY[o.w][1])}" style="stroke:var(--fg)" stroke-dasharray="4 3" opacity=".6"/>`);
+     if(arrow){const [a,b,c,res]=arrow;const v=[CITY[c][0]-CITY[b][0],CITY[c][1]-CITY[b][1]];g+=`<line x1="${X(CITY[b][0])}" y1="${Y(CITY[b][1])}" x2="${X(CITY[c][0])}" y2="${Y(CITY[c][1])}" style="stroke:var(--tok)" stroke-width="3" marker-end="url(#ah)"/><line x1="${X(CITY[a][0])}" y1="${Y(CITY[a][1])}" x2="${X(CITY[a][0]+v[0])}" y2="${Y(CITY[a][1]+v[1])}" style="stroke:var(--out)" stroke-width="3.5" marker-end="url(#ah2)"/>`;}
+     g=`<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10z" style="fill:var(--tok)"/></marker><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 10 5 0 10z" style="fill:var(--out)"/></marker></defs>`+g;
+     Object.entries(CITY).forEach(([w,[x,y]])=>{const s=w===sel,res=arrow&&arrow[3]===w;g+=`<g data-w="${w}" style="cursor:pointer"><circle cx="${X(x)}" cy="${Y(y)}" r="${s||res?9:6}" style="fill:${hoodOf(w)[3]};stroke:${s||res?"#fff":"var(--bg)"}" stroke-width="2"/><text x="${X(x)+11}" y="${Y(y)+4}" font-size="${s?14:12}" font-weight="${s?700:400}" style="fill:var(--fg)" font-family="IBM Plex Sans">${w}</text></g>`;});
+     $("#cityS").innerHTML=g;$("#cityW").textContent=sel;
+     $("#cityNN").innerHTML=nn.map(o=>`<div class="row" style="justify-content:space-between"><span class="chip">${o.w}</span><span class="muted mono" style="font-size:.8rem">distance ${o.d.toFixed(1)}</span></div>`).join("")+`<p class="note" style="margin-top:8px">“${sel}” lives in <b>${hoodOf(sel)[0]}</b>. Its closest neighbours share its meaning.</p>`;}
+   $("#cityS").addEventListener("click",e=>{const g=e.target.closest("[data-w]");if(g){sel=g.dataset.w;arrow=null;draw();window.__citySel=sel;}});
+   $$("#cityPz [data-p]").forEach(b=>b.addEventListener("click",()=>{const [a,bb,c]=b.dataset.p.split(","),t=[CITY[a][0]-CITY[bb][0]+CITY[c][0],CITY[a][1]-CITY[bb][1]+CITY[c][1]];
+     const res=Object.keys(CITY).filter(w=>![a,bb,c].includes(w)).sort((p,q)=>Math.hypot(CITY[p][0]-t[0],CITY[p][1]-t[1])-Math.hypot(CITY[q][0]-t[0],CITY[q][1]-t[1]))[0];
+     arrow=[a,bb,c,res];sel=a;draw();$("#citySay").innerHTML=`Walk from <b class="c-tok">${bb}</b> to <b class="c-tok">${c}</b> (yellow arrow). Take the <b>same walk</b> starting at <b>${a}</b> (green arrow) and you land on <b class="c-out">${res}</b>.`;window.__cityPz=(window.__cityPz||0)+1;}));
+   draw();}},
+ real:[["Search that understands meaning","Searching “cheap flights” also finds “low-cost airfare”, because the two have nearby embeddings."],["Shopping recommendations","“People who bought this also bought…” often uses embeddings of products."],["Bank FAQ matching","“How do I block my card?” matches “lost debit card” even with different words."]],
+ inside:"Each token’s embedding is a list of <b>128 to 4,096 numbers</b>, a row of the <b>embedding matrix</b>. These numbers start random and are <b>learned during training</b>, so words used in similar sentences drift close together.",
+ quiz:[{q:"On the word map, why are “loan” and “EMI” close together?",opts:[{t:"Because they have related meanings (they appear in similar sentences)",ok:1,why:"Yes. Closeness means similar meaning."},{t:"Because they start with similar letters",why:"Spelling doesn’t matter. Meaning does."},{t:"Because they are both short words",why:"Length is irrelevant. They’re neighbours because of meaning."}]},
+  {q:"What is an embedding, in simple words?",opts:[{t:"A list of numbers (an address) that represents a word’s meaning",ok:1,why:"Exactly. It’s the word’s coordinates on the meaning map."},{t:"A dictionary definition stored inside the model",why:"No text definitions are stored. Only numbers."},{t:"The word’s position in the sentence",why:"That’s positional information (Chapter 9), which is a different thing."}]},
+  {q:"king − man + woman ≈ ?",opts:[{t:"queen",ok:1,why:"Right. The man→woman direction, applied to king, lands on queen."},{t:"princess",why:"Close, but princess also adds a “younger” direction. The exact walk lands on queen."},{t:"man",why:"We subtracted man, so we move away from it."}]}],
+ narr:[{tab:0,en:"Imagine a city where similar things live close together. Each word gets an address, a list of numbers. That address is called an embedding.",te:"ఒకే రకమైనవి దగ్గరగా ఉండే ఒక నగరాన్ని ఊహించుకోండి. ప్రతి పదానికి ఒక చిరునామా, అంటే సంఖ్యల జాబితా వస్తుంది. ఆ చిరునామానే ఎంబెడింగ్ అంటారు.",hn:"एक ऐसे शहर की कल्पना कीजिए जहाँ मिलती-जुलती चीज़ें पास-पास रहती हैं। हर शब्द को एक पता मिलता है, यानी नंबरों की एक सूची। इसी पते को एम्बेडिंग कहते हैं।"},
+  {tab:1,sel:"#citySay",act:()=>{const b=document.querySelector('#cityPz [data-p="king,man,woman"]');if(b)b.click();},en:"Walk from man to woman. Now take the same walk starting at king, and you land on queen. Directions on the map carry meaning.",te:"పురుషుడి నుంచి స్త్రీ వరకు నడవండి. ఇప్పుడు అదే నడక రాజు నుంచి మొదలుపెడితే, మీరు రాణి దగ్గరికి చేరతారు. మ్యాప్‌పై దిశలకు అర్థం ఉంది.",hn:"आदमी से औरत तक चलिए। अब वही रास्ता राजा से शुरू कीजिए, तो आप रानी पर पहुँचते हैं। मैप पर दिशाओं का भी अर्थ होता है।"},
+  {tab:2,en:"This is why search and bank FAQ bots can match questions that use different words with the same meaning.",te:"అందుకే సెర్చ్, బ్యాంక్ ఎఫ్ఏక్యూ బాట్లు వేర్వేరు పదాలతో ఉన్నా ఒకే అర్థం ఉన్న ప్రశ్నలను జతపరచగలవు.",hn:"इसीलिए सर्च और बैंक के एफ़एक्यू बॉट अलग शब्दों वाले पर एक ही अर्थ वाले सवालों को मिला पाते हैं।"}]});
+
+/* ---- 7. Neural network ---- */
+const sigm=z=>1/(1+Math.exp(-z));
+CH.push({icon:"team",title:"Neural networks: a team of tiny deciders",like:"A loan committee where each expert checks one thing",mins:5,
+ story:{h:"How a bank decides on a loan",p:"Picture a <b>loan committee</b>. One expert checks <b>“Can they afford it?”</b>, another <b>“Do they repay on time?”</b>, another <b>“Do they already have too much debt?”</b>. Each gives a score, and the manager combines them, trusting some experts more than others. A <b>neural network</b> is a team like this, with thousands or millions of tiny experts (neurons). <b>Learning</b> means adjusting how much each opinion counts.",
+  map:[["Each expert on the committee","A neuron"],["How much the manager trusts each expert","Weights"],["The applicant’s details","Inputs"],["Approve or reject","Output"],["Changing trust after bad decisions","Training"]],
+  one:"<b>In one line:</b> a neural network is <b>layers of simple deciders</b>, each adding up weighted inputs. Training adjusts the <b>weights</b> until the final answers are good."},
+ play:{h:"Run the loan committee",intro:"Move the applicant’s details. Watch each expert neuron light up, and the final decision change. Thicker lines mean the manager trusts that expert more. You can change that trust too: that is what training does automatically.",mount(el){
+   el.innerHTML=`<div class="row" id="nnPre"><span class="eyebrow">Applicants</span><button type="button" class="btn" data-p="85,780,10">Ravi: salaried, good history</button><button type="button" class="btn" data-p="120,720,70">Priya: high income, many EMIs</button><button type="button" class="btn" data-p="30,600,5">Arjun: new to credit</button></div>
+    <div class="grid2"><div class="box" style="display:grid;gap:10px"><label class="f">Monthly income: <b id="niV"></b><input type="range" id="ni" min="10" max="200" value="85"></label><label class="f">Credit score: <b id="ncV"></b><input type="range" id="nc" min="300" max="900" value="780"></label><label class="f">Existing EMIs per month: <b id="neV"></b><input type="range" id="ne" min="0" max="100" value="10"></label>
+      <div class="eyebrow" style="margin-top:6px">Manager’s trust in each expert (weights)</div><label class="f">trust “can afford”: <b id="w1V"></b><input type="range" id="w1" min="0" max="60" value="30"></label><label class="f">trust “repays on time”: <b id="w2V"></b><input type="range" id="w2" min="0" max="60" value="30"></label><label class="f">worry about “too much debt”: <b id="w3V"></b><input type="range" id="w3" min="0" max="60" value="40"></label></div>
+    <div class="box"><svg class="v" id="nnS" viewBox="0 0 560 330" role="img" aria-label="Loan decision network"></svg><p class="say" id="nnSay" style="margin-top:8px"></p></div></div>`;
+   function draw(){const inc=+$("#ni").value,sc=+$("#nc").value,emi=+$("#ne").value,w=[+$("#w1").value/10,+$("#w2").value/10,+$("#w3").value/10];
+     $("#niV").textContent=`₹${inc}k`;$("#ncV").textContent=sc;$("#neV").textContent=`₹${emi}k`;["w1","w2","w3"].forEach((k,i)=>$("#"+k+"V").textContent=w[i].toFixed(1));
+     const e1=sigm((inc-1.6*emi-30)/12),e2=sigm((sc-650)/45),e3=sigm((emi/Math.max(inc,1)-.45)*10),out=sigm(w[0]*e1+w[1]*e2-w[2]*e3-2.2);
+     const IN=[["income",inc/200,`₹${inc}k`],["credit score",(sc-300)/600,sc],["EMIs",emi/100,`₹${emi}k`]],EX=[["can afford?",e1],["repays on time?",e2],["too much debt?",e3]];
+     const conn=[[1,0,.6],[0,1,0],[.6,0,1]];let g="";
+     IN.forEach((_,i)=>EX.forEach((_,j)=>{if(conn[i][j])g+=`<line x1="110" y1="${60+i*105}" x2="270" y2="${60+j*105}" style="stroke:var(--line2)" stroke-width="${1+conn[i][j]*3}"/>`;}));
+     EX.forEach((_,j)=>g+=`<line x1="300" y1="${60+j*105}" x2="455" y2="165" style="stroke:${j===2?"var(--err)":"var(--emb)"}" stroke-width="${1+w[j]*1.3}" opacity=".85"/>`);
+     IN.forEach(([n,v,t],i)=>g+=`<circle cx="90" cy="${60+i*105}" r="26" style="fill:rgba(243,185,85,${.15+.6*v});stroke:var(--tok)" stroke-width="2"/><text x="90" y="${64+i*105}" text-anchor="middle" font-size="11" style="fill:var(--fg)" font-family="IBM Plex Mono">${t}</text><text x="90" y="${100+i*105}" text-anchor="middle" font-size="11" style="fill:var(--muted)" font-family="IBM Plex Sans">${n}</text>`);
+     EX.forEach(([n,v],j)=>g+=`<circle cx="285" cy="${60+j*105}" r="28" style="fill:rgba(169,147,255,${.1+.75*v});stroke:var(--hid)" stroke-width="2"/><text x="285" y="${64+j*105}" text-anchor="middle" font-size="12" font-weight="600" style="fill:var(--fg)" font-family="IBM Plex Mono">${(v*100).toFixed(0)}%</text><text x="285" y="${103+j*105}" text-anchor="middle" font-size="11" style="fill:var(--muted)" font-family="IBM Plex Sans">${n}</text>`);
+     const ok=out>.5;g+=`<circle cx="480" cy="165" r="38" style="fill:${ok?"rgba(98,227,162,.35)":"rgba(255,125,147,.3)"};stroke:${ok?"var(--out)":"var(--err)"}" stroke-width="3"/><text x="480" y="162" text-anchor="middle" font-size="15" font-weight="700" style="fill:var(--fg)" font-family="IBM Plex Mono">${(out*100).toFixed(0)}%</text><text x="480" y="180" text-anchor="middle" font-size="11" style="fill:${ok?"var(--out)":"var(--err)"}" font-family="IBM Plex Sans">${ok?"APPROVE":"REJECT"}</text><text x="90" y="16" text-anchor="middle" font-size="11" style="fill:var(--tok)" font-family="IBM Plex Mono">inputs</text><text x="285" y="16" text-anchor="middle" font-size="11" style="fill:var(--hid)" font-family="IBM Plex Mono">expert neurons</text><text x="480" y="110" text-anchor="middle" font-size="11" style="fill:var(--out)" font-family="IBM Plex Mono">decision</text>`;
+     $("#nnS").innerHTML=g;$("#nnSay").innerHTML=`The committee says <b class="${ok?"c-out":"c-err"}">${ok?"approve":"reject"}</b> (${(out*100).toFixed(0)}% confident). ${e3>.5?"The <b>debt expert</b> is worried, and its rose line pulls the score down.":e2<.5?"The <b>repayment expert</b> isn't convinced by the credit score.":"The experts mostly agree."}`;window.__loanOut=out;}
+   ["ni","nc","ne","w1","w2","w3"].forEach(k=>$("#"+k).addEventListener("input",draw));
+   $$("#nnPre [data-p]").forEach(b=>b.addEventListener("click",()=>{const [a,c,d]=b.dataset.p.split(",");$("#ni").value=a;$("#nc").value=c;$("#ne").value=d;draw();}));draw();}},
+ real:[["Loan & credit decisions","Banks use neural networks (with careful checks) to assess risk."],["Face unlock","Layers of neurons go from edges, to eyes and nose, to “that’s you”."],["Voice assistants","Turning your voice into text uses deep neural networks."]],
+ inside:"Each neuron computes <b>weighted sum + bias</b>, then an <b>activation</b> (a gentle on/off switch). An SLM stacks many layers of such neurons, with <b>millions of weights</b> learned automatically by <b>backpropagation</b>.",
+ quiz:[{q:"In the loan committee, what plays the role of a neural network’s “weights”?",opts:[{t:"How much the manager trusts each expert’s opinion",ok:1,why:"Yes. Weights say how much each input counts."},{t:"The applicant’s income",why:"That’s an input, not a weight."},{t:"The final approve/reject",why:"That’s the output."}]},
+  {q:"What does “training” a neural network change?",opts:[{t:"The weights, so future decisions become more accurate",ok:1,why:"Exactly. Training adjusts the trust in each connection."},{t:"The applicants’ data",why:"Training never changes the inputs. It changes the network."},{t:"The number of experts, every time",why:"The structure usually stays fixed. Weights change."}]},
+  {q:"Why use many simple neurons instead of one big rule?",opts:[{t:"Together they can capture complex patterns that no single rule can",ok:1,why:"Right. Many simple deciders combined can handle very complex situations."},{t:"Because one neuron is too expensive",why:"Neurons are cheap. It’s about capturing complexity."},{t:"Because rules are illegal",why:"Not at all. Networks just learn patterns rules would miss."}]}],
+ narr:[{tab:0,en:"Think of a loan committee. Each expert checks one thing, and the manager decides how much to trust each one. A neural network is a team of tiny deciders like this, and learning means adjusting that trust.",te:"ఒక లోన్ కమిటీని ఊహించుకోండి. ప్రతి నిపుణుడు ఒక విషయాన్ని తనిఖీ చేస్తాడు, మేనేజర్ ఒక్కొక్కరిని ఎంత నమ్మాలో నిర్ణయిస్తాడు. న్యూరల్ నెట్‌వర్క్ ఇలాంటి చిన్న నిర్ణేతల బృందం, నేర్చుకోవడం అంటే ఆ నమ్మకాన్ని సర్దుబాటు చేయడం.",hn:"एक लोन कमेटी के बारे में सोचिए। हर विशेषज्ञ एक चीज़ जाँचता है, और मैनेजर तय करता है कि किस पर कितना भरोसा करे। न्यूरल नेटवर्क ऐसे ही छोटे फ़ैसला लेने वालों की टीम है, और सीखने का मतलब है उस भरोसे को बदलना।"},
+  {tab:1,sel:"#nnS",act:()=>{const b=document.querySelector('#nnPre [data-p="120,720,70"]');if(b)b.click();},en:"Priya earns well but already pays many EMIs. The debt expert lights up, and its rose line pulls the decision towards reject.",te:"ప్రియకు మంచి ఆదాయం ఉంది కానీ ఇప్పటికే ఎన్నో ఈఎంఐలు కడుతోంది. అప్పు నిపుణుడు వెలుగుతాడు, అతని గులాబీ గీత నిర్ణయాన్ని తిరస్కరణ వైపు లాగుతుంది.",hn:"प्रिया अच्छा कमाती है, पर पहले से कई ईएमआई भर रही है। कर्ज़ वाला विशेषज्ञ जगमगाता है, और उसकी गुलाबी रेखा फ़ैसले को अस्वीकार की ओर खींचती है।"},
+  {tab:2,en:"Face unlock, voice assistants and credit checks all use networks like this, just with millions of neurons.",te:"ఫేస్ అన్‌లాక్, వాయిస్ అసిస్టెంట్లు, క్రెడిట్ చెక్‌లు అన్నీ ఇలాంటి నెట్‌వర్క్‌లనే వాడతాయి, లక్షల న్యూరాన్లతో.",hn:"फ़ेस अनलॉक, वॉइस असिस्टेंट और क्रेडिट जाँच सब ऐसे ही नेटवर्क इस्तेमाल करते हैं, बस लाखों न्यूरॉन के साथ।"}]});
+
+/* ---- 8. Attention ---- */
+const ATT_S=[{s:"The bank approved the loan because it was safe .",focus:"it",att:{it:{loan:.62,bank:.12,safe:.1,it:.16},bank:{bank:.3,approved:.35,loan:.35},approved:{bank:.45,approved:.2,loan:.35},safe:{it:.35,loan:.35,safe:.3}},bank:"money bank"},
+ {s:"I sat on the river bank and watched the water .",focus:"bank",att:{bank:{river:.5,water:.25,bank:.15,sat:.1},watched:{i:.4,water:.4,watched:.2},water:{river:.45,water:.35,watched:.2}},bank:"river bank"},
+ {s:"The customer asked the bank about the loan interest .",focus:"bank",att:{bank:{customer:.3,loan:.3,interest:.2,bank:.2},interest:{loan:.55,interest:.25,bank:.2},asked:{customer:.6,asked:.2,bank:.2}},bank:"money bank"}];
+CH.push({icon:"spot",title:"Attention: who should each word listen to?",like:"A spotlight at a noisy party",mins:5,
+ story:{h:"Listening to the right people",p:"At a noisy wedding, you can’t listen to everyone equally. You <b>focus</b> on the people who matter for what you’re trying to understand. <b>Attention</b> lets every word in a sentence do the same: it looks at all the other words and decides <b>which ones matter most</b> for understanding itself. In “The bank approved the loan because <b>it</b> was safe”, the word “it” pays attention to “loan”, and now the model knows what “it” means.",
+  map:[["Focusing on the right person at a party","Attention"],["How strongly you listen to each person","Attention weights (percentages)"],["Understanding a joke from its context","A word’s meaning shaped by its neighbours"],["River bank vs money bank","Same word, different meaning from context"]],
+  one:"<b>In one line:</b> attention lets each word <b>look at the other words</b> and borrow meaning from the most relevant ones. It’s the key idea behind modern AI."},
+ play:{h:"Shine the spotlight",intro:"Pick a sentence and tap a word. The arcs show where that word is looking; thicker means more attention. Compare “bank” in the money sentence and the river sentence. These patterns are illustrative, but they show what trained models really learn to do.",mount(el){
+   el.innerHTML=`<div class="row" id="atSel"></div><div class="box"><svg class="v" id="atS" viewBox="0 0 700 230" role="img" aria-label="Attention arcs"></svg><p class="say" id="atSay"></p></div>`;
+   let si=0,w=null;
+   $("#atSel").innerHTML=ATT_S.map((x,i)=>`<button type="button" class="btn" data-s="${i}">${esc(x.s.replace(" .","."))}</button>`).join("");
+   $$("#atSel [data-s]").forEach(b=>b.addEventListener("click",()=>{si=+b.dataset.s;w=null;draw();}));
+   function draw(){$$("#atSel [data-s]").forEach(b=>b.classList.toggle("on",+b.dataset.s===si));const S=ATT_S[si],toks=S.s.split(" ");if(!w)w=S.focus;
+     const n=toks.length,x=i=>40+i*(620/(n-1));const lw=w.toLowerCase(),A=S.att[lw]||(()=>{const o={};o[lw]=.5;const k=toks.findIndex(t=>t.toLowerCase()===lw);if(k>0)o[toks[k-1].toLowerCase()]=.3;if(k<n-1)o[toks[k+1].toLowerCase()]=.2;return o;})();
+     const wi=toks.findIndex(t=>t.toLowerCase()===lw);let g="";
+     toks.forEach((t,i)=>{const a=A[t.toLowerCase()]||0;if(i!==wi&&a>0){const mx=(x(wi)+x(i))/2,h=Math.min(150,30+Math.abs(x(wi)-x(i))*.45);g+=`<path d="M${x(wi)} 168 Q${mx} ${168-h} ${x(i)} 168" style="fill:none;stroke:var(--tok)" stroke-width="${1.5+a*14}" opacity="${.35+a*.65}"/><text x="${x(i)}" y="226" text-anchor="middle" font-size="12" font-weight="600" style="fill:var(--tok)" font-family="IBM Plex Mono">${Math.round(a*100)}%</text>`;}});
+     toks.forEach((t,i)=>g+=`<g data-w="${esc(t)}" style="cursor:pointer"><rect x="${x(i)-34}" y="172" width="68" height="34" rx="8" style="fill:${i===wi?"rgba(243,185,85,.3)":"var(--panel2)"};stroke:${i===wi?"var(--tok)":"var(--line2)"}"/><text x="${x(i)}" y="194" text-anchor="middle" font-size="13" style="fill:var(--fg)" font-family="IBM Plex Sans">${esc(t)}</text></g>`);
+     $("#atS").innerHTML=g;const top=Object.entries(A).filter(([k])=>k!==lw).sort((a,b)=>b[1]-a[1])[0];
+     $("#atSay").innerHTML=`“<b class="c-tok">${esc(w)}</b>” pays most attention to “<b>${top?top[0]:"itself"}</b>”${top?` (${Math.round(top[1]*100)}%)`:""}.`+(lw==="bank"?` So here it means a <b class="c-out">${S.bank}</b>.`:lw==="it"?` So the model understands that <b>“it” = the loan</b>.`:"");window.__atSeen=(window.__atSeen||new Set()).add(si+":"+lw);}
+   $("#atS").addEventListener("click",e=>{const g=e.target.closest("[data-w]");if(g){w=g.dataset.w;draw();}});draw();}},
+ real:[["Google Translate","Attention lets each translated word look back at the right source words, even when word order changes between languages."],["Understanding pronouns","Chatbots know what “it” or “they” refers to because of attention."],["Summaries","Attention helps a model focus on the important sentences of a long document."]],
+ inside:"Each word makes a <b>Query</b> (what am I looking for?), a <b>Key</b> (what do I contain?) and a <b>Value</b> (what will I share?). Matching queries with keys gives the attention percentages. In a decoder SLM, words may only look <b>backwards</b> (the <b>causal mask</b>).",
+ quiz:[{q:"What does attention let a word do?",opts:[{t:"Look at the other words and focus on the most relevant ones",ok:1,why:"Yes, like focusing on the right person at a party."},{t:"Skip unimportant words entirely from the text",why:"Nothing is deleted. Words just get less focus."},{t:"Translate itself into another language",why:"Translation uses attention, but attention itself is about focusing."}]},
+  {q:"In “I sat on the river bank…”, how does the model know “bank” isn’t a money bank?",opts:[{t:"“bank” pays attention to “river” and “water”, which shapes its meaning",ok:1,why:"Exactly. The context changes the meaning."},{t:"It looks the word up in a dictionary",why:"There’s no dictionary inside. Meaning comes from attending to context."},{t:"It can’t; it always means money",why:"With attention it can tell the difference."}]},
+  {q:"The attention percentages for one word add up to…",opts:[{t:"100%: the word divides its focus among the words it can see",ok:1,why:"Right. It’s a fixed budget of attention, shared out."},{t:"Any number",why:"They always sum to 100%, which comes from a softmax step."},{t:"0%",why:"Then it would ignore everything."}]}],
+ narr:[{tab:0,en:"At a noisy party you focus on the people who matter. Attention lets every word look at the others and focus on the most relevant ones. In the bank approved the loan because it was safe, the word it focuses on loan.",te:"గోలగా ఉన్న పార్టీలో ముఖ్యమైన వ్యక్తులపై మీరు దృష్టి పెడతారు. అటెన్షన్ ప్రతి పదాన్ని మిగతా పదాలను చూసి, అత్యంత సంబంధితమైన వాటిపై దృష్టి పెట్టేలా చేస్తుంది. బ్యాంక్ లోన్ ఆమోదించింది ఎందుకంటే అది సురక్షితం అనే వాక్యంలో, అది అనే పదం లోన్ మీద దృష్టి పెడుతుంది.",hn:"शोर भरी पार्टी में आप ज़रूरी लोगों पर ध्यान देते हैं। अटेंशन हर शब्द को बाकी शब्दों को देखकर सबसे ज़रूरी शब्दों पर ध्यान देने देता है। बैंक ने लोन मंज़ूर किया क्योंकि वह सुरक्षित था, इस वाक्य में वह शब्द लोन पर ध्यान देता है।"},
+  {tab:1,sel:"#atS",act:()=>{const b=document.querySelector('#atSel [data-s="1"]');if(b)b.click();},en:"Now the river sentence. Here bank pays attention to river and water, so the model understands it means a river bank, not a money bank.",te:"ఇప్పుడు నది వాక్యం. ఇక్కడ బ్యాంక్ అనే పదం నది, నీరు మీద దృష్టి పెడుతుంది, కాబట్టి అది డబ్బు బ్యాంక్ కాదు, నది ఒడ్డు అని మోడల్ అర్థం చేసుకుంటుంది.",hn:"अब नदी वाला वाक्य। यहाँ बैंक शब्द नदी और पानी पर ध्यान देता है, इसलिए मॉडल समझता है कि यह पैसों वाला बैंक नहीं, नदी का किनारा है।"},
+  {tab:2,en:"Translation, chatbots that understand pronouns, and summaries all rely on attention. It is the key idea behind modern AI.",te:"అనువాదం, సర్వనామాలను అర్థం చేసుకునే చాట్‌బాట్లు, సారాంశాలు అన్నీ అటెన్షన్‌పైనే ఆధారపడతాయి. ఆధునిక ఏఐ వెనుక ఉన్న ముఖ్య ఆలోచన ఇదే.",hn:"अनुवाद, सर्वनाम समझने वाले चैटबॉट और सारांश, सब अटेंशन पर टिके हैं। आधुनिक एआई के पीछे यही मुख्य विचार है।"}]});
+/* =================== CHAPTERS 9–15 =================== */
+
+/* ---- 9. Transformer factory ---- */
+const STATIONS=[["Cutter","Cuts the sentence into tokens (Chapter 5).","var(--tok)"],["Address stamp","Gives each token its map address (embedding) plus a seat number (position) so word order is kept.","var(--emb)"],["Meeting room","Attention: every word looks at earlier words and borrows meaning (Chapter 8).","var(--hid)"],["Thinking room","Each word is processed by a small neural network on its own (Chapter 7).","var(--hid)"],["Prediction desk","Scores every possible next token and picks the most likely one.","var(--out)"]];
+CH.push({icon:"factory",title:"The Transformer: a word factory",like:"An assembly line with many floors",mins:5,
+ story:{h:"Inside the factory",p:"A Transformer is like a <b>factory building</b>. Your sentence enters at the ground floor and is <b>cut into pieces</b>. Each piece gets an <b>address stamp</b>. Then it goes up through many identical <b>floors</b>: on each floor there’s a <b>meeting room</b> (words share information through attention) and a <b>thinking room</b> (each word is processed). At the top, the <b>prediction desk</b> announces the next word. More floors means a bigger, smarter model.",
+  map:[["Ground-floor cutter","Tokenizer"],["Address stamp","Embedding + position"],["Meeting room on each floor","Attention layer"],["Thinking room on each floor","Feed-forward network"],["Number of floors","Number of layers"],["Prediction desk","Output layer (next-token probabilities)"]],
+  one:"<b>In one line:</b> a Transformer = <b>cut → stamp → (meet + think) × many floors → predict</b>. Every SLM and LLM is built this way."},
+ play:{h:"Send a sentence through the factory",intro:"Type a sentence and press Run. Watch it move through each station. Click any station to see what happens there, and change the number of floors to see how models grow.",mount(el,ctx){
+   el.innerHTML=`<div class="row"><input class="txt" id="fcIn" value="the customer asked about the" style="flex:1 1 260px"><button class="btn primary" type="button" id="fcRun">Run the factory</button></div>
+    <div class="box"><div id="fcLine" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center"></div></div>
+    <div class="grid2"><div class="box"><div class="eyebrow" id="fcT" style="margin-bottom:6px"></div><div id="fcOut" class="say" style="min-height:110px"></div></div>
+    <div class="box"><label class="f">Floors (layers): <b id="flV"></b><input type="range" id="fl" min="1" max="24" value="6"></label><svg class="v" id="flS" viewBox="0 0 300 170" role="img" aria-label="Building with floors"></svg></div></div>`;
+   let st=-1,run=0;
+   function stationOut(k){const t=words($("#fcIn").value);const r=mulberry(9);
+     if(k===0)return `<div class="row" style="gap:6px">${t.map((w,i)=>`<span class="chip ${["","b","g","p"][i%4]}">${esc(w)}</span>`).join("")}</div>`;
+     if(k===1)return t.map((w,i)=>`<div class="row" style="gap:3px;margin-bottom:3px"><span class="mono" style="width:140px;font-size:.8rem;white-space:nowrap">${esc(w)} · seat ${i}</span>${Array.from({length:8},()=>{const v=r()*2-1;return `<span style="width:20px;height:14px;border-radius:2px;background:${v>0?"rgba(82,211,226,"+(.2+v*.7)+")":"rgba(255,125,147,"+(.2-v*.7)+")"}"></span>`;}).join("")}</div>`).join("");
+     if(k===2)return `Each word looks back at earlier words. “<b>${esc(t[t.length-1]||"")}</b>” mostly listens to “<b>${esc(t.find(w=>["customer","bank","loan","account","cat","dog"].includes(w))||t[0]||"")}</b>”, picking up what this sentence is about.`;
+     if(k===3)return "Each word’s numbers go through a small neural network: like a person quietly thinking over what they heard in the meeting. This repeats on every floor.";
+     const d=dist(LM_ALL,t).slice(0,3);return `Most likely next words: ${d.map(a=>`<span class="chip g">${esc(a.w)} ${(a.p*100).toFixed(0)}%</span>`).join(" ")}`;}
+   function draw(){$("#fcLine").innerHTML=STATIONS.map(([n,,c],k)=>`${k?'<span class="dim">→</span>':""}<button type="button" class="btn${k===st?" on":""}" data-k="${k}" style="border-color:${k===st?c:""};"><span style="color:${c};font-weight:600">${k+1}. ${n}</span>${k===2||k===3?` <span class="dim mono" style="font-size:.72rem">× ${$("#fl").value} floors</span>`:""}</button>`).join("");
+     $$("#fcLine [data-k]").forEach(b=>b.addEventListener("click",()=>{run++;st=+b.dataset.k;draw();}));
+     if(st>=0){$("#fcT").textContent=`Station ${st+1}: ${STATIONS[st][0]}`;$("#fcOut").innerHTML=`<p style="margin-bottom:8px" class="muted">${STATIONS[st][1]}</p>`+stationOut(st);}else{$("#fcT").textContent="Press Run";$("#fcOut").textContent="The sentence is waiting at the factory door.";}
+     const F=+$("#fl").value;$("#flV").textContent=F;let g="";const h=Math.min(12,130/F);for(let i=0;i<F;i++)g+=`<rect x="90" y="${150-(i+1)*h}" width="120" height="${h-1.5}" rx="2" style="fill:${i%2?"rgba(169,147,255,.45)":"rgba(169,147,255,.7)"}"/>`;
+     g+=`<rect x="80" y="150" width="140" height="14" rx="3" style="fill:var(--tok)"/><text x="230" y="${150-F*h+10}" font-size="11" style="fill:var(--muted)" font-family="IBM Plex Mono">${F} floors</text><text x="10" y="20" font-size="11" style="fill:var(--muted)" font-family="IBM Plex Sans">${F<=8?"small model (SLM)":F<=32?"medium":"large"}</text>`;$("#flS").innerHTML=g;window.__fcSt=Math.max(window.__fcSt||-1,st);}
+   $("#fcRun").addEventListener("click",()=>{const id=++run;st=-1;const go=()=>{if(id!==run)return;st++;draw();if(st<4)ctx.after(go,1500);};go();});
+   $("#fl").addEventListener("input",draw);$("#fcIn").addEventListener("input",draw);draw();}},
+ real:[["Every chat assistant","ChatGPT, Gemini, Claude and Llama are all Transformers, just with different numbers of floors and room sizes."],["Phone keyboards","Many modern keyboards run a very small Transformer on the phone."],["Translation apps","The Transformer was invented in 2017 for translation, and it then took over AI."]],
+ inside:"The real names: <b>tokenizer → embeddings + positional encoding → N × (self-attention + feed-forward, with residual connections and normalisation) → language-model head → softmax</b>. A tiny SLM might have 4 floors, while big models have 80+.",
+ quiz:[{q:"In the factory, what happens in the “meeting room”?",opts:[{t:"Words share information by paying attention to each other",ok:1,why:"Yes. That’s the attention layer."},{t:"The sentence is cut into tokens",why:"That’s the cutter at the ground floor."},{t:"The final word is printed",why:"That’s the prediction desk at the top."}]},
+  {q:"What does adding more floors (layers) usually do?",opts:[{t:"Makes the model bigger and able to learn more complex patterns",ok:1,why:"Right, at the cost of more memory and compute."},{t:"Makes it faster",why:"More floors means more work, so it gets slower."},{t:"Nothing at all",why:"Floors are where the learning capacity lives."}]},
+  {q:"What comes out at the very top of the factory?",opts:[{t:"Scores for every possible next word, and the chosen next word",ok:1,why:"Exactly. Then the word is added and the whole thing runs again."},{t:"A full essay at once",why:"It produces one token at a time."},{t:"The original sentence unchanged",why:"It adds a predicted next word."}]}],
+ narr:[{tab:0,en:"A transformer is like a factory building. The sentence is cut into pieces, stamped with addresses, and then goes up many floors. Each floor has a meeting room and a thinking room. At the top, the prediction desk announces the next word.",te:"ట్రాన్స్‌ఫార్మర్ ఒక ఫ్యాక్టరీ భవనం లాంటిది. వాక్యాన్ని ముక్కలుగా కోసి, చిరునామాలు ముద్రించి, ఎన్నో అంతస్తులు పైకి పంపుతారు. ప్రతి అంతస్తులో ఒక మీటింగ్ రూమ్, ఒక థింకింగ్ రూమ్ ఉంటాయి. పైన ప్రిడిక్షన్ డెస్క్ తర్వాతి పదాన్ని ప్రకటిస్తుంది.",hn:"ट्रांसफ़ॉर्मर एक फ़ैक्टरी की इमारत जैसा है। वाक्य को टुकड़ों में काटा जाता है, उन पर पते की मुहर लगती है, और फिर वे कई मंज़िल ऊपर जाते हैं। हर मंज़िल पर एक मीटिंग रूम और एक सोचने का कमरा है। सबसे ऊपर प्रेडिक्शन डेस्क अगला शब्द बताता है।"},
+  {tab:1,sel:"#fcLine",act:()=>$("#fcRun")&&$("#fcRun").click(),en:"Watch the sentence travel through each station, from the cutter to the prediction desk.",te:"వాక్యం కట్టర్ నుంచి ప్రిడిక్షన్ డెస్క్ వరకు ప్రతి స్టేషన్ గుండా ప్రయాణించడం చూడండి.",hn:"देखिए वाक्य कटर से लेकर प्रेडिक्शन डेस्क तक हर स्टेशन से गुज़रता है।"},
+  {tab:2,en:"Every modern chat assistant is a transformer. The difference is only the number of floors and the size of the rooms.",te:"ప్రతి ఆధునిక చాట్ అసిస్టెంట్ ఒక ట్రాన్స్‌ఫార్మరే. తేడా అంతస్తుల సంఖ్య, గదుల పరిమాణంలో మాత్రమే.",hn:"हर आधुनिक चैट असिस्टेंट एक ट्रांसफ़ॉर्मर है। फ़र्क सिर्फ़ मंज़िलों की संख्या और कमरों के आकार का है।"}]});
+
+/* ---- 10. Data: cooking ---- */
+const DIRTY=[["<p>How do I reset my net banking password?</p>","fmt"],["How do I reset my net banking password?","dup"],["My account 1234567890 was charged twice, mail me at ravi.k@example.com","pii"],["The bank approved the home loan at 8.5% interest.",""],["asdf qwerty zzzz","junk"],["Call me on +91 98765 43210 about the credit card fee","pii"],["The bank approved the home loan at 8.5% interest.","dup"],["How can I block my lost debit card?",""],["ok","junk"],["Customer   asked about   overdraft fees!!!","fmt"],["The agent explained fixed deposit rates for senior citizens.",""],["I want to close my savings account and move the balance.",""]];
+CH.push({icon:"pot",title:"Data: the ingredients",like:"Cooking: good ingredients make good food",mins:4,
+ story:{h:"You can’t cook a great meal with spoiled ingredients",p:"A model learns <b>only</b> from its data, like a dish can only taste as good as its ingredients. Real-world text is messy: <b>repeated messages</b>, <b>private details</b> like phone and account numbers, <b>junk</b>, and messy formatting. Before cooking (training), we <b>wash, sort and clean</b>. And for a banking assistant, we need banking ingredients: FAQs, support chats, and policy documents.",
+  map:[["Ingredients","Training data (text)"],["Washing vegetables","Cleaning formatting and junk"],["Removing duplicates from the basket","Deduplication"],["Hiding the family’s secret recipe","Masking private information (PII)"],["Choosing a cuisine","Choosing domain data (e.g. banking)"]],
+  one:"<b>In one line:</b> <b>garbage in, garbage out</b>. Clean, relevant, private-safe data matters more than a bigger model."},
+ play:{h:"Clean the ingredients",intro:"This basket of real-looking bank messages is messy. Use each cleaning tool and watch the dish-quality meter rise. Struck-out lines are thrown away and amber lines are fixed.",mount(el){
+   const on={fmt:false,dup:false,pii:false,junk:false};
+   el.innerHTML=`<div class="row" id="ckT"><button type="button" class="btn" data-k="fmt">Tidy formatting</button><button type="button" class="btn" data-k="dup">Remove duplicates</button><button type="button" class="btn" data-k="pii">Hide private details</button><button type="button" class="btn" data-k="junk">Throw away junk</button></div>
+    <div class="grid2"><div class="box"><div id="ckList" style="display:grid;gap:4px;font-size:.9rem"></div></div><div style="display:grid;gap:12px;align-content:start"><div class="box"><div class="eyebrow" style="margin-bottom:6px">Dish quality</div><div class="meter" style="height:20px"><i id="ckM"></i></div><p class="say" id="ckSay" style="margin-top:10px"></p></div>
+    <div class="box"><div class="eyebrow" style="margin-bottom:6px">Ingredients for a banking SLM</div><div class="row" style="gap:6px"><span class="chip g">bank FAQs</span><span class="chip g">support chat logs (anonymised)</span><span class="chip g">product & policy documents</span><span class="chip g">general good-quality text</span><span class="chip r">random internet junk</span><span class="chip r">customers' private data</span></div></div></div></div>`;
+   function clean(s,k){let t=s;if(on.fmt)t=t.replace(/<[^>]+>/g,"").replace(/\s+/g," ").replace(/([!?.])\1+/g,"$1").trim();if(on.pii)t=t.replace(/[\w.+-]+@[\w-]+\.[\w.]+/g,"[EMAIL]").replace(/\+?\d[\d\s-]{8,}\d/g,"[NUMBER]");return t;}
+   function draw(){$$("#ckT [data-k]").forEach(b=>b.classList.toggle("on",on[b.dataset.k]));const seen=new Set();let issues=0;
+     $("#ckList").innerHTML=DIRTY.map(([s,k])=>{const c=clean(s,k),key=c.toLowerCase().replace(/[^a-z0-9]/g,"");let rm="";
+       if(on.junk&&k==="junk")rm="junk";else if(on.dup&&seen.has(key))rm="duplicate";seen.add(key);
+       if(!rm&&((k==="fmt"&&!on.fmt)||(k==="dup"&&!on.dup)||(k==="pii"&&!on.pii)||(k==="junk"&&!on.junk)))issues++;
+       return `<div style="padding:4px 8px;border-radius:6px;background:var(--bg);${rm?"text-decoration:line-through;opacity:.5;color:var(--err)":c!==s?"color:var(--tok)":""}">${esc(c)}${rm?` <span class="dim" style="text-decoration:none">(${rm})</span>`:""}</div>`;}).join("");
+     const q=1-issues/8;$("#ckM").style.width=(q*100)+"%";$("#ckM").style.background=q>.9?"var(--out)":q>.5?"var(--tok)":"var(--err)";
+     $("#ckSay").innerHTML=issues?`${issues} problem${issues>1?"s":""} left. ${!on.pii?"<b class='c-err'>Private numbers are still in the data. A model can memorise and repeat them!</b>":""}`:"<b class='c-out'>Clean and safe. Ready to cook (train)!</b>";window.__ckIssues=issues;}
+   $$("#ckT [data-k]").forEach(b=>b.addEventListener("click",()=>{on[b.dataset.k]=!on[b.dataset.k];draw();}));draw();}},
+ real:[["Bank chatbots","Trained on the bank’s own FAQs and anonymised chats, never on raw customer records."],["Spam in, spam out","Models trained on junk web pages learned to write junk, so companies filter heavily."],["Privacy laws","India’s DPDP Act, and similar laws elsewhere, require protecting personal data used to train AI."]],
+ inside:"Data preparation steps: <b>collect → clean → deduplicate → mask PII → filter quality → tokenize → split into train / validation / test</b>. The validation and test parts are held back to check the model honestly (Chapter 12).",
+ quiz:[{q:"What does “garbage in, garbage out” mean for AI?",opts:[{t:"A model trained on bad data will give bad answers",ok:1,why:"Exactly. Data quality limits model quality."},{t:"AI deletes garbage automatically",why:"It doesn’t. It learns from whatever you give it, garbage included."},{t:"Bigger models fix bad data",why:"A bigger model just learns the garbage more thoroughly."}]},
+  {q:"Why hide phone and account numbers before training?",opts:[{t:"Models can memorise and repeat private details, which breaks privacy and the law",ok:1,why:"Right. Masking protects customers."},{t:"Numbers make training slower",why:"Speed isn’t the reason. Privacy is."},{t:"Models can’t read numbers",why:"They can, and they can memorise them, which is exactly the risk."}]},
+  {q:"For a banking helpdesk SLM, which data is best?",opts:[{t:"Bank FAQs, anonymised support chats and policy documents",ok:1,why:"Relevant, high-quality and privacy-safe: the ideal ingredients."},{t:"Random internet pages",why:"Too noisy and off-topic for a focused banking assistant."},{t:"Raw customer account records",why:"Private data must never go in raw."}]}],
+ narr:[{tab:0,en:"A model can only be as good as its data, just like food is only as good as its ingredients. Real data has duplicates, private details and junk, so we clean it before training.",te:"పదార్థాలు ఎంత బాగుంటే వంట అంత బాగుంటుంది. అలాగే మోడల్ దాని డేటా అంత మాత్రమే మంచిది. నిజమైన డేటాలో నకళ్లు, ప్రైవేట్ వివరాలు, చెత్త ఉంటాయి, కాబట్టి ట్రైనింగ్‌కు ముందు శుభ్రం చేస్తాం.",hn:"मॉडल उतना ही अच्छा होता है जितना उसका डेटा, जैसे खाना उतना ही अच्छा होता है जितनी उसकी सामग्री। असली डेटा में दोहराव, निजी जानकारी और कचरा होता है, इसलिए ट्रेनिंग से पहले हम उसे साफ़ करते हैं।"},
+  {tab:1,sel:"#ckM",act:()=>{["fmt","dup","pii","junk"].forEach((k,i)=>setTimeout(()=>{const b=document.querySelector(`#ckT [data-k="${k}"]`);if(b&&!b.classList.contains("on"))b.click();},i*1200));},en:"Watch each cleaning tool fix the basket: tidy formatting, remove duplicates, hide private numbers, and throw away junk. The quality meter turns green.",te:"ప్రతి క్లీనింగ్ సాధనం బుట్టను సరిచేయడం చూడండి: ఫార్మాటింగ్ సరిచేయడం, నకళ్లు తొలగించడం, ప్రైవేట్ నంబర్లు దాచడం, చెత్త పారేయడం. నాణ్యత మీటర్ ఆకుపచ్చగా మారుతుంది.",hn:"देखिए हर सफ़ाई का औज़ार टोकरी को ठीक करता है: फ़ॉर्मैटिंग सुधारना, दोहराव हटाना, निजी नंबर छिपाना, और कचरा फेंकना। गुणवत्ता का मीटर हरा हो जाता है।"},
+  {tab:2,en:"Bank chatbots are trained on FAQs and anonymised chats, never on raw private records. Privacy laws require it.",te:"బ్యాంక్ చాట్‌బాట్లు ఎఫ్ఏక్యూలు, అనామక చాట్‌లపై ట్రైన్ అవుతాయి, ముడి ప్రైవేట్ రికార్డులపై ఎప్పుడూ కాదు. గోప్యతా చట్టాలు దాన్ని తప్పనిసరి చేస్తాయి.",hn:"बैंक चैटबॉट एफ़एक्यू और गुमनाम चैट पर ट्रेन होते हैं, कच्चे निजी रिकॉर्ड पर कभी नहीं। निजता के कानून यही माँगते हैं।"}]});
+
+/* ---- 11. Training: hiker ---- */
+const hillL=w=>.18*(w-6)*(w-6)+.5*Math.sin(w*1.3)+1.2,hillG=w=>.36*(w-6)+.65*Math.cos(w*1.3);
+CH.push({icon:"mountain",title:"Training: walking downhill in fog",like:"A hiker finding the valley in thick fog",mins:5,
+ story:{h:"Lost on a foggy mountain",p:"Imagine you’re on a mountain in <b>thick fog</b> and want to reach the lowest valley. You can’t see far, but you can <b>feel the slope</b> under your feet. So you take a step downhill, feel again, and step again. Training a model is exactly this: the <b>height</b> is how wrong the model is (the <b>loss</b>), and each step adjusts the model’s knobs downhill. Your <b>step size</b> matters: too tiny and you’ll take forever, too big and you’ll jump over the valley.",
+  map:[["Height on the mountain","Loss (how wrong the model is)"],["Feeling the slope","Computing the gradient"],["Taking a step downhill","Updating the weights"],["Step size","Learning rate"],["Reaching the valley","A well-trained model"]],
+  one:"<b>In one line:</b> training repeatedly <b>measures the error and steps downhill</b>. The <b>learning rate</b> sets the step size."},
+ play:{h:"Guide the hiker",intro:"Choose a step size and press Walk. Try tiny, good, and too big. The chart on the right is the training-loss curve that real engineers watch.",mount(el,ctx){
+   el.innerHTML=`<div class="row" id="hkSz"><span class="eyebrow">Step size</span><button type="button" class="btn" data-s="0.08">Tiny</button><button type="button" class="btn" data-s="0.7">Just right</button><button type="button" class="btn" data-s="3.2">Too big</button></div>
+    <div class="grid2"><div class="box"><svg class="v" id="hkS" viewBox="0 0 500 250" role="img" aria-label="Mountain"></svg><div class="row" style="margin-top:8px"><button class="btn primary" type="button" id="hkGo">Walk 20 steps</button><button class="btn" type="button" id="hkR">Back to the top</button></div></div>
+    <div style="display:grid;gap:12px;align-content:start"><div class="box"><div class="eyebrow" style="margin-bottom:4px">Loss after each step</div><svg class="v" id="hkL" viewBox="0 0 300 140"></svg></div><p class="say" id="hkSay"></p></div></div>`;
+   let lr=.7,w=.6,hist=[hillL(.6)],run=0;const X=v=>20+v*38,Y=v=>230-v*28;
+   function draw(){$$("#hkSz [data-s]").forEach(b=>b.classList.toggle("on",+b.dataset.s===lr));let p=[];for(let v=0;v<=12.5;v+=.1)p.push(`${X(v).toFixed(1)},${Y(hillL(v)).toFixed(1)}`);
+     $("#hkS").innerHTML=`<polygon points="${X(0)},240 ${p.join(" ")} ${X(12.5)},240" style="fill:rgba(169,147,255,.18)"/><polyline points="${p.join(" ")}" style="fill:none;stroke:var(--hid)" stroke-width="2.5"/><rect x="0" y="0" width="500" height="250" style="fill:url(#fog)"/><defs><linearGradient id="fog" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#cfe" stop-opacity=".08"/><stop offset="1" stop-color="#cfe" stop-opacity="0"/></linearGradient></defs><circle cx="${X(Math.max(0,Math.min(12.5,w)))}" cy="${Y(hillL(Math.max(0,Math.min(12.5,w))))-9}" r="9" style="fill:var(--tok);stroke:#1a1206" stroke-width="2"/><text x="${X(6.3)}" y="245" text-anchor="middle" font-size="11" style="fill:var(--out)" font-family="IBM Plex Sans">valley</text>`;
+     const W=300,H=140,mx=Math.max(...hist,4);$("#hkL").innerHTML=`<line x1="20" x2="290" y1="120" y2="120" style="stroke:var(--line2)"/><polyline points="${hist.map((v,i)=>`${20+i*13},${120-Math.min(v,mx)/mx*105}`).join(" ")}" style="fill:none;stroke:var(--err)" stroke-width="2.5"/><text x="290" y="135" text-anchor="end" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono">steps →</text>`;
+     const last=hist[hist.length-1];$("#hkSay").innerHTML=hist.length<2?"Pick a step size and press Walk.":lr<.2?"Tiny steps: safe, but it will take <b>forever</b> to reach the valley.":lr>2?"Steps too big: the hiker <b class='c-err'>jumps over the valley</b> again and again. In training, the loss jumps around or explodes.":last<1.5?"<b class='c-out'>Just right:</b> the hiker reaches the valley quickly. The loss curve drops and flattens.":"Getting there…";window.__hk={lr,last};}
+   $$("#hkSz [data-s]").forEach(b=>b.addEventListener("click",()=>{lr=+b.dataset.s;run++;w=.6;hist=[hillL(.6)];draw();}));
+   $("#hkR").addEventListener("click",()=>{run++;w=.6;hist=[hillL(.6)];draw();});
+   $("#hkGo").addEventListener("click",()=>{const id=++run;let k=0;const go=()=>{if(id!==run)return;w=w-lr*hillG(w);w=Math.max(-1,Math.min(13.5,w));hist.push(hillL(Math.max(0,Math.min(12.5,w))));draw();if(++k<20)ctx.after(go,220);};go();});draw();}},
+ real:[["Learning to cycle","You wobble, feel which way you’re falling, and correct a little each time."],["Tuning a guitar","Turn the peg a bit, listen, turn again. Turning it too far overshoots the note."],["Training real SLMs","Engineers watch exactly this loss curve for days. If it jumps, they lower the learning rate."]],
+ inside:"Each step: take a <b>batch</b> of text, run the model (<b>forward pass</b>), measure the <b>loss</b>, compute <b>gradients</b> with <b>backpropagation</b>, and update weights with an optimiser like <b>AdamW</b>. One pass over all the data is an <b>epoch</b>.",
+ quiz:[{q:"In the mountain story, what is the “height”?",opts:[{t:"The loss: how wrong the model currently is",ok:1,why:"Yes. Training tries to go downhill to the lowest loss."},{t:"The model’s size",why:"Size doesn’t change during training. Error does."},{t:"How many words it knows",why:"Height is how wrong it is."}]},
+  {q:"What goes wrong with a learning rate (step size) that’s too big?",opts:[{t:"It overshoots the valley and bounces around, so training becomes unstable",ok:1,why:"Right. That’s why engineers lower it when the loss jumps."},{t:"It trains slowly",why:"That’s the tiny-step problem."},{t:"Nothing, since bigger is always better",why:"Too big makes it jump over the best point."}]},
+  {q:"How does the model know which way is “downhill”?",opts:[{t:"It calculates the slope of the error (the gradient)",ok:1,why:"Exactly, like feeling the ground under your feet."},{t:"It tries every possible direction",why:"With millions of knobs, that’s impossible. The gradient points the way directly."},{t:"A human tells it",why:"It’s automatic maths."}]}],
+ narr:[{tab:0,en:"Imagine walking down a mountain in thick fog. You feel the slope and step downhill, again and again. Training does exactly this with the model's error. The step size is called the learning rate.",te:"దట్టమైన పొగమంచులో కొండ దిగుతున్నారని ఊహించుకోండి. వాలును గమనించి, మళ్లీ మళ్లీ కిందికి అడుగు వేస్తారు. ట్రైనింగ్ మోడల్ ఎర్రర్‌తో సరిగ్గా ఇదే చేస్తుంది. అడుగు పరిమాణాన్ని లెర్నింగ్ రేట్ అంటారు.",hn:"घने कोहरे में पहाड़ से उतरने की कल्पना कीजिए। आप ढलान महसूस करते हैं और बार-बार नीचे की ओर कदम रखते हैं। ट्रेनिंग मॉडल की गलती के साथ यही करती है। कदम के आकार को लर्निंग रेट कहते हैं।"},
+  {tab:1,sel:"#hkS",act:()=>{const b=document.querySelector('#hkSz [data-s="3.2"]');if(b)b.click();setTimeout(()=>$("#hkGo")&&$("#hkGo").click(),300);},en:"With steps that are too big, the hiker jumps right over the valley. Try just right, and it settles at the bottom quickly.",te:"అడుగులు చాలా పెద్దవైతే, హైకర్ లోయను దాటి దూకేస్తాడు. సరైన అడుగుతో ప్రయత్నించండి, అతను త్వరగా అడుగుకు చేరతాడు.",hn:"कदम बहुत बड़े हों तो हाइकर घाटी के ऊपर से कूद जाता है। सही कदम आज़माइए, वह जल्दी तल पर पहुँच जाता है।"},
+  {tab:2,en:"Like tuning a guitar or learning to cycle: small corrections, repeated many times. Engineers watch this loss curve during real training.",te:"గిటార్ ట్యూన్ చేయడం లేదా సైకిల్ నేర్చుకోవడం లాగా: చిన్న సవరణలు, ఎన్నోసార్లు. నిజమైన ట్రైనింగ్‌లో ఇంజినీర్లు ఈ లాస్ వక్రరేఖను చూస్తుంటారు.",hn:"गिटार ट्यून करने या साइकिल सीखने की तरह: छोटे सुधार, कई बार। असली ट्रेनिंग में इंजीनियर यही लॉस कर्व देखते रहते हैं।"}]});
+
+/* ---- 12. Evaluation: exam ---- */
+const EXAM=[["the customer opened a savings","account",1],["the dog chased the ball in the","park",1],["the bank charged a small","fee",1],["the train was late this","morning",1],["the customer paid the loan","fee",0],["she drank a cup of hot","coffee",0],["the agent explained the loan","interest",0],["the bank approved the car","loan",0]];
+CH.push({icon:"exam",title:"Testing: exam day",like:"A surprise exam with new questions",mins:4,
+ story:{h:"Practice tests vs the real exam",p:"A student who <b>memorised</b> the practice paper can ace it, and still fail a new exam. So teachers test with <b>new questions</b>. We do the same with models: we keep some text aside (the <b>test set</b>) that the model never trained on. We also watch for <b>hallucination</b>: when the model answers <b>confidently but wrongly</b>, like a student bluffing.",
+  map:[["Practice paper","Training data"],["A surprise exam with new questions","Test data the model never saw"],["Report card","Evaluation metrics"],["Memorising answers without understanding","Overfitting"],["Confident bluffing","Hallucination"]],
+  one:"<b>In one line:</b> judge a model on <b>text it has never seen</b>, and treat confident answers with healthy suspicion."},
+ play:{h:"Give the model an exam",intro:"Our tiny model takes 8 fill-in-the-blank questions: 4 from sentences it practised and 4 brand-new ones. Then ask it to write freely and check whether it is reciting or making things up.",mount(el){
+   el.innerHTML=`<div class="row"><button class="btn primary" type="button" id="exGo">Start the exam</button></div><div class="grid2"><div class="box"><div id="exQ" style="display:grid;gap:6px;font-size:.92rem"></div></div><div style="display:grid;gap:12px;align-content:start"><div class="box" id="exCard"></div><div class="box"><div class="eyebrow" style="margin-bottom:6px">Hallucination check</div><button class="btn" type="button" id="exGen">Let it write a sentence</button><p class="say" id="exGenOut" style="margin-top:10px"></p></div></div></div>`;
+   $("#exCard").innerHTML='<p class="muted">The report card appears after the exam.</p>';
+   $("#exGo").addEventListener("click",()=>{let a=[0,0],t=[0,0];$("#exQ").innerHTML=EXAM.map(([s,ans,seen])=>{const d=dist(LM_ALL,words(s)),g=d[0];const ok=g.w===ans;t[seen]++;if(ok)a[seen]++;
+     return `<div>${seen?'<span class="chip b" style="font-size:.7rem">practised</span>':'<span class="chip p" style="font-size:.7rem">new</span>'} ${esc(s)} <span class="chip ${ok?"g":"r"}">${esc(g.w)}</span> <span class="dim mono" style="font-size:.75rem">${(g.p*100).toFixed(0)}% sure</span> ${ok?"✓":`✗ <span class="dim">(${ans})</span>`}${!ok&&g.p>.5?' <span class="chip r" style="font-size:.7rem">confidently wrong</span>':""}</div>`;}).join("");
+     $("#exCard").innerHTML=`<div class="eyebrow" style="margin-bottom:8px">Report card</div><div class="row" style="gap:26px"><div><div class="big c-out">${a[1]}/${t[1]}</div><div class="muted" style="font-size:.85rem">practised questions</div></div><div><div class="big c-err">${a[0]}/${t[0]}</div><div class="muted" style="font-size:.85rem">brand-new questions</div></div></div><p class="note" style="margin-top:10px">The gap between these two scores is what really matters. A big gap means the model <b>memorised</b> instead of <b>generalising</b>. Only the new questions tell you how it will do in real life.</p>`;window.__exDone=1;});
+   $("#exGen").addEventListener("click",()=>{const r=Math.random;let t=words("the bank");for(let i=0;i<10;i++){const a=pick(dist(LM_ALL,t),r);t.push(a.w);if(a.w===".")break;}const s=t.join(" ").replace(" .",".");const all=[...GENERAL,...BANKING].map(x=>x.replace(" .","."));const seen=all.includes(s);
+     $("#exGenOut").innerHTML=`“${esc(s)}”<br>${seen?'<span class="chip b">recited from training</span> It copied a sentence it saw.':'<span class="chip r">newly made up</span> It sounds fluent, but nobody checked that this is <b>true</b>. That’s how hallucinations happen.'}`;window.__exGen=(window.__exGen||0)+1;});}},
+ real:[["Board exams","Questions you haven’t seen test real understanding, and model tests work the same way."],["Chatbots inventing facts","Assistants sometimes invent references or numbers, because they predict plausible words, not verified facts."],["Bank safety checks","Banks test assistants on hundreds of real customer questions before launch, and limit them to approved information."]],
+ inside:"Real metrics: <b>validation/test loss</b> and <b>perplexity</b> (how “confused” the model is; lower is better), plus <b>benchmarks</b> for specific tasks. Reducing hallucination: <b>retrieval (RAG)</b> from trusted documents, and refusing when unsure.",
+ quiz:[{q:"Why test a model on text it never trained on?",opts:[{t:"To see if it truly learned patterns or just memorised",ok:1,why:"Yes. Only unseen questions reveal real ability."},{t:"Because training text is secret",why:"The reason is honest measurement, not secrecy."},{t:"To make the test easier",why:"New questions are usually harder, and that’s the point."}]},
+  {q:"What is a hallucination in AI?",opts:[{t:"A confident, fluent answer that is actually wrong or made up",ok:1,why:"Exactly. The model predicts plausible words, not checked facts."},{t:"When the model crashes",why:"A crash is a bug. Hallucination is a wrong-but-confident answer."},{t:"When the model refuses to answer",why:"Refusing is actually safer than hallucinating."}]},
+  {q:"A model scores 98% on practice questions but 60% on new ones. This means…",opts:[{t:"It memorised the practice data (overfitting)",ok:1,why:"Right. The big gap is the warning sign."},{t:"It’s a great model",why:"Only the 60% reflects real-world performance."},{t:"The new questions were wrong",why:"Most likely the model just didn’t generalise."}]}],
+ narr:[{tab:0,en:"A student who memorised the practice paper can still fail a new exam. So we test models on text they have never seen. And we watch for hallucinations: confident answers that are actually wrong.",te:"ప్రాక్టీస్ పేపర్ బట్టీ పట్టిన విద్యార్థి కొత్త పరీక్షలో ఫెయిల్ కావచ్చు. అందుకే మోడల్స్‌ను అవి ఎప్పుడూ చూడని టెక్స్ట్‌పై పరీక్షిస్తాం. అలాగే హాలూసినేషన్ల కోసం చూస్తాం: నమ్మకంగా చెప్పిన కానీ తప్పు జవాబులు.",hn:"जिस छात्र ने प्रैक्टिस पेपर रट लिया, वह नई परीक्षा में फ़ेल हो सकता है। इसलिए हम मॉडल को ऐसे टेक्स्ट पर परखते हैं जो उसने कभी नहीं देखा। और हम हैलुसिनेशन पर नज़र रखते हैं: आत्मविश्वास भरे पर गलत जवाब।"},
+  {tab:1,sel:"#exCard",act:()=>$("#exGo")&&$("#exGo").click(),en:"Look at the report card. The model does well on questions it practised, but worse on brand new ones. That gap is what matters.",te:"రిపోర్ట్ కార్డ్ చూడండి. ప్రాక్టీస్ చేసిన ప్రశ్నల్లో మోడల్ బాగా చేస్తుంది, కొత్త వాటిలో తక్కువగా. ఆ తేడానే ముఖ్యం.",hn:"रिपोर्ट कार्ड देखिए। प्रैक्टिस किए सवालों पर मॉडल अच्छा करता है, पर बिल्कुल नए सवालों पर कम। वही फ़र्क मायने रखता है।"},
+  {tab:2,en:"This is why chatbots sometimes invent facts, and why banks test assistants carefully and connect them to trusted documents.",te:"అందుకే చాట్‌బాట్లు కొన్నిసార్లు వాస్తవాలు కల్పిస్తాయి, బ్యాంకులు అసిస్టెంట్లను జాగ్రత్తగా పరీక్షించి నమ్మదగిన పత్రాలకు అనుసంధానిస్తాయి.",hn:"इसीलिए चैटबॉट कभी-कभी तथ्य गढ़ लेते हैं, और बैंक असिस्टेंट को ध्यान से परखकर भरोसेमंद दस्तावेज़ों से जोड़ते हैं।"}]});
+
+/* ---- 13. Fine-tuning ---- */
+CH.push({icon:"doctor",title:"Fine-tuning: from general to specialist",like:"A general doctor training to become a cardiologist",mins:5,
+ story:{h:"Same doctor, new speciality",p:"A <b>general doctor</b> already knows medicine broadly. To become a <b>heart specialist</b>, they don’t go back to school from zero. They do a <b>short, focused training</b> on heart cases. Models work the same way: first <b>pre-training</b> on lots of general text, then <b>fine-tuning</b> on a small set of domain examples, like banking chats. A smart shortcut called <b>LoRA</b> is like adding <b>sticky notes</b> to a textbook instead of rewriting the whole book.",
+  map:[["Medical school (years, broad)","Pre-training on huge general text"],["Short specialist training","Fine-tuning on domain data"],["Forgetting general medicine by only studying hearts","Catastrophic forgetting"],["Sticky notes on the textbook","LoRA (train a few small extra weights)"]],
+  one:"<b>In one line:</b> fine-tuning <b>specialises</b> a pretrained model with a small amount of domain data, which is much cheaper than training from zero."},
+ play:{h:"Turn a general model into a banking specialist",intro:"Slide the amount of banking training. Watch the suggestions for a banking prompt improve. If you stop revising general text, watch it start forgetting everyday language.",mount(el){
+   el.innerHTML=`<div class="grid2"><div class="box" style="display:grid;gap:10px"><label class="f">Banking training: <b id="ftV"></b><input type="range" id="ft" min="0" max="10" value="0"></label><label class="row" style="font-size:.9rem;color:var(--muted)"><input type="checkbox" id="ftKeep" checked> keep revising some general text (prevents forgetting)</label>
+     <div><div class="muted" style="font-size:.85rem">Banking skill</div><div class="meter"><i id="ftB"></i></div></div><div><div class="muted" style="font-size:.85rem">General language</div><div class="meter"><i id="ftG"></i></div></div></div>
+     <div class="box"><div class="eyebrow">“the customer asked about the …”</div><div class="row" id="ftP1" style="gap:6px;margin:6px 0 12px"></div><div class="eyebrow">“the cat sat on the …”</div><div class="row" id="ftP2" style="gap:6px;margin-top:6px"></div><p class="say" id="ftSay" style="margin-top:12px"></p></div></div>
+     <div class="box"><div class="eyebrow" style="margin-bottom:8px">LoRA: sticky notes instead of rewriting the book</div><label class="f">sticky-note size (LoRA rank): <b id="lrV2"></b><input type="range" id="lr2" min="1" max="64" value="8"></label><div id="lrGrid" style="display:grid;grid-template-columns:repeat(25,1fr);gap:2px;margin-top:10px"></div><p class="note" id="lrSay" style="margin-top:8px"></p></div>`;
+   function draw(){const k=+$("#ft").value,keep=$("#ftKeep").checked,gw=keep?1:Math.max(.02,1-k*.098),bw=k*.6;$("#ftV").textContent=k?`${k*10}%`:"none (general model)";
+     const m=trainLM(GENERAL,gw*10);if(bw)addLM(m,BANKING,bw*10);
+     const d1=dist(m,words("the customer asked about the")).slice(0,3),d2=dist(m,words("the cat sat on the")).slice(0,3);
+     const bank=["loan","interest","account","emi","balance"],bs=d1.filter(a=>bank.includes(a.w)).reduce((s,a)=>s+a.p,0),gs=keep?Math.min(1,.4+gw*.6):gw;
+     $("#ftP1").innerHTML=d1.map(a=>`<span class="chip ${bank.includes(a.w)?"g":""}">${esc(a.w)} ${(a.p*100).toFixed(0)}%</span>`).join("");$("#ftP2").innerHTML=d2.map(a=>`<span class="chip ${a.w==="mat"?"g":"r"}">${esc(a.w)} ${(a.p*100).toFixed(0)}%</span>`).join("");
+     $("#ftB").style.width=(Math.min(1,bs)*100)+"%";$("#ftB").style.background="var(--out)";$("#ftG").style.width=(gs*100)+"%";$("#ftG").style.background=gs>.6?"var(--emb)":"var(--err)";
+     $("#ftSay").innerHTML=!k?"A general model: it has never seen banking chats, so its guesses are vague.":!keep&&k>6?"<b class='c-err'>Catastrophic forgetting:</b> it only studied banking and is losing everyday language. Turn revising back on.":"<b class='c-out'>Specialist:</b> banking answers are sharp, and general language is still fine.";
+     const r=+$("#lr2").value,d=4096,full=d*d,lora=2*d*r,pct=lora/full*100;$("#lrV2").textContent=r;
+     $("#lrGrid").innerHTML=Array.from({length:100},(_,i)=>`<span style="aspect-ratio:1;border-radius:2px;background:${i<Math.max(1,Math.round(pct))?"var(--tok)":"var(--line2)"}"></span>`).join("");
+     $("#lrSay").innerHTML=`For one 4,096 × 4,096 weight table, full fine-tuning changes <b>${(full/1e6).toFixed(1)}M</b> numbers. LoRA trains only <b class="c-tok">${(lora/1e3).toFixed(0)}K</b> sticky-note numbers (${pct.toFixed(2)}%). The original book stays frozen.`;window.__ft={k,keep};}
+   ["ft","ftKeep","lr2"].forEach(i=>$("#"+i).addEventListener("input",draw));$("#ftKeep").addEventListener("change",draw);draw();}},
+ real:[["Banking assistant","A general open model, fine-tuned on a bank’s FAQs and support chats, learns its products and tone."],["Legal & medical bots","Fine-tuned on domain documents to use the right terms."],["Your own SLM","With LoRA, you can fine-tune a small model on a single gaming GPU, or even slowly on a laptop."]],
+ inside:"Steps: <b>pre-training</b> (next-word prediction on huge text) → <b>supervised fine-tuning / instruction tuning</b> (question → good answer pairs) → optional alignment. <b>LoRA / QLoRA</b> train small low-rank add-ons while the main weights stay frozen (QLoRA also compresses the base to 4 bits).",
+ quiz:[{q:"What is fine-tuning?",opts:[{t:"Further training a pretrained model on a small, focused dataset",ok:1,why:"Yes, like a doctor specialising."},{t:"Training a brand-new model from zero",why:"That’s pre-training, which is much more expensive."},{t:"Deleting parts of the model",why:"Fine-tuning adjusts, it doesn’t delete."}]},
+  {q:"What is catastrophic forgetting?",opts:[{t:"The model loses general skills when trained only on new specialised data",ok:1,why:"Right. Mixing in some general data helps prevent it."},{t:"The model forgets its password",why:"Ha, no. It’s about losing earlier knowledge."},{t:"Data getting deleted from disk",why:"It’s about the model’s knowledge, not files."}]},
+  {q:"Why is LoRA like sticky notes?",opts:[{t:"It adds small trainable notes while the original book (weights) stays unchanged",ok:1,why:"Exactly, so it’s cheap, small and easy to swap."},{t:"It rewrites every page",why:"That would be full fine-tuning."},{t:"It makes the book shorter",why:"Shrinking models is Chapter 14 (quantization)."}]}],
+ narr:[{tab:0,en:"A general doctor becomes a heart specialist with a short, focused training. Models do the same: pre-train on general text, then fine-tune on a small amount of domain data, like banking.",te:"జనరల్ డాక్టర్ చిన్న, కేంద్రీకృత శిక్షణతో గుండె నిపుణుడు అవుతాడు. మోడల్స్ కూడా అంతే: సాధారణ టెక్స్ట్‌పై ప్రీ-ట్రైన్ చేసి, తర్వాత బ్యాంకింగ్ లాంటి చిన్న డొమైన్ డేటాపై ఫైన్-ట్యూన్ చేస్తారు.",hn:"एक सामान्य डॉक्टर छोटी, केंद्रित ट्रेनिंग से दिल का विशेषज्ञ बनता है। मॉडल भी यही करते हैं: पहले आम टेक्स्ट पर प्री-ट्रेनिंग, फिर बैंकिंग जैसे थोड़े डोमेन डेटा पर फ़ाइन-ट्यूनिंग।"},
+  {tab:1,sel:"#ftP1",act:()=>{const s=$("#ft");if(s){s.value=8;s.dispatchEvent(new Event("input"));}},en:"Add banking training and the suggestions become banking words. If it stops revising general text, it starts forgetting everyday language. That is catastrophic forgetting.",te:"బ్యాంకింగ్ ట్రైనింగ్ జోడిస్తే సూచనలు బ్యాంకింగ్ పదాలుగా మారతాయి. సాధారణ టెక్స్ట్ పునశ్చరణ ఆపేస్తే, రోజువారీ భాషను మర్చిపోవడం మొదలవుతుంది. దాన్నే క్యాటస్ట్రోఫిక్ ఫర్గెటింగ్ అంటారు.",hn:"बैंकिंग ट्रेनिंग जोड़िए, तो सुझाव बैंकिंग शब्द बन जाते हैं। अगर वह आम टेक्स्ट दोहराना बंद कर दे, तो रोज़मर्रा की भाषा भूलने लगता है। इसे कैटास्ट्रॉफ़िक फ़ॉरगेटिंग कहते हैं।"},
+  {tab:2,en:"LoRA is like adding sticky notes to a textbook instead of rewriting it. It lets you fine-tune a model cheaply, even on modest hardware.",te:"లోరా పాఠ్యపుస్తకాన్ని తిరగరాయకుండా స్టిక్కీ నోట్స్ జోడించడం లాంటిది. దీనితో తక్కువ ఖర్చుతో, సాధారణ హార్డ్‌వేర్‌పై కూడా మోడల్‌ను ఫైన్-ట్యూన్ చేయవచ్చు.",hn:"लोरा किताब दोबारा लिखने के बजाय उस पर स्टिकी नोट लगाने जैसा है। इससे आप मॉडल को सस्ते में, साधारण हार्डवेयर पर भी फ़ाइन-ट्यून कर सकते हैं।"}]});
+
+/* ---- 14. Shrinking ---- */
+const QB=[[32,"FP32 (full)"],[16,"FP16 (half)"],[8,"INT8"],[4,"INT4"],[2,"INT2"]];
+CH.push({icon:"photo",title:"Shrinking the model",like:"Compressing a photo so it fits on WhatsApp",mins:4,
+ story:{h:"Same photo, smaller file",p:"A photo from a good camera might be 12 MB. WhatsApp compresses it to 300 KB, and it still looks almost the same. You only notice if you compress <b>too much</b>. Models can be compressed the same way: each of the billions of numbers inside is stored with <b>fewer digits</b>. This is called <b>quantization</b>, and it lets a model that needed a big server run on a laptop or phone.",
+  map:[["Photo detail (colours per pixel)","Precision of each number (bits)"],["Compressing a photo","Quantization (32 → 8 → 4 bits)"],["Blocky photo when over-compressed","Quality loss when too few bits"],["Making a short video from a long one","Distillation (a small model learning from a big one)"]],
+  one:"<b>In one line:</b> storing each number with fewer bits makes models <b>4–8× smaller and faster</b>, with only a small quality loss, up to a point."},
+ play:{h:"Compress the picture, compress the model",intro:"Slide the precision. The picture shows what fewer bits per number does to detail. The numbers below show what the same compression does to a 1-billion-parameter model.",mount(el){
+   el.innerHTML=`<div class="box"><label class="f">Bits per number: <b id="qbV"></b><input type="range" id="qb" min="0" max="4" value="0"></label></div><div class="grid2"><div class="box"><canvas id="qbC" width="480" height="300" style="width:100%;height:auto;border-radius:10px;display:block" aria-label="Compressed picture"></canvas></div><div class="box" style="display:grid;gap:10px;align-content:start"><div class="row" style="gap:26px"><div><div class="big c-tok" id="qbSize"></div><div class="muted" style="font-size:.85rem">a 1B-parameter model</div></div><div><div class="big" id="qbQ"></div><div class="muted" style="font-size:.85rem">quality kept (rough)</div></div></div><div id="qbDev" style="display:grid;gap:6px"></div><p class="say" id="qbSay"></p></div></div>`;
+   const W=480,H=300,base=new Float32Array(W*H*3);
+   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const i=(y*W+x)*3,t=y/H;let r=.98-.5*t,g=.55-.35*t+.25*(1-t)*(1-t),b=.35+.45*t;const dx=x-330,dy=y-120,d=Math.hypot(dx,dy);if(d<52){r=1;g=.86-d/400;b=.45;}const m1=200+60*Math.sin(x/70)+25*Math.sin(x/23);const m2=235+30*Math.sin(x/45+1);if(y>m1){r=.32*(1-t)+.1;g=.22+.1*Math.sin(x/90);b=.42;}if(y>m2){r=.12;g=.18+.06*Math.sin(x/30);b=.22;}base[i]=r;base[i+1]=g;base[i+2]=b;}
+   function draw(){const [bits,lab]=QB[+$("#qb").value];$("#qbV").textContent=lab;const c=$("#qbC").getContext("2d"),im=c.createImageData(W,H),lv=bits>=16?255:Math.pow(2,Math.min(bits,8))-1,q=bits>=16?1:Math.max(1,Math.round(255/lv));
+     for(let k=0,j=0;k<base.length;k+=3,j+=4){for(let ch=0;ch<3;ch++){let v=base[k+ch];if(bits<16){const L=bits===8?24:bits===4?6:bits===2?2:255;v=Math.round(v*L)/L;}im.data[j+ch]=Math.max(0,Math.min(255,v*255));}im.data[j+3]=255;}
+     c.putImageData(im,0,0);c.fillStyle="rgba(10,17,22,.6)";c.fillRect(0,0,150,30);c.fillStyle="#fff";c.font="600 15px IBM Plex Sans, sans-serif";c.fillText(lab,10,20);
+     const size=1e9*bits/8,qual={32:100,16:100,8:99,4:96,2:70}[bits];$("#qbSize").textContent=fmtB(size);$("#qbQ").textContent=qual+"%";$("#qbQ").style.color=qual>95?"var(--out)":qual>85?"var(--tok)":"var(--err)";
+     $("#qbDev").innerHTML=[["Basic phone (3 GB free)",3e9],["Good phone (6 GB free)",6e9],["Laptop (12 GB free)",12e9]].map(([d,cap])=>`<div class="row" style="justify-content:space-between"><span>${d}</span><span class="chip ${size<cap*.8?"g":"r"}">${size<cap*.8?"✓ fits":"✗ too big"}</span></div>`).join("");
+     $("#qbSay").innerHTML=bits>=16?"Full detail, but big.":bits===8?"Half the size of FP16, and you can barely see the difference. This is the most popular choice.":bits===4?"4× smaller than FP16 with small quality loss. Great for phones and laptops.":"<b class='c-err'>Too much compression:</b> visible blocks, and a model would start making mistakes.";window.__qb=bits;}
+   $("#qb").addEventListener("input",draw);draw();}},
+ real:[["WhatsApp photos & Netflix video","Compressed to save data, while looking almost the same."],["On-device AI","Phone assistants run 4-bit compressed small models to save memory and battery."],["Running models at home","Tools like Ollama and llama.cpp run 4-bit models on ordinary laptops."]],
+ inside:"Formats: <b>FP32 (4 bytes) → FP16/BF16 (2) → INT8 (1) → INT4 (½)</b> per parameter. Other tricks: <b>pruning</b> (removing unimportant weights) and <b>knowledge distillation</b> (a small “student” model learning from a big “teacher”).",
+ quiz:[{q:"What does quantization do?",opts:[{t:"Stores each of the model’s numbers with fewer bits, making it smaller and faster",ok:1,why:"Yes, like compressing a photo."},{t:"Removes whole layers",why:"That’s closer to pruning. Quantization keeps everything but stores it more compactly."},{t:"Adds more knowledge",why:"It compresses. It doesn’t add knowledge."}]},
+  {q:"A 1-billion-parameter model in INT4 (½ byte each) takes about…",opts:[{t:"0.5 GB",ok:1,why:"1 billion × 0.5 byte = 0.5 GB. That fits on a phone."},{t:"4 GB",why:"That would be FP32 (4 bytes each)."},{t:"1 KB",why:"Far too small. Each of the billion numbers needs space."}]},
+  {q:"What happens if you compress too much (like 2 bits)?",opts:[{t:"Quality drops noticeably, like a blocky photo",ok:1,why:"Right. There’s a sweet spot, usually 4–8 bits."},{t:"It becomes smarter",why:"Compression never adds intelligence."},{t:"Nothing changes",why:"Too few bits loses real information."}]}],
+ narr:[{tab:0,en:"WhatsApp compresses your photos and they still look almost the same. Models can be compressed too, by storing each number with fewer bits. This is called quantization.",te:"వాట్సాప్ మీ ఫోటోలను కంప్రెస్ చేస్తుంది, అయినా అవి దాదాపు అలాగే కనిపిస్తాయి. మోడల్స్‌ను కూడా ప్రతి సంఖ్యను తక్కువ బిట్లలో నిల్వ చేసి కంప్రెస్ చేయవచ్చు. దీన్ని క్వాంటైజేషన్ అంటారు.",hn:"व्हाट्सऐप आपकी फ़ोटो कंप्रेस करता है, फिर भी वे लगभग वैसी ही दिखती हैं। मॉडल भी हर नंबर को कम बिट में रखकर कंप्रेस किए जा सकते हैं। इसे क्वांटाइज़ेशन कहते हैं।"},
+  {tab:1,sel:"#qbC",act:()=>{const s=$("#qb");if(s){s.value=3;s.dispatchEvent(new Event("input"));}},en:"At four bits, the model is four times smaller than half precision and fits on a phone, with only a small loss. At two bits, the picture becomes blocky, and so would the model's answers.",te:"నాలుగు బిట్ల వద్ద మోడల్ హాఫ్ ప్రెసిషన్ కంటే నాలుగు రెట్లు చిన్నది, కొద్దిపాటి నష్టంతో ఫోన్‌లో సరిపోతుంది. రెండు బిట్ల వద్ద చిత్రం గడ్డలుగా మారుతుంది, మోడల్ జవాబులు కూడా అలాగే.",hn:"चार बिट पर मॉडल हाफ़ प्रिसिशन से चार गुना छोटा होता है और थोड़े से नुकसान के साथ फ़ोन में आ जाता है। दो बिट पर तस्वीर ब्लॉक जैसी हो जाती है, और मॉडल के जवाब भी।"},
+  {tab:2,en:"That is how assistants run on phones, and how tools like Ollama run models on ordinary laptops.",te:"అలాగే అసిస్టెంట్లు ఫోన్లలో నడుస్తాయి, ఒల్లామా లాంటి సాధనాలు సాధారణ ల్యాప్‌టాప్‌లలో మోడల్స్ నడుపుతాయి.",hn:"इसी तरह असिस्टेंट फ़ोन पर चलते हैं, और ओलामा जैसे टूल आम लैपटॉप पर मॉडल चलाते हैं।"}]});
+
+/* ---- 15. Going live ---- */
+const SERVE=["Customer","Waiter (API)","Order slip (tokens)","Kitchen (model)","Plating (detokenize)","Served"];
+CH.push({icon:"shop",title:"Going live: serving your SLM",like:"A restaurant taking orders and serving dishes",mins:5,
+ story:{h:"Opening the restaurant",p:"Your model is trained. Now customers need to use it, like opening a <b>restaurant</b>. A customer places an order (asks a question). The <b>waiter</b> (an API) carries it to the <b>kitchen</b> (the model), which cooks the answer <b>one word at a time</b>, and it’s served back. You decide how <b>creative the chef</b> is (temperature), and you watch the restaurant: waiting times, busy hours and mistakes (monitoring).",
+  map:[["Customer’s order","User’s prompt"],["Waiter","API (e.g. FastAPI)"],["Kitchen","The model running on a server or laptop"],["Chef’s creativity","Temperature"],["Dish served course by course","Streaming tokens"],["Manager watching the floor","Monitoring & logging"]],
+  one:"<b>In one line:</b> deployment wraps your model in an <b>API</b>, generates answers token by token, and <b>monitors</b> speed, cost and quality."},
+ play:{h:"Run the restaurant",intro:"Type how the answer should begin, set the chef’s creativity, and press Order. Watch the request travel through the restaurant and the answer arrive word by word.",mount(el,ctx){
+   el.innerHTML=`<div class="box" style="display:grid;gap:10px"><div class="row"><input class="txt" id="rsIn" value="the customer asked about the" style="flex:1 1 260px"><button class="btn primary" type="button" id="rsGo">Order</button></div><div class="row" style="gap:16px"><label class="f" style="flex:1 1 200px">Chef’s creativity (temperature): <b id="rsTV"></b><input type="range" id="rsT" min="1" max="20" value="8"></label><label class="f" style="flex:1 1 200px">Maximum words: <b id="rsMV"></b><input type="range" id="rsM" min="3" max="15" value="8"></label></div></div>
+    <div class="box"><div id="rsFlow" style="display:flex;flex-wrap:wrap;gap:6px;align-items:center"></div></div>
+    <div class="grid2"><div class="box"><div class="eyebrow" style="margin-bottom:6px">Answer (streamed)</div><p class="say" id="rsOut" style="min-height:70px;font-size:1.1rem"></p></div><div class="box"><div class="eyebrow" style="margin-bottom:6px">Manager’s dashboard (simulated)</div><div class="row" style="gap:22px" id="rsDash"></div></div></div>`;
+   let st=-1,run=0,orders=0,lat=[];
+   function flow(){$("#rsFlow").innerHTML=SERVE.map((s,k)=>`${k?'<span class="dim">→</span>':""}<span class="chip ${k===st?"g":k<st?"b":""}" style="${k===st?"box-shadow:0 0 14px rgba(98,227,162,.5)":""}">${s}</span>`).join("");}
+   function dash(){const avg=lat.length?lat.reduce((a,b)=>a+b,0)/lat.length:0;$("#rsDash").innerHTML=`<div><div class="big c-tok">${orders}</div><div class="muted" style="font-size:.82rem">orders served</div></div><div><div class="big">${avg?(avg/1000).toFixed(1)+"s":"–"}</div><div class="muted" style="font-size:.82rem">avg waiting time</div></div><div><div class="big c-out">0</div><div class="muted" style="font-size:.82rem">errors</div></div>`;}
+   function labels(){$("#rsTV").textContent=(+$("#rsT").value/10).toFixed(1)+(+$("#rsT").value<5?" (very safe)":+$("#rsT").value>13?" (wild!)":" (balanced)");$("#rsMV").textContent=$("#rsM").value;}
+   $("#rsGo").addEventListener("click",()=>{const id=++run,t0=performance.now();st=0;flow();$("#rsOut").textContent="";const T=+$("#rsT").value/10,M=+$("#rsM").value;let ctxW=words($("#rsIn").value),n=0;
+     const steps=()=>{if(id!==run)return;if(st<3){st++;flow();ctx.after(steps,450);return;}
+       const a=pick(dist(LM_ALL,ctxW,T));ctxW.push(a.w);$("#rsOut").insertAdjacentHTML("beforeend",`<span class="chip g" style="margin:2px">${esc(a.w)}</span>`);n++;
+       if(n<M&&a.w!==".")ctx.after(steps,220);else{st=4;flow();ctx.after(()=>{if(id!==run)return;st=5;flow();orders++;lat.push(performance.now()-t0);dash();window.__rsOrders=orders;window.__rsT=T;},400);}};steps();});
+   ["rsT","rsM"].forEach(i=>$("#"+i).addEventListener("input",labels));labels();flow();dash();}},
+ real:[["Bank app chat","Your question goes to the bank’s API, the model runs on its servers, and the answer streams back."],["Typing indicator","The answer appearing word by word is real streaming, not an animation trick."],["Status pages","AI services publish uptime and speed, because monitoring is part of the job."]],
+ inside:"A production setup: <b>save the trained weights</b> → load them with the tokenizer → wrap generation in a <b>FastAPI</b> endpoint → set <b>temperature, top-k / top-p, max tokens</b> → <b>log</b> requests and <b>monitor latency</b> (time to answer) and <b>throughput</b> (answers per second).",
+ quiz:[{q:"What does the API do, in the restaurant story?",opts:[{t:"Like a waiter, it carries the user’s request to the model and brings the answer back",ok:1,why:"Yes. Apps talk to models through an API."},{t:"It cooks the answer",why:"The model (kitchen) does that."},{t:"It trains the model",why:"Training happened earlier. The API is for serving."}]},
+  {q:"What does a higher temperature (chef’s creativity) do?",opts:[{t:"Makes answers more varied and surprising, but riskier",ok:1,why:"Right. For banking, a low temperature is usually safer."},{t:"Makes the server hotter",why:"Funny, but it’s about randomness in word choice."},{t:"Makes answers longer",why:"Length is controlled by max tokens."}]},
+  {q:"Why monitor a deployed model?",opts:[{t:"To catch slow responses, errors and bad answers before customers suffer",ok:1,why:"Exactly, like a manager watching the restaurant floor."},{t:"It isn’t needed once trained",why:"Real traffic always brings surprises, so monitoring is essential."},{t:"To make the model learn automatically",why:"Monitoring observes. Retraining is a separate, deliberate step."}]}],
+ narr:[{tab:0,en:"Going live is like opening a restaurant. The customer orders, the waiter, which is the API, takes it to the kitchen, which is the model, and the answer is served word by word.",te:"లైవ్‌కి వెళ్లడం ఒక రెస్టారెంట్ తెరవడం లాంటిది. కస్టమర్ ఆర్డర్ చేస్తాడు, వెయిటర్ అంటే ఏపీఐ దాన్ని కిచెన్‌కి అంటే మోడల్‌కి తీసుకెళ్తాడు, జవాబు పదం పదంగా వడ్డించబడుతుంది.",hn:"लाइव होना एक रेस्टोरेंट खोलने जैसा है। ग्राहक ऑर्डर देता है, वेटर यानी एपीआई उसे किचन यानी मॉडल तक ले जाता है, और जवाब शब्द-दर-शब्द परोसा जाता है।"},
+  {tab:1,sel:"#rsOut",act:()=>$("#rsGo")&&$("#rsGo").click(),en:"Watch the order travel through the restaurant and the answer stream in, word by word. Turn up the chef's creativity for more surprising answers.",te:"ఆర్డర్ రెస్టారెంట్ గుండా ప్రయాణించడం, జవాబు పదం పదంగా రావడం చూడండి. మరింత ఆశ్చర్యకరమైన జవాబుల కోసం చెఫ్ సృజనాత్మకతను పెంచండి.",hn:"देखिए ऑर्डर रेस्टोरेंट से गुज़रता है और जवाब शब्द-दर-शब्द आता है। और चौंकाने वाले जवाबों के लिए शेफ़ की रचनात्मकता बढ़ाइए।"},
+  {tab:2,en:"Your bank app's chat works exactly like this. And with that, you have seen every step of building a small language model. Well done!",te:"మీ బ్యాంక్ యాప్ చాట్ సరిగ్గా ఇలాగే పనిచేస్తుంది. దీనితో, చిన్న లాంగ్వేజ్ మోడల్ నిర్మాణంలో ప్రతి దశను మీరు చూశారు. శభాష్!",hn:"आपके बैंक ऐप की चैट बिल्कुल ऐसे ही काम करती है। और इसके साथ, आपने छोटा लैंग्वेज मॉडल बनाने का हर कदम देख लिया। बहुत बढ़िया!"}]});
+
+/* =================== START =================== */
+$("#homeBtn").addEventListener("click",goHome);
+$("#startBtn").addEventListener("click",()=>{let i=CH.findIndex((_,k)=>!P.done.includes(k));if(i<0)i=0;openChapter(i);});
+let resetArm=false;$("#resetBtn").addEventListener("click",()=>{if(!resetArm){resetArm=true;$("#resetMsg").textContent="Press again to erase your progress.";setTimeout(()=>{resetArm=false;$("#resetMsg").textContent="";},4000);return;}P={done:[]};saveP();resetArm=false;$("#resetMsg").textContent="Progress erased.";renderRoad();});
+renderRoad();
+
+})();
+</script>
