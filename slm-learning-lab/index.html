@@ -90,6 +90,7 @@ button{cursor:pointer}
 .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .field{display:block;font-size:.8rem;color:var(--muted)}
 .field > input,.field > select{display:block;margin-top:5px}
+.field > textarea{display:block;width:100%;margin-top:5px}
 .field input[type=text],.field select,input.txt{background:var(--bg);border:1px solid var(--line2);border-radius:8px;padding:8px 10px;color:var(--fg);font-family:var(--f-mono);font-size:.88rem;width:100%}
 input[type=range]{accent-color:var(--emb);width:100%}
 .sim{display:inline-flex;gap:6px;align-items:center;font-family:var(--f-mono);font-size:.68rem;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:1px solid}
@@ -291,6 +292,55 @@ svg.plot{width:100%;height:auto;display:block;touch-action:none}
 .narr{font-size:.95rem;padding:10px 14px;border-radius:8px;background:var(--bg);border:1px solid var(--line);min-height:3.2em}
 .bigloss{font-family:var(--f-display);font-size:2.6rem;font-weight:700;line-height:1.05;color:var(--err);font-variant-numeric:tabular-nums}
 .statusline{font-weight:600}
+/* ---- Stage 2 instruments ---- */
+.bycards{display:flex;flex-wrap:wrap;gap:6px}
+.bycard{border:1px solid var(--line2);border-top:3px solid var(--bc);border-radius:8px;padding:6px 8px;display:grid;gap:3px;justify-items:center;background:var(--bg);animation:pop .3s ease both;min-width:52px}
+.bycard .ch{font-size:1.35rem;line-height:1.2}
+.bycard .cp{font-family:var(--f-mono);font-size:.62rem;color:var(--muted)}
+.bycard .bs{display:flex;gap:2px}
+.bycard .bs span{font-family:var(--f-mono);font-size:.66rem;padding:1px 4px;border-radius:3px;background:color-mix(in srgb,var(--bc) 22%,transparent);color:var(--fg)}
+.ws{color:var(--dim)}
+.nstep{display:grid;grid-template-columns:130px minmax(0,1fr);gap:8px;align-items:baseline;font-size:.82rem}
+.nstep .nm{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.nstep .tx{font-family:var(--f-mono);background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:5px 8px;overflow-x:auto;white-space:pre}
+.nstep.chg .tx{border-color:rgba(82,211,226,.45)}
+@media (max-width:560px){.nstep{grid-template-columns:minmax(0,1fr)}}
+.tog{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;padding:5px 10px;border-radius:999px;border:1px solid var(--line2);background:var(--panel2);cursor:pointer;user-select:none}
+.tog:has(input:checked){border-color:var(--emb);color:var(--emb)}
+.tog input{accent-color:var(--emb);margin:0}
+.tk{font-family:var(--f-mono);font-size:.82rem;padding:3px 6px;border-radius:5px;border:1px solid transparent;white-space:pre;animation:pop .25s ease both}
+.tk0{background:rgba(243,185,85,.16);border-color:rgba(243,185,85,.35);color:#f7d08e}
+.tk1{background:rgba(82,211,226,.14);border-color:rgba(82,211,226,.35);color:#98e6ef}
+.tk2{background:rgba(169,147,255,.16);border-color:rgba(169,147,255,.38);color:#c9baff}
+.tk3{background:rgba(98,227,162,.13);border-color:rgba(98,227,162,.35);color:#9ff0c6}
+.tk.unk{background:rgba(255,125,147,.18);border-color:var(--err);color:var(--err)}
+.tk.spec{background:rgba(169,147,255,.3);border-color:var(--hid);color:var(--fg)}
+.tk.hipair{background:rgba(98,227,162,.3);border-color:var(--out);color:var(--fg);box-shadow:0 0 10px rgba(98,227,162,.35)}
+.tk.newtok{border-color:var(--out);color:var(--out);animation:pop .45s ease both}
+.tkrow{display:flex;flex-wrap:wrap;gap:3px}
+.tkhead{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin-bottom:8px}
+.tkhead h4{margin:0;font-family:var(--f-display);font-size:1rem}
+.pill{font-family:var(--f-mono);font-size:.72rem;padding:2px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line2);color:var(--muted)}
+.pill b{color:var(--fg);font-weight:500}
+.pill.bad{border-color:var(--err);color:var(--err)}
+.idline{font-family:var(--f-mono);font-size:.72rem;color:var(--dim);margin-top:6px;overflow-x:auto;white-space:nowrap}
+.bword{display:grid;grid-template-columns:44px minmax(0,1fr);gap:8px;align-items:center}
+.bword .fq{font-family:var(--f-mono);font-size:.75rem;color:var(--muted);text-align:right}
+table.pg{border-collapse:separate;border-spacing:3px;font-family:var(--f-mono);font-size:.7rem}
+.pg td{min-width:46px;height:30px;text-align:center;border-radius:4px;padding:2px 4px;line-height:1.15;white-space:nowrap}
+.pg td small{display:block;color:var(--muted);font-size:.6rem}
+.pg th{font-weight:400;color:var(--dim);font-size:.62rem;padding:0 4px;text-align:right}
+.pg .c-t{background:rgba(243,185,85,.16);color:#f7d08e}
+.pg .c-s{background:rgba(169,147,255,.32);color:var(--fg)}
+.pg .c-p{background:var(--bg);border:1px dashed var(--line2);color:var(--dim)}
+.pg .c-x{background:rgba(255,125,147,.18);color:var(--err);text-decoration:line-through}
+.pg .c-cut{width:3px;min-width:3px;padding:0;background:var(--err)}
+.pg .m1{background:rgba(98,227,162,.25);color:var(--out)}
+.pg .m0{background:var(--bg);color:var(--dim);border:1px solid var(--line)}
+i.lg{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.encstep{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px;align-items:center;font-size:.8rem;animation:pop .3s ease both}
+.encstep .why{font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+@media (max-width:560px){.encstep{grid-template-columns:minmax(0,1fr)}}
 </style>
 
 <header class="top">
@@ -774,6 +824,222 @@ svg.plot{width:100%;height:auto;display:block;touch-action:none}
     </div>
   </section>
 
+  <!-- ====================== STAGE 2 ====================== -->
+  <section id="stage2" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 02 · unlocked</div>
+      <h2>How words become numbers: tokenization</h2>
+      <p>A neural network only does arithmetic. This stage follows a sentence from the letters you type to the integer tensor the model receives, and you build a real BPE tokenizer one merge at a time along the way.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 2 sections">
+      <button type="button" data-go="p2-pipe">1 · The full pipeline</button>
+      <button type="button" data-go="p2-bytes">2 · Text is bytes</button>
+      <button type="button" data-go="p2-norm">3 · Normalization</button>
+      <button type="button" data-go="p2-cmp">4 · Char vs word vs BPE</button>
+      <button type="button" data-go="p2-bpe">5 · BPE, merge by merge</button>
+      <button type="button" data-go="p2-vocab">6 · Vocabulary size</button>
+      <button type="button" data-go="p2-pad">7 · Padding & truncation</button>
+      <button type="button" data-go="p2-code">8 · Code</button>
+      <button type="button" data-go="p2-ex">9 · Exercise</button>
+      <button type="button" data-go="p2-quiz">10 · Assessment</button>
+    </nav>
+
+    <!-- 1 PIPELINE -->
+    <div class="panel" id="p2-pipe">
+      <div class="phead"><span class="tag">01</span><h3>The tokenizer pipeline, end to end</h3><span class="sim real">real tokenizer</span>
+        <p class="plain">Every SLM has a <em>tokenizer</em> in front of it: a translator that turns text into a list of integers, and back again. Type anything and press Play to see all eight steps. The rest of this stage looks at each step closely.</p></div>
+      <div class="row" style="margin-bottom:12px">
+        <label class="field" style="flex:1 1 280px">Your text<input class="txt" id="p2In" type="text" value="The bank APPROVED the borrower’s refinancing!" autocomplete="off"></label>
+        <div class="row" style="align-self:end"><button class="btn primary" id="p2Play" type="button">Play</button><button class="btn" id="p2Prev" type="button">Back</button><button class="btn" id="p2Next" type="button">Next</button></div>
+      </div>
+      <div class="pipe" id="pipe2"></div>
+      <div class="box stage-out" id="p2Out" aria-live="polite"></div>
+    </div>
+
+    <!-- 2 BYTES -->
+    <div class="panel" id="p2-bytes">
+      <div class="phead"><span class="tag">02</span><h3>Text is already numbers: Unicode & UTF-8</h3><span class="sim real">your browser's real encoding</span>
+        <p class="plain">Your computer already stores every character as <em>bytes</em> (numbers from 0 to 255). English letters take 1 byte, accented letters 2, the rupee sign 3 and emoji 4. Some tokenizers start from these 256 bytes, so they never meet a character they can't handle.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <label class="field">Type anything, including emoji or other scripts<input class="txt" id="byIn" type="text" value="Café ₹500 👍 नमस्ते" autocomplete="off"></label>
+          <div class="bycards" id="byCards" style="margin-top:12px"></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="stats" id="byStats"></div><div class="row" style="margin-top:10px;gap:12px;font-size:.75rem;font-family:var(--f-mono)" id="byLeg"></div></div>
+          <div class="predict" id="byPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Key idea</b><div class="formula">character → code point (U+…) → 1–4 bytes</div></div>
+        <div><b>What the terms mean</b><ul><li><span class="c-tok">Code point</span>: Unicode's number for a character</li><li><span class="c-emb">UTF-8</span>: the rule that stores a code point as 1–4 bytes</li><li><span class="c-hid">Byte-level BPE</span>: BPE that starts from the 256 bytes</li></ul></div>
+        <div><b>Inside an SLM</b>GPT-2-style tokenizers are byte-level, so emoji, Hindi or a typo never become &lt;unk&gt;. The catch: text with rare characters costs more tokens. A 4-byte emoji can take several.</div>
+      </div>
+    </div>
+
+    <!-- 3 NORMALIZATION -->
+    <div class="panel" id="p2-norm">
+      <div class="phead"><span class="tag">03</span><h3>Normalization: cleaning before cutting</h3><span class="sim real">live</span>
+        <p class="plain">The same word can be typed many ways: <em>Bank, BANK, bank</em>, or "café" stored as one character or as two. Normalization rewrites text into one standard form so these variants become the same token. Switch each rule on and off and watch the text change.</p></div>
+      <div class="grid2">
+        <div class="box" style="display:grid;gap:10px;align-content:start">
+          <label class="field">Messy input (spaces shown as ·)<input class="txt" id="nIn" type="text" value="  The BANK’s   Café charged ₹500!!  ｆｕｌｌ-width ﬁnance   https://bank.example/help  " autocomplete="off"></label>
+          <div class="row" id="nOpts"></div>
+          <div id="nSteps" style="display:grid;gap:6px"></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Seven variants of two words</div><div id="nVar"></div></div>
+          <div class="predict" id="nPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Common rules</b><div class="formula" style="white-space:normal">NFKC · lowercase · strip accents · collapse spaces · mask URLs/numbers</div></div>
+        <div><b>Trade-offs</b><ul><li>Lowercasing merges "US" and "us"</li><li>Stripping accents merges "résumé" and "resume"</li><li>Masking numbers loses "₹500 vs ₹5000"</li></ul></div>
+        <div><b>Inside an SLM</b>Modern SLM tokenizers normalize <b>lightly</b> (usually NFKC only) and keep case. The model learns that Bank and bank are related. For a banking SLM, never mask amounts or account formats: they <i>are</i> the data.</div>
+      </div>
+    </div>
+
+    <!-- 4 COMPARE -->
+    <div class="panel" id="p2-cmp">
+      <div class="phead"><span class="tag">04</span><h3>Character vs word vs subword (BPE)</h3><span class="sim real">three real tokenizers, trained on this lab's corpus</span>
+        <p class="plain">Where do we cut the text? Into <em>characters</em> (tiny vocabulary, very long sequences), <em>whole words</em> (short sequences, but every new word is unknown), or <em>subwords</em> (common words whole, rare words in pieces). Each coloured box below is one token.</p></div>
+      <div class="row" style="margin-bottom:12px">
+        <label class="field" style="flex:1 1 300px">Sentence<input class="txt" id="cIn" type="text" value="The borrower refinanced her mortgage at a lower rate." autocomplete="off"></label>
+        <label class="field" style="flex:0 1 240px">BPE merges learned: <b id="bpeNv"></b><input id="bpeN" type="range" min="0" max="400" value="120"></label>
+      </div>
+      <div id="cRows" style="display:grid;gap:12px"></div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="cAdd" type="button">Add unknown words to the word vocabulary</button><button class="btn" id="cReset" type="button">Reset word vocabulary</button><span class="mono dim" id="cAddMsg" style="font-size:.78rem"></span></div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="predict" id="cPred"></div>
+        <div class="box note" style="border-left:0">All three were trained on the same ~50 sentences (Stage 0's corpus plus banking text) and the input is lowercased first. Try a typo like <span class="mono c-tok">mortgaeg</span>, or a new word like <span class="mono c-tok">overdrafts</span>. Then slide the BPE merges to 0 (BPE becomes characters) and to its maximum (BPE becomes almost whole words, because merges stop once no pair appears twice).</div>
+      </div>
+      <div class="facts">
+        <div><b>Vocabulary size V</b><div class="formula">char ≈ 40 · BPE = base + merges · word = every word seen</div></div>
+        <div><b>What to watch</b><ul><li><span class="c-tok">Tokens</span>: sequence length T</li><li><span class="c-err">&lt;unk&gt;</span>: information lost forever</li><li><span class="c-hid">V × d</span>: embedding parameters</li></ul></div>
+        <div><b>Inside an SLM</b>Nearly every modern SLM uses subwords (BPE, WordPiece or Unigram) with V = 8K–128K. Common words stay whole, rare ones split into known pieces, and nothing becomes &lt;unk&gt;.</div>
+      </div>
+    </div>
+
+    <!-- 5 BPE -->
+    <div class="panel" id="p2-bpe">
+      <div class="phead"><span class="tag">05</span><h3>Byte Pair Encoding, one merge at a time</h3><span class="sim real">real BPE training</span>
+        <p class="plain">BPE builds a vocabulary bottom-up: start from single characters, <em>find the pair of neighbours that appears most often, glue it into a new token, repeat</em>. The ordered list of merges <em>is</em> the trained tokenizer. ▁ marks the start of a word.</p></div>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn primary" id="bNext" type="button">Next merge</button><button class="btn" id="bAuto" type="button">Auto-play</button><button class="btn" id="bReset" type="button">Reset</button>
+        <span class="eyebrow" style="margin-left:8px">Corpus</span><button class="btn" id="bClassic" type="button">Classic: low / newest</button><button class="btn" id="bBank" type="button">Banking words</button>
+      </div>
+      <label class="field" style="margin-bottom:12px">Training text (edit freely; word counts are computed from it)<input class="txt" id="bCorpus" type="text" autocomplete="off"></label>
+      <div class="grid2">
+        <div class="box">
+          <div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="eyebrow">Words in the corpus, as current tokens</span><span class="mono dim" id="bRound" style="font-size:.75rem"></span></div>
+          <div id="bWords" style="display:grid;gap:6px"></div>
+          <div class="narr" id="bNarr" style="margin-top:10px" aria-live="polite"></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Neighbour-pair counts this round</div><div class="bars" id="bPairs"></div></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Merge rules learned (in order)</div><ol id="bRules" class="mono" style="margin:0;padding-left:22px;font-size:.82rem;display:grid;gap:2px"></ol></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Vocabulary: <span id="bVsz"></span></div><div class="chips" id="bVocab"></div></div>
+        </div>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="box">
+          <label class="field">Encode a word the corpus never contained<input class="txt" id="bEnc" type="text" value="lowest" autocomplete="off"></label>
+          <div id="bEncOut" style="margin-top:10px;display:grid;gap:4px"></div>
+        </div>
+        <div class="predict" id="bPred"></div>
+      </div>
+      <div class="facts">
+        <div><b>Algorithm</b><div class="formula" style="white-space:normal">repeat: (a, b) = most frequent neighbour pair → replace every a b with ab → add ab to vocab</div></div>
+        <div><b>What the parts mean</b><ul><li><span class="c-tok">Pair count</span>: Σ word frequency × occurrences</li><li><span class="c-out">Merge rule</span>: (a, b) → ab, applied in order</li><li>Vocab size = base symbols + number of merges</li></ul></div>
+        <div><b>Inside an SLM</b>GPT-2 learned 50,000 merges this way on 40 GB of text. Encoding a new string replays the same merges in the same order, so the result is deterministic and never unknown.</div>
+      </div>
+    </div>
+
+    <!-- 6 VOCAB -->
+    <div class="panel" id="p2-vocab">
+      <div class="phead"><span class="tag">06</span><h3>Vocabulary size: the central trade-off</h3><span class="sim real">measured on this lab's corpus</span>
+        <p class="plain">More merges means a bigger vocabulary and <em>shorter sequences</em>, which is cheaper attention and more text per context window. But it also means a <em>bigger embedding matrix</em>, and rare tokens the model barely sees in training. The slider is the same BPE slider as in panel 04.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <svg class="plot" id="vSvg" viewBox="0 0 440 250" role="img" aria-label="Tokens versus vocabulary size"></svg>
+          <label class="field" style="margin-top:8px">BPE merges learned: <b id="bpeNv2"></b><input id="bpeN2" type="range" min="0" max="400" value="120"></label>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="stats" id="vStats"></div></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Real tokenizers (public figures)</div>
+            <table class="tbl"><tr><th>model family</th><th>vocab V</th><th>embeddings at its d</th></tr>
+              <tr><td>GPT-2</td><td>50,257</td><td>50,257 × 768 ≈ 38.6M</td></tr>
+              <tr><td>Llama 2</td><td>32,000</td><td>32,000 × 4,096 ≈ 131M</td></tr>
+              <tr><td>Llama 3</td><td>128,256</td><td>128,256 × 4,096 ≈ 525M</td></tr>
+              <tr><td class="c-out">your CPU SLM</td><td class="c-out">2K–8K</td><td class="c-out">8,000 × 256 ≈ 2M</td></tr></table></div>
+          <div class="predict" id="vPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formulas</b><div class="formula" style="white-space:normal">embedding params = V × d  ·  attention cost ∝ T²</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-emb">V</span>: vocabulary size</li><li><span class="c-hid">d</span>: embedding width</li><li><span class="c-tok">T</span>: tokens in the sequence</li></ul></div>
+        <div><b>Inside an SLM</b>For a <b>small</b> model, V × d can swallow a big share of all parameters (remember panel 04 in Stage 0). That's why CPU-scale SLMs pick small vocabularies of 2K–16K.</div>
+      </div>
+    </div>
+
+    <!-- 7 PADDING -->
+    <div class="panel" id="p2-pad">
+      <div class="phead"><span class="tag">07</span><h3>Special tokens, padding, truncation & sequence length</h3><span class="sim real">live batch builder</span>
+        <p class="plain">A model processes sentences in <em>batches</em>, and a batch must be a rectangle. Short sentences get <em>&lt;pad&gt;</em> tokens added, and long ones get <em>truncated</em> (cut). An <em>attention mask</em> tells the model which positions are real. Edit the sentences (one per line) and the settings.</p></div>
+      <div class="grid2">
+        <div class="box" style="display:grid;gap:10px;align-content:start">
+          <label class="field">Sentences (one per line)<textarea id="pText" class="txt" rows="4" style="resize:vertical;font-family:var(--f-mono)">the bank approved the loan
+hi
+the customer asked about the account balance and the interest rate on her savings</textarea></label>
+          <div class="ctrls">
+            <label class="field">max_length: <b id="pMaxV"></b><input id="pMax" type="range" min="4" max="32" value="12"></label>
+            <label class="field">pad to<select id="pTo" class="txt"><option value="longest">longest in batch</option><option value="max">max_length</option></select></label>
+            <label class="field">padding side<select id="pSide" class="txt"><option value="right">right</option><option value="left">left</option></select></label>
+            <label class="field">tokenizer<select id="pTok" class="txt"><option value="bpe">BPE (panel 04)</option><option value="word">word</option></select></label>
+          </div>
+          <div class="row" style="font-size:.85rem;color:var(--muted)"><label class="row"><input type="checkbox" id="pSpec" checked> add &lt;bos&gt; / &lt;eos&gt;</label><label class="row"><input type="checkbox" id="pTrunc" checked> truncation</label></div>
+          <div class="box" style="padding:10px"><div class="stats" id="pStats"></div></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start;min-width:0">
+          <div class="box" style="min-width:0"><div class="eyebrow" style="margin-bottom:6px">input_ids <span id="pShape" class="shape"></span></div><div class="scroll" id="pGrid"></div>
+            <div class="eyebrow" style="margin:12px 0 6px">attention_mask (1 = real, 0 = ignore)</div><div class="scroll" id="pMask"></div>
+            <div class="row" style="margin-top:10px;gap:12px;font-size:.72rem;font-family:var(--f-mono)"><span><i class="lg" style="background:rgba(169,147,255,.35)"></i>special</span><span><i class="lg" style="background:rgba(243,185,85,.22)"></i>token</span><span><i class="lg" style="background:var(--bg);border:1px dashed var(--line2)"></i>&lt;pad&gt;</span><span><i class="lg" style="background:rgba(255,125,147,.25)"></i>cut by truncation</span></div></div>
+          <div class="predict" id="pPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Shapes</b><div class="formula">input_ids, attention_mask: [B, L]</div></div>
+        <div><b>Special tokens</b><ul><li><span class="c-hid">&lt;pad&gt; = 0</span>: filler, always masked</li><li><span class="c-hid">&lt;unk&gt; = 1</span>: unknown</li><li><span class="c-hid">&lt;bos&gt; = 2 / &lt;eos&gt; = 3</span>: start / end of text</li></ul></div>
+        <div><b>Inside an SLM</b>The context window (Stage 5) is the hard maximum L. Padded positions are masked in attention <b>and</b> ignored in the loss (<span class="mono">ignore_index</span>). Decoder models usually pad on the <b>left</b> for generation, so the newest token is always at the end.</div>
+      </div>
+    </div>
+
+    <!-- 8 CODE -->
+    <div class="panel" id="p2-code">
+      <div class="phead"><span class="tag">08</span><h3>Code it on your CPU</h3>
+        <p>Three files: tokenizers from scratch, BPE from scratch (it prints the same merges as panel 05), and the production route with Hugging Face <span class="mono">tokenizers</span>.</p></div>
+      <div class="code" id="code2"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <!-- 9 EXERCISE -->
+    <div class="panel" id="p2-ex">
+      <div class="phead"><span class="tag">09</span><h3>Hands-on exercise: four missions</h3>
+        <p>Each mission uses one instrument. The checks read the panels' live state.</p></div>
+      <div class="box">
+        <div class="checks" id="ex2Checks"></div>
+        <div class="row" style="margin-top:14px"><button class="btn primary" id="ex2Btn" type="button">Check missions</button></div>
+        <p class="note" id="ex2Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p>
+      </div>
+    </div>
+
+    <!-- 10 QUIZ -->
+    <div class="panel" id="p2-quiz">
+      <div class="phead"><span class="tag">10</span><h3>Stage 2 assessment</h3>
+        <p>5 questions: numerical, conceptual and practical. Score 4/5 or better to unlock Stage 3.</p></div>
+      <div id="quiz2"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -821,7 +1087,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -1061,7 +1327,7 @@ const STEPS=[
 ];
 let jStep=0,jTimer=null,jTemp=1;
 $("#pipe").innerHTML=STEPS.map((s,i)=>(i?`<span class="arrow" id="ar${i}"></span>`:"")+`<button type="button" class="step" data-i="${i}" style="--sc:${s.c}"><span class="sn">${i+1}</span><span class="sl" style="color:${s.c}">${s.l}</span><span class="ss">${s.s}</span></button>`).join("");
-$$(".step").forEach(b=>b.addEventListener("click",()=>{stopPlay();setStep(+b.dataset.i);}));
+$$("#pipe .step").forEach(b=>b.addEventListener("click",()=>{stopPlay();setStep(+b.dataset.i);}));
 function jData(){
   const toks=tokenize($("#jIn").value).slice(-12);
   const ids=toks.map(t=>ID.has(t)?ID.get(t):1);
@@ -1074,7 +1340,7 @@ function jData(){
 }
 function setStep(i){
   jStep=Math.max(0,Math.min(STEPS.length-1,i));
-  $$(".step").forEach((b,k)=>{b.classList.toggle("on",k===jStep);b.classList.toggle("past",k<jStep);});
+  $$("#pipe .step").forEach((b,k)=>{b.classList.toggle("on",k===jStep);b.classList.toggle("past",k<jStep);});
   const ar=$("#ar"+jStep);if(ar){ar.classList.remove("flow");void ar.offsetWidth;ar.classList.add("flow");}
   const d=jData(),T=d.toks.length,o=$("#jOut");
   if(!T){o.innerHTML='<p class="muted">Type a sentence above to start.</p>';return;}
@@ -1878,6 +2144,402 @@ function makeQuiz1(seed){
   ];
 }
 mountQuiz(1,$("#quiz1"),makeQuiz1);
+
+/* =================== STAGE 2 =================== */
+const SPEC2=["<pad>","<unk>","<bos>","<eos>"];
+const EXTRA2=`the lender reviewed the borrower's application .
+the bank lowered the interest rate on savings accounts .
+customers can transfer money between accounts online .
+the agent explained the overdraft fee to the customer .
+a mortgage is a loan used to buy a house .
+the borrower repaid the loan early and saved interest .
+lending rates are lower for customers with good credit .
+the customer reported a lost card and the bank blocked it .`.split("\n");
+const T2TEXT=[...CORPUS,...EXTRA2].join(" ");
+const preTok=s=>s.toLowerCase().match(/[a-z0-9]+|[^\sa-z0-9]/g)||[];
+const showWS=s=>esc(s).replace(/ /g,'<span class="ws">·</span>');
+const tkc=(t,i,extra)=>`<span class="tk tk${i%4}${extra?" "+extra:""}">${esc(t)}</span>`;
+
+/* ---- BPE core (shared) ---- */
+const wordFreqs=words=>{const m=new Map();words.forEach(w=>m.set(w,(m.get(w)||0)+1));return [...m.entries()];};
+const bpeInit=wf=>wf.map(([w,f])=>({w,f,s:["▁"+w[0],...w.slice(1)]}));
+function bpeCount(st){const m=new Map();st.forEach(x=>{for(let i=0;i<x.s.length-1;i++){const k=x.s[i]+"\u0001"+x.s[i+1];m.set(k,(m.get(k)||0)+x.f);}});return m;}
+function bpeBest(m){let bk=null,bv=1;m.forEach((v,k)=>{if(v>bv){bv=v;bk=k;}});return bk?[...bk.split("\u0001"),bv]:null;}
+function mergeSeq(s,a,b){const n=[];for(let i=0;i<s.length;i++){if(i<s.length-1&&s[i]===a&&s[i+1]===b){n.push(a+b);i++;}else n.push(s[i]);}return n;}
+function bpeMergeAll(st,a,b){st.forEach(x=>{x.s=mergeSeq(x.s,a,b);});}
+function bpeEncodeWord(w,merges,N,trace){let s=["▁"+w[0],...w.slice(1)];const tr=trace?[{s:s.slice(),r:null}]:null;for(let r=0;r<Math.min(N,merges.length);r++){if(s.length<2)break;const [a,b]=merges[r];const n=mergeSeq(s,a,b);if(n.length!==s.length){s=n;if(tr)tr.push({s:s.slice(),r});}}return trace?tr:s;}
+
+/* ---- trained lab tokenizers ---- */
+const T2WORDS=preTok(T2TEXT);
+const BPE_WF=wordFreqs(T2WORDS);
+const BPE={merges:[],totals:[],base:[]};
+(function(){const st=bpeInit(BPE_WF);const base=new Set();st.forEach(x=>x.s.forEach(c=>base.add(c)));BPE.base=[...base].sort();
+  const tot=()=>st.reduce((a,x)=>a+x.f*x.s.length,0);BPE.totals.push(tot());
+  for(let i=0;i<400;i++){const b=bpeBest(bpeCount(st));if(!b)break;BPE.merges.push([b[0],b[1]]);bpeMergeAll(st,b[0],b[1]);BPE.totals.push(tot());}})();
+const MAXM=BPE.merges.length;
+$("#bpeN").max=MAXM;$("#bpeN2").max=MAXM;
+let bpeN=Math.min(120,MAXM);
+function bpeVocab(N){return [...SPEC2,...BPE.base,...BPE.merges.slice(0,N).map(m=>m[0]+m[1])];}
+function bpeEncodeText(text,N){const out=[];preTok(text).forEach(w=>bpeEncodeWord(w,BPE.merges,N).forEach(t=>out.push(t)));return out;}
+const CHARV=[...SPEC2,...[...new Set([...T2TEXT.toLowerCase()])].sort()];
+const WORDBASE=[...new Set(T2WORDS)].sort();
+let wordAdded=new Set();
+const wordVocab=()=>[...SPEC2,...WORDBASE,...wordAdded];
+
+/* ---- normalization ---- */
+const NOPTS=[["nfkc","Unicode NFKC",true],["lower","lowercase",true],["accent","strip accents",false],["space","collapse spaces",true],["punct","remove punctuation",false],["url","URLs → <url>",false],["num","numbers → <num>",false]];
+const normState=Object.fromEntries(NOPTS.map(o=>[o[0],o[2]]));
+function normSteps(s,o){
+  const st=[["raw",s,false]];const push=(n,v)=>{st.push([n,v,v!==st[st.length-1][1]]);return v;};
+  if(o.nfkc)s=push("Unicode NFKC",s.normalize("NFKC"));
+  if(o.url)s=push("URLs → <url>",s.replace(/https?:\/\/\S+/g,"<url>"));
+  if(o.lower)s=push("lowercase",s.toLowerCase());
+  if(o.accent)s=push("strip accents",s.normalize("NFD").replace(/[̀-ͯ]/g,""));
+  if(o.num)s=push("numbers → <num>",s.replace(/\d+([.,]\d+)?/g,"<num>"));
+  if(o.punct)s=push("remove punctuation",s.replace(/<(url|num)>|[^\p{L}\p{N}\s]/gu,m=>m.length>1?m:" "));
+  if(o.space)s=push("collapse spaces",s.replace(/\s+/g," ").trim());
+  return st;
+}
+const normalize=(s,o)=>{const st=normSteps(s,o);return st[st.length-1][1];};
+const NVARS=["Bank","bank","BANK","Café","cafe","CAFÉ","ｃａｆｅ"];
+$("#nOpts").innerHTML=NOPTS.map(o=>`<label class="tog"><input type="checkbox" id="no-${o[0]}" ${o[2]?"checked":""}>${esc(o[1])}</label>`).join("");
+NOPTS.forEach(o=>$("#no-"+o[0]).addEventListener("change",e=>{normState[o[0]]=e.target.checked;renderNorm();}));
+function renderNorm(){
+  const st=normSteps($("#nIn").value,normState);
+  $("#nSteps").innerHTML=st.map(([n,v,c],i)=>`<div class="nstep${c?" chg":""}"><span class="nm">${i?"→ ":""}${esc(n)}${c?' <span class="c-emb">changed</span>':""}</span><span class="tx">${showWS(v)}</span></div>`).join("");
+  const after=NVARS.map(v=>normalize(v,normState));const u=new Set(after).size;
+  $("#nVar").innerHTML=`<div style="display:grid;gap:4px">${NVARS.map((v,i)=>`<div class="row" style="gap:8px;font-family:var(--f-mono);font-size:.82rem"><span class="tk tk0" style="min-width:64px;text-align:center">${esc(v)}</span><span class="dim">→</span><span class="tk tk${[...new Set(after)].indexOf(after[i])%4}">${esc(after[i])}</span></div>`).join("")}</div>
+   <p style="margin-top:10px;font-weight:600;color:${u<=2?"var(--out)":"var(--tok)"}">${NVARS.length} variants → ${u} distinct token type${u>1?"s":""}</p><p class="note" style="margin-top:4px">Fewer types means each one gets more training examples, but also less information (case, accents).</p>`;
+}
+$("#nIn").addEventListener("input",renderNorm);renderNorm();
+predictBox($("#nPred"),{q:"Switch on NFKC + lowercase + strip accents. How many distinct types will Café, cafe, CAFÉ and ｃａｆｅ (full-width letters) become?",opts:["1","2","4"],ok:0,
+  why:"NFKC turns full-width ｃａｆｅ into plain cafe, lowercase turns CAFÉ into café, and stripping accents turns café into cafe. All four become <span class='mono'>cafe</span>.",onReveal:()=>{["nfkc","lower","accent"].forEach(k=>{normState[k]=true;$("#no-"+k).checked=true;});renderNorm();}});
+
+/* ---- bytes ---- */
+const BCOL={1:"var(--out)",2:"var(--emb)",3:"var(--tok)",4:"var(--err)"};
+const enc8=new TextEncoder();
+function renderBytes(){
+  const chars=[...$("#byIn").value];let nb=0;
+  $("#byCards").innerHTML=chars.map((c,i)=>{const b=[...enc8.encode(c)];nb+=b.length;const cp=c.codePointAt(0).toString(16).toUpperCase().padStart(4,"0");
+    return `<div class="bycard" style="--bc:${BCOL[b.length]};animation-delay:${Math.min(i,30)*25}ms" title="${b.map(x=>x.toString(2).padStart(8,"0")).join(" ")}"><span class="ch">${c===" "?'<span class="ws">␣</span>':esc(c)}</span><span class="cp">U+${cp}</span><span class="bs">${b.map(x=>`<span>${x.toString(16).toUpperCase().padStart(2,"0")}</span>`).join("")}</span></div>`;}).join("");
+  $("#byStats").innerHTML=`<div class="stat"><span class="v c-tok">${chars.length}</span><span class="k">characters</span></div><div class="stat"><span class="v c-emb">${nb}</span><span class="k">UTF-8 bytes</span></div><div class="stat"><span class="v">${chars.length?(nb/chars.length).toFixed(2):0}</span><span class="k">bytes / char</span></div><div class="stat"><span class="v c-hid">256</span><span class="k">possible byte values</span></div>`;
+}
+$("#byLeg").innerHTML=[1,2,3,4].map(n=>`<span><i class="lg" style="background:${BCOL[n]}"></i>${n} byte${n>1?"s":""}</span>`).join("")+'<span class="dim">hover a card for its bits</span>';
+$("#byIn").addEventListener("input",renderBytes);renderBytes();
+predictBox($("#byPred"),{q:"How many UTF-8 bytes does the thumbs-up emoji 👍 take?",opts:["1","2","4"],ok:2,
+  why:"👍 is U+1F44D, beyond the first 65,536 code points, so UTF-8 needs 4 bytes: F0 9F 91 8D. A byte-level tokenizer starts from those 4 bytes and merges them if the emoji was common in training.",onReveal:()=>{$("#byIn").value="👍";renderBytes();}});
+
+/* ---- compare tokenizers ---- */
+function tokChar(s){const v=CHARV,id=new Map(v.map((t,i)=>[t,i]));const toks=[...s.toLowerCase()];return {toks,ids:toks.map(t=>id.has(t)?id.get(t):1),V:v.length,unk:toks.map(t=>!id.has(t))};}
+function tokWord(s){const v=wordVocab(),id=new Map(v.map((t,i)=>[t,i]));const toks=preTok(s);return {toks,ids:toks.map(t=>id.has(t)?id.get(t):1),V:v.length,unk:toks.map(t=>!id.has(t))};}
+function tokBpe(s,N){const v=bpeVocab(N),id=new Map(v.map((t,i)=>[t,i]));const toks=bpeEncodeText(s,N);return {toks,ids:toks.map(t=>id.has(t)?id.get(t):1),V:v.length,unk:toks.map(t=>!id.has(t))};}
+function cmpRow(name,desc,r,disp){
+  const nu=r.unk.filter(Boolean).length;
+  return `<div class="box"><div class="tkhead"><h4>${name}</h4><span class="pill">tokens T = <b>${r.toks.length}</b></span><span class="pill">vocab V = <b>${r.V.toLocaleString()}</b></span><span class="pill${nu?" bad":""}">&lt;unk&gt; = <b>${nu}</b></span><span class="pill">V × 256 = <b>${(r.V*256).toLocaleString()}</b> params</span><span class="dim" style="font-size:.78rem">${desc}</span></div>
+   <div class="tkrow">${r.toks.map((t,i)=>tkc(r.unk[i]?(disp?disp(t):t)+" → <unk>":(disp?disp(t):t),i,r.unk[i]?"unk":"")).join("")}</div>
+   <div class="idline">ids: [${r.ids.join(", ")}]</div></div>`;
+}
+let lastWordRes=null;
+function renderCmp(){
+  const s=$("#cIn").value;$("#bpeNv").textContent=`${bpeN} → V = ${bpeVocab(bpeN).length}`;$("#bpeN").value=bpeN;
+  const c=tokChar(s),w=tokWord(s),b=tokBpe(s,bpeN);lastWordRes=w;
+  $("#cRows").innerHTML=cmpRow("Character","one token per letter",c,t=>t===" "?"␣":t)+cmpRow("Word","one token per word or punctuation mark",w)+cmpRow("Subword (BPE)",`${bpeN} merges learned`,b);
+  renderVocab();renderPad();renderPipe();
+}
+$("#cIn").addEventListener("input",renderCmp);
+const setBpeN=v=>{bpeN=+v;renderCmp();};
+$("#bpeN").addEventListener("input",e=>setBpeN(e.target.value));$("#bpeN2").addEventListener("input",e=>setBpeN(e.target.value));
+$("#cAdd").addEventListener("click",()=>{const before=wordVocab().length;preTok($("#cIn").value).forEach(t=>{if(!WORDBASE.includes(t))wordAdded.add(t);});const n=wordVocab().length-before;$("#cAddMsg").textContent=n?`+${n} word${n>1?"s":""}: V grew to ${wordVocab().length}. Each new word needs a new embedding row (256 numbers) that starts untrained.`:"No unknown words to add.";renderCmp();});
+$("#cReset").addEventListener("click",()=>{wordAdded=new Set();$("#cAddMsg").textContent="";renderCmp();});
+predictBox($("#cPred"),{q:"For the sentence above, which tokenizer produces the longest sequence?",opts:["Character","Word","BPE"],ok:0,
+  why:"Characters give one token per letter, about 5× more than words. Attention cost grows with T², so character-level models pay a heavy price for their tiny vocabulary."});
+
+/* ---- vocab trade-off ---- */
+function renderVocab(){
+  const W=440,H=250,l=50,r=50,t=16,b=36,base=SPEC2.length+BPE.base.length,maxV=base+MAXM;
+  const X=n=>l+n/MAXM*(W-l-r),tmax=BPE.totals[0],Y=v=>t+(1-v/tmax)*(H-t-b),Yp=v=>t+(1-v/(maxV*256))*(H-t-b);
+  let g="";for(let k=0;k<=4;k++){const v=tmax*k/4;g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l-6}" y="${Y(v)+3}" text-anchor="end" font-size="9" style="fill:var(--tok)" font-family="IBM Plex Mono">${Math.round(v)}</text><text x="${W-r+6}" y="${Y(v)+3}" font-size="9" style="fill:var(--hid)" font-family="IBM Plex Mono">${Math.round(maxV*256*k/4/1000)}K</text>`;}
+  [0,.25,.5,.75,1].forEach(q=>{const n=Math.round(q*MAXM);g+=`<text x="${X(n)}" y="${H-20}" text-anchor="middle" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${base+n}</text>`;});
+  g+=`<text x="${(l+W-r)/2}" y="${H-5}" text-anchor="middle" font-size="10" style="fill:var(--muted)" font-family="IBM Plex Mono">vocabulary size V</text><text x="${l}" y="${t-5}" font-size="9.5" style="fill:var(--tok)" font-family="IBM Plex Mono">tokens to encode corpus</text><text x="${W-r}" y="${t-5}" text-anchor="end" font-size="9.5" style="fill:var(--hid)" font-family="IBM Plex Mono">embedding params (d=256)</text>`;
+  const tp=BPE.totals.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  const pp=`${X(0)},${Yp(base*256)} ${X(MAXM)},${Yp(maxV*256)}`;
+  const cx=X(bpeN),cur=BPE.totals[bpeN];
+  $("#vSvg").innerHTML=g+`<polyline points="${tp}" style="fill:none;stroke:var(--tok)" stroke-width="2.5"/><polyline points="${pp}" style="fill:none;stroke:var(--hid)" stroke-width="2" stroke-dasharray="6 4"/><line x1="${cx}" x2="${cx}" y1="${t}" y2="${H-b}" style="stroke:var(--fg)" stroke-opacity=".5"/><circle cx="${cx}" cy="${Y(cur)}" r="5.5" style="fill:var(--tok);stroke:var(--bg)" stroke-width="2"/><circle cx="${cx}" cy="${Yp((base+bpeN)*256)}" r="5" style="fill:var(--hid);stroke:var(--bg)" stroke-width="2"/>`;
+  const V=base+bpeN,nw=T2WORDS.length,att=(cur/BPE.totals[0])**2;
+  $("#vStats").innerHTML=`<div class="stat"><span class="v c-emb">${V}</span><span class="k">vocab V</span></div><div class="stat"><span class="v c-tok">${cur}</span><span class="k">corpus tokens</span></div><div class="stat"><span class="v">${(cur/nw).toFixed(2)}</span><span class="k">tokens / word</span></div><div class="stat"><span class="v c-hid">${(V*256/1000).toFixed(1)}K</span><span class="k">V × 256 params</span></div><div class="stat"><span class="v c-err">${(att*100).toFixed(0)}%</span><span class="k">attention cost vs chars</span></div>`;
+  $("#bpeNv2").textContent=`${bpeN} → V = ${V}`;$("#bpeN2").value=bpeN;
+}
+predictBox($("#vPred"),{q:"An LLM with d = 4096 grows its vocabulary from 32,000 to 64,000. How many extra embedding parameters?",opts:["32,000","≈ 131 million","≈ 1 billion"],ok:1,
+  why:"Extra rows × width = 32,000 × 4,096 ≈ 131M. If the LM head isn't tied to the embeddings, the output layer adds another 131M on top."});
+
+/* ---- BPE stepper ---- */
+const BCLASSIC="low low low low low lower lower newest newest newest newest newest newest widest widest widest";
+const BBANK="loan loan loan loans loans loans lend lender lender lending lending lending bank bank banker banking banking banking";
+const bs={st:[],merges:[],base:[],hi:null,newTok:null,timer:null,busy:false,lastCounts:null};
+function bReset(){
+  clearInterval(bs.timer);bs.timer=null;bs.busy=false;
+  const words=($("#bCorpus").value.toLowerCase().match(/[a-z]+/g)||[]);
+  bs.st=bpeInit(wordFreqs(words));bs.merges=[];bs.hi=null;bs.newTok=null;
+  const base=new Set();bs.st.forEach(x=>x.s.forEach(c=>base.add(c)));bs.base=[...base].sort();
+  $("#bNarr").innerHTML=`Start: every word is split into single characters. Press <b>Next merge</b>: BPE counts every pair of neighbours (weighted by how often the word appears) and glues the winner together.`;
+  $("#bAuto").textContent="Auto-play";renderB();
+}
+function renderB(){
+  const counts=bpeCount(bs.st),best=bpeBest(counts);bs.lastCounts=counts;
+  $("#bRound").textContent=`round ${bs.merges.length+1}`;
+  $("#bWords").innerHTML=bs.st.map(x=>{let h="";for(let i=0;i<x.s.length;i++){const t=x.s[i];const isHi=bs.hi&&i<x.s.length-1&&t===bs.hi[0]&&x.s[i+1]===bs.hi[1];if(isHi){h+=tkc(t,i,"hipair")+tkc(x.s[i+1],i+1,"hipair");i++;}else h+=tkc(t,i,bs.newTok&&t===bs.newTok?"newtok":"");}
+    return `<div class="bword"><span class="fq">${x.f}×</span><span class="tkrow">${h}</span></div>`;}).join("");
+  const arr=[...counts.entries()].sort((a,b)=>b[1]-a[1]).slice(0,8),mx=arr.length?arr[0][1]:1;
+  $("#bPairs").innerHTML=arr.length?arr.map(([k,v])=>{const [a,b]=k.split("\u0001"),win=best&&a===best[0]&&b===best[1];return `<div class="bar${win?" pick":""}"><span class="lbl" style="color:${win?"var(--out)":"var(--tok)"}">${esc(a)} + ${esc(b)}</span><span class="trk"><span class="fill" style="display:block;width:${(v/mx*100).toFixed(1)}%;background:${win?"var(--out)":"var(--line2)"}"></span></span><span class="val">${v}×</span></div>`;}).join(""):'<p class="muted">No pairs left: every word is a single token.</p>';
+  $("#bRules").innerHTML=bs.merges.length?bs.merges.map(([a,b,v],i)=>`<li${i===bs.merges.length-1?' class="c-out"':""}>${esc(a)} + ${esc(b)} → <b>${esc(a+b)}</b> <span class="dim">(${v}×)</span></li>`).join(""):'<li class="dim" style="list-style:none;margin-left:-22px">none yet</li>';
+  $("#bVsz").textContent=`${bs.base.length} base + ${bs.merges.length} merged = ${bs.base.length+bs.merges.length}`;
+  $("#bVocab").innerHTML=bs.base.map((t,i)=>tkc(t,i)).join("")+bs.merges.map(([a,b])=>`<span class="tk newtok">${esc(a+b)}</span>`).join("");
+  const tr=bpeEncodeWord(($("#bEnc").value.toLowerCase().match(/[a-z]+/)||["?"])[0],bs.merges.map(m=>[m[0],m[1]]),bs.merges.length,true);
+  $("#bEncOut").innerHTML=tr.map((t,i)=>`<div class="encstep"><span class="why">${i?`rule ${t.r+1}: ${esc(bs.merges[t.r][0])} + ${esc(bs.merges[t.r][1])}`:"start: characters"}</span><span class="tkrow">${t.s.map((x,j)=>tkc(x,j)).join("")}</span></div>`).join("")+`<p class="note" style="margin-top:4px">${tr[tr.length-1].s.length} token${tr[tr.length-1].s.length>1?"s":""}. Rules are replayed in the order they were learned. Rules that don't apply to this word are skipped.</p>`;
+  $("#bNext").disabled=!best||bs.busy;
+}
+async function bStep(){
+  if(bs.busy)return false;const best=bpeBest(bpeCount(bs.st));if(!best)return false;
+  bs.busy=true;bs.hi=[best[0],best[1]];bs.newTok=null;renderB();
+  $("#bNarr").innerHTML=`Most frequent pair: <b class="c-out">${esc(best[0])} + ${esc(best[1])}</b>, seen <b>${best[2]}</b> times. It's highlighted in every word where it appears…`;
+  await sleep(950);
+  bpeMergeAll(bs.st,best[0],best[1]);bs.merges.push(best);bs.hi=null;bs.newTok=best[0]+best[1];bs.busy=false;renderB();
+  $("#bNarr").innerHTML=`Merged into the new token <b class="c-out">${esc(best[0]+best[1])}</b> and added it to the vocabulary as rule ${bs.merges.length}. Every word that contained the pair is now one token shorter.`;
+  return true;
+}
+$("#bNext").addEventListener("click",bStep);
+$("#bAuto").addEventListener("click",()=>{if(bs.timer){clearInterval(bs.timer);bs.timer=null;$("#bAuto").textContent="Auto-play";return;}$("#bAuto").textContent="Pause";const go=async()=>{if(!(await bStep())){clearInterval(bs.timer);bs.timer=null;$("#bAuto").textContent="Auto-play";}};go();bs.timer=setInterval(go,1500);});
+$("#bReset").addEventListener("click",bReset);
+$("#bClassic").addEventListener("click",()=>{$("#bCorpus").value=BCLASSIC;$("#bEnc").value="lowest";bReset();});
+$("#bBank").addEventListener("click",()=>{$("#bCorpus").value=BBANK;$("#bEnc").value="lenders";bReset();});
+$("#bCorpus").addEventListener("change",bReset);$("#bEnc").addEventListener("input",renderB);
+$("#bCorpus").value=BCLASSIC;bReset();
+predictBox($("#bPred"),{q:"Classic corpus: low ×5, lower ×2, newest ×6, widest ×3. Which pair is merged <b>first</b>?",opts:["▁l + o (7×)","w + e (8×)","e + s (9×)"],ok:2,
+  why:"e+s appears in newest (6×) and widest (3×) = 9, more than any other pair. Frequency, not meaning, decides the order. After 4 merges, the unseen word 'lowest' becomes ▁low + est.",onReveal:()=>{$("#bCorpus").value=BCLASSIC;$("#bEnc").value="lowest";bReset();bStep();}});
+
+/* ---- padding & truncation ---- */
+let padStats={drop:0,padPct:0};
+function renderPad(){
+  const lines=$("#pText").value.split("\n").map(x=>x.trim()).filter(Boolean).slice(0,6);
+  const maxL=+$("#pMax").value,to=$("#pTo").value,side=$("#pSide").value,spec=$("#pSpec").checked,trunc=$("#pTrunc").checked,tk=$("#pTok").value;
+  $("#pMaxV").textContent=maxL;
+  const enc=s=>{if(tk==="word"){const r=tokWord(s);return r.toks.map((t,i)=>({t:r.unk[i]?"<unk>":t,id:r.ids[i]}));}const r=tokBpe(s,bpeN);return r.toks.map((t,i)=>({t,id:r.ids[i]}));};
+  const rows=lines.map(s=>{let body=enc(s),dropped=[];const room=maxL-(spec?2:0);if(trunc&&body.length>room){dropped=body.slice(room);body=body.slice(0,room);}
+    const seq=[...(spec?[{t:"<bos>",id:2,s:1}]:[]),...body,...(spec?[{t:"<eos>",id:3,s:1}]:[])];return {seq,dropped};});
+  const longest=Math.max(0,...rows.map(r=>r.seq.length)),L=to==="max"?Math.max(maxL,trunc?0:longest):longest;
+  let real=0,pads=0,drop=0;
+  const grid=rows.map(r=>{const n=L-r.seq.length;real+=r.seq.length;pads+=n;drop+=r.dropped.length;const pad=Array.from({length:n},()=>({t:"<pad>",id:0,p:1}));const full=side==="left"?[...pad,...r.seq]:[...r.seq,...pad];return {full,dropped:r.dropped};});
+  const cell=c=>`<td class="${c.p?"c-p":c.s?"c-s":"c-t"}">${esc(c.t)}<small>${c.id}</small></td>`;
+  $("#pGrid").innerHTML=`<table class="pg"><tr><th></th>${Array.from({length:L},(_,i)=>`<th style="text-align:center">${i}</th>`).join("")}</tr>${grid.map((g,ri)=>`<tr><th>row ${ri}</th>${g.full.map(cell).join("")}${g.dropped.length?`<td class="c-cut"></td>${g.dropped.map(c=>`<td class="c-x">${esc(c.t)}</td>`).join("")}`:""}</tr>`).join("")}</table>`;
+  $("#pMask").innerHTML=`<table class="pg">${grid.map((g,ri)=>`<tr><th>row ${ri}</th>${g.full.map(c=>`<td class="${c.p?"m0":"m1"}">${c.p?0:1}</td>`).join("")}</tr>`).join("")}</table>`;
+  $("#pShape").textContent=`[${grid.length}, ${L}]`;
+  const total=real+pads,pct=total?pads/total*100:0;padStats={drop,padPct:pct,rows:grid.length};
+  const warn=!trunc&&longest>maxL;
+  $("#pStats").innerHTML=`<div class="stat"><span class="v c-tok">${real}</span><span class="k">real tokens</span></div><div class="stat"><span class="v" style="color:var(--dim)">${pads}</span><span class="k">pad tokens</span></div><div class="stat"><span class="v ${pct>40?"c-err":""}">${pct.toFixed(0)}%</span><span class="k">wasted on padding</span></div><div class="stat"><span class="v c-err">${drop}</span><span class="k">tokens cut</span></div>`+(warn?`<p class="c-err" style="grid-column:1/-1;font-size:.85rem;margin-top:6px">Without truncation the longest row has ${longest} tokens, more than max_length = ${maxL}. A model with that context window would crash or silently ignore the overflow.</p>`:"");
+}
+["#pText","#pMax","#pTo","#pSide","#pSpec","#pTrunc","#pTok"].forEach(s=>$(s).addEventListener("input",renderPad));
+["#pTo","#pSide","#pTok"].forEach(s=>$(s).addEventListener("change",renderPad));
+predictBox($("#pPred"),{q:"The sentence <span class='mono'>hi</span> becomes &lt;bos&gt; hi &lt;eos&gt;. In a batch padded to length 8, how many &lt;pad&gt; tokens does that row get?",opts:["5","6","8"],ok:0,
+  why:"8 positions − 3 real tokens = 5 pads, each with mask 0. Short rows in a batch with long rows waste compute, so training code often groups sentences of similar length together (bucketing).",onReveal:()=>{$("#pTo").value="max";$("#pMax").value=8;$("#pSpec").checked=true;$("#pTrunc").checked=true;renderPad();}});
+
+/* ---- end-to-end pipeline ---- */
+const P2STEPS=[{l:"Raw text",c:"var(--tok)",s:"str"},{l:"Normalize",c:"var(--tok)",s:"str"},{l:"Pre-tokenize",c:"var(--tok)",s:"words"},{l:"BPE subwords",c:"var(--tok)",s:"[T]"},{l:"Special tokens",c:"var(--hid)",s:"[T+2]"},{l:"Token IDs",c:"var(--emb)",s:"[T+2] int"},{l:"Pad + mask",c:"var(--emb)",s:"[1, L]"},{l:"Tensor",c:"var(--out)",s:"[1, L]"}];
+let p2Step=0,p2Timer=null;
+$("#pipe2").innerHTML=P2STEPS.map((s,i)=>(i?`<span class="arrow" id="br${i}"></span>`:"")+`<button type="button" class="step" data-i="${i}" style="--sc:${s.c}"><span class="sn">${i+1}</span><span class="sl" style="color:${s.c}">${s.l}</span><span class="ss">${s.s}</span></button>`).join("");
+$$("#pipe2 .step").forEach(b=>b.addEventListener("click",()=>{p2Stop();p2Set(+b.dataset.i);}));
+const P2L=16;
+function renderPipe(){p2Set(p2Step,true);}
+function p2Set(i,quiet){
+  p2Step=Math.max(0,Math.min(P2STEPS.length-1,i));
+  $$("#pipe2 .step").forEach((b,k)=>{b.classList.toggle("on",k===p2Step);b.classList.toggle("past",k<p2Step);});
+  if(!quiet){const ar=$("#br"+p2Step);if(ar){ar.classList.remove("flow");void ar.offsetWidth;ar.classList.add("flow");}}
+  const raw=$("#p2In").value,nrm=normalize(raw,{nfkc:true,lower:true,space:true}),words=preTok(nrm);
+  const vocab=bpeVocab(bpeN),id=new Map(vocab.map((t,k)=>[t,k]));
+  const sub=[];words.forEach(w=>bpeEncodeWord(w,BPE.merges,bpeN).forEach(t=>sub.push(t)));
+  const withSp=["<bos>",...sub,"<eos>"],ids=withSp.map(t=>id.has(t)?id.get(t):1);
+  const body=ids.slice(0,P2L),toksL=withSp.slice(0,P2L),npad=P2L-body.length,padded=[...body,...Array(Math.max(0,npad)).fill(0)],mask=[...body.map(()=>1),...Array(Math.max(0,npad)).fill(0)];
+  const head=(t,sh)=>`<div class="row" style="justify-content:space-between;margin-bottom:10px"><h3>${t}</h3><span class="shape">${sh}</span></div>`;
+  let h="";
+  switch(p2Step){
+   case 0:h=head("1 · Raw text, exactly as typed","string")+`<div class="formula c-tok" style="font-size:1.05rem;white-space:normal">${showWS(raw)}</div><p class="note" style="margin-top:10px">Capitals, curly apostrophes, punctuation and spacing are all still here. The model can't use any of it yet.</p>`;break;
+   case 1:h=head("2 · Normalize: NFKC, lowercase, tidy spaces","string")+`<div class="formula c-tok" style="white-space:normal">${showWS(nrm)}</div><p class="note" style="margin-top:10px">Panel 03 lets you try each rule. This lab's tokenizer lowercases. Many real SLMs keep case.</p>`;break;
+   case 2:h=head("3 · Pre-tokenize: split on spaces & punctuation",`${words.length} pieces`)+`<div class="tkrow">${words.map((w,k)=>tkc(w,k)).join("")}</div><p class="note" style="margin-top:10px">BPE never merges across these boundaries, so a token can't span two words.</p>`;break;
+   case 3:h=head("4 · BPE: each word becomes known subword pieces",`[T] = [${sub.length}]`)+`<div class="tkrow">${sub.map((t,k)=>tkc(t,k,id.has(t)?"":"unk")).join("")}</div><p class="note" style="margin-top:10px">${bpeN} merge rules learned (change them in panel 04). ▁ marks the start of a word. ${words.length} words → ${sub.length} tokens.</p>`;break;
+   case 4:h=head("5 · Wrap with special tokens",`[${withSp.length}]`)+`<div class="tkrow">${withSp.map((t,k)=>tkc(t,k,t[0]==="<"&&t.length>2?"spec":"")).join("")}</div><p class="note" style="margin-top:10px"><span class="c-hid">&lt;bos&gt;</span> says "a text starts here" and <span class="c-hid">&lt;eos&gt;</span> says "it's finished". During generation, producing &lt;eos&gt; is how the model decides to stop.</p>`;break;
+   case 5:h=head("6 · Vocabulary lookup: token → integer ID",`[${ids.length}] int`)+`<div class="scroll"><table class="tbl"><tr><th>token</th>${withSp.map(t=>`<td class="c-tok">${esc(t)}</td>`).join("")}</tr><tr><th>id</th>${ids.map(x=>`<td class="${x<4?"c-hid":"c-emb"}">${x}</td>`).join("")}</tr></table></div><p class="note" style="margin-top:10px">The vocabulary has V = ${vocab.length} entries. IDs 0–3 are special. Each ID will later pick one row of the embedding matrix (Stage 3).</p>`;break;
+   case 6:h=head(`7 · Pad (or cut) to a fixed length L = ${P2L}, and build the mask`,`[1, ${P2L}]`)+`<div class="scroll"><table class="pg"><tr><th>ids</th>${padded.map((x,k)=>`<td class="${k>=body.length?"c-p":x<4?"c-s":"c-t"}">${k<body.length?esc(toksL[k]):"&lt;pad&gt;"}<small>${x}</small></td>`).join("")}</tr><tr><th>mask</th>${mask.map(m=>`<td class="${m?"m1":"m0"}">${m}</td>`).join("")}</tr></table></div><p class="note" style="margin-top:10px">${withSp.length>P2L?`<span class="c-err">${withSp.length-P2L} tokens were truncated.</span> `:""}Panel 07 shows this for a whole batch.</p>`;break;
+   case 7:h=head("8 · The tensor the model actually receives",`[1, ${P2L}] int64`)+`<pre class="formula" style="white-space:pre;line-height:1.6">input_ids      = tensor([[${padded.join(", ")}]])
+attention_mask = tensor([[${mask.join(", ")}]])</pre><p class="note" style="margin-top:10px">That's it: your sentence is now ${padded.length} integers. Decoding reverses the lookup: ids → tokens → join and remove ▁ → text. <span class="c-out">Next stage: turning each ID into a meaningful vector (embeddings).</span></p>`;break;
+  }
+  $("#p2Out").innerHTML=h;
+}
+function p2Stop(){clearInterval(p2Timer);p2Timer=null;$("#p2Play").textContent="Play";}
+$("#p2Play").addEventListener("click",()=>{if(p2Timer){p2Stop();return;}if(p2Step>=P2STEPS.length-1)p2Step=-1;$("#p2Play").textContent="Pause";p2Set(p2Step+1);p2Timer=setInterval(()=>{if(p2Step>=P2STEPS.length-1){p2Stop();return;}p2Set(p2Step+1);},1800);});
+$("#p2Next").addEventListener("click",()=>{p2Stop();p2Set(p2Step+1);});
+$("#p2Prev").addEventListener("click",()=>{p2Stop();p2Set(p2Step-1);});
+$("#p2In").addEventListener("input",()=>p2Set(p2Step,true));
+p2Step=3;renderCmp();
+
+/* ---- code ---- */
+const CODE2={
+"tokenizers_from_scratch.py":`import re
+
+SPECIALS = ["<pad>", "<unk>", "<bos>", "<eos>"]   # ids 0, 1, 2, 3
+
+class CharTokenizer:
+    def __init__(self, text):
+        self.itos = SPECIALS + sorted(set(text))     # id -> token
+        self.stoi = {s: i for i, s in enumerate(self.itos)}
+    def encode(self, s):
+        return [self.stoi.get(c, 1) for c in s]       # unknown -> 1
+    def decode(self, ids):
+        return "".join(self.itos[i] for i in ids)
+
+def words_of(s):
+    return re.findall(r"[a-z0-9]+|[^\\sa-z0-9]", s.lower())
+
+class WordTokenizer:
+    def __init__(self, text):
+        self.itos = SPECIALS + sorted(set(words_of(text)))
+        self.stoi = {s: i for i, s in enumerate(self.itos)}
+    def encode(self, s):
+        return [self.stoi.get(w, 1) for w in words_of(s)]
+    def decode(self, ids):
+        return " ".join(self.itos[i] for i in ids)
+
+def pad_batch(batch, max_len, pad_id=0):
+    ids_out, mask_out = [], []
+    for ids in batch:
+        ids = ids[:max_len]                           # truncation
+        n_pad = max_len - len(ids)
+        ids_out.append(ids + [pad_id] * n_pad)        # right padding
+        mask_out.append([1] * len(ids) + [0] * n_pad) # attention mask
+    return ids_out, mask_out
+
+text = "the bank approved the loan . the customer paid the fee ."
+ct, wt = CharTokenizer(text), WordTokenizer(text)
+print(len(ct.itos), ct.encode("the loan"))
+print(wt.encode("the bank approved the mortgage"))   # 'mortgage' -> 1 (<unk>)
+ids, mask = pad_batch([wt.encode("the bank approved the loan"), wt.encode("the fee")], 6)
+print(ids)
+print(mask)`,
+"bpe_from_scratch.py":`from collections import Counter
+
+def get_words(text):
+    freq = Counter(text.lower().split())
+    # each word -> tuple of symbols; "▁" marks the start of a word
+    return {tuple(["▁" + w[0]] + list(w[1:])): f for w, f in freq.items()}
+
+def pair_counts(words):
+    pairs = Counter()
+    for sym, f in words.items():
+        for a, b in zip(sym, sym[1:]):
+            pairs[(a, b)] += f
+    return pairs
+
+def merge_word(sym, a, b):
+    out, i = [], 0
+    while i < len(sym):
+        if i < len(sym) - 1 and sym[i] == a and sym[i + 1] == b:
+            out.append(a + b); i += 2
+        else:
+            out.append(sym[i]); i += 1
+    return tuple(out)
+
+def train_bpe(text, num_merges):
+    words, merges = get_words(text), []
+    for _ in range(num_merges):
+        pairs = pair_counts(words)
+        if not pairs or max(pairs.values()) < 2:
+            break
+        best = max(pairs, key=pairs.get)            # most frequent pair
+        words = {merge_word(s, *best): f for s, f in words.items()}
+        merges.append(best)
+        print(f"rule {len(merges)}: {best[0]} + {best[1]}  ({pairs[best]}x)")
+    return merges
+
+def encode(word, merges):
+    sym = tuple(["▁" + word[0]] + list(word[1:]))
+    for a, b in merges:                             # replay rules in order
+        sym = merge_word(sym, a, b)
+    return list(sym)
+
+corpus = "low " * 5 + "lower " * 2 + "newest " * 6 + "widest " * 3
+merges = train_bpe(corpus, 10)       # rule 1: e + s (9x), rule 2: es + t ...
+print(encode("lowest", merges))      # ['▁low', 'est']`,
+"hf_tokenizer.py":`# pip install tokenizers transformers      (CPU only; training takes seconds)
+from tokenizers import Tokenizer, models, trainers, pre_tokenizers, normalizers
+
+tok = Tokenizer(models.BPE(unk_token="<unk>"))
+tok.normalizer = normalizers.NFKC()                 # light normalization
+tok.pre_tokenizer = pre_tokenizers.Whitespace()
+trainer = trainers.BpeTrainer(
+    vocab_size=4000,                                # small vocab for a CPU SLM
+    special_tokens=["<pad>", "<unk>", "<bos>", "<eos>"],
+)
+tok.train(["my_banking_corpus.txt"], trainer)       # any plain-text file
+tok.save("slm_tokenizer.json")
+
+tok.enable_padding(pad_id=0, pad_token="<pad>")
+tok.enable_truncation(max_length=16)
+for e in tok.encode_batch(["the bank approved the loan", "hi"]):
+    print(e.tokens)
+    print(e.ids, e.attention_mask)
+
+# Compare with a pretrained byte-level BPE tokenizer (downloads ~1 MB once)
+from transformers import AutoTokenizer
+gpt2 = AutoTokenizer.from_pretrained("gpt2")
+print(len(gpt2))                                    # 50257
+print(gpt2.tokenize("The borrower's refinancing was approved 👍"))`
+};
+codeBox($("#code2"),CODE2);
+
+/* ---- exercise ---- */
+let ex2Checked=false;
+const EX2=[
+ {t:"<b>Normalization (panel 03):</b> collapse the 7 variants into exactly 2 token types",f:()=>new Set(NVARS.map(v=>normalize(v,normState))).size===2},
+ {t:"<b>Word tokenizer (panel 04):</b> type a sentence with a word the word tokenizer has never seen, then press \"Add unknown words\" so it shows 0 &lt;unk&gt;",f:()=>wordAdded.size>0&&lastWordRes&&lastWordRes.unk.every(u=>!u)},
+ {t:"<b>BPE (panel 05):</b> on the classic corpus, learn merges until the unseen word <span class=\"mono\">lowest</span> is encoded as exactly 2 tokens",f:()=>bpeEncodeWord("lowest",bs.merges.map(m=>[m[0],m[1]]),bs.merges.length).length===2},
+ {t:"<b>Batching (panel 07):</b> with at least 3 sentences, reach 0 truncated tokens and less than 25% padding",f:()=>padStats.rows>=3&&padStats.drop===0&&padStats.padPct<25}
+];
+function runEx2(){let ok=0;$("#ex2Checks").innerHTML=EX2.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex2Checked?(r?"ok":"no"):""}"><span class="dot">${ex2Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex2Checked)$("#ex2Msg").innerHTML=ok===EX2.length?'<span class="c-out">All 4 missions complete.</span> You normalized, tokenized, trained BPE and built a batch by hand.':`${ok}/4 missions complete. Hint for padding: write sentences of similar length, or lower max_length.`;}
+$("#ex2Btn").addEventListener("click",()=>{ex2Checked=true;runEx2();});runEx2();
+
+/* ---- quiz ---- */
+function makeQuiz2(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)],ri=(lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
+  const lens=[ri(3,9),ri(3,12),ri(2,8),ri(4,11)],L=Math.max(...lens),pads=lens.reduce((a,b)=>a+L-b,0);
+  let f;do{f={hug:ri(2,9),pug:ri(1,8),pun:ri(1,8),bun:ri(1,8),hugs:ri(1,6)};}while(false);
+  const pc={"u + g":f.hug+f.pug+f.hugs,"▁h + u":f.hug+f.hugs,"u + n":f.pun+f.bun,"▁p + u":f.pug+f.pun,"▁b + u":f.bun,"g + s":f.hugs};
+  let ent=Object.entries(pc).sort((a,b)=>b[1]-a[1]);
+  while(ent[0][1]===ent[1][1]){f.bun+=1;pc["u + n"]=f.pun+f.bun;pc["▁b + u"]=f.bun;ent=Object.entries(pc).sort((a,b)=>b[1]-a[1]);}
+  const top4=ent.slice(0,4);const win=top4[0][0];
+  const V1=pick([8000,16000,32000]),V2=V1*2,d=pick([256,512,768]);
+  return [
+   {type:"Numerical",kind:"num",q:`A batch has 4 sentences of <b>${lens.join(", ")}</b> tokens. They are padded to the longest one. How many &lt;pad&gt; tokens are added in total?`,
+    check:v=>{if(v===pads)return [true,`Longest = ${L}. Pads = ${lens.map(x=>`(${L}−${x})`).join(" + ")} = ${pads}.`];
+      if(v===L*4)return [false,`${L*4} is the size of the whole [4 × ${L}] rectangle. Subtract the real tokens (${lens.reduce((a,b)=>a+b,0)}) to get the pads: ${pads}.`];
+      return [false,`Pad every row up to the longest (${L}): ${lens.map(x=>`(${L}−${x})`).join(" + ")} = ${pads}. Panel 07 shows this as the dashed cells.`];}},
+   {type:"Numerical",kind:"mcq",q:`BPE training text: <span class="mono">hug ×${f.hug}, pug ×${f.pug}, pun ×${f.pun}, bun ×${f.bun}, hugs ×${f.hugs}</span>. Words start as characters (▁h u g …). Which pair does BPE merge <b>first</b>?`,opts:shuffle(top4.map(([k,v],i)=>({t:`${k}`,ok:i===0,why:i===0?`Correct: ${k} appears ${v} times. All counts: ${ent.map(([a,b])=>`${a} = ${b}`).join(", ")}. Each pair's count is the sum of the frequencies of the words that contain it.`:`Misconception: <b>counting words, not weighted occurrences</b>. ${k} appears ${v} times, but ${win} appears ${top4[0][1]} times. Add the frequencies of every word that contains the pair. All counts: ${ent.map(([a,b])=>`${a} = ${b}`).join(", ")}.`})),r)},
+   {type:"Conceptual",kind:"mcq",q:"Why do almost all modern SLMs use subword tokenization (like BPE) instead of whole words?",opts:shuffle([
+     {t:"Unseen words can still be split into known pieces, while common words stay as single short tokens",ok:true,why:"Correct. Subwords avoid &lt;unk&gt; (an open vocabulary) and keep sequences far shorter than characters. Panel 04 shows both effects at once."},
+     {t:"Subwords use a smaller vocabulary than characters",why:"Misconception: <b>subword vocab is smaller</b>. It's the other way round: characters need ~40–256 symbols, while BPE vocabularies have thousands. Subwords trade a bigger vocabulary for shorter sequences."},
+     {t:"Subwords carry dictionary meaning that whole words lack",why:"Misconception: <b>tokens have built-in meaning</b>. BPE pieces come from frequency statistics, not linguistics (est, ▁lo…). Meaning is learned later, in the embeddings."},
+     {t:"Subword models don't need an embedding matrix",why:"Misconception: <b>tokenization replaces embeddings</b>. Every token ID, subword or not, still looks up a row of the [V × d] embedding matrix."}],r)},
+   {type:"Numerical",kind:"num",q:`Your tokenizer's vocabulary grows from V = ${V1.toLocaleString()} to ${V2.toLocaleString()}. The embedding width is d = ${d}. How many <b>extra</b> embedding parameters does this add?`,
+    check:v=>{const a=(V2-V1)*d;if(Math.abs(v-a)<0.5)return [true,`(${V2.toLocaleString()} − ${V1.toLocaleString()}) × ${d} = ${a.toLocaleString()}. One new row of ${d} numbers per new token.`];
+      if(v===V2-V1)return [false,`That's the number of new tokens. Each one needs a whole row of ${d} numbers: ${(V2-V1).toLocaleString()} × ${d} = ${a.toLocaleString()}.`];
+      if(v===V2*d)return [false,`That's the whole new matrix. The question asks for the <b>extra</b>: (${V2}−${V1}) × ${d} = ${a.toLocaleString()}.`];
+      return [false,`Extra rows × row width = (${V2.toLocaleString()} − ${V1.toLocaleString()}) × ${d} = ${a.toLocaleString()}.`];}},
+   {type:"Practical",kind:"mcq",q:"You batch customer messages of very different lengths and pad them. What stops the model from learning from the &lt;pad&gt; tokens as if they were real words?",opts:shuffle([
+     {t:"The attention mask (0 at pad positions), plus ignoring pad positions in the loss",ok:true,why:"Correct. Mask = 0 means attention gives pads zero weight, and ignore_index removes them from the loss. Pads still cost compute but teach nothing, which is why bucketing by length helps."},
+     {t:"Nothing is needed: the model learns that &lt;pad&gt; is meaningless",why:"Misconception: <b>the model will figure it out</b>. Without a mask, real tokens attend to pads and the loss rewards predicting pads, which wastes capacity and distorts the outputs."},
+     {t:"Use a bigger vocabulary so padding is rarer",why:"Misconception: <b>vocabulary size controls padding</b>. Padding comes from different sentence <i>lengths</i> in a batch, not from the vocabulary."},
+     {t:"Turn off truncation",why:"Misconception: <b>truncation causes padding</b>. Truncation cuts long rows. Turning it off makes the rectangle longer, which means <i>more</i> padding."}],r)}
+  ];
+}
+mountQuiz(2,$("#quiz2"),makeQuiz2);
 
 showStage(0);window.scrollTo(0,0);
 })();
