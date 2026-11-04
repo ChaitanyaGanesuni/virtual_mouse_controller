@@ -1938,6 +1938,84 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 10 ====================== -->
+  <section id="stage10" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 10 · unlocked</div>
+      <h2>Fine-tuning: turning a general model into a banking specialist</h2>
+      <p>Pre-training from scratch is expensive. Fine-tuning takes a model that already knows language and specialises it cheaply with a small domain dataset. This stage shows the full lifecycle, runs a real domain fine-tune (including the forgetting trap), and opens up LoRA and QLoRA, the tricks that let you fine-tune on modest hardware.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 10 sections">
+      <button type="button" data-go="p10-journey">1 · The lifecycle</button>
+      <button type="button" data-go="p10-ft">2 · A real domain fine-tune</button>
+      <button type="button" data-go="p10-lora">3 · LoRA & QLoRA</button>
+      <button type="button" data-go="p10-sft">4 · Instruction data</button>
+      <button type="button" data-go="p10-code">5 · Code</button>
+      <button type="button" data-go="p10-ex">6 · Exercise</button>
+      <button type="button" data-go="p10-quiz">7 · Assessment</button>
+    </nav>
+
+    <div class="panel" id="p10-journey">
+      <div class="phead"><span class="tag">01</span><h3>From pre-training to a banking assistant</h3><span class="sim illus">typical figures</span>
+        <p class="plain">A model is built in phases, each with its own data and purpose. <em>Click a phase</em> to see what it learns, what its data looks like, and what it costs. Fine-tuning reuses everything pre-training learned, which is why it's so much cheaper.</p></div>
+      <div class="row" id="ljBtns" style="margin-bottom:10px"></div>
+      <div class="grid2"><div class="box" id="ljInfo"></div><div class="code" style="min-width:0"><div class="tabs"><button type="button" class="on">example training record</button></div><pre id="ljCode"></pre></div></div>
+    </div>
+
+    <div class="panel" id="p10-ft">
+      <div class="phead"><span class="tag">02</span><h3>A real domain fine-tune, and catastrophic forgetting</h3><span class="sim real">real models · real perplexity</span>
+        <p class="plain">A word model is pre-trained on everyday sentences, then fine-tuned on banking sentences. Slide the fine-tuning amount and watch banking predictions sharpen (banking perplexity falls). Switch off <em>replay</em> (mixing some general text back in) and watch it <em>forget</em> everyday language.</p></div>
+      <div class="grid2">
+        <div class="box" style="display:grid;gap:10px;align-content:start"><label class="field">fine-tuning steps: <b id="ftKV"></b><input id="ftK" type="range" min="0" max="10" value="0"></label><label class="row" style="font-size:.88rem;color:var(--muted)"><input type="checkbox" id="ftReplay" checked> replay: keep mixing in 20% general text</label>
+          <div class="bars" id="ftBars"></div><p class="note" id="ftNote"></p></div>
+        <div class="box"><div class="scroll" id="ftTbl"></div></div>
+      </div>
+      <div class="grid2" style="margin-top:12px"><div class="box"><svg class="plot" id="ftSvg" viewBox="0 0 420 180" role="img" aria-label="Perplexity during fine-tuning"></svg></div><div class="predict" id="ftPred"></div></div>
+    </div>
+
+    <div class="panel" id="p10-lora">
+      <div class="phead"><span class="tag">03</span><h3>LoRA & QLoRA: fine-tuning with sticky notes</h3><span class="sim real">exact parameter and memory arithmetic</span>
+        <p class="plain">Full fine-tuning updates every weight. <em>LoRA</em> freezes the big weight matrix W and learns a small correction <em>ΔW = B·A</em> from two thin matrices of rank r, like sticky notes on a textbook. <em>QLoRA</em> also stores the frozen W in 4 bits. Together they let a laptop-sized GPU fine-tune a billion-parameter model.</p></div>
+      <div class="grid2">
+        <div class="box"><label class="field">LoRA rank r (picture): <b id="loRv"></b><input id="loR" type="range" min="1" max="6" value="2"></label><div id="loViz" class="scroll" style="margin-top:10px"></div></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" style="display:grid;gap:8px"><div class="ctrls" style="grid-template-columns:1fr 1fr"><label class="field">layer width d<select id="loD" class="txt"><option value="768">768 (GPT-2 small)</option><option value="2048">2048 (1B SLM)</option><option value="4096" selected>4096 (7B model)</option></select></label><label class="field">rank r: <b id="loR2v"></b><input id="loR2" type="range" min="1" max="64" value="8"></label></div><div class="stats" id="loStats"></div></div>
+          <div class="box"><label class="field">model size to fine-tune<select id="loN" class="txt"><option value="0.5">0.5B</option><option value="1">1B</option><option value="3" selected>3B</option><option value="7">7B</option><option value="13">13B</option></select></label><div class="scroll" id="loMem" style="margin-top:8px"></div></div>
+          <div class="predict" id="loPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula" style="white-space:normal">W′ = W + (α/r) · B·A, with B: [d, r], A: [r, d], W frozen</div></div>
+        <div><b>Why it works</b><ul><li>Domain changes are low-rank, so a few directions suffice</li><li>Trainable params: 2dr instead of d²</li><li>B starts at 0, so training begins from the exact pretrained model</li></ul></div>
+        <div><b>Inside an SLM</b>LoRA adapters are usually put on the attention projections (q, k, v, o) and sometimes the FFN. An adapter file is only a few MB, so a bank can keep one base model and swap adapters per product line.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p10-sft">
+      <div class="phead"><span class="tag">04</span><h3>Instruction tuning: teaching it to answer, not just continue</h3><span class="sim real">real token count</span>
+        <p class="plain">A pre-trained model only continues text. <em>Supervised fine-tuning (SFT)</em> shows it thousands of <em>question → ideal answer</em> examples wrapped in a chat template. Usually the loss is computed <em>only on the answer tokens</em>: we teach it to <em>reply</em>, not to imitate the customer. Edit the example and toggle masking.</p></div>
+      <div class="grid2">
+        <div class="box" style="display:grid;gap:10px"><label class="field">customer question<input class="txt" id="sfQ" type="text" value="How do I block my lost debit card?" autocomplete="off"></label><label class="field">ideal answer<textarea class="txt" id="sfA" rows="3">Open the app, go to Cards and tap Block card. You can also call 1800-XXX-XXXX any time. A replacement card arrives in 5-7 working days.</textarea></label><label class="row" style="font-size:.88rem;color:var(--muted)"><input type="checkbox" id="sfMask" checked> compute the loss only on the answer (mask the prompt)</label></div>
+        <div style="display:grid;gap:12px;align-content:start"><div class="box"><div class="tkrow" id="sfToks"></div><div class="stats" id="sfStats" style="margin-top:12px"></div></div><div class="predict" id="sfPred"></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p10-code">
+      <div class="phead"><span class="tag">05</span><h3>Code it on your CPU</h3><p><b>lora_from_scratch.py</b> builds LoRA by hand, pre-trains a tiny model on general text and then fine-tunes only the adapter on banking text. It runs in seconds. <b>hf_peft_finetune.py</b> is the standard production recipe with Hugging Face PEFT. It needs a one-time model download, so it wasn't executed inside this lab.</p></div>
+      <div class="code" id="code10"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <div class="panel" id="p10-ex">
+      <div class="phead"><span class="tag">06</span><h3>Hands-on exercise: four missions</h3><p>The checks read the panels' live state.</p></div>
+      <div class="box"><div class="checks" id="ex10Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex10Btn" type="button">Check missions</button></div><p class="note" id="ex10Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <div class="panel" id="p10-quiz">
+      <div class="phead"><span class="tag">07</span><h3>Stage 10 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 11, optimisation and quantization.</p></div>
+      <div id="quiz10"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -2002,7 +2080,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8",9:"#stage9"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8",9:"#stage9",10:"#stage10"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -5393,6 +5471,235 @@ function makeQuiz9(seed){
 mountQuiz(9,$("#quiz9"),makeQuiz9);
 runEx9();
 
+/* =================== STAGE 10 =================== */
+/* ---- 1. lifecycle ---- */
+const LJ={pre:{n:"1 · Pre-training",learns:"Grammar, facts, reasoning patterns: general language, from predicting the next token.",data:"Huge, unlabelled text: books, web, code, news. Billions to trillions of tokens.",cost:"The most expensive phase: GPU clusters for days to months. You usually download this instead of doing it.",fmt:`{"text": "The monsoon reaches Kerala in early June and covers most of India by mid-July ..."}`},
+ dapt:{n:"2 · Domain-adaptive pre-training (optional)",learns:"Domain vocabulary and style, by continuing next-token training on domain text.",data:"Unlabelled banking text: product docs, policies, circulars. Millions of tokens.",cost:"Moderate: hours to days on one or a few GPUs for an SLM.",fmt:`{"text": "A Recurring Deposit allows monthly instalments for a fixed tenure; interest is compounded quarterly ..."}`},
+ sft:{n:"3 · Supervised fine-tuning (instruction tuning)",learns:"To follow instructions and answer in the right format and tone, instead of just continuing text.",data:"Thousands of high-quality question → answer (or chat) pairs.",cost:"Cheap with LoRA/QLoRA: hours on a single GPU, or slowly on a CPU for tiny models.",fmt:`{"messages": [
+  {"role": "system", "content": "You are a helpful, accurate banking assistant."},
+  {"role": "user", "content": "What is the penalty for early FD withdrawal?"},
+  {"role": "assistant", "content": "Breaking an FD early usually reduces the rate by 0.5-1%. Please check your FD advice for the exact terms."}]}`},
+ align:{n:"4 · Preference alignment (optional)",learns:"Which of two answers people prefer: safer, more helpful, more honest (RLHF / DPO).",data:"Pairs of answers to the same prompt, labelled chosen vs rejected.",cost:"Similar to SFT; needs careful human or rule-based labels.",fmt:`{"prompt": "Can you tell me another customer's balance?",
+ "chosen": "I'm sorry, I can't share another customer's account details.",
+ "rejected": "Sure, their balance is ..."}`},
+ deploy:{n:"5 · Evaluate & deploy",learns:"Nothing new: you measure on held-out banking questions, red-team for safety, then serve (Stage 12).",data:"A test set the model never saw, plus adversarial prompts.",cost:"Small compute, but the most human attention.",fmt:`{"question": "My card was charged twice, what do I do?", "must_mention": ["dispute", "7 working days"], "must_not": ["guarantee"]}`}};
+let ljK="sft";
+$("#ljBtns").innerHTML=Object.entries(LJ).map(([k,v])=>`<button type="button" class="btn" data-lj="${k}">${v.n}</button>`).join("");
+$$("#ljBtns [data-lj]").forEach(b=>b.addEventListener("click",()=>{ljK=b.dataset.lj;renderLJ();}));
+function renderLJ(){$$("#ljBtns [data-lj]").forEach(b=>b.classList.toggle("primary",b.dataset.lj===ljK));const v=LJ[ljK];$("#ljInfo").innerHTML=`<h3 style="margin-bottom:10px">${v.n}</h3><dl class="kv"><dt>learns</dt><dd>${v.learns}</dd><dt>data</dt><dd>${v.data}</dd><dt>cost</dt><dd>${v.cost}</dd></dl>`;$("#ljCode").innerHTML=hl(v.fmt);}
+renderLJ();
+
+/* ---- 2. real domain fine-tune ---- */
+const FT_BANK=`the customer opened a savings account .
+the customer asked about the loan .
+the customer asked about the interest rate .
+the customer asked about the account balance .
+the customer asked about the emi .
+the bank approved the home loan .
+the bank approved the loan application .
+the bank rejected the loan application .
+the bank charged a small fee .
+the customer paid the fee online .
+the agent helped the customer with the account .
+the agent explained the interest rate .
+the agent explained the emi .
+the loan has a low interest rate .
+the customer reported a lost debit card .
+the bank blocked the lost card .
+the customer transferred money using upi .
+the salary was credited to the account .
+the emi was debited from the account .
+the customer wants to close the account .`.split("\n");
+const FT_GEN=CORPUS.filter(s=>!/bank|loan|account|fee|customer|agent|interest|balance|savings/.test(s));
+const FT_HELD_B=["the customer asked about the home loan .","the agent explained the fee .","the bank blocked the debit card ."],FT_HELD_G=["the cat sat on the rug .","the dog ran to the park .","the model reads the text ."];
+const FT_VOC=new Set([...FT_BANK,...FT_GEN,...FT_HELD_B,...FT_HELD_G].flatMap(tokenize));const FT_VN=FT_VOC.size+1;
+function ftModel(gw,bw){const bi=new Map(),tri=new Map();const add=(lines,w)=>{if(w<=0)return;lines.forEach(s=>{const t=["<s>","<s>",...tokenize(s)];for(let i=2;i<t.length;i++){[[bi,t[i-1]],[tri,t[i-2]+" "+t[i-1]]].forEach(([m,k])=>{if(!m.has(k))m.set(k,new Map());const q=m.get(k);q.set(t[i],(q.get(t[i])||0)+w);});}});};add(FT_GEN,gw);add(FT_BANK,bw);return {bi,tri};}
+function ftP(m,prev,w){const row=m.bi.get(prev);let tot=0,c=0;if(row){row.forEach(v=>tot+=v);c=row.get(w)||0;}return (c+.05)/(tot+.05*FT_VN);}
+function ftPPL(m,lines){let L=0,n=0;lines.forEach(s=>{const t=["<s>",...tokenize(s)];for(let i=1;i<t.length;i++){L-=Math.log(ftP(m,t[i-1],t[i]));n++;}});return Math.exp(L/n);}
+function ftTop(m,prompt){const t=["<s>","<s>",...tokenize(prompt)],k=t[t.length-2]+" "+t[t.length-1],row=m.tri.get(k)||m.bi.get(t[t.length-1]);if(!row)return [];const tot=[...row.values()].reduce((a,b)=>a+b,0);return [...row.entries()].sort((a,b)=>b[1]-a[1]).slice(0,3).map(([w,c])=>`${w} ${(c/tot*100).toFixed(0)}%`);}
+const FT_PROMPTS=["the customer asked about the","the bank blocked the","the cat sat on the","the dog ran to the"];
+let ftState={b:0,g:0,minB:1e9,maxG:0};
+function ftWeights(k,rep){return {gw:rep?1:Math.max(.03,1-.097*k),bw:k*.5};}
+function renderFT(){
+  const k=+$("#ftK").value,rep=$("#ftReplay").checked;$("#ftKV").textContent=k?`${k} × 100 steps`:"0 (pre-trained only)";
+  const {gw,bw}=ftWeights(k,rep),m=ftModel(gw,bw),m0=ftModel(1,0),pb=ftPPL(m,FT_HELD_B),pg=ftPPL(m,FT_HELD_G),pb0=ftPPL(m0,FT_HELD_B),pg0=ftPPL(m0,FT_HELD_G);
+  ftState={b:pb,g:pg,k,rep,minB:Math.min(ftState.minB,pb),maxG:Math.max(ftState.maxG,pg)};
+  const mx=Math.max(pb0,pg0,pb,pg);
+  $("#ftBars").innerHTML=`<div class="bar"><span class="lbl">banking ppl</span><span class="trk"><span class="fill" style="display:block;width:${pb/mx*100}%;background:var(--out)"></span></span><span class="val">${pb.toFixed(1)}</span></div><div class="bar"><span class="lbl">general ppl</span><span class="trk"><span class="fill" style="display:block;width:${pg/mx*100}%;background:${pg>pg0*1.6?"var(--err)":"var(--emb)"}"></span></span><span class="val">${pg.toFixed(1)}</span></div>`;
+  $("#ftNote").innerHTML=!k?`Pre-trained only: everyday text is easy (perplexity ${pg0.toFixed(1)}), but banking is unfamiliar (${pb0.toFixed(1)}).`:(!rep&&pg>pg0*1.6)?`<b class="c-err">Catastrophic forgetting:</b> without replay the general text fades from the model, and general perplexity has risen from ${pg0.toFixed(1)} to ${pg.toFixed(1)}. Switch replay on.`:`Banking perplexity dropped from ${pb0.toFixed(1)} to <b class="c-out">${pb.toFixed(1)}</b>${rep?", and replay keeps everyday language intact.":"."}`;
+  $("#ftTbl").innerHTML=`<table class="tbl" style="width:100%"><tr><th>prompt</th><th>pre-trained</th><th>after fine-tuning</th></tr>${FT_PROMPTS.map(p=>`<tr><td class="dim">${p} …</td><td>${ftTop(m0,p).join(", ")||"–"}</td><td class="c-out">${ftTop(m,p).join(", ")||'<span class="c-err">(forgotten)</span>'}</td></tr>`).join("")}</table>`;
+  const W=420,H=180,l=34,r=10,t=10,b=24,curve=re=>[...Array(11)].map((_,i)=>{const w=ftWeights(i,re),mm=ftModel(w.gw,w.bw);return [ftPPL(mm,FT_HELD_B),ftPPL(mm,FT_HELD_G)];});
+  const cr=curve(true),cn=curve(false),top=Math.max(...cr.flat(),...cn.flat())*1.05,X=i=>l+i/10*(W-l-r),Y=v=>t+(top-v)/top*(H-t-b),pl=(a,j)=>a.map((v,i)=>`${X(i)},${Y(v[j])}`).join(" ");
+  $("#ftSvg").innerHTML=`<polyline points="${pl(cn,0)}" style="fill:none;stroke:var(--out)" stroke-width="2.5"/><polyline points="${pl(rep?cr:cn,1)}" style="fill:none;stroke:${rep?"var(--emb)":"var(--err)"}" stroke-width="2.5"/>${rep?"":`<polyline points="${pl(cr,1)}" style="fill:none;stroke:var(--emb)" stroke-width="1.5" stroke-dasharray="4 3" opacity=".6"/>`}<line x1="${X(k)}" x2="${X(k)}" y1="${t}" y2="${H-b}" style="stroke:var(--fg)" opacity=".4"/><text x="${l}" y="${H-6}" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">fine-tuning steps →</text><text x="${W-r}" y="${t+10}" text-anchor="end" font-size="9.5" style="fill:var(--out)" font-family="IBM Plex Mono">banking perplexity</text><text x="${W-r}" y="${t+24}" text-anchor="end" font-size="9.5" style="fill:${rep?"var(--emb)":"var(--err)"}" font-family="IBM Plex Mono">general perplexity${rep?" (with replay)":" (no replay)"}</text>`;
+}
+$("#ftK").addEventListener("input",renderFT);$("#ftReplay").addEventListener("change",renderFT);
+predictBox($("#ftPred"),{q:"You fine-tune for a long time on banking text only, with no general text mixed in. What happens to everyday sentences?",opts:["Nothing: knowledge only accumulates","The model gets worse at them (catastrophic forgetting)","It refuses to answer them"],ok:1,
+  why:"The same weights are pulled towards banking patterns and away from general ones. Mixing some general data back in (replay), a lower learning rate, fewer steps, or LoRA, which leaves the original weights frozen, all reduce forgetting.",onReveal:()=>{$("#ftReplay").checked=false;$("#ftK").value=10;renderFT();}});
+
+/* ---- 3. LoRA & QLoRA ---- */
+const LO_D=12,loR0=mulberry(41),LO_W=Array.from({length:LO_D},()=>Array.from({length:LO_D},()=>gauss(loR0)*.6)),LO_B=Array.from({length:LO_D},()=>Array.from({length:6},()=>gauss(loR0)*.5)),LO_A=Array.from({length:6},()=>Array.from({length:LO_D},()=>gauss(loR0)*.5));
+let loSaw={q:false};
+function heatT(M,title,col){return `<div style="display:inline-grid;gap:3px;justify-items:center;vertical-align:top"><span class="mono" style="font-size:.7rem;color:${col}">${title}</span><div style="display:grid;grid-template-columns:repeat(${M[0].length},11px);gap:1px">${M.flat().map(v=>`<span style="width:11px;height:11px;border-radius:2px;background:${cellCol(v*1.2)}" title="${v.toFixed(2)}"></span>`).join("")}</div><span class="mono dim" style="font-size:.66rem">[${M.length} × ${M[0].length}]</span></div>`;}
+function renderLoRA(){
+  const r=+$("#loR").value;$("#loRv").textContent=r;const B=LO_B.map(row=>row.slice(0,r)),A=LO_A.slice(0,r),dW=mmul(B,A),Wp=LO_W.map((row,i)=>row.map((v,j)=>v+dW[i][j]));
+  const op=s=>`<span class="mmop" style="font-size:1.2rem;align-self:center;margin:0 6px">${s}</span>`;
+  $("#loViz").innerHTML=`<div style="display:flex;align-items:center;flex-wrap:nowrap;min-width:560px">${heatT(LO_W,"W (frozen)","var(--muted)")}${op("+")}${heatT(B,"B","var(--tok)")}${op("·")}${heatT(A,"A","var(--tok)")}${op("=")}${heatT(Wp,"W′ (adapted)","var(--out)")}</div><div style="margin-top:12px">${heatT(dW,`ΔW = B·A (rank ${r})`,"var(--tok)")}</div><p class="note" style="margin-top:8px">ΔW is a full 12 × 12 change, but it's built from only ${2*LO_D*r} numbers (${(2*LO_D*r/(LO_D*LO_D)*100).toFixed(0)}% of W). At rank 1 every row of ΔW is a multiple of the same pattern. Higher rank allows richer corrections.</p>`;
+  const d=+$("#loD").value,r2=+$("#loR2").value;$("#loR2v").textContent=r2;const full=d*d,lo=2*d*r2;
+  $("#loStats").innerHTML=`<div class="stat"><span class="v">${fmtN(full)}</span><span class="k">full fine-tune: weights trained in this layer</span></div><div class="stat"><span class="v c-tok">${fmtN(lo)}</span><span class="k">LoRA: trainable (2dr)</span></div><div class="stat"><span class="v ${lo/full<.01?"c-out":"c-err"}">${(lo/full*100).toFixed(2)}%</span><span class="k">of the layer</span></div>`;
+  window.__lo={d,r:r2,pct:lo/full};
+  const N=+$("#loN").value*1e9,ad=N*.01,meth=[["Full fine-tune (AdamW, mixed precision)",16*N],["LoRA (FP16 frozen base + adapters)",2*N+16*ad],["QLoRA (4-bit frozen base + adapters)",.55*N+16*ad]],dev=[["8 GB laptop",8e9],["16 GB laptop / GPU",16e9],["24 GB GPU",24e9],["80 GB GPU",80e9]];
+  $("#loMem").innerHTML=`<table class="tbl"><tr><th>method</th><th>memory</th>${dev.map(d=>`<th>${d[0]}</th>`).join("")}</tr>${meth.map(([n,m])=>`<tr><td>${n}</td><td class="mono">${fmtB(m)}</td>${dev.map(([,c])=>`<td>${m<c*.8?'<span class="c-out">✓</span>':'<span class="c-err">✗</span>'}</td>`).join("")}</tr>`).join("")}</table><p class="note" style="margin-top:6px">Rough figures, excluding activations. Adapters assumed at 1% of the model's size.</p>`;
+  if(meth[2][1]<16e9*.8&&meth[1][1]>=16e9*.8)loSaw.q=true;
+}
+["#loR","#loR2","#loD","#loN"].forEach(s=>$(s).addEventListener("input",renderLoRA));["#loD","#loN"].forEach(s=>$(s).addEventListener("change",renderLoRA));
+predictBox($("#loPred"),{q:"A 4096 × 4096 attention projection gets a rank-8 LoRA adapter. How many trainable numbers does that add?",opts:["16.8 million","65,536","4,096"],ok:1,
+  why:"2 × d × r = 2 × 4096 × 8 = 65,536, which is 0.39% of the 16.8M weights in W. Applied to every projection of a 7B model, that's still only a few million trainable parameters.",onReveal:()=>{$("#loD").value=4096;$("#loR2").value=8;renderLoRA();}});
+
+/* ---- 4. instruction data ---- */
+function renderSFT(){
+  const q=$("#sfQ").value,a=$("#sfA").value,mask=$("#sfMask").checked,seg=t=>t.toLowerCase().match(/[a-z0-9]+|[^\sa-z0-9]/g)||[];
+  const P=["<|system|>",...seg("You are a helpful banking assistant."),"<|user|>",...seg(q),"<|assistant|>"],R=[...seg(a),"<|end|>"];
+  $("#sfToks").innerHTML=P.map(t=>`<span class="tk ${t.startsWith("<|")?"spec":""}" style="${mask?"opacity:.45":""}">${esc(t)}</span>`).join("")+R.map((t,i)=>`<span class="tk ${t.startsWith("<|")?"spec":"tk3"}">${esc(t)}</span>`).join("");
+  const nl=mask?R.length:P.length+R.length;
+  $("#sfStats").innerHTML=`<div class="stat"><span class="v">${P.length}</span><span class="k">prompt tokens (template + question)</span></div><div class="stat"><span class="v c-out">${R.length}</span><span class="k">answer tokens</span></div><div class="stat"><span class="v c-tok">${nl}</span><span class="k">tokens that count in the loss</span></div>`;
+  window.__sfMask=mask;
+}
+["#sfQ","#sfA"].forEach(s=>$(s).addEventListener("input",renderSFT));$("#sfMask").addEventListener("change",renderSFT);renderSFT();
+predictBox($("#sfPred"),{q:"Why mask the prompt tokens out of the loss during instruction tuning?",opts:["To save memory","So the model learns to produce good answers, not to predict the customer's question","Because the prompt is secret"],ok:1,
+  why:"The model only has to <i>generate</i> the assistant's part, so the gradient should come from those tokens. Without masking, much of the learning goes into imitating questions and template text."});
+
+/* ---- code ---- */
+codeBox($("#code10"),{"lora_from_scratch.py":`import torch, torch.nn as nn, torch.nn.functional as F
+torch.manual_seed(0)
+
+class LoRALinear(nn.Module):
+    """y = x W^T + (alpha / r) * x A^T B^T, with W frozen and only A, B trained."""
+    def __init__(self, base: nn.Linear, r=4, alpha=8):
+        super().__init__()
+        self.base = base
+        for p in self.base.parameters():
+            p.requires_grad = False                                      # freeze pretrained weights
+        self.A = nn.Parameter(torch.randn(r, base.in_features) * 0.01)   # [r, in]
+        self.B = nn.Parameter(torch.zeros(base.out_features, r))         # [out, r]; 0 = no change at start
+        self.scale = alpha / r
+
+    def forward(self, x):
+        return self.base(x) + self.scale * (x @ self.A.T @ self.B.T)
+
+general = ("the cat sat on the mat . the dog ran to the park . the sun rises in the east . "
+           "she drank a cup of hot tea . the train was late this morning . ") * 30
+banking = ("the customer asked about the emi . the bank approved the home loan . "
+           "the agent explained the interest rate . the bank blocked the lost card . ") * 30
+vocab = sorted(set((general + banking).split())); stoi = {w: i for i, w in enumerate(vocab)}
+enc = lambda t: torch.tensor([stoi[w] for w in t.split()])
+G, Bk = enc(general), enc(banking)
+
+def batch(d, n=64):
+    ix = torch.randint(len(d) - 1, (n,))
+    return d[ix], d[ix + 1]
+
+def loss_on(model, d):
+    with torch.no_grad():
+        return F.cross_entropy(model(d[:-1]), d[1:]).item()
+
+model = nn.Sequential(nn.Embedding(len(vocab), 32), nn.Linear(32, len(vocab)))   # tiny "pretrained" LM
+opt = torch.optim.AdamW(model.parameters(), lr=0.05)
+for _ in range(400):                                          # 1) pre-train on general text
+    x, y = batch(G); loss = F.cross_entropy(model(x), y)
+    opt.zero_grad(); loss.backward(); opt.step()
+print(f"pre-trained  general loss {loss_on(model, G):.2f}   banking loss {loss_on(model, Bk):.2f}")
+
+import copy
+
+def lora_finetune(pretrained, replay):
+    m = copy.deepcopy(pretrained)
+    m[1] = LoRALinear(m[1], r=4)                              # 2) wrap the output layer with LoRA
+    for p in m[0].parameters():
+        p.requires_grad = False                               #    and freeze the embedding too
+    opt = torch.optim.AdamW([p for p in m.parameters() if p.requires_grad], lr=0.02)
+    for _ in range(400):                                      # 3) fine-tune on banking text
+        x, y = batch(Bk)
+        if replay:                                            #    replay: mix in 20% general text
+            xg, yg = batch(G, 16); x, y = torch.cat([x, xg]), torch.cat([y, yg])
+        loss = F.cross_entropy(m(x), y)
+        opt.zero_grad(); loss.backward(); opt.step()
+    return m
+
+only_bank, with_replay = lora_finetune(model, replay=False), lora_finetune(model, replay=True)
+trainable = sum(p.numel() for p in with_replay.parameters() if p.requires_grad)
+total = sum(p.numel() for p in with_replay.parameters())
+print(f"trainable: {trainable} of {total} parameters ({100 * trainable / total:.1f}%; <1% in real SLMs)")
+print(f"LoRA, banking only  general loss {loss_on(only_bank, G):.2f}   banking loss {loss_on(only_bank, Bk):.2f}   <- forgets")
+print(f"LoRA + 20% replay   general loss {loss_on(with_replay, G):.2f}   banking loss {loss_on(with_replay, Bk):.2f}   <- keeps both")`,
+"hf_peft_finetune.py":`# Standard recipe with Hugging Face (pip install transformers peft datasets accelerate)
+# Downloads the base model once; runs slowly on a CPU and quickly on a GPU.
+from datasets import load_dataset
+from transformers import (AutoTokenizer, AutoModelForCausalLM, TrainingArguments,
+                          Trainer, DataCollatorForLanguageModeling)
+from peft import LoraConfig, get_peft_model
+
+base = "HuggingFaceTB/SmolLM2-135M-Instruct"           # a small open SLM
+tok = AutoTokenizer.from_pretrained(base)
+model = AutoModelForCausalLM.from_pretrained(base)
+model = get_peft_model(model, LoraConfig(r=8, lora_alpha=16, lora_dropout=0.05,
+                                         target_modules=["q_proj", "v_proj"], task_type="CAUSAL_LM"))
+model.print_trainable_parameters()                     # well under 1% of the weights
+
+ds = load_dataset("json", data_files="banking_faq.jsonl")["train"]   # {"question": ..., "answer": ...}
+def to_tokens(ex):
+    msgs = [{"role": "user", "content": ex["question"]}, {"role": "assistant", "content": ex["answer"]}]
+    return tok(tok.apply_chat_template(msgs, tokenize=False), truncation=True, max_length=256)
+ds = ds.map(to_tokens, remove_columns=ds.column_names)
+# Note: this simple collator computes the loss on all tokens. For answer-only loss
+# (panel 04), use TRL's SFTTrainer with completion-only loss.
+
+args = TrainingArguments("banking-lora", per_device_train_batch_size=4, num_train_epochs=3,
+                         learning_rate=2e-4, logging_steps=10, save_strategy="epoch")
+Trainer(model=model, args=args, train_dataset=ds,
+        data_collator=DataCollatorForLanguageModeling(tok, mlm=False)).train()
+model.save_pretrained("banking-lora")                  # saves only the small adapter (a few MB)`});
+
+/* ---- exercise ---- */
+let ex10Checked=false;
+const EX10=[
+ {t:"<b>Fine-tune (panel 02):</b> with replay on, bring <b>banking perplexity below 15</b> while <b>general perplexity stays below 20</b>",f:()=>ftState.rep&&ftState.b<15&&ftState.g<20},
+ {t:"<b>Forgetting (panel 02):</b> reproduce catastrophic forgetting: general perplexity <b>above 40</b>",f:()=>ftState.maxG>40},
+ {t:"<b>LoRA (panel 03):</b> with d = 4096, find the <b>largest rank</b> that keeps LoRA <b>under 1%</b> of the layer",f:()=>window.__lo&&window.__lo.d===4096&&window.__lo.pct<.01&&(2*4096*(window.__lo.r+1))/(4096*4096)>=.01},
+ {t:"<b>QLoRA (panel 03):</b> pick a model size that fits on a <b>16 GB</b> machine <b>only</b> with QLoRA",f:()=>loSaw.q}
+];
+function runEx10(){let ok=0;$("#ex10Checks").innerHTML=EX10.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex10Checked?(r?"ok":"no"):""}"><span class="dot">${ex10Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex10Checked)$("#ex10Msg").innerHTML=ok===EX10.length?'<span class="c-out">All 4 missions complete.</span> You can now plan a domain fine-tune that fits your hardware without forgetting.':`${ok}/4 missions complete. Hint: 2 × 4096 × r must stay below 1% of 4096².`;}
+$("#ex10Btn").addEventListener("click",()=>{ex10Checked=true;runEx10();});
+
+/* ---- quiz ---- */
+function makeQuiz10(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)];
+  const d=pick([1024,2048,4096]),rk=pick([4,8,16]),lp=2*d*rk,N=pick([.5,1,3]),mem=16*N;
+  return [
+   {type:"Numerical",kind:"num",q:`A ${d} × ${d} weight matrix gets a LoRA adapter of rank <b>r = ${rk}</b>. How many trainable parameters does the adapter have?`,
+    check:v=>{if(v===lp)return [true,`B is [${d} × ${rk}] and A is [${rk} × ${d}]: 2 × ${d} × ${rk} = ${lp.toLocaleString()}, or ${(lp/(d*d)*100).toFixed(2)}% of the layer.`];if(v===d*rk)return [false,`That's one of the two matrices. LoRA has both B [d × r] and A [r × d]: 2 × ${d} × ${rk} = ${lp.toLocaleString()}.`];if(v===d*d)return [false,`That's the frozen W, which LoRA does <b>not</b> train. The adapter is 2dr = ${lp.toLocaleString()}.`];return [false,`2 × d × r = 2 × ${d} × ${rk} = ${lp.toLocaleString()}.`];}},
+   {type:"Numerical",kind:"num",q:`Full fine-tuning with AdamW in mixed precision needs about <b>16 bytes per parameter</b> (weights, gradients, two Adam moments). How many GB for a <b>${N}B</b>-parameter model, ignoring activations?`,
+    check:v=>{if(Math.abs(v-mem)<.5)return [true,`${N} × 10⁹ × 16 bytes = ${mem} GB. That's why full fine-tuning even small models needs big GPUs, and why LoRA/QLoRA exist.`];if(Math.abs(v-2*N)<.3)return [false,`${2*N} GB is just the FP16 weights. Training also stores gradients and Adam's two moment estimates: ~16 bytes/param = ${mem} GB.`];return [false,`${N}B × 16 bytes = ${mem} GB.`];}},
+   {type:"Conceptual",kind:"mcq",q:"After fine-tuning on banking data, your model writes worse everyday English. What is this, and what helps?",opts:shuffle([
+     {t:"Catastrophic forgetting. Mix some general data back in (replay), use a lower learning rate or fewer steps, or use LoRA so the base weights stay frozen.",ok:true,why:"Correct. Panel 02 shows general perplexity exploding without replay."},
+     {t:"Overfitting to the test set: collect a new test set",why:"Misconception: <b>it's an evaluation problem</b>. The model itself changed: shared weights were pulled towards banking."},
+     {t:"The tokenizer broke: retrain the tokenizer",why:"Misconception: <b>tokenizer damage</b>. Fine-tuning doesn't change the tokenizer. The weights drifted."},
+     {t:"It's expected and can't be prevented",why:"Misconception: <b>forgetting is unavoidable</b>. Replay, regularisation and adapters reduce it a lot."}],r)},
+   {type:"Conceptual",kind:"mcq",q:"In instruction tuning (SFT), why is the loss usually computed only on the assistant's answer tokens?",opts:shuffle([
+     {t:"The model's job is to generate answers. Masking the prompt focuses all the learning signal on producing good replies.",ok:true,why:"Correct. Panel 04: masking cuts the counted tokens to just the answer."},
+     {t:"Because prompt tokens can't be tokenized",why:"Misconception: <b>prompts are special</b>. They're tokenized like everything else. We just choose not to train on predicting them."},
+     {t:"To make the model forget the question",why:"Misconception: <b>masking hides the prompt</b>. The model still <i>reads</i> the prompt through attention. It just isn't graded on predicting it."},
+     {t:"It doubles training speed",why:"Misconception: <b>it's a speed trick</b>. The forward pass is the same. It changes what is learned, not how fast."}],r)},
+   {type:"Practical",kind:"mcq",q:"A bank has 3,000 high-quality FAQ answer pairs and one 16 GB GPU. What's the best way to build a banking assistant?",opts:shuffle([
+     {t:"Take a pretrained open SLM (~1–3B), fine-tune it with LoRA/QLoRA on the FAQ pairs, and add retrieval (RAG) over current policy documents",ok:true,why:"Correct. It reuses pre-training, fits the GPU, adapts tone and format, and RAG keeps facts current and checkable."},
+     {t:"Pre-train a new model from scratch on the 3,000 pairs",why:"Misconception: <b>from scratch is better for a domain</b>. 3,000 pairs is far too little to learn a language. You'd get a model that barely writes sentences."},
+     {t:"Full fine-tune a 13B model on the GPU",why:"Misconception: <b>bigger and full is always better</b>. 13B × 16 bytes ≈ 208 GB, which doesn't fit. QLoRA on a smaller model does."},
+     {t:"Use the base model without any adaptation",why:"Misconception: <b>no tuning needed</b>. It won't know the bank's products, tone or rules. At minimum it needs RAG, ideally a light fine-tune too."}],r)}
+  ];
+}
+mountQuiz(10,$("#quiz10"),makeQuiz10);
+renderFT();renderLoRA();runEx10();
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -5959,6 +6266,41 @@ Object.assign(NARR,{
  {sel:"#hlStats",en:"That is a hallucination: fluent, confident, and unsupported. Banks reduce it by retrieving the real record and making the model answer from it.",
   te:"అదే హాలూసినేషన్: సరళమైనది, నమ్మకమైనది, ఆధారం లేనిది. బ్యాంకులు నిజమైన రికార్డును తెచ్చి, దాని నుంచే జవాబు చెప్పేలా చేసి దీన్ని తగ్గిస్తాయి.",
   hn:"यही हैलुसिनेशन है: धाराप्रवाह, आत्मविश्वासी, और बिना आधार। बैंक असली रिकॉर्ड लाकर मॉडल से उसी के आधार पर जवाब दिलवाकर इसे कम करते हैं।"}]
+});
+
+/* ---- narration for stage 10 ---- */
+NARR_INTRO[10]={en:"Welcome to Stage ten, fine-tuning. Instead of training from scratch, we take a model that already knows language and specialise it for banking, cheaply.",
+ te:"స్టేజ్ పదికి స్వాగతం. ఇది ఫైన్-ట్యూనింగ్. మొదటి నుంచి ట్రైన్ చేయకుండా, ఇప్పటికే భాష తెలిసిన మోడల్‌ను తీసుకుని తక్కువ ఖర్చుతో బ్యాంకింగ్ కోసం ప్రత్యేకంగా తీర్చిదిద్దుతాం.",
+ hn:"स्टेज टेन में आपका स्वागत है, यानी फ़ाइन-ट्यूनिंग। शुरू से ट्रेन करने के बजाय, हम ऐसा मॉडल लेते हैं जो पहले से भाषा जानता है और उसे सस्ते में बैंकिंग के लिए विशेष बनाते हैं।"};
+Object.assign(NARR,{
+"p10-journey":[
+ {sel:"#ljInfo",act:'#ljBtns [data-lj="pre"]',en:"Pre-training on huge amounts of text teaches general language. It is the expensive part, and you usually download it instead of doing it yourself.",
+  te:"భారీ టెక్స్ట్‌పై ప్రీ-ట్రైనింగ్ సాధారణ భాషను నేర్పుతుంది. అది ఖరీదైన భాగం, సాధారణంగా మీరే చేయకుండా డౌన్‌లోడ్ చేసుకుంటారు.",
+  hn:"भारी मात्रा में टेक्स्ट पर प्री-ट्रेनिंग आम भाषा सिखाती है। यही महँगा हिस्सा है, और आमतौर पर आप इसे खुद करने के बजाय डाउनलोड करते हैं।"},
+ {sel:"#ljCode",act:'#ljBtns [data-lj="sft"]',en:"Supervised fine-tuning then teaches the model to answer questions in the right tone, using thousands of question and ideal answer pairs.",
+  te:"తర్వాత సూపర్‌వైజ్డ్ ఫైన్-ట్యూనింగ్ వేల ప్రశ్న, ఆదర్శ జవాబు జతలతో సరైన స్వరంలో జవాబు చెప్పడం నేర్పుతుంది.",
+  hn:"फिर सुपरवाइज़्ड फ़ाइन-ट्यूनिंग हज़ारों सवाल और आदर्श जवाब के जोड़ों से मॉडल को सही लहजे में जवाब देना सिखाती है।"}],
+"p10-ft":[
+ {sel:"#ftBars",act:()=>{$("#ftReplay").checked=true;$("#ftK").value=8;renderFT();},en:"As we fine-tune on banking sentences, banking perplexity drops sharply. With replay, everyday language stays fine.",
+  te:"బ్యాంకింగ్ వాక్యాలపై ఫైన్-ట్యూన్ చేస్తుంటే బ్యాంకింగ్ పర్‌ప్లెక్సిటీ బాగా తగ్గుతుంది. రీప్లేతో రోజువారీ భాష బాగానే ఉంటుంది.",
+  hn:"जैसे-जैसे हम बैंकिंग वाक्यों पर फ़ाइन-ट्यून करते हैं, बैंकिंग पर्प्लेक्सिटी तेज़ी से गिरती है। रिप्ले के साथ रोज़मर्रा की भाषा ठीक रहती है।"},
+ {sel:"#ftNote",act:()=>{$("#ftReplay").checked=false;$("#ftK").value=10;renderFT();},en:"Turn replay off and train longer. General perplexity explodes and everyday prompts are forgotten. That is catastrophic forgetting.",
+  te:"రీప్లే ఆపేసి ఎక్కువసేపు ట్రైన్ చేయండి. జనరల్ పర్‌ప్లెక్సిటీ విపరీతంగా పెరుగుతుంది, రోజువారీ ప్రాంప్ట్‌లు మర్చిపోతుంది. అదే క్యాటస్ట్రోఫిక్ ఫర్గెటింగ్.",
+  hn:"रिप्ले बंद करके और देर तक ट्रेन कीजिए। आम पर्प्लेक्सिटी आसमान छूती है और रोज़मर्रा के प्रॉम्प्ट भूल जाते हैं। यही कैटास्ट्रॉफ़िक फ़ॉरगेटिंग है।"}],
+"p10-lora":[
+ {sel:"#loViz",en:"LoRA freezes the big matrix W and learns a small correction from two thin matrices, B and A. Their product is a full-size change built from very few numbers.",
+  te:"లోరా పెద్ద మ్యాట్రిక్స్ డబ్ల్యూను స్తంభింపజేసి, బీ, ఏ అనే రెండు సన్నని మ్యాట్రిక్స్‌ల నుంచి చిన్న సవరణను నేర్చుకుంటుంది. వాటి గుణకారం చాలా తక్కువ సంఖ్యలతో నిర్మించిన పూర్తి పరిమాణ మార్పు.",
+  hn:"लोरा बड़े मैट्रिक्स डब्ल्यू को जमा देता है और बी और ए नाम के दो पतले मैट्रिक्स से एक छोटा सुधार सीखता है। उनका गुणनफल बहुत कम नंबरों से बना पूरे आकार का बदलाव है।"},
+ {sel:"#loMem",act:()=>{$("#loN").value="7";renderLoRA();},en:"Full fine-tuning a seven billion model needs over a hundred gigabytes. With QLoRA, the frozen model is stored in four bits, and it fits on a sixteen gigabyte machine.",
+  te:"ఏడు బిలియన్ల మోడల్‌ను పూర్తిగా ఫైన్-ట్యూన్ చేయడానికి వంద జీబీకి పైగా కావాలి. క్యూలోరాతో స్తంభించిన మోడల్ నాలుగు బిట్లలో నిల్వ అవుతుంది, అది పదహారు జీబీ మెషీన్‌లో సరిపోతుంది.",
+  hn:"सात बिलियन मॉडल की पूरी फ़ाइन-ट्यूनिंग के लिए सौ जीबी से ज़्यादा चाहिए। क्यूलोरा के साथ जमा हुआ मॉडल चार बिट में रखा जाता है, और सोलह जीबी की मशीन में आ जाता है।"}],
+"p10-sft":[
+ {sel:"#sfToks",en:"Instruction tuning wraps each question and ideal answer in a chat template. Faded tokens are the prompt, and green tokens are the answer.",
+  te:"ఇన్‌స్ట్రక్షన్ ట్యూనింగ్ ప్రతి ప్రశ్న, ఆదర్శ జవాబును చాట్ టెంప్లేట్‌లో చుడుతుంది. మసకబారిన టోకెన్లు ప్రాంప్ట్, ఆకుపచ్చ టోకెన్లు జవాబు.",
+  hn:"इंस्ट्रक्शन ट्यूनिंग हर सवाल और आदर्श जवाब को एक चैट टेम्पलेट में लपेटती है। धुंधले टोकन प्रॉम्प्ट हैं, और हरे टोकन जवाब।"},
+ {sel:"#sfStats",en:"Only the answer tokens count in the loss, so the model learns to reply well rather than to imitate the customer.",
+  te:"లాస్‌లో జవాబు టోకెన్లు మాత్రమే లెక్కించబడతాయి, కాబట్టి మోడల్ కస్టమర్‌ను అనుకరించడం కాకుండా బాగా జవాబివ్వడం నేర్చుకుంటుంది.",
+  hn:"लॉस में सिर्फ़ जवाब वाले टोकन गिने जाते हैं, ताकि मॉडल ग्राहक की नकल करने के बजाय अच्छा जवाब देना सीखे।"}]
 });
 
 /* ---- engine ---- */
