@@ -2016,6 +2016,95 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 11 ====================== -->
+  <section id="stage11" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 11 · unlocked</div>
+      <h2>Optimization & quantization: making it small and fast</h2>
+      <p>A trained model is just billions of numbers. Store each number with fewer bits, remove the least important ones, or teach a smaller model to copy a bigger one, and the same intelligence fits on a laptop or phone. This stage shows exactly what each trick does to memory, speed and quality.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 11 sections">
+      <button type="button" data-go="p11-calc">1 · Optimization calculator</button>
+      <button type="button" data-go="p11-fmt">2 · Number formats</button>
+      <button type="button" data-go="p11-quant">3 · Quantization lab</button>
+      <button type="button" data-go="p11-prune">4 · Pruning & distillation</button>
+      <button type="button" data-go="p11-code">5 · Code</button>
+      <button type="button" data-go="p11-ex">6 · Exercise</button>
+      <button type="button" data-go="p11-quiz">7 · Assessment</button>
+    </nav>
+
+    <div class="panel" id="p11-calc">
+      <div class="phead"><span class="tag">01</span><h3>Model optimization calculator</h3><span class="sim illus">exact memory · estimated speed and quality</span>
+        <p class="plain">Choose a model size and a precision. Memory is exact arithmetic (parameters × bytes). Speed on a CPU is limited mostly by how fast memory can be read, so <em>smaller numbers mean faster generation</em>. Quality figures are typical published ranges, not guarantees.</p></div>
+      <div class="ctrls box" style="margin-bottom:12px">
+        <label class="field">parameters: <b id="ocNv"></b><input id="ocN" type="range" min="0" max="9" value="5"></label>
+        <label class="field">precision / quantization<select id="ocP" class="txt"><option value="32">FP32 · 4 bytes</option><option value="16">FP16 · 2 bytes</option><option value="16b">BF16 · 2 bytes</option><option value="8">INT8 · 1 byte</option><option value="4" selected>INT4 · 0.5 byte</option><option value="3">INT3 · 0.375 byte</option><option value="2">INT2 · 0.25 byte</option></select></label>
+        <label class="field">memory bandwidth: <b id="ocBv"></b><input id="ocB" type="range" min="0" max="4" value="1"></label>
+      </div>
+      <div class="grid2">
+        <div class="box"><div class="stats" id="ocStats"></div><div id="ocDev" style="display:grid;gap:6px;margin-top:12px"></div></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Every precision for this model</div><svg class="plot" id="ocSvg" viewBox="0 0 440 230" role="img" aria-label="Size, speed and quality by precision"></svg></div>
+      </div>
+      <div class="facts">
+        <div><b>Formulas</b><div class="formula" style="white-space:normal">memory ≈ N × bytes/param (+ ~20% runtime) · tokens/s ≈ bandwidth ÷ model bytes</div></div>
+        <div><b>The trade-off</b><ul><li><span class="c-out">Smaller</span>: fits more devices, cheaper to serve</li><li><span class="c-emb">Faster</span>: less data to move per token</li><li><span class="c-err">Quality</span>: drops slowly to ~4 bits, then sharply</li></ul></div>
+        <div><b>Inside an SLM</b>Most local SLM apps (llama.cpp, Ollama, LM Studio) run <b>4-bit GGUF</b> files by default. Training uses BF16, and serving often uses INT8 or INT4.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p11-fmt">
+      <div class="phead"><span class="tag">02</span><h3>Number formats, bit by bit</h3><span class="sim real">real bit patterns from your browser</span>
+        <p class="plain">Every weight is stored as bits: a <em>sign</em>, an <em>exponent</em> (range: how big or small) and a <em>mantissa</em> (precision: how many digits). Type a number and see how FP32, FP16 and BF16 store it, and how much error each one introduces.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:1 1 220px">number<input class="txt" id="nfIn" type="text" value="0.1" autocomplete="off"></label><div class="row" id="nfPre" style="align-self:end"></div></div>
+      <div class="box"><div id="nfRows" style="display:grid;gap:12px"></div></div>
+      <div class="grid2" style="margin-top:12px"><div class="box note" style="border-left:0" id="nfNote"></div><div class="predict" id="nfPred"></div></div>
+    </div>
+
+    <div class="panel" id="p11-quant">
+      <div class="phead"><span class="tag">03</span><h3>Quantization lab: squeezing 64 weights into a few bits</h3><span class="sim real">real absmax quantization</span>
+        <p class="plain">Quantization picks a <em>scale</em> so the largest weight maps to the largest integer, then rounds every weight to the nearest level. Fewer bits means fewer levels and bigger rounding error. A single <em>outlier</em> stretches the scale and crushes small weights to zero. <em>Per-group</em> scales fix that.</p></div>
+      <div class="ctrls box" style="margin-bottom:12px">
+        <label class="field">bits: <b id="qlBv"></b><input id="qlB" type="range" min="2" max="8" value="4"></label>
+        <label class="field">scale<select id="qlS" class="txt"><option value="tensor">one scale per tensor</option><option value="group">one scale per group of 16</option></select></label>
+        <label class="row" style="font-size:.88rem;color:var(--muted);align-self:end"><input type="checkbox" id="qlO"> add 2 outlier weights</label>
+      </div>
+      <div class="grid2">
+        <div class="box"><svg class="plot" id="qlSvg" viewBox="0 0 460 250" role="img" aria-label="Original versus quantized weights"></svg></div>
+        <div style="display:grid;gap:12px;align-content:start"><div class="box"><div class="stats" id="qlStats"></div></div><div class="predict" id="qlPred"></div></div>
+      </div>
+      <div class="facts">
+        <div><b>Formula (symmetric absmax)</b><div class="formula" style="white-space:normal">scale = max|w| / (2<sup>b−1</sup> − 1) · q = round(w / scale) · ŵ = q × scale</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-tok">b</span>: bits per weight</li><li><span class="c-emb">q</span>: the small integer actually stored</li><li><span class="c-err">ŵ − w</span>: rounding error</li></ul></div>
+        <div><b>Inside an SLM</b>Real 4-bit formats (GPTQ, AWQ, GGUF Q4_K) use groups of 32–128 weights, each with its own scale, and some protect important outlier channels. That's why 4-bit models lose so little quality.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p11-prune">
+      <div class="phead"><span class="tag">04</span><h3>Pruning & knowledge distillation</h3><span class="sim real">real computation</span>
+        <p class="plain"><em>Pruning</em> removes the weights with the smallest magnitude, the ones that matter least. <em>Distillation</em> trains a small student model to copy a big teacher's full probability distribution (its “soft targets”), not just its top answer.</p></div>
+      <div class="grid2">
+        <div class="box"><label class="field">prune the smallest: <b id="prSv"></b><input id="prS" type="range" min="0" max="95" value="50"></label><div id="prGrid" style="display:grid;grid-template-columns:repeat(16,1fr);gap:2px;margin-top:10px;max-width:320px"></div><div class="stats" id="prStats" style="margin-top:10px"></div></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Teacher's next word after “the bank approved the …”</div><label class="field">distillation temperature T: <b id="dsTv"></b><input id="dsT" type="range" min="5" max="60" value="10"></label><div class="grid2" style="gap:10px;margin-top:10px"><div><div class="mono dim" style="font-size:.72rem;margin-bottom:4px">hard label (one-hot)</div><div class="bars" id="dsHard"></div></div><div><div class="mono dim" style="font-size:.72rem;margin-bottom:4px">teacher's soft targets</div><div class="bars" id="dsSoft"></div></div></div><p class="note" id="dsNote" style="margin-top:8px"></p></div>
+      </div>
+      <div class="grid2" style="margin-top:12px"><div class="box note" style="border-left:0">Unstructured pruning (single weights) saves memory only with sparse formats. <b>Structured</b> pruning (whole heads, neurons or layers) speeds up ordinary hardware. Distilled SLMs (DistilBERT, many “mini” models) keep most of a larger model's quality at a fraction of the size.</div><div class="predict" id="prPred"></div></div>
+    </div>
+
+    <div class="panel" id="p11-code">
+      <div class="phead"><span class="tag">05</span><h3>Code it on your CPU</h3><p>Absmax INT8/INT4 quantization by hand, then PyTorch's built-in dynamic INT8 quantization of a model's linear layers, with a size and speed comparison on the CPU. A GGUF/llama.cpp note covers running real 4-bit SLMs.</p></div>
+      <div class="code" id="code11"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <div class="panel" id="p11-ex">
+      <div class="phead"><span class="tag">06</span><h3>Hands-on exercise: four missions</h3><p>The checks read the panels' live state.</p></div>
+      <div class="box"><div class="checks" id="ex11Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex11Btn" type="button">Check missions</button></div><p class="note" id="ex11Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <div class="panel" id="p11-quiz">
+      <div class="phead"><span class="tag">07</span><h3>Stage 11 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 12, deployment.</p></div>
+      <div id="quiz11"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -2080,7 +2169,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8",9:"#stage9",10:"#stage10"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8",9:"#stage9",10:"#stage10",11:"#stage11"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -5700,6 +5789,181 @@ function makeQuiz10(seed){
 mountQuiz(10,$("#quiz10"),makeQuiz10);
 renderFT();renderLoRA();runEx10();
 
+/* =================== STAGE 11 =================== */
+/* ---- 1. calculator ---- */
+const OC_N=[1e7,5e7,1.35e8,5e8,1e9,3e9,7e9,1.3e10,3e10,7e10],OC_BW=[[20,"phone (~20 GB/s)"],[50,"laptop (~50 GB/s)"],[90,"desktop DDR5 (~90 GB/s)"],[400,"Apple M-series Max (~400 GB/s)"],[2000,"data-centre GPU (~2,000 GB/s)"]];
+const OC_P={"32":{n:"FP32",b:4,q:100},"16":{n:"FP16",b:2,q:100},"16b":{n:"BF16",b:2,q:100},"8":{n:"INT8",b:1,q:99.5},"4":{n:"INT4",b:.5,q:97},"3":{n:"INT3",b:.375,q:91},"2":{n:"INT2",b:.25,q:70}};
+const OC_DEV=[["Phone (6 GB usable)",6e9],["Laptop (16 GB)",16e9],["Desktop (32 GB)",32e9],["Server GPU (80 GB)",80e9]];
+let ocFit=null;
+function renderOC(){
+  const N=OC_N[+$("#ocN").value],pk=$("#ocP").value,P=OC_P[pk],[bw,bwn]=OC_BW[+$("#ocB").value],mem=N*P.b,need=mem*1.2,tps=bw*1e9/mem;
+  $("#ocNv").textContent=fmtN(N);$("#ocBv").textContent=bwn;
+  $("#ocStats").innerHTML=`<div class="stat"><span class="v c-hid">${fmtB(mem)}</span><span class="k">weights in ${P.n}</span></div><div class="stat"><span class="v">${fmtB(need)}</span><span class="k">RAM needed (+20%)</span></div><div class="stat"><span class="v c-emb">${tps>=100?Math.round(tps):tps.toFixed(1)}</span><span class="k">tokens/s (upper bound)</span></div><div class="stat"><span class="v ${P.q>=97?"c-out":P.q>=90?"c-tok":"c-err"}">~${P.q}%</span><span class="k">quality kept (typical)</span></div>`;
+  $("#ocDev").innerHTML=OC_DEV.map(([d,c])=>`<div class="row" style="justify-content:space-between"><span>${d}</span><span class="pill ${need<=c?"":"bad"}" style="${need<=c?"color:var(--out);border-color:var(--out)":""}">${need<=c?"✓ fits":"✗ too big"}</span></div>`).join("");
+  ocFit={N,q:P.q,phone:need<=6e9};
+  const keys=["32","16b","8","4","3","2"],W=440,H=230,l=10,top=24,bh=150,gw=(W-l*2)/keys.length;let g="";
+  keys.forEach((k,i)=>{const p=OC_P[k],x=l+i*gw,sel=k===pk||(pk==="16"&&k==="16b"),hs=p.b/4,hv=Math.min(1,(.5/p.b)/8)*1;const bars=[[p.b/4,"var(--hid)"],[.25/p.b,"var(--emb)"],[p.q/100,p.q>=97?"var(--out)":p.q>=90?"var(--tok)":"var(--err)"]];
+    bars.forEach(([v,c],j)=>{const bx=x+6+j*(gw-12)/3,bwid=(gw-12)/3-3;g+=`<rect x="${bx}" y="${top+bh-v*bh}" width="${bwid}" height="${v*bh}" rx="2" style="fill:${c};opacity:${sel?1:.45}"/>`;});
+    g+=`<text x="${x+gw/2}" y="${top+bh+16}" text-anchor="middle" font-size="11" font-weight="${sel?700:400}" style="fill:${sel?"var(--fg)":"var(--muted)"}" font-family="IBM Plex Mono">${p.n}</text>`;});
+  g+=`<text x="${l}" y="14" font-size="10" font-family="IBM Plex Mono"><tspan style="fill:var(--hid)">■ size</tspan>  <tspan style="fill:var(--emb)">■ speed</tspan>  <tspan style="fill:var(--out)">■ quality</tspan></text>`;
+  $("#ocSvg").innerHTML=g;
+}
+["#ocN","#ocB"].forEach(s=>$(s).addEventListener("input",renderOC));$("#ocP").addEventListener("change",renderOC);renderOC();
+
+/* ---- 2. number formats ---- */
+const f32b=x=>{const dv=new DataView(new ArrayBuffer(4));dv.setFloat32(0,x);return dv.getUint32(0).toString(2).padStart(32,"0");};
+const f32v=x=>Math.fround(x);
+function toF16(x){if(!isFinite(x))return x;const s=x<0?-1:1;x=Math.abs(x);if(x>65504)return s*Infinity;if(x<6.1e-5){const q=Math.round(x/5.96e-8)*5.96e-8;return s*q;}const e=Math.floor(Math.log2(x)),m=x/Math.pow(2,e);return s*Math.round(m*1024)/1024*Math.pow(2,e);}
+function toBF16(x){const dv=new DataView(new ArrayBuffer(4));dv.setFloat32(0,x);let u=dv.getUint32(0);const lsb=(u>>16)&1;u=(u+0x7fff+lsb)&0xffff0000;dv.setUint32(0,u>>>0);return dv.getFloat32(0);}
+function f16bits(v){if(v===Infinity)return "0111110000000000";if(v===-Infinity)return "1111110000000000";const s=v<0||Object.is(v,-0)?1:0;const a=Math.abs(v);if(a===0)return s+"0".repeat(15);if(a<6.1e-5){return s+"00000"+Math.round(a/5.96e-8).toString(2).padStart(10,"0").slice(-10);}const e=Math.floor(Math.log2(a)),m=Math.round((a/Math.pow(2,e)-1)*1024);return s+(e+15).toString(2).padStart(5,"0")+m.toString(2).padStart(10,"0");}
+const NF_PRE=["0.1","3.14159","70000","0.00001","-2.5","1e-8"];
+$("#nfPre").innerHTML=NF_PRE.map(v=>`<button type="button" class="btn" data-nf="${v}">${v}</button>`).join("");
+$$("#nfPre [data-nf]").forEach(b=>b.addEventListener("click",()=>{$("#nfIn").value=b.dataset.nf;renderNF();}));
+let nfSaw=false;
+function bitRow(name,bits,se,val,x){const [s,e]=se,cells=[...bits].map((b,i)=>`<span style="width:${Math.max(8,Math.min(14,440/bits.length))}px;height:20px;display:inline-grid;place-items:center;font-family:var(--f-mono);font-size:.62rem;border-radius:2px;background:${i<s?"rgba(255,125,147,.35)":i<s+e?"rgba(82,211,226,.3)":"rgba(243,185,85,.25)"};color:var(--fg)">${b}</span>`).join("");
+  const err=isFinite(val)?Math.abs(val-x):Infinity,rel=x!==0?err/Math.abs(x):err;
+  return `<div style="min-width:0"><div class="row" style="justify-content:space-between;margin-bottom:4px;flex-wrap:wrap"><b class="mono">${name} · ${bits.length} bits</b><span class="mono" style="font-size:.8rem;white-space:normal;overflow-wrap:anywhere;min-width:0">stored: <span class="${isFinite(val)?"c-out":"c-err"}">${isFinite(val)?val.toPrecision(8):"∞ (overflow!)"}</span> · error ${isFinite(err)?(rel*100).toPrecision(2)+"%":"∞"}</span></div><div class="scroll"><div style="display:flex;gap:1px;min-width:max-content">${cells}</div></div></div>`;}
+function renderNF(){
+  const x=parseFloat($("#nfIn").value);if(isNaN(x)){$("#nfRows").innerHTML='<p class="muted">Type a number.</p>';return;}
+  const v32=f32v(x),v16=toF16(x),vb=toBF16(x);
+  $("#nfRows").innerHTML=bitRow("FP32",f32b(x),[1,8],v32,x)+bitRow("FP16",f16bits(v16),[1,5],v16,x)+bitRow("BF16",f32b(vb).slice(0,16),[1,8],vb,x)+`<div class="row" style="gap:12px;font-size:.75rem;font-family:var(--f-mono)"><span><i class="lg" style="background:rgba(255,125,147,.6)"></i>sign</span><span><i class="lg" style="background:rgba(82,211,226,.6)"></i>exponent (range)</span><span><i class="lg" style="background:rgba(243,185,85,.6)"></i>mantissa (precision)</span></div>`;
+  if(!isFinite(v16)&&isFinite(vb))nfSaw=true;
+  $("#nfNote").innerHTML=!isFinite(v16)?`<b class="c-err">FP16 overflows</b> above 65,504 because it has only 5 exponent bits. BF16 keeps FP32's 8 exponent bits, so it stores ${x} roughly (with only ~3 significant digits). That's why <b>BF16 is the standard for training</b>: no overflow, and no need for loss scaling.`:`FP32 keeps ~7 significant digits, FP16 ~3–4, BF16 ~2–3. Neural networks tolerate this rounding well, which is why halving the bits barely hurts quality while halving memory.`;
+}
+$("#nfIn").addEventListener("input",renderNF);renderNF();
+predictBox($("#nfPred"),{q:"An activation reaches 70,000 during training. Which 16-bit format can store it?",opts:["FP16","BF16","Neither"],ok:1,
+  why:"FP16's maximum is 65,504, so it overflows to ∞. BF16 shares FP32's exponent range (up to ~3.4 × 10³⁸) and stores it approximately. Range matters more than precision in training, which is why BF16 took over.",onReveal:()=>{$("#nfIn").value="70000";renderNF();}});
+
+/* ---- 3. quantization lab ---- */
+const QL_R=mulberry(55),QL_W=Array.from({length:64},()=>gauss(QL_R)*.35),QL_X=Array.from({length:8},()=>Array.from({length:64},()=>gauss(QL_R)));
+let qlLast={};
+function quantize(w,bits,group){const out=[],qmax=Math.pow(2,bits-1)-1,G=group?16:w.length,scales=[];for(let s=0;s<w.length;s+=G){const blk=w.slice(s,s+G),sc=Math.max(...blk.map(Math.abs))/qmax||1;scales.push(sc);blk.forEach(v=>out.push(Math.round(v/sc)*sc));}return {q:out,scales};}
+function renderQL(){
+  const bits=+$("#qlB").value,group=$("#qlS").value==="group",out=$("#qlO").checked;$("#qlBv").textContent=`${bits} (${Math.pow(2,bits)} levels)`;
+  const w=QL_W.slice();if(out){w[9]=3.2;w[13]=-2.9;}
+  const {q,scales}=quantize(w,bits,group),tens=quantize(w,bits,false).q;
+  const mse=a=>a.reduce((s,v,i)=>s+(v-w[i])**2,0)/w.length,zeros=q.filter((v,i)=>v===0&&w[i]!==0).length,outs=a=>QL_X.map(x=>a.reduce((s,v,i)=>s+v*x[i],0)),y=outs(w),yq=outs(q),oerr=Math.sqrt(yq.reduce((s,v,i)=>s+(v-y[i])**2,0)/y.reduce((s,v)=>s+v*v,0));
+  const W=460,H=250,l=30,r=8,t=12,bm=24,mx=out?3.4:Math.max(...w.map(Math.abs))*1.15,X=i=>l+(i+.5)/64*(W-l-r),Y=v=>t+(mx-v)/(2*mx)*(H-t-bm);
+  let g=`<line x1="${l}" x2="${W-r}" y1="${Y(0)}" y2="${Y(0)}" style="stroke:var(--line2)"/>`;
+  if(!group){const sc=scales[0],qm=Math.pow(2,bits-1)-1;if(qm<=15)for(let k=-qm;k<=qm;k++)g+=`<line x1="${l}" x2="${W-r}" y1="${Y(k*sc)}" y2="${Y(k*sc)}" style="stroke:var(--line)" stroke-dasharray="2 3"/>`;}
+  else for(let gI=0;gI<4;gI++)g+=`<rect x="${X(gI*16)-3}" y="${t}" width="${(W-l-r)/4}" height="${H-t-bm}" style="fill:${gI%2?"rgba(169,147,255,.05)":"transparent"}"/>`;
+  w.forEach((v,i)=>{g+=`<line x1="${X(i)}" x2="${X(i)}" y1="${Y(0)}" y2="${Y(v)}" style="stroke:var(--emb)" stroke-width="2.5" opacity=".55"/><circle cx="${X(i)}" cy="${Y(q[i])}" r="3" style="fill:var(--tok)"/>`;});
+  g+=`<text x="${l}" y="${H-6}" font-size="9.5" font-family="IBM Plex Mono"><tspan style="fill:var(--emb)">| original weight</tspan>  <tspan style="fill:var(--tok)">● quantized value</tspan>${group?'  <tspan style="fill:var(--hid)">shaded = groups of 16</tspan>':"  dashed = available levels"}</text>`;
+  $("#qlSvg").innerHTML=g;
+  qlLast={bits,group,out,mse:mse(q),mseT:mse(tens)};
+  $("#qlStats").innerHTML=`<div class="stat"><span class="v c-err">${mse(q).toExponential(1)}</span><span class="k">mean squared error</span></div><div class="stat"><span class="v">${zeros}</span><span class="k">weights rounded to 0</span></div><div class="stat"><span class="v c-tok">${(oerr*100).toFixed(1)}%</span><span class="k">layer output error (8 inputs)</span></div><div class="stat"><span class="v c-hid">${bits/32*100}%</span><span class="k">of FP32 memory (plus ${scales.length} scale${scales.length>1?"s":""})</span></div>`;
+}
+["#qlB"].forEach(s=>$(s).addEventListener("input",renderQL));["#qlS","#qlO"].forEach(s=>$(s).addEventListener("change",renderQL));renderQL();
+predictBox($("#qlPred"),{q:"At 4 bits with one scale for the whole tensor, you add one huge outlier weight. What happens to the small weights?",opts:["Nothing changes","Many become exactly 0, because the scale stretches to fit the outlier","They become more accurate"],ok:1,
+  why:"The scale is set by the largest |w|, so the gap between levels grows and small weights fall into the zero bucket. Per-group scales confine the damage to the outlier's group. That's the idea behind modern 4-bit formats.",onReveal:()=>{$("#qlO").checked=true;$("#qlB").value=4;$("#qlS").value="tensor";renderQL();}});
+
+/* ---- 4. pruning & distillation ---- */
+const PR_R=mulberry(77),PR_W=Array.from({length:256},()=>gauss(PR_R)),PR_X=Array.from({length:16},()=>gauss(PR_R));
+function renderPR(){const s=+$("#prS").value;$("#prSv").textContent=s+"%";const th=[...PR_W].map(Math.abs).sort((a,b)=>a-b)[Math.min(255,Math.floor(256*s/100))]||0,keep=PR_W.map(v=>s&&Math.abs(v)<th?0:v);
+  $("#prGrid").innerHTML=keep.map(v=>`<span style="aspect-ratio:1;border-radius:2px;background:${v===0?"#05090c":cellCol(v)}"></span>`).join("");
+  const mv=Wm=>[...Array(16)].map((_,i)=>[...Array(16)].reduce((a,_,j)=>a+Wm[i*16+j]*PR_X[j],0)),y=mv(PR_W),yp=mv(keep),err=Math.sqrt(yp.reduce((a,v,i)=>a+(v-y[i])**2,0)/y.reduce((a,v)=>a+v*v,0));
+  $("#prStats").innerHTML=`<div class="stat"><span class="v">${keep.filter(v=>v===0).length}/256</span><span class="k">weights removed</span></div><div class="stat"><span class="v ${err<.1?"c-out":err<.3?"c-tok":"c-err"}">${(err*100).toFixed(1)}%</span><span class="k">layer output error</span></div>`;window.__pr={s,err};}
+$("#prS").addEventListener("input",renderPR);renderPR();
+const DS_W=["loan","application","account","mortgage","cat"],DS_Z=[3.2,2.1,1.5,1.1,-2];
+function renderDS(){const T=+$("#dsT").value/10;$("#dsTv").textContent=T.toFixed(1);const z=DS_Z.map(v=>v/T),m=Math.max(...z),e=z.map(v=>Math.exp(v-m)),S=e.reduce((a,b)=>a+b,0),p=e.map(v=>v/S);
+  $("#dsHard").innerHTML=DS_W.map((w,i)=>`<div class="bar" style="grid-template-columns:70px minmax(0,1fr) 40px"><span class="lbl">${w}</span><span class="trk"><span class="fill" style="display:block;width:${i?0:100}%;background:var(--muted)"></span></span><span class="val">${i?0:100}%</span></div>`).join("");
+  $("#dsSoft").innerHTML=DS_W.map((w,i)=>`<div class="bar" style="grid-template-columns:70px minmax(0,1fr) 40px"><span class="lbl">${w}</span><span class="trk"><span class="fill" style="display:block;width:${(p[i]*100).toFixed(1)}%"></span></span><span class="val">${(p[i]*100).toFixed(0)}%</span></div>`).join("");
+  $("#dsNote").innerHTML=`The one-hot label only says “loan”. The teacher's soft targets also say <b>application and account are reasonable, and cat is absurd</b>. That's “dark knowledge”, which the student learns for free. A higher T spreads it out more.`;window.__dsApp=p[1];}
+$("#dsT").addEventListener("input",renderDS);renderDS();
+predictBox($("#prPred"),{q:"Magnitude pruning removes 30% of a layer's weights (the smallest ones). Roughly how much does the layer's output change?",opts:["About 30% or more","Clearly less, around 10–15%","It stops working"],ok:1,
+  why:"The smallest weights carry little energy: the bottom 30% of a Gaussian weight matrix hold only ~3% of its squared magnitude, so the output error is about √0.03 ≈ 15% (this panel measures ~13%). Push to 80–90% and the error climbs fast. Real models fine-tune briefly after pruning to recover.",onReveal:()=>{$("#prS").value=30;renderPR();}});
+
+/* ---- code ---- */
+codeBox($("#code11"),{"quantize.py":`import time, warnings, torch, torch.nn as nn
+warnings.filterwarnings("ignore")   # torch.ao.quantization is being moved to the torchao package
+
+# ---- 1. absmax quantization by hand ----------------------------------------
+def quantize_absmax(w, bits=8, group=None):
+    qmax = 2 ** (bits - 1) - 1                                  # 127 for INT8, 7 for INT4
+    flat = w.reshape(-1, group) if group else w.reshape(1, -1)
+    scale = flat.abs().amax(dim=1, keepdim=True) / qmax         # one scale per row/group
+    q = torch.clamp(torch.round(flat / scale), -qmax, qmax).to(torch.int8)
+    return q, scale
+
+def dequantize(q, scale, shape):
+    return (q.float() * scale).reshape(shape)
+
+torch.manual_seed(0)
+w = torch.randn(256, 256) * 0.02
+w[0, 0] = 1.0                                                   # one outlier
+for bits, group in [(8, None), (4, None), (4, 64)]:
+    q, s = quantize_absmax(w, bits, group)
+    err = (dequantize(q, s, w.shape) - w).pow(2).mean().sqrt() / w.std()
+    print(f"INT{bits} {'per-group' if group else 'per-tensor'}: relative error {err:.3f}")
+
+# ---- 2. PyTorch dynamic INT8 quantization of Linear layers (CPU) -----------
+# (newer PyTorch: pip install torchao and use torchao.quantization.quantize_)
+model = nn.Sequential(nn.Linear(1024, 4096), nn.GELU(), nn.Linear(4096, 1024)).eval()
+qmodel = torch.ao.quantization.quantize_dynamic(model, {nn.Linear}, dtype=torch.qint8)
+
+def size_mb(m):
+    torch.save(m.state_dict(), "tmp.pt")
+    import os; return os.path.getsize("tmp.pt") / 1e6
+
+x = torch.randn(64, 1024)
+def bench(m):
+    with torch.no_grad():
+        t = time.perf_counter()
+        for _ in range(20):
+            m(x)
+        return (time.perf_counter() - t) / 20 * 1000
+
+print(f"FP32: {size_mb(model):.1f} MB, {bench(model):.2f} ms/batch")
+print(f"INT8: {size_mb(qmodel):.1f} MB, {bench(qmodel):.2f} ms/batch")
+with torch.no_grad():
+    print("max output difference:", (model(x) - qmodel(x)).abs().max().item())
+
+# ---- 3. real 4-bit SLMs on a CPU ---------------------------------------------
+# llama.cpp / Ollama load GGUF files, e.g. a Q4_K_M build of a 1-3B model:
+#   ollama run qwen2.5:1.5b      (downloads a ~1 GB 4-bit model and chats on the CPU)`});
+
+/* ---- exercise ---- */
+let ex11Checked=false;
+const EX11=[
+ {t:"<b>Calculator (panel 01):</b> make a <b>3B</b> model fit on a <b>phone</b> while keeping <b>≥ 95%</b> quality",f:()=>ocFit&&ocFit.N===3e9&&ocFit.phone&&ocFit.q>=95},
+ {t:"<b>Formats (panel 02):</b> find a number that <b>overflows FP16</b> but is stored by <b>BF16</b>",f:()=>nfSaw},
+ {t:"<b>Quantization (panel 03):</b> with outliers on at <b>4 bits</b>, use per-group scales to cut the error to <b>less than half</b> of per-tensor",f:()=>qlLast.out&&qlLast.bits===4&&qlLast.group&&qlLast.mse<.5*qlLast.mseT},
+ {t:"<b>Distillation (panel 04):</b> raise the temperature until “application” gets <b>at least 20%</b> of the teacher's soft target",f:()=>(window.__dsApp||0)>=.2}
+];
+function runEx11(){let ok=0;$("#ex11Checks").innerHTML=EX11.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex11Checked?(r?"ok":"no"):""}"><span class="dot">${ex11Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex11Checked)$("#ex11Msg").innerHTML=ok===EX11.length?'<span class="c-out">All 4 missions complete.</span> You can now pick a precision and compression plan for any target device.':`${ok}/4 missions complete. Hint: 3B in INT4 is 1.5 GB.`;}
+$("#ex11Btn").addEventListener("click",()=>{ex11Checked=true;runEx11();});
+
+/* ---- quiz ---- */
+function makeQuiz11(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)];
+  const N=pick([1,3,7]),pr=pick([["INT4",.5],["INT8",1],["FP16",2]]),gb=N*pr[1];
+  const mx=pick([2.54,1.27,3.81]),sc=mx/127,wv=pick([.5,.9,-1.1]),qv=Math.round(wv/sc);
+  return [
+   {type:"Numerical",kind:"num",q:`How many GB do the weights of a <b>${N}B</b>-parameter model take in <b>${pr[0]}</b>?`,
+    check:v=>{if(Math.abs(v-gb)<.06)return [true,`${N} × 10⁹ × ${pr[1]} bytes = ${gb} GB.`];if(Math.abs(v-N*4)<.06)return [false,`${N*4} GB is FP32 (4 bytes). ${pr[0]} uses ${pr[1]} byte(s) per parameter: ${gb} GB.`];return [false,`parameters × bytes = ${N}B × ${pr[1]} = ${gb} GB.`];}},
+   {type:"Numerical",kind:"num",q:`Symmetric INT8 absmax quantization: the largest |weight| is <b>${mx}</b>, so the scale is ${mx}/127. Which integer stores the weight <b>${wv}</b>?`,
+    check:v=>{if(v===qv)return [true,`scale = ${mx}/127 = ${sc.toFixed(4)}; ${wv}/${sc.toFixed(4)} = ${(wv/sc).toFixed(2)} → round → ${qv}.`];if(v===Math.trunc(wv/sc))return [false,`Close, but quantization <b>rounds</b> to the nearest integer rather than truncating: ${(wv/sc).toFixed(2)} → ${qv}.`];return [false,`q = round(w / scale) = round(${wv} / ${sc.toFixed(4)}) = round(${(wv/sc).toFixed(2)}) = ${qv}.`];}},
+   {type:"Conceptual",kind:"mcq",q:"Why is BF16 usually preferred over FP16 for <b>training</b>?",opts:shuffle([
+     {t:"BF16 keeps FP32's 8-bit exponent (the same range), so large values and gradients don't overflow. It gives up some precision instead.",ok:true,why:"Correct. Panel 02: 70,000 overflows FP16 but fits BF16. Range matters more than the last digits during training."},
+     {t:"BF16 is more precise than FP16",why:"Misconception: <b>BF16 = more precision</b>. It has fewer mantissa bits (7 vs 10). Its advantage is range."},
+     {t:"BF16 uses less memory than FP16",why:"Misconception: <b>BF16 is smaller</b>. Both are 16 bits, so memory is identical."},
+     {t:"FP16 can't be used on GPUs",why:"Misconception: <b>FP16 is unsupported</b>. FP16 works widely. It just needs loss scaling to avoid overflow and underflow, which BF16 avoids."}],r)},
+   {type:"Conceptual",kind:"mcq",q:"What is knowledge distillation?",opts:shuffle([
+     {t:"Training a small student model to match a large teacher's output probabilities (soft targets), so it inherits much of the teacher's behaviour",ok:true,why:"Correct. The soft targets carry “dark knowledge” about which wrong answers are nearly right (panel 04)."},
+     {t:"Removing the smallest weights from a model",why:"Misconception: <b>distillation = pruning</b>. That's pruning. Distillation trains a separate, smaller model."},
+     {t:"Storing weights with fewer bits",why:"Misconception: <b>distillation = quantization</b>. That's quantization. Distillation changes the architecture and retrains."},
+     {t:"Cleaning the training data",why:"Misconception: <b>distilling the dataset</b>. It's about transferring knowledge from model to model."}],r)},
+   {type:"Practical",kind:"mcq",q:"You want a 7B open model answering banking questions on a 16 GB laptop with no GPU. What's the most practical setup?",opts:shuffle([
+     {t:"Run a 4-bit (e.g. GGUF Q4) build with llama.cpp/Ollama: about 4 GB of weights, a few tokens per second on the CPU",ok:true,why:"Correct. 7B × 0.5 byte ≈ 3.5–4 GB. It fits comfortably, and speed is bounded by memory bandwidth (panel 01)."},
+     {t:"Run it in FP32 for the best quality",why:"Misconception: <b>full precision is required</b>. 7B × 4 bytes = 28 GB, which doesn't fit in 16 GB."},
+     {t:"Prune 90% of its weights",why:"Misconception: <b>aggressive pruning is safe</b>. 90% unstructured pruning wrecks quality and doesn't speed up ordinary CPU kernels."},
+     {t:"It's impossible without a GPU",why:"Misconception: <b>LLMs need GPUs</b>. Quantized 7B models run on laptops every day, just more slowly."}],r)}
+  ];
+}
+mountQuiz(11,$("#quiz11"),makeQuiz11);
+runEx11();
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -6301,6 +6565,41 @@ Object.assign(NARR,{
  {sel:"#sfStats",en:"Only the answer tokens count in the loss, so the model learns to reply well rather than to imitate the customer.",
   te:"లాస్‌లో జవాబు టోకెన్లు మాత్రమే లెక్కించబడతాయి, కాబట్టి మోడల్ కస్టమర్‌ను అనుకరించడం కాకుండా బాగా జవాబివ్వడం నేర్చుకుంటుంది.",
   hn:"लॉस में सिर्फ़ जवाब वाले टोकन गिने जाते हैं, ताकि मॉडल ग्राहक की नकल करने के बजाय अच्छा जवाब देना सीखे।"}]
+});
+
+/* ---- narration for stage 11 ---- */
+NARR_INTRO[11]={en:"Welcome to Stage eleven, optimisation. A trained model is billions of numbers, and storing them more cleverly lets the same model run on a laptop or a phone.",
+ te:"స్టేజ్ పదకొండుకు స్వాగతం. ఇది ఆప్టిమైజేషన్. ట్రైన్ అయిన మోడల్ అంటే కోట్లాది సంఖ్యలు, వాటిని తెలివిగా నిల్వ చేస్తే అదే మోడల్ ల్యాప్‌టాప్ లేదా ఫోన్‌లో నడుస్తుంది.",
+ hn:"स्टेज इलेवन में आपका स्वागत है, यानी ऑप्टिमाइज़ेशन। ट्रेन किया हुआ मॉडल अरबों नंबर है, और उन्हें समझदारी से रखने पर वही मॉडल लैपटॉप या फ़ोन पर चल सकता है।"};
+Object.assign(NARR,{
+"p11-calc":[
+ {sel:"#ocStats",en:"Memory is simply the number of parameters times the bytes per parameter. A three billion model needs twelve gigabytes in FP32, but only one and a half in INT4.",
+  te:"మెమరీ అంటే పారామీటర్ల సంఖ్య గుణించి ప్రతి పారామీటర్‌కు బైట్లు. మూడు బిలియన్ల మోడల్‌కు ఎఫ్‌పీ32లో పన్నెండు జీబీ కావాలి, కానీ ఐఎన్‌టీ4లో ఒకటిన్నర మాత్రమే.",
+  hn:"मेमोरी बस पैरामीटरों की संख्या गुणा हर पैरामीटर के बाइट है। तीन बिलियन मॉडल को एफ़पी32 में बारह जीबी चाहिए, पर आईएनटी4 में सिर्फ़ डेढ़।"},
+ {sel:"#ocSvg",en:"Fewer bits also means faster generation on a CPU, because less data moves per word. Quality stays high down to about four bits, then drops sharply.",
+  te:"తక్కువ బిట్లు అంటే సీపీయూపై వేగమైన జనరేషన్ కూడా, ఎందుకంటే ప్రతి పదానికి తక్కువ డేటా కదులుతుంది. నాలుగు బిట్ల వరకు నాణ్యత బాగుంటుంది, తర్వాత బాగా పడిపోతుంది.",
+  hn:"कम बिट का मतलब सीपीयू पर तेज़ जनरेशन भी है, क्योंकि हर शब्द के लिए कम डेटा चलता है। गुणवत्ता लगभग चार बिट तक अच्छी रहती है, फिर तेज़ी से गिरती है।"}],
+"p11-fmt":[
+ {sel:"#nfRows",act:()=>{$("#nfIn").value="0.1";renderNF();},en:"Each format splits its bits into a sign, an exponent for range, and a mantissa for precision. Fewer mantissa bits means a slightly rounder number.",
+  te:"ప్రతి ఫార్మాట్ తన బిట్లను సైన్, రేంజ్ కోసం ఎక్స్‌పోనెంట్, ఖచ్చితత్వం కోసం మాంటిస్సాగా విభజిస్తుంది. తక్కువ మాంటిస్సా బిట్లు అంటే కొంచెం గుండ్రంగా ఉన్న సంఖ్య.",
+  hn:"हर फ़ॉर्मैट अपने बिट को साइन, रेंज के लिए एक्सपोनेंट, और सटीकता के लिए मैंटिसा में बाँटता है। कम मैंटिसा बिट का मतलब थोड़ा गोल किया हुआ नंबर।"},
+ {sel:"#nfNote",act:()=>{$("#nfIn").value="70000";renderNF();},en:"Seventy thousand overflows FP16, but BF16 keeps the full range of FP32. That is why BF16 is the standard for training.",
+  te:"డెబ్బై వేలు ఎఫ్‌పీ16లో ఓవర్‌ఫ్లో అవుతుంది, కానీ బీఎఫ్16 ఎఫ్‌పీ32 పూర్తి రేంజ్‌ను ఉంచుతుంది. అందుకే ట్రైనింగ్‌కు బీఎఫ్16 ప్రమాణం.",
+  hn:"सत्तर हज़ार एफ़पी16 में ओवरफ़्लो हो जाता है, पर बीएफ़16 एफ़पी32 की पूरी रेंज रखता है। इसीलिए ट्रेनिंग के लिए बीएफ़16 मानक है।"}],
+"p11-quant":[
+ {sel:"#qlSvg",act:()=>{$("#qlO").checked=true;$("#qlB").value=4;$("#qlS").value="tensor";renderQL();},en:"Quantization rounds each weight to the nearest available level. Add an outlier and the scale stretches, so many small weights collapse to zero.",
+  te:"క్వాంటైజేషన్ ప్రతి వెయిట్‌ను అందుబాటులో ఉన్న దగ్గరి స్థాయికి రౌండ్ చేస్తుంది. ఒక అవుట్‌లైయర్ జోడిస్తే స్కేల్ సాగుతుంది, కాబట్టి చాలా చిన్న వెయిట్లు సున్నాకు పడిపోతాయి.",
+  hn:"क्वांटाइज़ेशन हर वेट को सबसे पास के उपलब्ध स्तर पर गोल करता है। एक आउटलायर जोड़िए, तो स्केल खिंच जाता है और कई छोटे वेट शून्य हो जाते हैं।"},
+ {sel:"#qlStats",act:()=>{$("#qlS").value="group";renderQL();},en:"With a separate scale for each group of sixteen weights, the outlier only affects its own group, and the error falls sharply.",
+  te:"ప్రతి పదహారు వెయిట్ల సమూహానికి వేర్వేరు స్కేల్‌తో, అవుట్‌లైయర్ తన సమూహాన్నే ప్రభావితం చేస్తుంది, ఎర్రర్ బాగా తగ్గుతుంది.",
+  hn:"सोलह वेट के हर समूह के लिए अलग स्केल रखने पर आउटलायर सिर्फ़ अपने समूह पर असर डालता है, और गलती तेज़ी से घटती है।"}],
+"p11-prune":[
+ {sel:"#prGrid",act:()=>{$("#prS").value=30;renderPR();},en:"Pruning removes the smallest weights. Removing thirty percent of them changes this layer's output by far less than thirty percent, because small weights carry little signal.",
+  te:"ప్రూనింగ్ అతి చిన్న వెయిట్లను తొలగిస్తుంది. వాటిలో ముప్పై శాతం తొలగించినా ఈ లేయర్ అవుట్‌పుట్ ముప్పై శాతం కంటే చాలా తక్కువ మారుతుంది, ఎందుకంటే చిన్న వెయిట్లు తక్కువ సిగ్నల్ మోస్తాయి.",
+  hn:"प्रूनिंग सबसे छोटे वेट हटाती है। उनमें से तीस प्रतिशत हटाने पर इस लेयर का आउटपुट तीस प्रतिशत से बहुत कम बदलता है, क्योंकि छोटे वेट कम सिग्नल रखते हैं।"},
+ {sel:"#dsSoft",act:()=>{$("#dsT").value=30;renderDS();},en:"In distillation, a small student copies the teacher's full probabilities. They say that application and account are reasonable and cat is absurd, which a one-hot label never shows.",
+  te:"డిస్టిలేషన్‌లో చిన్న స్టూడెంట్ టీచర్ పూర్తి సంభావ్యతలను అనుకరిస్తుంది. అప్లికేషన్, అకౌంట్ సహేతుకమని, క్యాట్ అసంబద్ధమని అవి చెబుతాయి, వన్-హాట్ లేబుల్ ఎప్పుడూ చూపించనిది ఇదే.",
+  hn:"डिस्टिलेशन में एक छोटा छात्र शिक्षक की पूरी संभावनाओं की नकल करता है। वे बताती हैं कि एप्लिकेशन और अकाउंट उचित हैं और कैट बेतुका है, जो वन-हॉट लेबल कभी नहीं दिखाता।"}]
 });
 
 /* ---- engine ---- */
