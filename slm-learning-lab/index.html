@@ -3764,7 +3764,7 @@ predictBox($("#ffnPred"),{q:"In a GPT-2-size block (d = 768), which part holds m
 const CODE4={
 "mlp_numpy.py":`import numpy as np
 
-rng = np.random.default_rng(0)
+rng = np.random.default_rng(1)       # seed 0 gets stuck at [0, .5, 1, .5]: try it, an unlucky start can trap training
 X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=float)
 y = np.array([[0], [1], [1], [0]], dtype=float)          # XOR
 

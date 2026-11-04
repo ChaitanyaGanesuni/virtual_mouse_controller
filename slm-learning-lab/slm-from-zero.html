@@ -1,0 +1,383 @@
+<title>SLM From Zero</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;800&family=Lexend:wght@400;500;600&display=swap">
+<style>
+/* Layout: a trail of 10 stops across the top; one big stop card at a time below (toy on the left, plain-words explainer on the right). */
+:root{
+  --bg:#f2f5fb; --card:#ffffff; --soft:#e9eef8; --ink:#1b2333; --muted:#5b687d; --line:#d9e1ee;
+  --blue:#2d64f0; --mint:#0d936d; --sun:#d98a00; --coral:#d9434b; --lilac:#7255f0;
+  --blue-soft:rgba(45,100,240,.12); --mint-soft:rgba(13,147,109,.13); --sun-soft:rgba(217,138,0,.14); --coral-soft:rgba(217,67,75,.12); --lilac-soft:rgba(114,85,240,.12);
+  --shadow:0 10px 30px rgba(27,35,51,.08);
+  --f-display:"Baloo 2","Trebuchet MS",system-ui,sans-serif;
+  --f-body:"Lexend",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e131d; --card:#161d2a; --soft:#1d2636; --ink:#e8edf6; --muted:#9aa7bc; --line:#29344a;
+  --blue:#6d95ff; --mint:#3cc79e; --sun:#f2b33d; --coral:#ff7378; --lilac:#a08bff;
+  --blue-soft:rgba(109,149,255,.16); --mint-soft:rgba(60,199,158,.15); --sun-soft:rgba(242,179,61,.15); --coral-soft:rgba(255,115,120,.15); --lilac-soft:rgba(160,139,255,.16);
+  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e131d; --card:#161d2a; --soft:#1d2636; --ink:#e8edf6; --muted:#9aa7bc; --line:#29344a;
+  --blue:#6d95ff; --mint:#3cc79e; --sun:#f2b33d; --coral:#ff7378; --lilac:#a08bff;
+  --blue-soft:rgba(109,149,255,.16); --mint-soft:rgba(60,199,158,.15); --sun-soft:rgba(242,179,61,.15); --coral-soft:rgba(255,115,120,.15); --lilac-soft:rgba(160,139,255,.16);
+  --shadow:0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 60px}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.15;text-wrap:balance}
+p{margin:0}
+button,select,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+.hero{display:grid;gap:6px;margin-bottom:18px}
+.hero h1{font-size:clamp(2rem,5vw,3rem);font-weight:800}
+.hero h1 span{color:var(--blue)}
+.hero p{color:var(--muted);max-width:60ch;font-size:1.05rem}
+/* trail */
+.trail{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;position:relative;margin:8px 0 18px}
+.trail::before{content:"";position:absolute;left:4%;right:4%;top:22px;height:4px;border-radius:4px;background:var(--line)}
+.stop{position:relative;display:grid;justify-items:center;gap:4px;background:none;border:0;padding:0;color:var(--muted);font-size:.72rem;text-align:center;line-height:1.2}
+.stop .dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:3px solid var(--line);font-family:var(--f-display);font-weight:800;font-size:1.15rem;color:var(--muted);transition:transform .2s,border-color .2s}
+.stop:hover .dot{transform:translateY(-2px)}
+.stop.done .dot{background:var(--mint);border-color:var(--mint);color:#fff}
+.stop.on .dot{border-color:var(--blue);color:var(--blue);box-shadow:0 0 0 5px var(--blue-soft)}
+.stop.on{color:var(--ink);font-weight:600}
+@media (max-width:720px){.trail{grid-template-columns:repeat(5,minmax(0,1fr));row-gap:12px}.trail::before{display:none}.stop .dot{width:40px;height:40px;font-size:1rem}}
+.progress{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.85rem;margin-bottom:6px}
+.progress .bar{flex:1;height:8px;border-radius:8px;background:var(--line);overflow:hidden;max-width:260px}
+.progress .bar i{display:block;height:100%;background:var(--mint);width:0;transition:width .5s}
+/* stop card */
+.card{background:var(--card);border-radius:22px;box-shadow:var(--shadow);border:1px solid var(--line);padding:clamp(16px,3vw,28px)}
+.chead{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;margin-bottom:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;padding:4px 11px;border-radius:999px;background:var(--blue-soft);color:var(--blue)}
+.chead h2{font-size:clamp(1.6rem,3.6vw,2.2rem);font-weight:800}
+.oneline{font-size:clamp(1.1rem,2.2vw,1.3rem);font-weight:500;margin:6px 0 18px;max-width:62ch}
+.oneline b{color:var(--blue);font-weight:600}
+.cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:22px}
+@media (max-width:860px){.cols{grid-template-columns:minmax(0,1fr)}}
+.toy{background:var(--soft);border-radius:18px;padding:18px;min-width:0;display:grid;gap:14px;align-content:start}
+.toy .tt{font-family:var(--f-display);font-weight:800;font-size:1.1rem}
+.toy .hint{font-size:.85rem;color:var(--muted)}
+.side{display:grid;gap:12px;align-content:start;min-width:0}
+.box{border-radius:16px;padding:14px 16px;border:1px solid var(--line)}
+.box h3{font-size:1rem;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.box h3 .ic{width:26px;height:26px;border-radius:8px;display:grid;place-items:center;font-size:.95rem}
+.life{background:var(--sun-soft);border-color:transparent}.life .ic{background:var(--sun);color:#fff}
+.inslm{background:var(--blue-soft);border-color:transparent}.inslm .ic{background:var(--blue);color:#fff}
+.word{background:var(--lilac-soft);border-color:transparent}.word .ic{background:var(--lilac);color:#fff}
+.word b{color:var(--lilac)}
+.check{background:var(--card)}
+.opts{display:grid;gap:6px;margin-top:8px}
+.opt{text-align:left;background:var(--soft);border:2px solid transparent;border-radius:12px;padding:9px 12px;font-size:.92rem}
+.opt:hover{border-color:var(--line)}
+.opt.right{border-color:var(--mint);background:var(--mint-soft)}
+.opt.wrong{border-color:var(--coral);background:var(--coral-soft)}
+.fb{font-size:.9rem;margin-top:8px}
+.nav{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:22px;flex-wrap:wrap}
+.btn{border:0;border-radius:12px;padding:10px 18px;font-weight:600;background:var(--soft);color:var(--ink)}
+.btn:hover{filter:brightness(.97)}
+.btn.pri{background:var(--blue);color:#fff}
+.btn.mint{background:var(--mint);color:#fff}
+.btn.sm{padding:6px 12px;font-size:.85rem;border-radius:10px}
+.btn[aria-pressed="true"]{background:var(--blue);color:#fff}
+.toy .btn{background:var(--card);border:1px solid var(--line)}
+.toy .btn.pri,.toy .btn[aria-pressed="true"]{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.listen{display:inline-flex;align-items:center;gap:6px;background:var(--sun-soft);color:var(--sun);border:0;border-radius:999px;padding:6px 14px;font-weight:600;font-size:.85rem}
+.listen.playing{background:var(--sun);color:#fff}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+/* toy parts */
+.bars{display:grid;gap:7px}
+.barrow{display:grid;grid-template-columns:96px minmax(0,1fr) 52px;gap:10px;align-items:center;font-size:.9rem}
+.barrow .lb{text-align:right;font-weight:600}
+.barrow .tr{height:22px;background:var(--card);border-radius:8px;overflow:hidden}
+.barrow .fl{height:100%;border-radius:8px;background:var(--blue);transition:width .5s ease}
+.barrow .vl{font-variant-numeric:tabular-nums;color:var(--muted);font-size:.85rem}
+.barrow.best .fl{background:var(--mint)}
+.sentence{font-family:var(--f-display);font-size:1.35rem;font-weight:600;line-height:1.4}
+.blank{display:inline-block;min-width:90px;border-bottom:3px dashed var(--blue);color:var(--blue);text-align:center}
+.say{background:var(--card);border-radius:12px;padding:10px 14px;font-size:.92rem;border-left:4px solid var(--mint)}
+input[type=range]{width:100%;accent-color:var(--blue)}
+.lab{font-size:.88rem;color:var(--muted);display:grid;gap:4px}
+.lab b{color:var(--ink)}
+.txt{width:100%;border:2px solid var(--line);background:var(--card);border-radius:12px;padding:10px 12px;font-size:1rem}
+.bricks{display:flex;flex-wrap:wrap;gap:6px}
+.brick{display:grid;justify-items:center;padding:6px 10px 4px;border-radius:8px 8px 6px 6px;font-weight:600;color:#fff;position:relative;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18);animation:pop .35s ease both}
+.brick small{font-size:.65rem;opacity:.9;font-weight:500}
+.brick::before{content:"";position:absolute;top:-5px;left:22%;width:12px;height:6px;border-radius:3px 3px 0 0;background:inherit;filter:brightness(1.1)}
+.brick::after{content:"";position:absolute;top:-5px;right:22%;width:12px;height:6px;border-radius:3px 3px 0 0;background:inherit;filter:brightness(1.1)}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+.svgbox{width:100%;height:auto;display:block;background:var(--card);border-radius:14px}
+.meaning{display:flex;gap:12px;align-items:center;background:var(--card);border-radius:14px;padding:12px 14px}
+.meaning .em{font-size:2rem}
+.students{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stu{background:var(--card);border-radius:14px;padding:12px;display:grid;gap:8px}
+.stu .face{font-size:1.8rem}
+.vbars{display:flex;gap:10px;align-items:flex-end;height:120px}
+.vbars div{flex:1;display:grid;gap:4px;justify-items:center;font-size:.75rem;color:var(--muted)}
+.vbars i{display:block;width:100%;border-radius:8px 8px 4px 4px;transition:height .6s ease}
+.stations{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;position:relative}
+@media (max-width:560px){.stations{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.st{background:var(--card);border-radius:12px;padding:8px 6px;text-align:center;display:grid;gap:2px;border:2px solid transparent;transition:border-color .2s,transform .2s}
+.st .e{font-size:1.5rem}
+.st .n{font-size:.78rem;font-weight:600}
+.st .r{font-size:.66rem;color:var(--muted)}
+.st.on{border-color:var(--blue);transform:translateY(-3px)}
+.st.done{border-color:var(--mint)}
+.devices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.dev{background:var(--card);border-radius:12px;padding:10px;text-align:center;border:2px solid var(--line);font-size:.82rem}
+.dev .e{font-size:1.6rem}
+.dev.fit{border-color:var(--mint)}
+.dev.nofit{opacity:.5}
+.recipe{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.recipe button{text-align:left;background:var(--soft);border:0;border-radius:14px;padding:12px;display:grid;gap:4px}
+.recipe button b{font-family:var(--f-display);font-size:1.05rem}
+.recipe button span{font-size:.82rem;color:var(--muted)}
+.foot{margin-top:18px;font-size:.85rem;color:var(--muted)}
+.foot a{color:var(--blue)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header class="hero">
+    <div class="chip">A beginner's guide · no maths needed · about 30 minutes</div>
+    <h1>How a <span>Small Language Model</span> works, in 10 easy stops</h1>
+    <p>Follow Mira, a new trainee at a bank, as she learns to answer customers. A small language model (SLM) learns in almost exactly the same way. Every stop has one idea, an everyday comparison, and a toy to play with.</p>
+  </header>
+  <div class="progress"><span id="progTxt">0 of 10 stops completed</span><span class="bar"><i id="progBar"></i></span></div>
+  <nav class="trail" id="trail" aria-label="The 10 stops"></nav>
+  <main class="card" id="card" aria-live="polite"></main>
+  <p class="foot">Toys marked "real" really compute their answers in your browser; the others are simplified pictures of the idea. When you're ready to go deeper, the full <b>SLM Learning Lab</b> covers every stop in detail, with code you can run.</p>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const COLORS=["var(--blue)","var(--mint)","var(--sun)","var(--coral)","var(--lilac)"];
+function bars(el,items,best){const mx=Math.max(...items.map(i=>i[1]),1e-9);el.innerHTML=items.map(([l,v])=>`<div class="barrow${l===best?" best":""}"><span class="lb">${esc(l)}</span><span class="tr"><span class="fl" style="display:block;width:${(v/mx*100).toFixed(1)}%"></span></span><span class="vl">${(v*100).toFixed(v<.01?1:0)}%</span></div>`).join("");}
+const norm=a=>{const s=a.reduce((x,y)=>x+y,0);return a.map(x=>x/s);};
+
+/* ================= the 10 stops ================= */
+const STOPS=[
+{title:"What is an SLM?",icon:"1",
+ line:"An SLM is a program that has read a lot of text and is very good at one thing: <b>guessing the next word</b>.",
+ life:"Your phone keyboard already does a tiny version of this. Type \"Happy\" and it suggests \"birthday\". An SLM is that same idea, trained on far more text, so it can write whole helpful answers one word at a time.",
+ slm:"\"Small\" means it fits on a laptop or phone (millions to a few billion settings), unlike giant models that need a data centre. Small also means cheaper, faster and private.",
+ word:["Language model","a program that predicts the next word from the words before it."],
+ check:{q:"What is the one core skill of a language model?",opts:["Searching the internet","Guessing the next word","Storing a dictionary"],ok:1,why:"Everything it does, like answering, summarising or chatting, is built from guessing the next word again and again."},
+ toy:el=>{
+  const P=[["I want to check my account","balance",[["balance",.62],["statement",.21],["number",.12],["holder",.04],["banana",.001]]],["Please send me the loan","details",[["details",.48],["amount",.27],["documents",.18],["rate",.06],["guitar",.001]]],["Thank you for your","help",[["help",.55],["patience",.25],["time",.15],["support",.04],["sandwich",.001]]]];
+  let k=0;
+  el.innerHTML=`<div class="tt">Game: finish the sentence</div><div class="sentence" id="g1s"></div><div class="row" id="g1o"></div><div class="bars" id="g1b"></div><div class="say" id="g1m">Tap the word you think comes next.</div><div class="row"><button class="btn sm" id="g1n" type="button">Another sentence</button></div>`;
+  const draw=()=>{const [s,,opts]=P[k];$("#g1s").innerHTML=`${esc(s)} <span class="blank">?</span>`;$("#g1b").innerHTML="";$("#g1m").textContent="Tap the word you think comes next.";
+    $("#g1o").innerHTML=opts.map(o=>o[0]).sort().map(w=>`<button class="btn sm" type="button" data-w="${w}">${w}</button>`).join("");
+    $$("#g1o [data-w]").forEach(b=>b.addEventListener("click",()=>{const w=b.dataset.w,best=opts[0][0];bars($("#g1b"),opts,best);$("#g1s").innerHTML=`${esc(s)} <span class="blank">${esc(best)}</span>`;$("#g1m").innerHTML=w===best?`<b>Same as the model!</b> You picked the most likely word, just like an SLM does.`:`The model's top pick is <b>${best}</b>. "${esc(w)}" got ${(opts.find(o=>o[0]===w)[1]*100).toFixed(w==="banana"||w==="guitar"||w==="sandwich"?1:0)}%. Every word gets a chance, but some are far more likely.`;}));};
+  $("#g1n").addEventListener("click",()=>{k=(k+1)%P.length;draw();});draw();}},
+{title:"How does it learn?",icon:"2",
+ line:"It learns by <b>reading lots of examples</b> and noticing which words usually follow which.",
+ life:"Mira, our trainee, sits beside experienced staff for weeks. After hearing \"Please transfer the…\" hundreds of times, she knows \"money\" usually comes next. Nobody gave her a rule. She picked it up from examples.",
+ slm:"The SLM reads millions of sentences. Each time it guesses wrong, it adjusts itself slightly. Over time its guesses become confident and correct.",
+ word:["Training data","the text the model learns from. Better data gives a better model."],
+ check:{q:"Where does an SLM get its knowledge of language?",opts:["From rules written by programmers","From reading many example texts","From a built-in dictionary"],ok:1,why:"Like a child learning to speak, it learns patterns from examples, not from hand-written rules."},
+ toy:el=>{
+  const W=["money","amount","funds","file","cat","shoes"],T=[.55,.25,.14,.04,.01,.01];
+  el.innerHTML=`<div class="tt">Watch knowledge grow with reading <span class="chip" style="margin-left:6px">real counting</span></div><div class="sentence">Please transfer the <span class="blank">?</span></div><label class="lab">Sentences read: <b id="g2v"></b><input type="range" id="g2r" min="0" max="100" value="5"></label><div class="bars" id="g2b"></div><div class="say" id="g2m"></div>`;
+  const draw=()=>{const r=+$("#g2r").value,n=Math.round(r*r*.5),w=1-Math.exp(-r/22);const p=norm(W.map((_,i)=>(1-w)/W.length+w*T[i]));$("#g2v").textContent=n.toLocaleString();
+   bars($("#g2b"),W.map((x,i)=>[x,p[i]]),r>10?"money":"");
+   $("#g2m").innerHTML=r<8?"Barely read anything, so every word looks equally likely. It's just guessing.":r<40?`It has noticed "money" comes up often. Its guess is getting better.`:`After ${n.toLocaleString()} sentences it's confident: <b>"money"</b>. That's learning: experience turned into good guesses.`;};
+  $("#g2r").addEventListener("input",draw);draw();}},
+{title:"Words become pieces & numbers",icon:"3",
+ line:"Computers only understand numbers, so text is first cut into small <b>pieces (tokens)</b>, and each piece gets an ID number.",
+ life:"Think of LEGO. A long sentence is broken into standard bricks, and each brick type has a catalogue number. Even an unusual word like \"unbelievable\" can be built from common bricks: un + believ + able.",
+ slm:"A tokenizer splits text into tokens and swaps each one for its number. The model never sees letters, only these numbers.",
+ word:["Token","a small piece of text (a word or part of a word) that the model reads as one number."],
+ check:{q:"Why is the word \"unbelievable\" split into pieces like un + believ + able?",opts:["To make the text look nicer","So rare or new words can be built from pieces the model already knows","Because computers can't store long words"],ok:1,why:"With pieces, the model never meets a completely unknown word. It recognises the parts."},
+ toy:el=>{
+  const PIECES=["the","customer","bank","loan","account","refund","card","pay","believ","able","un","ment","ing","ed","er","s","re","pre","approv","al","ly","transfer","money","my","is","was","for","to","and","a","i","want","close","lost","happy","fast","interest","rate","fee","online","ation","pro","cess","in","on","at","of"];
+  const set=new Set(PIECES);let mode="pieces";
+  el.innerHTML=`<div class="tt">Cut your sentence into LEGO bricks <span class="chip" style="margin-left:6px">real</span></div><input class="txt" id="g3i" value="The customer's unbelievable refund was approved" aria-label="Sentence to cut"><div class="row"><button class="btn sm" type="button" data-m="words">Whole words</button><button class="btn sm" type="button" data-m="pieces">Pieces (what SLMs use)</button><button class="btn sm" type="button" data-m="letters">Single letters</button></div><div class="bricks" id="g3b"></div><div class="say" id="g3m"></div>`;
+  const id=s=>{let h=7;for(const c of s)h=(h*31+c.charCodeAt(0))%9973;return h+10;};
+  const cut=w=>{const out=[];let i=0;while(i<w.length){let best=null;for(let j=w.length;j>i;j--){if(set.has(w.slice(i,j))){best=w.slice(i,j);break;}}if(!best)best=w[i];out.push(best);i+=best.length;}return out;};
+  const draw=()=>{const txt=$("#g3i").value.toLowerCase(),words=txt.match(/[a-z]+|[^\sa-z]/g)||[];let toks=[];
+   if(mode==="words")toks=words;else if(mode==="letters")toks=[...txt.replace(/\s+/g," ")].map(c=>c===" "?"␣":c);else words.forEach(w=>toks.push(...(/[a-z]/.test(w)?cut(w):[w])));
+   $$("[data-m]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===mode));
+   $("#g3b").innerHTML=toks.map((t,i)=>`<span class="brick" style="background:${COLORS[i%5]};animation-delay:${Math.min(i,30)*25}ms">${esc(t)}<small>#${id(t)}</small></span>`).join("");
+   $("#g3m").innerHTML=`<b>${toks.length} pieces.</b> ${mode==="words"?"Few pieces, but a word the model has never seen would be a mystery.":mode==="letters"?"Nothing is ever unknown, but the text becomes very long and slow to process.":"The sweet spot: common words stay whole, and rare words are built from known bricks."} The small numbers are the IDs the model actually reads.`;};
+  $$("[data-m]").forEach(b=>b.addEventListener("click",()=>{mode=b.dataset.m;draw();}));$("#g3i").addEventListener("input",draw);draw();}},
+{title:"Meaning becomes a map",icon:"4",
+ line:"Each token gets a position on a giant <b>map of meaning</b>. Words with similar meanings live close together.",
+ life:"Picture a city. All the banks are on Money Street, pet shops cluster in Animal Park, and food stalls line Food Street. If you know a shop's address, you can guess what it sells from its neighbours.",
+ slm:"Each token's \"address\" is a list of numbers called an embedding. Because \"loan\" lives near \"bank\" and \"interest\", the model understands they're related.",
+ word:["Embedding","a word's address on the meaning map: a list of numbers that captures what it means."],
+ check:{q:"On the meaning map, which word would live closest to \"loan\"?",opts:["puppy","interest","coffee"],ok:1,why:"\"Loan\" and \"interest\" appear in the same kinds of sentences, so training places them in the same neighbourhood."},
+ toy:el=>{
+  const D=[["Money Street","var(--blue)",130,90,["bank",-40,-30],["loan",10,-40],["cash",45,-5],["account",-35,25],["interest",20,35]],["Animal Park","var(--mint)",400,85,["cat",-35,-25],["dog",20,-35],["puppy",40,10],["kitten",-30,25]],["Food Street","var(--sun)",140,250,["pizza",-40,-20],["rice",20,-30],["tea",-20,30],["coffee",35,15]],["Feelings Lane","var(--coral)",390,250,["happy",-40,-20],["glad",15,-35],["sad",-25,30],["angry",35,20]]];
+  const P=[];D.forEach(d=>d.slice(4).forEach(w=>P.push({w:w[0],x:d[2]+w[1],y:d[3]+w[2],c:d[1]})));let sel="loan";
+  el.innerHTML=`<div class="tt">Word City: tap any word</div><svg class="svgbox" id="g4s" viewBox="0 0 530 340" role="img" aria-label="Map of words grouped by meaning"></svg><div class="say" id="g4m"></div><p class="hint">A picture to show the idea. Real models use maps with hundreds of directions, not 2.</p>`;
+  const draw=()=>{const s=P.find(p=>p.w===sel),nn=P.filter(p=>p!==s).map(p=>({...p,d:Math.hypot(p.x-s.x,p.y-s.y)})).sort((a,b)=>a.d-b.d).slice(0,3);
+   let g=D.map(d=>`<circle cx="${d[2]}" cy="${d[3]}" r="78" style="fill:${d[1]};opacity:.1"/><text x="${d[2]}" y="${d[3]-62}" text-anchor="middle" font-size="13" font-weight="700" style="fill:${d[1]}" font-family="Lexend, sans-serif">${d[0]}</text>`).join("");
+   nn.forEach(n=>g+=`<line x1="${s.x}" y1="${s.y}" x2="${n.x}" y2="${n.y}" style="stroke:${s.c}" stroke-width="2.5" stroke-dasharray="5 4"/>`);
+   P.forEach(p=>{const on=p.w===sel;g+=`<g data-w="${p.w}" style="cursor:pointer"><circle cx="${p.x}" cy="${p.y}" r="${on?9:6}" style="fill:${p.c};stroke:var(--card)" stroke-width="2"/><text x="${p.x+9}" y="${p.y+4}" font-size="${on?14:12}" font-weight="${on?700:500}" style="fill:var(--ink)" font-family="Lexend, sans-serif">${p.w}</text></g>`;});
+   $("#g4s").innerHTML=g;$("#g4m").innerHTML=`<b>${sel}</b>'s closest neighbours: ${nn.map(n=>`<b>${n.w}</b>`).join(", ")}. Close on the map means close in meaning.`;};
+  $("#g4s").addEventListener("click",e=>{const g=e.target.closest("[data-w]");if(g){sel=g.dataset.w;draw();}});draw();}},
+{title:"Paying attention",icon:"5",
+ line:"To understand a word, the model <b>looks back at the other words</b> in the sentence and decides which ones matter most.",
+ life:"\"Bank\" can mean a river's edge or a place for money. You know which one from the other words: \"river\" or \"deposit\". At a busy party you do the same thing, tuning in to the voices that matter to you.",
+ slm:"This is called attention. For every word, the model scores how relevant each earlier word is, then blends in their meaning. It's the key idea behind modern AI (the Transformer).",
+ word:["Attention","how the model decides which other words to focus on to understand the current one."],
+ check:{q:"In \"I went to the bank to deposit my salary\", which word helps most to understand \"bank\"?",opts:["went","deposit","my"],ok:1,why:"\"Deposit\" tells the model this is a money bank, so attention gives it the strongest link."},
+ toy:el=>{
+  const S=[{w:"I sat on the river bank and watched the water".split(" "),f:5,a:{river:.45,water:.3,sat:.1,watched:.08},em:"🏞️",m:"the edge of a river"},{w:"I went to the bank to deposit my salary".split(" "),f:4,a:{deposit:.45,salary:.3,went:.1},em:"🏦",m:"a place that keeps money"},{w:"The loan was approved because it met the rules".split(" "),f:5,a:{loan:.62,rules:.18,approved:.1},em:"📄",m:"\"it\" means the loan"}];let k=0;
+  el.innerHTML=`<div class="tt">Who is the highlighted word listening to?</div><div class="row" id="g5b"></div><svg class="svgbox" id="g5s" viewBox="0 0 560 200" role="img" aria-label="Attention lines between words"></svg><div class="meaning" id="g5m"></div><p class="hint">Thicker lines mean more attention. Simplified numbers for illustration.</p>`;
+  $("#g5b").innerHTML=S.map((s,i)=>`<button class="btn sm" type="button" data-s="${i}">${["river bank","money bank","what is \"it\"?"][i]}</button>`).join("");
+  const draw=()=>{const s=S[k],n=s.w.length,x=i=>30+i*(500/(n-1)),fx=x(s.f);let g="";
+   s.w.forEach((w,i)=>{const a=s.a[w]||0;if(a>0){const mx=(fx+x(i))/2,h=Math.min(130,24+Math.abs(fx-x(i))*.45);g+=`<path d="M${fx} 150 Q${mx} ${150-h} ${x(i)} 150" style="fill:none;stroke:var(--blue);opacity:${.3+a}" stroke-width="${2+a*14}" stroke-linecap="round"/><text x="${x(i)}" y="196" text-anchor="middle" font-size="12" font-weight="700" style="fill:var(--blue)" font-family="Lexend, sans-serif">${Math.round(a*100)}%</text>`;}});
+   s.w.forEach((w,i)=>{const f=i===s.f;g+=`<text x="${x(i)}" y="172" text-anchor="middle" font-size="${f?15:13}" font-weight="${f?800:500}" style="fill:${f?"var(--coral)":"var(--ink)"}" font-family="Lexend, sans-serif">${esc(w)}</text>`;});
+   $("#g5s").innerHTML=g;$$("[data-s]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.s===k));
+   $("#g5m").innerHTML=`<span class="em">${s.em}</span><span>By listening to <b>${Object.keys(s.a)[0]}</b>, the model understands <b style="color:var(--coral)">${esc(s.w[s.f])}</b> as <b>${s.m}</b>.</span>`;};
+  $$("[data-s]").forEach(b=>b.addEventListener("click",()=>{k=+b.dataset.s;draw();}));draw();}},
+{title:"Practice makes perfect",icon:"6",
+ line:"Training is a loop: <b>guess → check the answer → adjust a little</b>, repeated millions of times.",
+ life:"Learning to throw a ball into a basket: you throw, see how far you missed, adjust your arm slightly, and throw again. Each miss teaches you something, and slowly you start scoring.",
+ slm:"The model guesses the next word, compares it with the real word, measures how wrong it was (the \"mistake score\"), and nudges its internal settings. That's all training is.",
+ word:["Loss","the mistake score. Training means making it go down."],
+ check:{q:"What happens in each training step?",opts:["The model memorises one full book","The model guesses, checks the real answer, and adjusts itself slightly","A person corrects the model by hand"],ok:1,why:"Guess, compare, adjust: an automatic loop repeated millions of times with no human in the loop."},
+ toy:el=>{
+  const W=["loan","card","phone","rent","dog"];let p=norm([.15,.25,.2,.25,.15]),hist=[],timer=null;
+  el.innerHTML=`<div class="tt">Train the model yourself <span class="chip" style="margin-left:6px">real learning</span></div><div class="sentence">I want to repay my <span class="blank">loan</span></div><div class="bars" id="g6b"></div><label class="lab">Learning speed: <b id="g6lv"></b><input type="range" id="g6l" min="1" max="10" value="3"></label><div class="row"><button class="btn sm pri" type="button" id="g6a">Practise once</button><button class="btn sm" type="button" id="g6c">Practise 25 times</button><button class="btn sm" type="button" id="g6r">Forget everything</button></div><svg class="svgbox" id="g6s" viewBox="0 0 520 130" role="img" aria-label="Mistake score over practice rounds"></svg><div class="say" id="g6m"></div>`;
+  const draw=()=>{bars($("#g6b"),W.map((w,i)=>[w,p[i]]),W[p.indexOf(Math.max(...p))]);const L=-Math.log(p[0]);
+   const hs=hist.length?hist:[L],mx=Math.max(...hs,1.8),X=i=>40+i*(470/Math.max(1,hs.length-1)),Y=v=>12+(1-v/mx)*96;
+   $("#g6s").innerHTML=`<text x="6" y="16" font-size="11" style="fill:var(--muted)" font-family="Lexend, sans-serif">mistake</text><line x1="40" x2="510" y1="108" y2="108" style="stroke:var(--line)"/><text x="510" y="124" text-anchor="end" font-size="11" style="fill:var(--muted)" font-family="Lexend, sans-serif">practice rounds: ${hist.length}</text>`+(hs.length>1?`<polyline points="${hs.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ")}" style="fill:none;stroke:var(--coral)" stroke-width="3" stroke-linecap="round"/>`:"")+`<circle cx="${X(hs.length-1)}" cy="${Y(hs[hs.length-1])}" r="5" style="fill:var(--coral)"/>`;
+   const top=W[p.indexOf(Math.max(...p))];$("#g6m").innerHTML=`Current guess: <b>${top}</b> (${Math.round(p[0]*100)}% sure about "loan"). Mistake score: <b>${L.toFixed(2)}</b>. ${top==="loan"?"It has learned the right answer!":"Keep practising."}`;$("#g6lv").textContent=["","very slow","","slow","","normal","","fast","","","very fast"][+$("#g6l").value]||$("#g6l").value;};
+  const step=()=>{const lr=+$("#g6l").value*.03;p=norm(p.map((v,i)=>v+lr*((i===0?1:0)-v)));hist.push(-Math.log(p[0]));draw();};
+  $("#g6a").addEventListener("click",step);$("#g6c").addEventListener("click",()=>{clearInterval(timer);let n=0;timer=setInterval(()=>{step();if(++n>=25)clearInterval(timer);},110);});
+  $("#g6r").addEventListener("click",()=>{clearInterval(timer);p=norm([.15,.25,.2,.25,.15]);hist=[];draw();});$("#g6l").addEventListener("input",draw);draw();}},
+{title:"Taking the exam",icon:"7",
+ line:"A model is graded on <b>questions it has never seen</b>, because memorising is not the same as understanding.",
+ life:"Two students prepare for an exam. One memorises the practice answers word for word. The other understands the ideas. On the practice test both look great. On a brand-new exam, only the one who understands does well.",
+ slm:"We hide part of the data (a test set) during training. If the model scores well on training text but badly on the hidden text, it has memorised instead of learned. This is called overfitting.",
+ word:["Overfitting","when a model memorises its training examples and fails on new ones."],
+ check:{q:"A model scores 99% on its training text but 45% on new text. What happened?",opts:["It learned perfectly","It memorised instead of understanding (overfitting)","The new text was too easy"],ok:1,why:"A big gap between practice and new-exam scores is the classic sign of memorising."},
+ toy:el=>{
+  el.innerHTML=`<div class="tt">Study style: memorise or understand?</div><label class="lab">How much the model just memorises: <b id="g7v"></b><input type="range" id="g7r" min="0" max="100" value="80"></label><div class="students"><div class="stu"><div class="row"><span class="face">📝</span><b>Practice test</b></div><div class="vbars" id="g7a"></div></div><div class="stu"><div class="row"><span class="face">🎓</span><b>Brand-new exam</b></div><div class="vbars" id="g7b"></div></div></div><div class="say" id="g7m"></div>`;
+  const draw=()=>{const m=+$("#g7r").value/100,pr=60+38*m,ex=Math.max(20,84-62*m*m);$("#g7v").textContent=m<.3?"mostly understands":m<.7?"a bit of both":"mostly memorises";
+   $("#g7a").innerHTML=`<div><i style="height:${pr}px;background:var(--blue)"></i>${Math.round(pr)}%</div>`;$("#g7b").innerHTML=`<div><i style="height:${ex}px;background:${ex<55?"var(--coral)":"var(--mint)"}"></i>${Math.round(ex)}%</div>`;
+   $("#g7m").innerHTML=m>.6?`<b>Overfitting!</b> Great on practice, poor on new questions. Fix it with more varied data or by stopping training earlier.`:m<.3?`<b>Healthy.</b> Scores on new questions stay close to practice, so the model really learned.`:"In between: watch the gap between the two scores. The gap is the warning sign.";};
+  $("#g7r").addEventListener("input",draw);draw();}},
+{title:"Becoming a specialist",icon:"8",
+ line:"A general model can be <b>specialised</b> for one job, like banking, by extra training on that field's examples.",
+ life:"A general doctor studies cardiology for a few more years and becomes a heart specialist. Mira already speaks English well. Now she studies the bank's own manuals so she can explain EMIs and KYC rules accurately.",
+ slm:"This is fine-tuning: take a model that already knows language and train it a little more on banking questions and answers. A cheap trick called LoRA adds small \"sticky notes\" instead of rewriting the whole model.",
+ word:["Fine-tuning","extra training that turns a general model into a specialist."],
+ check:{q:"Why is fine-tuning cheaper than training a new model from scratch?",opts:["It starts from a model that already understands language","It uses no data at all","It makes the model bigger"],ok:0,why:"The hard part, learning language itself, is already done. Fine-tuning only teaches the specialist knowledge."},
+ toy:el=>{
+  const Q=[["What is an EMI?",["It's a type of payment, I think.","EMI is a monthly payment you make for something you bought.","EMI (Equated Monthly Instalment) is the fixed amount you pay every month to repay a loan. It covers both principal and interest."]],["How do I block my lost card?","It's best to contact the company.|Call your bank and ask them to block the card.|Block it instantly in the mobile app (Cards → Block) or call the 24×7 helpline. A replacement card is issued in 5–7 working days.".split("|")],["What is KYC?",["It's some kind of form.","KYC means checking who a customer is.","KYC (Know Your Customer) is the identity check banks must do, using documents like Aadhaar and PAN, before opening an account."]]];let k=0,notes=true;
+  el.innerHTML=`<div class="tt">From generalist to banking specialist</div><div class="row" id="g8q"></div><label class="lab">Extra banking training: <b id="g8v"></b><input type="range" id="g8r" min="0" max="2" value="0"></label><div class="say" id="g8a" style="font-size:1rem;min-height:70px"></div><div class="row"><button class="btn sm" type="button" id="g8full">Rewrite the whole book</button><button class="btn sm" type="button" id="g8lora">Add sticky notes (LoRA)</button></div><div class="say" id="g8n" style="border-left-color:var(--lilac)"></div>`;
+  $("#g8q").innerHTML=Q.map((q,i)=>`<button class="btn sm" type="button" data-q="${i}">${esc(q[0])}</button>`).join("");
+  const draw=()=>{const lv=+$("#g8r").value;$("#g8v").textContent=["none (general model)","a little","lots (specialist)"][lv];$$("[data-q]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.q===k));
+   $("#g8a").innerHTML=`<b>Q: ${esc(Q[k][0])}</b><br>A: ${esc(Q[k][1][lv])}`;
+   $("#g8full").setAttribute("aria-pressed",!notes);$("#g8lora").setAttribute("aria-pressed",notes);
+   $("#g8n").innerHTML=notes?`📒 <b>Sticky notes (LoRA):</b> the original book stays untouched, and you add a few pages of notes. That's about <b>1% of the settings</b>, small enough to train on one computer.`:`📕 <b>Full rewrite:</b> every page of the book gets edited. That's <b>100% of the settings</b>: slow, expensive, and the model may forget general things.`;};
+  $$("[data-q]").forEach(b=>b.addEventListener("click",()=>{k=+b.dataset.q;draw();}));$("#g8r").addEventListener("input",draw);
+  $("#g8full").addEventListener("click",()=>{notes=false;draw();});$("#g8lora").addEventListener("click",()=>{notes=true;draw();});draw();}},
+{title:"Making it small & fast",icon:"9",
+ line:"A trained model can be <b>compressed</b> by storing its numbers less precisely, so it fits on a phone or laptop.",
+ life:"Packing a suitcase: roll the clothes and you fit twice as much. Or rounding prices: ₹99.97 becomes ₹100, which is almost the same and much simpler. A compressed photo still looks fine but takes far less space.",
+ slm:"Each of the model's settings is a number. Storing it with fewer \"bits\" (32 → 16 → 8 → 4) shrinks the model 2–8×, with only a small drop in quality. This is called quantization.",
+ word:["Quantization","storing the model's numbers with less precision to make it smaller and faster."],
+ check:{q:"A model is 4 GB in 32-bit. Roughly how big is it in 8-bit?",opts:["4 GB","1 GB","8 GB"],ok:1,why:"8 bits is a quarter of 32 bits, so the size is about a quarter: 1 GB."},
+ toy:el=>{
+  const L={32:256,16:96,8:20,4:5},Q={32:"100%",16:"≈ 100%",8:"≈ 99%",4:"≈ 95–97%"};let b=32;
+  el.innerHTML=`<div class="tt">Shrink a 1-billion-setting model <span class="chip" style="margin-left:6px">real rounding</span></div><div class="row" id="g9b"></div><div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:center"><canvas id="g9c" width="240" height="150" style="width:100%;border-radius:12px;image-rendering:pixelated" aria-label="Picture showing the effect of fewer bits"></canvas><div><div class="sentence" id="g9s" style="font-size:2rem"></div><div class="hint">model size</div><div style="margin-top:8px">quality kept: <b id="g9q"></b></div></div></div><div class="devices" id="g9d"></div><div class="say" id="g9m"></div>`;
+  $("#g9b").innerHTML=[32,16,8,4].map(x=>`<button class="btn sm" type="button" data-b="${x}">${x}-bit</button>`).join("");
+  const draw=()=>{const c=$("#g9c").getContext("2d"),lv=L[b],q=v=>Math.round(Math.round(v/255*(lv-1))/(lv-1)*255);
+   for(let y=0;y<150;y++)for(let x=0;x<240;x++){const t=y/150,sun=Math.hypot(x-170,y-95)<30;let r=sun?255:40+200*t,g=sun?210:60+90*t,bl=sun?80:150-60*t;if(y>110){r=20+30*(y-110)/40;g=60+40*(y-110)/40;bl=120;}c.fillStyle=`rgb(${q(r)},${q(g)},${q(bl)})`;c.fillRect(x,y,1,1);}
+   const gb=b/8;$("#g9s").textContent=`${gb} GB`;$("#g9q").textContent=Q[b];$$("[data-b]").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.b===b));
+   const dv=[["📱","Phone","3 GB free",3],["💻","Laptop","8 GB free",8],["🖥️","Server","64 GB",64]];
+   $("#g9d").innerHTML=dv.map(d=>`<div class="dev ${gb<=d[3]?"fit":"nofit"}"><div class="e">${d[0]}</div><b>${d[1]}</b><div class="hint">${d[2]}</div><div>${gb<=d[3]?"✓ fits":"✗ too big"}</div></div>`).join("");
+   $("#g9m").innerHTML=b===32?"Full precision: the picture is perfect, but the model only fits on a big computer.":b===4?"4-bit: 8× smaller, so it fits on a phone. The picture is blockier, but you can still see the sunset. Models lose a little quality the same way.":"Fewer bits: a smaller file and a nearly identical picture.";};
+  $$("[data-b]").forEach(x=>x.addEventListener("click",()=>{b=+x.dataset.b;draw();}));draw();}},
+{title:"Going live",icon:"10",
+ line:"Once ready, the model is put <b>behind an app</b> so people can ask it questions and get answers in seconds.",
+ life:"A restaurant: you place an order, the waiter takes it to the kitchen, the chef cooks, someone plates it, and the waiter brings it back. Each station has one job, and together they serve hundreds of guests an hour.",
+ slm:"Your question travels through an API (the waiter), the tokenizer (prep), the model (the chef, cooking one word at a time) and back to text. A \"creativity dial\" (temperature) controls how predictable or varied the answers are.",
+ word:["Temperature","the creativity dial: low gives safe, repeatable answers; high gives varied ones."],
+ check:{q:"For a bank's customer-support bot, which creativity setting is safer?",opts:["Low: predictable, consistent answers","High: surprising, creative answers","It makes no difference"],ok:0,why:"Banking answers must be accurate and consistent, so keep the creativity dial low."},
+ toy:el=>{
+  const ST=[["🙋","You","ask",0],["🧑‍🍳","API","takes order",40],["🔪","Tokenizer","text → numbers",5],["🧠","Model","writes word by word",900],["🍽️","Detokenizer","numbers → text",5],["💬","Answer","served",30]];
+  const SLOTS=[[["Your",.7],["The",.25],["Ah, your",.05]],[["loan EMI",.75],["monthly instalment",.2],["payment thingy",.05]],[["is due on",.7],["will be charged on",.25],["shows up around",.05]],[["the 5th of every month.",.75],["the 5th each month.",.2],["roughly the 5th, if the stars align.",.05]]];
+  el.innerHTML=`<div class="tt">Order an answer <span class="chip" style="margin-left:6px">real sampling</span></div><input class="txt" id="g10i" value="When is my loan EMI due?" aria-label="Your question"><div class="stations" id="g10s"></div><label class="lab">Creativity dial (temperature): <b id="g10tv"></b><input type="range" id="g10t" min="1" max="20" value="3"></label><div class="row"><button class="btn sm pri" type="button" id="g10go">Send question</button></div><div class="say" id="g10a" style="font-size:1.02rem;min-height:56px">Press "Send question".</div>`;
+  let run=0;const drawSt=(on)=>{$("#g10s").innerHTML=ST.map((s,i)=>`<div class="st ${i===on?"on":i<on?"done":""}"><div class="e">${s[0]}</div><div class="n">${s[1]}</div><div class="r">${s[2]}${s[3]?` · ${s[3]} ms`:""}</div></div>`).join("");};
+  const sample=(opts,T)=>{const w=opts.map(o=>Math.pow(o[1],1/T)),s=w.reduce((a,b)=>a+b,0);let r=Math.random()*s;for(let i=0;i<opts.length;i++){r-=w[i];if(r<=0)return opts[i][0];}return opts[0][0];};
+  const tv=()=>{const T=+$("#g10t").value/10;$("#g10tv").textContent=`${T.toFixed(1)} · ${T<.6?"safe & predictable":T<1.2?"balanced":"creative & risky"}`;return T;};
+  $("#g10t").addEventListener("input",tv);tv();drawSt(-1);
+  $("#g10go").addEventListener("click",async()=>{const id=++run,T=tv();$("#g10a").textContent="…";
+   for(let i=0;i<ST.length;i++){if(id!==run)return;drawSt(i);await new Promise(r=>setTimeout(r,i===3?300:420));
+     if(i===3){let ans=[];for(const s of SLOTS){if(id!==run)return;ans.push(sample(s,T));$("#g10a").innerHTML=esc(ans.join(" "))+" ▍";await new Promise(r=>setTimeout(r,320));}$("#g10a").textContent=ans.join(" ");}}
+   if(id===run){drawSt(ST.length);$("#g10a").innerHTML+=`<div class="hint" style="margin-top:6px">Total ≈ 1 second. Press Send again${T>1.2?": at this creativity level the wording keeps changing, and may get silly.":". At low creativity you get almost the same answer every time."}</div>`;}});}}
+];
+
+/* ================= read aloud (English) ================= */
+const synth=("speechSynthesis" in window)?speechSynthesis:null;let voices=[],bad=new Set(),spk=0;
+const loadV=()=>{try{voices=synth?synth.getVoices():[];}catch(e){voices=[];}};if(synth){loadV();try{synth.onvoiceschanged=loadV;}catch(e){}}
+function cands(){const en=voices.filter(v=>/^en/i.test(v.lang));return [...en.filter(v=>v.localService),...en.filter(v=>!v.localService),null].filter(v=>!bad.has(v?v.voiceURI:"_d"));}
+function speak(parts,btn,i=0){
+  if(!synth){btn.textContent="🔈 No speech on this browser";return;}
+  const my=++spk;try{synth.cancel();}catch(e){}
+  const go=()=>{const list=cands();if(!list.length){btn.classList.remove("playing");btn.textContent="🔈 No voice worked here";return;}const v=list[0];let started=false,done=0;
+    btn.classList.add("playing");btn.textContent="■ Stop";
+    parts.forEach(t=>{const u=new SpeechSynthesisUtterance(t);if(v)u.voice=v;u.lang=v?v.lang:"en-US";u.rate=.95;u.onstart=()=>{started=true;};u.onend=()=>{if(my!==spk)return;if(++done===parts.length){btn.classList.remove("playing");btn.textContent="🔊 Listen";}};synth.speak(u);});
+    setTimeout(()=>{if(my===spk&&!started){bad.add(v?v.voiceURI:"_d");try{synth.cancel();}catch(e){}setTimeout(()=>{if(my===spk)go();},250);}},v&&!v.localService?4000:2600);};
+  go();
+}
+const stopSpeak=()=>{spk++;try{synth&&synth.cancel();}catch(e){}};
+const plain=h=>h.replace(/<[^>]+>/g,"").replace(/&[a-z]+;/g," ");
+
+/* ================= state & rendering ================= */
+let done=new Set(),cur=0;
+try{done=new Set(JSON.parse(localStorage.getItem("slmzero.done")||"[]"));}catch(e){}
+const save=()=>{try{localStorage.setItem("slmzero.done",JSON.stringify([...done]));}catch(e){}};
+function trail(){
+  $("#trail").innerHTML=STOPS.map((s,i)=>`<button type="button" class="stop ${done.has(i)?"done":""} ${i===cur?"on":""}" data-i="${i}" aria-label="Stop ${i+1}: ${esc(s.title)}"><span class="dot">${done.has(i)?"✓":i+1}</span><span>${esc(s.title)}</span></button>`).join("")+`<button type="button" class="stop ${cur===10?"on":""}" data-i="10" style="display:none"></button>`;
+  $$("#trail [data-i]").forEach(b=>b.addEventListener("click",()=>go(+b.dataset.i)));
+  $("#progTxt").textContent=`${done.size} of 10 stops completed`;$("#progBar").style.width=done.size*10+"%";
+}
+function go(i){stopSpeak();cur=Math.max(0,Math.min(10,i));try{history.replaceState(null,"","#stop-"+(cur+1));}catch(e){}render();trail();$("#card").scrollIntoView({behavior:"smooth",block:"start"});}
+function render(){
+  if(cur===10)return renderEnd();
+  const s=STOPS[cur];
+  $("#card").innerHTML=`<div class="chead"><span class="chip">Stop ${cur+1} of 10</span><h2>${esc(s.title)}</h2><button class="listen" type="button" id="lis">🔊 Listen</button></div>
+   <p class="oneline">${s.line}</p>
+   <div class="cols"><div class="toy" id="toy"></div>
+   <div class="side">
+     <div class="box life"><h3><span class="ic">★</span>Like in real life</h3><p>${s.life}</p></div>
+     <div class="box inslm"><h3><span class="ic">◆</span>Inside the SLM</h3><p>${s.slm}</p></div>
+     <div class="box word"><h3><span class="ic">A</span>New word</h3><p><b>${esc(s.word[0])}</b>: ${esc(s.word[1])}</p></div>
+     <div class="box check"><h3>Quick check</h3><p>${esc(s.check.q)}</p><div class="opts" id="chk">${s.check.opts.map((o,j)=>`<button class="opt" type="button" data-j="${j}">${esc(o)}</button>`).join("")}</div><div class="fb" id="fb"></div></div>
+   </div></div>
+   <div class="nav"><button class="btn" type="button" id="prev" ${cur===0?"disabled":""}>← Back</button><span class="hint" style="font-size:.85rem;color:var(--muted)">${done.has(cur)?"✓ Stop completed":"Answer the quick check to complete this stop"}</span><button class="btn pri" type="button" id="next">${cur===9?"Finish the journey →":"Next stop →"}</button></div>`;
+  s.toy($("#toy"));
+  $$("#chk [data-j]").forEach(b=>b.addEventListener("click",()=>{const j=+b.dataset.j,ok=j===s.check.ok;$$("#chk [data-j]").forEach((x,k)=>{x.classList.toggle("right",k===s.check.ok&&ok);x.classList.toggle("wrong",k===j&&!ok);});
+    $("#fb").innerHTML=ok?`<b style="color:var(--mint)">Correct!</b> ${esc(s.check.why)}`:`<b style="color:var(--coral)">Not quite. Try another answer.</b> Hint: look at the toy again.`;
+    if(ok&&!done.has(cur)){done.add(cur);save();trail();$(".nav .hint").textContent="✓ Stop completed";}}));
+  $("#prev").addEventListener("click",()=>go(cur-1));$("#next").addEventListener("click",()=>go(cur+1));
+  $("#lis").addEventListener("click",e=>{const b=e.currentTarget;if(b.classList.contains("playing")){stopSpeak();b.classList.remove("playing");b.textContent="🔊 Listen";return;}
+    speak([`Stop ${cur+1}. ${s.title}.`,plain(s.line),"Like in real life. "+plain(s.life),"Inside the S L M. "+plain(s.slm),`New word: ${s.word[0]}. ${s.word[1]}`],b);});
+}
+function renderEnd(){
+  $("#card").innerHTML=`<div class="chead"><span class="chip" style="background:var(--mint-soft);color:var(--mint)">Journey complete</span><h2>Your SLM recipe, start to finish</h2></div>
+   <p class="oneline">You now know the whole picture. Building a small language model is these ten steps, in this order. Tap any step to revisit it.</p>
+   <div class="recipe">${STOPS.map((s,i)=>`<button type="button" data-i="${i}"><b>${i+1}. ${esc(s.title)}</b><span>${esc(s.word[0])}: ${esc(s.word[1])}</span></button>`).join("")}</div>
+   <div class="box life" style="margin-top:16px"><h3><span class="ic">★</span>The whole story in one paragraph</h3><p>Mira (the SLM) reads lots of bank conversations (<b>training data</b>), cut into LEGO-like pieces (<b>tokens</b>) placed on a meaning map (<b>embeddings</b>). She learns which words matter to each other (<b>attention</b>) by guessing, checking and adjusting millions of times (<b>training</b>). She's tested on new questions to make sure she understands rather than memorises (<b>evaluation</b>), studies the bank's own manuals (<b>fine-tuning</b>), packs light (<b>quantization</b>), and starts serving customers through an app (<b>deployment</b>).</p></div>
+   <div class="nav"><button class="btn" type="button" id="prev">← Back to stop 10</button><span class="hint" style="color:var(--muted);font-size:.85rem">${done.size}/10 quick checks passed</span><button class="btn mint" type="button" id="again">Start again from stop 1</button></div>`;
+  $$(".recipe [data-i]").forEach(b=>b.addEventListener("click",()=>go(+b.dataset.i)));$("#prev").addEventListener("click",()=>go(9));$("#again").addEventListener("click",()=>go(0));
+}
+document.addEventListener("keydown",e=>{if(e.target.matches("input,textarea,select"))return;if(e.key==="ArrowRight")go(cur+1);if(e.key==="ArrowLeft")go(cur-1);});
+const m=(location.hash||"").match(/^#stop-(\d+)$/);if(m)cur=Math.max(0,Math.min(10,+m[1]-1));
+render();trail();
+})();
+</script>
