@@ -1,0 +1,1024 @@
+<title>AI Engineer Path</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap">
+<style>
+/* Layout: a 552-concept roadmap (home) and one concept at a time, taught in 7 fixed steps: Idea, How it works, Math & internals, Code, Pitfalls & production, Practice, Check. Dark-first, with a light theme. */
+:root{
+  color-scheme:dark;
+  --bg:#0a1116;--panel:#101a21;--panel2:#15232c;--line:#21333e;--line2:#2e4653;--code:#081015;
+  --fg:#e2edf2;--muted:#8fa8b4;--dim:#5f7884;
+  --tok:#f3b955;--emb:#52d3e2;--hid:#a993ff;--out:#62e3a2;--err:#ff7d93;--on-acc:#1a1206;
+  --glass:rgba(10,17,22,.92);
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Noto Sans Telugu","Noto Sans Devanagari",system-ui,-apple-system,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --r:12px;
+}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){color-scheme:light;
+  --bg:#f3f6f7;--panel:#ffffff;--panel2:#eaf0f2;--line:#d6e0e5;--line2:#bccbd3;--code:#f7fafb;
+  --fg:#0f1f28;--muted:#4c6470;--dim:#7a909a;
+  --tok:#a86a00;--emb:#0b7f8d;--hid:#5f45c9;--out:#16804d;--err:#c02f4b;--on-acc:#ffffff;--glass:rgba(243,246,247,.92)}}
+:root[data-theme="light"]{color-scheme:light;
+  --bg:#f3f6f7;--panel:#ffffff;--panel2:#eaf0f2;--line:#d6e0e5;--line2:#bccbd3;--code:#f7fafb;
+  --fg:#0f1f28;--muted:#4c6470;--dim:#7a909a;
+  --tok:#a86a00;--emb:#0b7f8d;--hid:#5f45c9;--out:#16804d;--err:#c02f4b;--on-acc:#ffffff;--glass:rgba(243,246,247,.92)}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.6}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 70px}
+h1,h2,h3,h4{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+p{margin:0}
+ul{margin:0;padding-left:20px}
+button,select,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--emb);outline-offset:2px}
+.mono{font-family:var(--f-mono)}.muted{color:var(--muted)}.dim{color:var(--dim)}
+.c-tok{color:var(--tok)}.c-emb{color:var(--emb)}.c-hid{color:var(--hid)}.c-out{color:var(--out)}.c-err{color:var(--err)}
+.eyebrow{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+code{font-family:var(--f-mono);font-size:.9em;background:var(--panel2);border:1px solid var(--line);border-radius:5px;padding:0 5px}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--glass);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:21;background:var(--bg)}
+.top .wrap{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;background:none;border:0;padding:0;color:var(--fg)}
+.brand .logo{width:32px;height:32px;border-radius:9px;background:linear-gradient(135deg,var(--tok),var(--hid));display:grid;place-items:center;color:var(--on-acc);font-family:var(--f-mono);font-weight:500;font-size:.78rem}
+.brand h1{font-size:1.2rem}
+.prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:.78rem;color:var(--muted)}
+.pbar{width:140px;height:8px;border-radius:4px;background:var(--line2);overflow:hidden}
+.pbar i{display:block;height:100%;background:linear-gradient(90deg,var(--out),var(--emb));transition:width .5s}
+.btn{background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:8px 14px;font-size:.92rem}
+.btn:hover{border-color:var(--emb)}
+.btn.primary{background:var(--tok);border-color:var(--tok);color:var(--on-acc);font-weight:600}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.sm{padding:4px 10px;font-size:.82rem;border-radius:8px}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.right{border-color:var(--out);color:var(--out)}.btn.wrong{border-color:var(--err);color:var(--err)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;min-width:0}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media (max-width:860px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.txt{background:var(--bg);border:1px solid var(--line2);border-radius:10px;padding:9px 12px;width:100%;font-size:1rem}
+input[type=range]{accent-color:var(--tok);width:100%}
+label.f{display:grid;gap:4px;font-size:.88rem;color:var(--muted);min-width:0}
+label.f b{color:var(--fg);font-family:var(--f-mono);font-weight:500}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.note{border-left:3px solid var(--emb);padding:8px 12px;background:var(--panel2);border-radius:0 8px 8px 0;font-size:.94rem}
+.note.warn{border-left-color:var(--tok)}.note.bad{border-left-color:var(--err)}.note.good{border-left-color:var(--out)}
+.pill{font-family:var(--f-mono);font-size:.72rem;padding:2px 9px;border-radius:999px;background:var(--bg);border:1px solid var(--line2);color:var(--muted);white-space:nowrap}
+.pill.good{border-color:var(--out);color:var(--out)}.pill.bad{border-color:var(--err);color:var(--err)}.pill.warn{border-color:var(--tok);color:var(--tok)}
+.scroll{overflow-x:auto;max-width:100%}
+.formula{font-family:var(--f-mono);background:var(--code);border:1px solid var(--line);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:pre;font-size:.9rem;line-height:1.7}
+table.t{border-collapse:collapse;font-size:.88rem;width:100%}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+table.t th{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500}
+/* home */
+.hero{padding-block:34px 14px;display:grid;gap:12px}
+.hero h2{font-size:clamp(1.9rem,5vw,3.1rem);line-height:1.06;max-width:22ch}
+.hero h2 em{font-style:normal;color:var(--tok)}
+.hero p{max-width:64ch;color:var(--muted);font-size:1.05rem}
+.stats{display:flex;flex-wrap:wrap;gap:22px}
+.stat .v{display:block;font-family:var(--f-display);font-size:1.6rem;font-variant-numeric:tabular-nums}
+.stat .k{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.rings{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:20px;align-items:center}
+@media (max-width:760px){.rings{grid-template-columns:minmax(0,1fr)}}
+.rings svg{width:100%;max-width:300px;height:auto;display:block;margin:0 auto}
+.method{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.method div{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:.84rem}
+.method b{display:block;font-family:var(--f-mono);font-size:.72rem;color:var(--tok);font-weight:500}
+.era{margin-top:26px}
+.era h3{font-size:1.05rem;display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.era h3 span{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);font-weight:400}
+.stages{display:grid;gap:8px;margin-top:10px}
+.stg{background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.stg>button{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center;background:none;border:0;padding:12px 14px;text-align:left}
+.stg .sn{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-family:var(--f-mono);font-size:.82rem;background:var(--panel2);color:var(--ec,var(--muted));border:1px solid var(--line2)}
+.stg .st{font-weight:600;line-height:1.25}
+.stg .ss{font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
+.stg .sbar{width:80px;height:6px;border-radius:3px;background:var(--line2);overflow:hidden}.stg .sbar i{display:block;height:100%;background:var(--out)}
+.stg.cur{border-color:color-mix(in srgb,var(--tok) 55%,var(--line))}
+.clist{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px;padding:0 14px 14px}
+.cc{display:flex;gap:8px;align-items:baseline;text-align:left;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 9px;font-size:.86rem;min-width:0}
+.cc .n{font-family:var(--f-mono);font-size:.7rem;color:var(--dim);flex:none;width:30px}
+.cc .tt{min-width:0;overflow-wrap:anywhere}
+.cc .s{margin-left:auto;font-size:.8rem;flex:none}
+.cc.mastered{border-color:color-mix(in srgb,var(--out) 45%,var(--line))}.cc.mastered .s{color:var(--out)}
+.cc.open{border-color:var(--tok)}.cc.open .s{color:var(--tok)}
+.cc.locked{opacity:.55}
+.cc:hover:not(:disabled){border-color:var(--emb)}
+.cc:disabled{cursor:default}
+.xref{font-family:var(--f-mono);font-size:.68rem;color:var(--hid);padding:0 14px 12px}
+/* concept */
+.crumb{padding-top:18px;font-family:var(--f-mono);font-size:.76rem;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.crumb button{background:none;border:0;padding:0;color:var(--emb);font:inherit}
+.chead{padding-block:10px 8px;display:grid;gap:10px}
+.chead h2{font-size:clamp(1.7rem,4.4vw,2.6rem);line-height:1.1}
+.chead .sub{color:var(--muted);max-width:68ch;font-size:1.04rem}
+.links{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.82rem}
+.steps{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-block:10px 16px}
+@media (max-width:900px){.steps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media (max-width:520px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.steps button{display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 10px;text-align:left;font-size:.84rem;min-width:0}
+.steps button .k{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-family:var(--f-mono);font-size:.72rem;background:var(--panel2);color:var(--muted);flex:none}
+.steps button.on{border-color:var(--tok)}
+.steps button.on .k{background:var(--tok);color:var(--on-acc)}
+.steps button.seen .k{background:color-mix(in srgb,var(--out) 25%,transparent);color:var(--out)}
+.pane{display:grid;gap:16px}
+.pane h3{font-size:1.15rem}
+.pane>*,#howHost>*,#mathHost>*,.grid2>*,.grid3>*{min-width:0}
+@media (max-width:640px){.listing table,.listing tbody{display:block}.listing tr{display:grid;grid-template-columns:auto minmax(0,1fr)}.listing td.src{overflow-x:auto}.listing td.ex{grid-column:2;border-left:0;min-width:0;padding-top:0;padding-bottom:8px}}
+.lead{font-size:1.08rem;max-width:70ch}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:6px;align-content:start}
+.card .eyebrow{color:var(--ec,var(--tok))}
+.navbtm{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+/* code */
+.listing{background:var(--code);border:1px solid var(--line);border-radius:10px;overflow-x:auto}
+.listing table{border-collapse:collapse;width:100%}
+.listing td{padding:3px 10px;vertical-align:top;font-size:.86rem}
+.listing td.ln{font-family:var(--f-mono);color:var(--dim);text-align:right;width:1%;user-select:none}
+.listing td.src{font-family:var(--f-mono);white-space:pre-wrap;overflow-wrap:anywhere;color:var(--fg)}
+.listing td.ex{color:var(--muted);font-size:.84rem;width:38%;min-width:200px;border-left:1px solid var(--line)}
+.listing tr.hl td{background:color-mix(in srgb,var(--tok) 14%,transparent)}
+.listing tr.hl td.ln{color:var(--tok)}
+.listing tr.dimmed td.src{opacity:.45}
+.kw{color:var(--hid)}.st{color:var(--out)}.nu{color:var(--tok)}.cm{color:var(--dim);font-style:italic}.bi{color:var(--emb)}
+.editor{width:100%;min-height:200px;resize:vertical;background:var(--code);border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font-family:var(--f-mono);font-size:.88rem;line-height:1.55;tab-size:4;white-space:pre;overflow:auto}
+.console{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:var(--f-mono);font-size:.84rem;white-space:pre-wrap;overflow-wrap:anywhere;min-height:60px;max-height:320px;overflow:auto}
+.console .err{color:var(--err)}
+.console .sys{color:var(--dim)}
+.vars{display:grid;gap:4px;font-family:var(--f-mono);font-size:.84rem}
+.vars div{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px}
+.vars .new{border-color:var(--tok)}
+.tests{display:grid;gap:6px}
+.tests div{display:flex;gap:8px;align-items:flex-start;font-size:.9rem}
+.tests .d{width:20px;height:20px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:.72rem;border:1px solid var(--line2)}
+.tests .ok .d{background:var(--out);color:var(--on-acc);border-color:var(--out)}
+.tests .no .d{background:var(--err);color:var(--on-acc);border-color:var(--err)}
+/* quiz */
+.q{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px;display:grid;gap:8px}
+.qh{display:flex;gap:10px;align-items:center}
+.qt{font-family:var(--f-mono);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--hid);border:1px solid var(--line2);border-radius:999px;padding:1px 8px}
+.qp pre{margin:6px 0 0}
+.opt{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:8px;cursor:pointer;background:var(--bg)}
+.opt input{margin-top:5px;accent-color:var(--tok)}
+.opt.right{border-color:var(--out)}.opt.wrong{border-color:var(--err)}
+.fb{display:none;font-size:.92rem}.fb.show{display:block}
+.fb b{display:block}
+.result{display:none;margin-top:14px;padding:14px;border:1px solid var(--line2);border-radius:12px}.result.show{display:block}
+.predict{border:1px dashed var(--tok);border-radius:12px;padding:12px;display:grid;gap:8px;background:color-mix(in srgb,var(--tok) 5%,transparent)}
+.predict .pw{display:none;font-size:.92rem}.predict .pw.show{display:block}
+/* narrator */
+.narr-hi{outline:2px solid var(--tok)!important;outline-offset:4px;border-radius:10px}
+body.narrating main{padding-bottom:200px}
+.narrbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--glass);backdrop-filter:blur(8px);border-top:1px solid var(--tok);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.narrbar .in{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 18px;align-items:center}
+@media (max-width:760px){.narrbar .in{grid-template-columns:minmax(0,1fr)}}
+.nb-t{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--tok)}
+.nb-x{font-size:1.04rem;margin-top:2px}
+.nb-s{font-family:var(--f-mono);font-size:.7rem;color:var(--muted);margin-top:3px}.nb-s:empty{display:none}
+.nb-c{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.nb-c button,.nb-c select{background:var(--panel2);border:1px solid var(--line2);border-radius:8px;padding:5px 9px;font-size:.82rem;max-width:190px}
+.nb-c button.pri{background:var(--tok);color:var(--on-acc);border-color:var(--tok);font-weight:600;min-width:74px}
+.nb-p{grid-column:1/-1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}.nb-p i{display:block;height:100%;background:var(--tok);width:0;transition:width .4s}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+</style>
+
+<header class="top"><div class="wrap">
+  <button class="brand" type="button" id="goHome" aria-label="Roadmap home"><span class="logo">AI</span><h1>AI Engineer Path</h1></button>
+  <div class="prog"><span id="progTxt">0 / 552 mastered</span><span class="pbar"><i id="progBar" style="width:0"></i></span></div>
+</div></header>
+
+<main class="wrap">
+  <section id="home">
+    <div class="hero">
+      <div class="eyebrow">From your first line of Python to building and running LLM systems</div>
+      <h2>Become an <em>end-to-end AI engineer</em>, one concept at a time.</h2>
+      <p>552 concepts in 20 stages, in a fixed order. Every concept is taught the same way: the idea, how it works step by step, the maths, runnable Python explained line by line, common mistakes and production use, a hands-on exercise that checks your code, and a 5-question check. A concept unlocks only when you've mastered the one before it.</p>
+      <div class="row"><button class="btn primary" type="button" id="resumeBtn">Start concept 1</button><span class="mono dim" id="resumeNote" style="font-size:.8rem"></span></div>
+      <div class="stats" id="homeStats"></div>
+    </div>
+    <div class="grid2">
+      <div class="box"><div class="eyebrow" style="margin-bottom:8px">How the families of AI fit together</div><div class="rings"><svg id="rings" viewBox="0 0 300 300" role="img" aria-label="Nested families of AI"></svg><div id="ringTxt" style="font-size:.92rem"></div></div></div>
+      <div class="box"><div class="eyebrow" style="margin-bottom:8px">Every concept, the same 7 steps</div><div class="method" id="method"></div><p class="muted" style="font-size:.86rem;margin-top:10px">Banking, credit-risk and loan-underwriting examples run through every stage. Code runs in your browser: real Python, no install needed.</p></div>
+    </div>
+    <div id="eras"></div>
+  </section>
+
+  <section id="concept" hidden>
+    <div class="crumb" id="crumb"></div>
+    <div class="chead"><h2 id="cTitle"></h2><p class="sub" id="cSub"></p><div class="links" id="cLinks"></div></div>
+    <div class="steps" id="steps" role="tablist" aria-label="Teaching steps"></div>
+    <div id="paneHost"></div>
+    <div class="navbtm"><button class="btn" type="button" id="prevStep">◀ Previous step</button><button class="btn primary" type="button" id="nextStep">Next step ▶</button></div>
+  </section>
+</main>
+
+<div class="narrbar" id="narrBar" hidden role="region" aria-label="Narrator">
+  <div class="in">
+    <div style="min-width:0"><div class="nb-t" id="nbTitle"></div><div class="nb-x" id="nbText" aria-live="polite"></div><div class="nb-s" id="nbStat"></div></div>
+    <div class="nb-c">
+      <button type="button" id="nbPrev" aria-label="Previous sentence">◀◀</button>
+      <button type="button" id="nbPlay" class="pri">Pause</button>
+      <button type="button" id="nbNext" aria-label="Next sentence">▶▶</button>
+      <select id="nbLang" aria-label="Language"><option value="en">English</option><option value="te">తెలుగు</option><option value="hn">हिन्दी</option></select>
+      <select id="nbRate" aria-label="Speed"><option value="0.8">0.8×</option><option value="1" selected>1×</option><option value="1.2">1.2×</option></select>
+      <select id="nbVoice" aria-label="Voice"></select>
+      <button type="button" id="nbTest">Test voice</button>
+      <button type="button" id="nbStop">Close</button>
+    </div>
+    <div class="nb-p"><i id="nbProg"></i></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffle(a,r){r=r||Math.random;for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+const LAB="https://claude.ai/artifact/MjUqJN4crEBCm2ekRAGcjK",ZERO="https://claude.ai/artifact/FsGMZS3ZVMy3fWwLMEgdLJ";
+
+/* =================== ROADMAP (552 concepts, 20 stages) =================== */
+const ERAS=[
+ {n:"Foundations",d:"code, maths and data: what every later stage stands on",c:"var(--emb)",s:[0,1,2]},
+ {n:"Traditional machine learning",d:"models that learn from tables of features",c:"var(--tok)",s:[3,4]},
+ {n:"Deep learning & language",d:"neural networks, NLP and the Transformer",c:"var(--hid)",s:[5,6,7]},
+ {n:"Generative AI & LLMs",d:"pretraining, prompting, retrieval and fine-tuning",c:"var(--out)",s:[8,9,10,11,12]},
+ {n:"Agentic AI & operations",d:"agents that act, and the pipelines that run them",c:"var(--err)",s:[13,14]},
+ {n:"Build & scale",d:"your own SLM, GPUs and inference optimisation",c:"var(--emb)",s:[15,16,17]},
+ {n:"Frontier & industry projects",d:"research directions and portfolio projects",c:"var(--tok)",s:[18,19]}];
+const RAW=[
+["Programming Foundations","Python Fundamentals|Variables and Data Types|Operators and Expressions|Conditional Statements|Loops and Iterations|Lists, Tuples, Sets and Dictionaries|Functions and Lambda Expressions|Object-Oriented Programming|Classes, Objects and Inheritance|Polymorphism and Encapsulation|Exception Handling|File Handling|Modules and Packages|List and Dictionary Comprehensions|Iterators and Generators|Decorators|Context Managers|Functional Programming|Multithreading|Multiprocessing|Asynchronous Programming|REST APIs and HTTP|JSON and XML Processing|Git and GitHub|Debugging and Testing|Virtual Environments and Dependency Management"],
+["Mathematical Foundations for AI/ML","Scalars, Vectors and Matrices|Linear Algebra|Matrix Multiplication|Matrix Transpose and Inverse|Determinants and Rank|Eigenvalues and Eigenvectors|Singular Value Decomposition (SVD)|Tensor Mathematics|Limits and Continuity|Differential Calculus|Partial Derivatives|Chain Rule|Gradients and Gradient Vectors|Multivariable Calculus|Integration|Probability Theory|Conditional Probability|Bayes' Theorem|Random Variables|Probability Distributions|Normal and Gaussian Distributions|Binomial and Poisson Distributions|Expectation and Variance|Covariance and Correlation|Descriptive Statistics|Inferential Statistics|Hypothesis Testing|Confidence Intervals|Statistical Significance|Information Theory|Entropy and Cross-Entropy|KL Divergence|Optimization Mathematics|Convex and Non-Convex Optimization"],
+["Data Science and Data Engineering","NumPy|Pandas|SciPy|Data Structures and DataFrames|Data Collection and Acquisition|Data Cleaning|Missing Value Treatment|Duplicate Detection|Outlier Detection|Exploratory Data Analysis (EDA)|Data Visualization|Data Transformation|Data Normalization|Data Standardization|Categorical Encoding|Feature Engineering|Feature Selection|Feature Extraction|SQL for Machine Learning|Database Fundamentals|ETL and ELT Pipelines|Batch Processing|Data Validation|Data Quality Management|Apache Spark Fundamentals"],
+["Core Machine Learning","Introduction to Machine Learning|Types of Machine Learning|Supervised Learning|Unsupervised Learning|Semi-Supervised Learning|Self-Supervised Learning|Reinforcement Learning Fundamentals|Linear Regression|Multiple Linear Regression|Polynomial Regression|Logistic Regression|K-Nearest Neighbors (KNN)|Naive Bayes|Decision Trees|Random Forest|Support Vector Machines (SVM)|Support Vector Regression|Gradient Boosting|XGBoost|LightGBM|CatBoost|K-Means Clustering|Hierarchical Clustering|DBSCAN|Gaussian Mixture Models|Principal Component Analysis (PCA)|Dimensionality Reduction|Anomaly Detection|Association Rule Mining|Model Training and Testing|Training, Validation and Test Splitting|Cross-Validation|Bias-Variance Tradeoff|Overfitting and Underfitting|Regularization (L1 and L2)|Hyperparameter Tuning|Grid Search|Random Search|Bayesian Optimization|Data Leakage Prevention"],
+["Advanced Machine Learning","Ensemble Learning|Bagging|Boosting|Stacking|Voting Classifiers|Feature Importance|Feature Interaction|Advanced Feature Selection|Imbalanced Dataset Handling|SMOTE|Class Weighting|Isolation Forest|One-Class SVM|Time Series Analysis|ARIMA and SARIMA|Time Series Forecasting|Recommendation Systems|Collaborative Filtering|Content-Based Filtering|Hybrid Recommendation Systems|Bayesian Machine Learning|Probabilistic Models|Model Calibration|Uncertainty Estimation|Explainable AI (XAI)|SHAP|LIME|Model Interpretability"],
+["Deep Learning and Neural Networks","Introduction to Deep Learning|Biological vs Artificial Neurons|Artificial Neuron|Perceptron|Multi-Layer Perceptron (MLP)|Neural Network Architecture|Input, Hidden and Output Layers|Weights and Biases|Activation Functions|Sigmoid|Tanh|ReLU|Leaky ReLU|GELU|Softmax|Forward Propagation|Loss Functions|Mean Squared Error|Binary Cross-Entropy|Categorical Cross-Entropy|Backpropagation|Computational Graphs|Automatic Differentiation|Gradient Descent|Stochastic Gradient Descent|Mini-Batch Gradient Descent|Momentum|RMSProp|Adam and AdamW|Learning Rate Scheduling|Weight Initialization|Dropout|Batch Normalization|Layer Normalization|Gradient Clipping|Vanishing Gradient Problem|Exploding Gradient Problem|Convolutional Neural Networks (CNN)|Recurrent Neural Networks (RNN)|Long Short-Term Memory (LSTM)|Gated Recurrent Units (GRU)|Autoencoders|Variational Autoencoders (VAE)|Generative Adversarial Networks (GAN)|Diffusion Models|Graph Neural Networks (GNN)|PyTorch|TensorFlow|Keras"],
+["Natural Language Processing","Introduction to NLP|Text Preprocessing|Tokenization|Sentence Segmentation|Stop Word Removal|Stemming|Lemmatization|Bag of Words|N-Grams|TF-IDF|Word2Vec|GloVe|FastText|Word Embeddings|Semantic Similarity|Cosine Similarity|Euclidean Distance|Sequence Modelling|Named Entity Recognition|Text Classification|Sentiment Analysis|Language Modelling|Text Generation"],
+["Transformer Architecture","Evolution of Language Models|Limitations of RNN and LSTM|Attention Mechanism|Self-Attention|Query, Key and Value Matrices|Scaled Dot-Product Attention|Multi-Head Attention|Positional Encoding|Token Embeddings|Transformer Encoder|Transformer Decoder|Encoder-Decoder Architecture|Feed-Forward Neural Networks|Residual Connections|Layer Normalization|Causal Masking|Autoregressive Generation|Context Windows|BERT Architecture|GPT Architecture|T5 Architecture|RoBERTa Architecture|Llama Architecture|Mistral Architecture|Gemma Architecture"],
+["Generative AI and LLM Fundamentals","Introduction to Generative AI|Large Language Models (LLMs)|Pretraining|Next Token Prediction|Tokenizers|Vocabulary Construction|Byte Pair Encoding (BPE)|SentencePiece|WordPiece|Supervised Fine-Tuning (SFT)|Instruction Tuning|Reinforcement Learning from Human Feedback (RLHF)|Direct Preference Optimization (DPO)|Model Inference|Temperature|Top-K Sampling|Top-P Sampling|Repetition Penalties|Context Window Management|Hallucination|Model Quantization|LLM Evaluation|Model Benchmarking"],
+["Prompt Engineering and Context Engineering","Zero-Shot Prompting|One-Shot Prompting|Few-Shot Prompting|Chain-of-Thought Prompting|Role-Based Prompting|System and User Instructions|Prompt Templates|Prompt Chaining|Structured Output Generation|JSON Schema Enforcement|Function Calling|Tool Calling|Context Engineering|Context Window Optimization|Prompt Injection|Prompt Security|Prompt Evaluation|Prompt Optimization"],
+["Embeddings and Vector Databases","Text Embeddings|Embedding Models|Semantic Search|Vector Similarity|Cosine Similarity|Dot Product|Euclidean Distance|Vector Indexing|Approximate Nearest Neighbour Search|HNSW|IVF Indexing|Vector Database Architecture|Metadata Filtering|Hybrid Search|Sparse Retrieval|Dense Retrieval|Reranking|FAISS|ChromaDB|Pinecone|Weaviate|Qdrant"],
+["Retrieval-Augmented Generation (RAG)","Introduction to RAG|RAG Architecture|Document Ingestion|PDF Parsing|Document Extraction|Text Chunking|Fixed-Size Chunking|Recursive Chunking|Semantic Chunking|Parent-Child Chunking|Embedding Generation|Vector Database Storage|Query Processing|Similarity Retrieval|Hybrid Retrieval|Reranking|Context Construction|Prompt Construction|LLM Response Generation|Citation Generation|RAG Evaluation|Retrieval Precision and Recall|Context Precision and Recall|Faithfulness Evaluation|Multi-Query Retrieval|Query Rewriting|Context Compression|GraphRAG|Agentic RAG|Corrective RAG|Advanced RAG Optimization"],
+["LLM Fine-Tuning and Custom Model Development","Fine-Tuning Fundamentals|Full Fine-Tuning|Parameter-Efficient Fine-Tuning (PEFT)|LoRA|QLoRA|Adapter Tuning|Dataset Preparation|Instruction Dataset Creation|Data Cleaning and Deduplication|Training Dataset Formatting|Training Configuration|Loss Calculation|Training Loops|Evaluation Datasets|Catastrophic Forgetting|Fine-Tuning vs RAG|Model Merging|Hugging Face Transformers|Hugging Face Datasets|Hugging Face PEFT"],
+["Agentic AI and AI Agents","Introduction to Agentic AI|AI Agent Architecture|Reasoning and Planning|Task Decomposition|ReAct Architecture|Agent Execution Loops|Tool Selection|Function Calling|API Integration|Agent Memory|Short-Term Memory|Long-Term Memory|State Management|Agent Reflection|Agent Evaluation|Multi-Agent Systems|Agent Collaboration|Agent Communication|Agent Orchestration|Sequential Workflows|Parallel Workflows|Human-in-the-Loop|Guardrails|Failure Recovery|LangChain|LangGraph|LlamaIndex|CrewAI|AutoGen|Model Context Protocol (MCP)|MCP Servers|MCP Clients|MCP Tools and Resources|Agentic RAG|Advanced Agent Architecture"],
+["MLOps and LLMOps","Introduction to MLOps|Introduction to LLMOps|Model Lifecycle Management|Model Versioning|Dataset Versioning|Experiment Tracking|MLflow|Weights & Biases|Model Registry|Model Serving|FastAPI|Flask|REST API Deployment|Docker|Kubernetes|CI/CD Pipelines|GitHub Actions|Cloud Fundamentals|AWS|Microsoft Azure|Google Cloud Platform|Apache Airflow|Model Monitoring|Data Drift|Concept Drift|Model Drift|Performance Monitoring|A/B Testing|Canary Deployment|Shadow Deployment|LLM Observability|LangSmith|Arize Phoenix|Logging and Tracing|AI Cost Monitoring|Production Reliability"],
+["SLM Development from Scratch","Small Language Model Fundamentals|SLM vs LLM Architecture|Model Architecture Design|Vocabulary Design|Tokenizer Training|Corpus Collection|Dataset Preparation|Data Deduplication|Data Filtering|Data Quality Assessment|Model Configuration|Transformer Implementation from Scratch|Embedding Layer Implementation|Attention Implementation|Feed-Forward Layer Implementation|Positional Encoding Implementation|Forward Pass Implementation|Loss Function Implementation|Backpropagation|Training Loop Implementation|Optimizer Configuration|Checkpointing|Model Evaluation|Pretraining|Instruction Fine-Tuning|Model Inference|SLM Deployment|SLM Benchmarking|Model Performance Optimization"],
+["Advanced LLM Infrastructure and GPU Computing","CPU and GPU Architecture|GPU Memory Hierarchy|CUDA Fundamentals|CUDA Kernels|GPU Parallel Computing|VRAM Management|Mixed Precision Training|FP32|FP16|BF16|Gradient Accumulation|Gradient Checkpointing|Distributed Training|Data Parallelism|Tensor Parallelism|Pipeline Parallelism|Model Parallelism|DeepSpeed|Fully Sharded Data Parallel (FSDP)|Distributed Inference|Multi-GPU Training"],
+["Advanced Model Optimization","Model Quantization|INT8 Quantization|INT4 Quantization|GPTQ|AWQ|GGUF|Model Pruning|Knowledge Distillation|Speculative Decoding|KV Cache Optimization|FlashAttention|PagedAttention|Continuous Batching|ONNX|TensorRT|vLLM|llama.cpp|Inference Latency Optimization|Throughput Optimization|Memory Optimization|Model Compression"],
+["Advanced AI Research","Mixture of Experts (MoE)|Multimodal AI|Vision Language Models (VLM)|Speech Language Models|Computer Vision|Image Classification|Object Detection|Image Segmentation|Optical Character Recognition (OCR)|Diffusion Models|Reinforcement Learning|Deep Reinforcement Learning|Policy Gradient Methods|Q-Learning|Proximal Policy Optimization (PPO)|Model Interpretability|Mechanistic Interpretability|Synthetic Data Generation|AI Safety|AI Alignment|Adversarial Machine Learning|Privacy-Preserving Machine Learning|Federated Learning|Continual Learning|World Models|Advanced Model Architecture Research"],
+["End-to-End Industry Projects","House Price Prediction|Customer Churn Prediction|Customer Segmentation|Fraud Detection|Credit Risk Prediction|Loan Default Prediction|Recommendation Engine|Time Series Forecasting|Document Intelligence System|Intelligent PDF Processing|Semantic Search Engine|End-to-End RAG Application|Fine-Tuned LLM Application|Custom SLM from Scratch|AI Chatbot with Tool Calling|MCP-Based AI Assistant|Multi-Agent AI System|AI-Powered Credit Underwriting Platform|Production-Grade AI API|End-to-End AI Deployment and Monitoring Platform"]];
+const STAGES=[],CONCEPTS=[];
+RAW.forEach(([t,list],si)=>{const st={i:si,n:si+1,t,c:[]};list.split("|").forEach(x=>{const c={n:CONCEPTS.length+1,t:x,s:si};CONCEPTS.push(c);st.c.push(c);});STAGES.push(st);});
+const TOTAL=CONCEPTS.length;
+// where the SLM Learning Lab already teaches a topic in depth
+const XREF={2:"Lab stages 1 & 5 cover vectors, matmul, softmax, chain rule, gradients",6:"Lab stages 4, 5 & 8 cover neurons, backprop, optimisers",7:"Lab stages 2 & 3 cover tokenization and embeddings",8:"Lab stage 5 covers attention and the Transformer",9:"Lab stages 9 & 12 cover evaluation, sampling, hallucination",13:"Lab stage 10 covers fine-tuning and LoRA",16:"The whole SLM Learning Lab (stages 0–12) is this stage in depth",18:"Lab stage 11 covers quantization, pruning, distillation"};
+
+/* =================== PROGRESS =================== */
+let P={m:[],att:{},seen:{},last:1};
+try{const s=localStorage.getItem("aieng.v1");if(s)P=Object.assign(P,JSON.parse(s));}catch(e){}
+const saveP=()=>{try{localStorage.setItem("aieng.v1",JSON.stringify(P));}catch(e){}};
+const mastered=n=>P.m.includes(n);
+const isOpen=n=>n===1||mastered(n-1);
+const C={};// built concept content, filled by the concept files
+function renderProgress(){const k=P.m.length;$("#progTxt").textContent=`${k} / ${TOTAL} mastered`;$("#progBar").style.width=(k/TOTAL*100).toFixed(2)+"%";}
+
+/* =================== PYTHON RUNNER (Brython in a Web Worker) =================== */
+const BRY="https://cdn.jsdelivr.net/npm/brython@3.12.4/";
+const PRE=["import sys","from browser import self as W","class _Out:","    def write(self,s): W.send(s)","    def flush(self): pass","sys.stdout=_Out()","sys.stderr=_Out()",
+"_inp=list(W.stdin)","def input(prompt=''):","    if prompt: print(prompt,end='')","    v=_inp.pop(0) if _inp else ''","    print(v)","    return v",
+"def run_user(_src=None, **g):","    import io","    buf=io.StringIO(); old=sys.stdout; sys.stdout=buf","    g.setdefault('__name__','__main__'); g.setdefault('input',input)","    try:","        exec(compile(W.src if _src is None else _src,'your_code.py','exec'),g)","    finally:","        sys.stdout=old","    return g, buf.getvalue()",
+"def check(desc, ok):","    print('\\n__T'+('1' if ok else '0')+' '+str(desc))",
+"try:","    if W.mode=='test':","        exec(W.tests,{'run_user':run_user,'check':check,'SRC':W.src,'__name__':'__main__'})","    else:","        exec(compile(W.src,'your_code.py','exec'),{'__name__':'__main__','input':input})",
+"except BaseException as e:","    ln=None","    try:","        if isinstance(e,SyntaxError): ln=e.lineno","        else:","            tb=e.__traceback__","            while tb is not None:","                if tb.tb_frame.f_code.co_filename=='your_code.py': ln=tb.tb_lineno","                tb=tb.tb_next","    except Exception: pass",
+"    print('\\n__E'+type(e).__name__+': '+str(e)+(f'  (line {ln} of your code)' if ln else ''))"].join("\n");
+const PY={w:null,ready:null,state:"idle"};
+function pyStatus(){$$(".pystat").forEach(e=>{e.textContent={idle:"Python: loads on first run (~5 MB, once)",loading:"Python: loading…",ready:"Python: ready",fail:"Python could not load here. Showing the expected output instead."}[PY.state];e.className="pystat pill "+(PY.state==="ready"?"good":PY.state==="fail"?"bad":"");});}
+function pyBoot(){
+  if(PY.ready)return PY.ready;PY.state="loading";pyStatus();
+  PY.ready=new Promise((res,rej)=>{let w;
+    try{const src=`self.__pre=${JSON.stringify(PRE)};
+try{importScripts("${BRY}brython.min.js","${BRY}brython_stdlib.js");brython({debug:0,indexedDB:false});self.send=s=>postMessage({t:"out",s:String(s)});postMessage({t:"ready"});}catch(err){postMessage({t:"fail",s:String(err)});}
+self.addEventListener("message",e=>{const d=e.data;if(d.t!=="run")return;self.src=d.src;self.stdin=d.stdin||[];self.mode=d.mode||"run";self.tests=d.tests||"";try{__BRYTHON__.runPythonSource(self.__pre,{});}catch(err){postMessage({t:"out",s:"\\n__E"+err});}postMessage({t:"done"});});`;
+      w=new Worker(URL.createObjectURL(new Blob([src],{type:"text/javascript"})));}catch(e){PY.state="fail";pyStatus();rej(e);return;}
+    const to=setTimeout(()=>{PY.state="fail";pyStatus();try{w.terminate();}catch(e){}rej("timeout");},45000);
+    w.onmessage=e=>{if(e.data.t==="ready"){clearTimeout(to);PY.w=w;PY.state="ready";pyStatus();res(w);}else if(e.data.t==="fail"){clearTimeout(to);PY.state="fail";pyStatus();rej(e.data.s);}};
+    w.onerror=()=>{clearTimeout(to);PY.state="fail";pyStatus();rej("worker error");};
+  });
+  PY.ready.catch(()=>{});return PY.ready;
+}
+async function pyRun(src,opt={}){
+  await pyBoot();const ms=opt.ms||5000;
+  return new Promise(res=>{let out="";const w=PY.w;
+    const to=setTimeout(()=>{w.terminate();PY.w=null;PY.ready=null;PY.state="idle";pyStatus();res({out:out+"\n__EStopped after "+ms/1000+" s. Is there a loop that never ends?",timeout:true});},ms);
+    w.onmessage=e=>{if(e.data.t==="out")out+=e.data.s;if(e.data.t==="done"){clearTimeout(to);res({out});}};
+    w.postMessage({t:"run",src,stdin:opt.stdin||[],mode:opt.tests?"test":"run",tests:opt.tests||""});});
+}
+function splitOut(out){const lines=out.split("\n"),tests=[],err=[],plain=[];
+  lines.forEach(l=>{if(l.startsWith("__T"))tests.push({ok:l[3]==="1",d:l.slice(5)});else if(l.startsWith("__E"))err.push(l.slice(3));else plain.push(l);});
+  return {text:plain.join("\n").replace(/\n+$/,""),tests,err:err.join("\n")};}
+function consoleHTML(o){return (o.text?esc(o.text):"")+(o.err?`${o.text?"\n":""}<span class="err">${esc(o.err)}</span>`:"")||'<span class="sys">(no output)</span>';}
+
+/* =================== SMALL WIDGETS =================== */
+const KW=new Set("False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield match case".split(" "));
+const BI=new Set("print input len range type int float str bool round abs sum min max list dict set tuple enumerate zip sorted isinstance divmod".split(" "));
+function hl(src){return src.split("\n").map(line=>{let out="",i=0;
+  while(i<line.length){const ch=line[i];
+    if(ch==="#"){out+=`<span class="cm">${esc(line.slice(i))}</span>`;break;}
+    if(ch==='"'||ch==="'"){let j=i+1;while(j<line.length&&line[j]!==ch){if(line[j]==="\\")j++;j++;}out+=`<span class="st">${esc(line.slice(i,j+1))}</span>`;i=j+1;continue;}
+    const m=/^[A-Za-z_]\w*/.exec(line.slice(i));if(m){const w=m[0];out+=KW.has(w)?`<span class="kw">${w}</span>`:BI.has(w)&&line[i+w.length]==="("?`<span class="bi">${w}</span>`:esc(w);i+=w.length;continue;}
+    const d=/^\d[\d_]*\.?\d*(e-?\d+)?/.exec(line.slice(i));if(d){out+=`<span class="nu">${d[0]}</span>`;i+=d[0].length;continue;}
+    out+=esc(ch);i++;}
+  return out;}).join("\n");}
+// annotated listing: lines = [[code, explanation], ...]
+function listing(lines,id){return `<div class="listing"${id?` id="${id}"`:""}><table>${lines.map((l,i)=>`<tr data-l="${i}"><td class="ln">${i+1}</td><td class="src">${hl(l[0])||" "}</td>${l.length>1?`<td class="ex">${l[1]||""}</td>`:""}</tr>`).join("")}</table></div>`;}
+// runnable editor
+function runner(host,o){
+  host.innerHTML=`<div class="row" style="justify-content:space-between;margin-bottom:8px"><div class="row"><button class="btn primary sm" type="button" data-a="run">▶ Run</button><button class="btn sm" type="button" data-a="reset">Reset code</button></div><span class="pystat pill"></span></div>
+  <textarea class="editor" spellcheck="false" aria-label="Python code editor" style="min-height:${o.h||200}px"></textarea>
+  ${o.stdin?`<label class="f" style="margin-top:8px">input() answers, one per line<input class="txt" data-a="stdin" type="text" value="${esc(o.stdin)}"></label>`:""}
+  <div class="eyebrow" style="margin:10px 0 4px">Output</div><div class="console" aria-live="polite"><span class="sys">Press Run.</span></div>`;
+  const ta=host.querySelector("textarea"),con=host.querySelector(".console");ta.value=o.code;
+  ta.addEventListener("keydown",e=>{if(e.key==="Tab"){e.preventDefault();const s=ta.selectionStart;ta.value=ta.value.slice(0,s)+"    "+ta.value.slice(ta.selectionEnd);ta.selectionStart=ta.selectionEnd=s+4;}});
+  host.querySelector("[data-a=reset]").addEventListener("click",()=>{ta.value=o.code;con.innerHTML='<span class="sys">Code reset.</span>';});
+  host.querySelector("[data-a=run]").addEventListener("click",async()=>{con.innerHTML='<span class="sys">Running…</span>';
+    const stdin=o.stdin?host.querySelector("[data-a=stdin]").value.split("|").map(s=>s.trim()):[];
+    try{const r=await pyRun(ta.value,{stdin});con.innerHTML=consoleHTML(splitOut(r.out));if(o.onRun)o.onRun(ta.value,splitOut(r.out));}
+    catch(e){con.innerHTML=`<span class="sys">Python couldn't load in this browser, so here is the output of the original code:</span>\n${esc(o.expected||"")}`;}});
+  pyStatus();return {get:()=>ta.value};
+}
+// predict-first box
+function predictBox(el,o){const draw=()=>{el.innerHTML=`<div class="eyebrow c-tok">Predict first</div><div>${o.q}</div><div class="row">${o.opts.map((t,i)=>`<button type="button" class="btn sm" data-i="${i}">${t}</button>`).join("")}</div><div class="pw"></div>`;
+  el.querySelectorAll("[data-i]").forEach(b=>b.addEventListener("click",()=>{const i=+b.dataset.i,ok=i===o.ok;el.querySelectorAll("[data-i]").forEach((bb,k)=>{bb.disabled=true;if(k===o.ok)bb.classList.add("right");else if(k===i)bb.classList.add("wrong");});
+    const w=el.querySelector(".pw");w.classList.add("show");w.innerHTML=`<b class="${ok?"c-out":"c-err"}">${ok?"You predicted it.":"Not quite."}</b> ${o.why} <button type="button" class="btn sm" data-again>Ask again</button>`;w.querySelector("[data-again]").addEventListener("click",draw);if(o.onReveal)o.onReveal();}));};draw();}
+// execution stepper: steps=[{l:lineIndex, v:{name:[value,type]}, o:"output line"|undefined, n:"note"}]
+function stepper(host,code,steps,o={}){
+  host.innerHTML=`<div class="grid2"><div>${listing(code.split("\n").map(l=>[l]))}</div><div style="display:grid;gap:10px;align-content:start"><div class="row"><button class="btn sm" type="button" data-a="prev">◀ Back</button><button class="btn primary sm" type="button" data-a="next">Next line ▶</button><button class="btn sm" type="button" data-a="play">Play</button><button class="btn sm" type="button" data-a="reset">Reset</button><span class="mono dim" data-a="cnt" style="font-size:.76rem"></span></div><div class="note" data-a="note"></div>${o.custom?'<div data-a="custom"></div>':`<div><div class="eyebrow" style="margin-bottom:4px">Variables (names → values)</div><div class="vars" data-a="vars"></div></div>`}<div><div class="eyebrow" style="margin-bottom:4px">Output</div><div class="console" data-a="out"></div></div></div></div>`;
+  let k=-1,timer=null;const q=s=>host.querySelector(`[data-a=${s}]`);
+  function draw(){const rows=host.querySelectorAll("tr");rows.forEach(r=>r.classList.remove("hl"));const st=steps[k];
+    if(st)rows[st.l]&&rows[st.l].classList.add("hl");
+    q("cnt").textContent=`step ${Math.max(0,k+1)} / ${steps.length}`;
+    q("note").innerHTML=st?st.n:(o.intro||"Press <b>Next line</b>. Python runs the program one line at a time, from the top.");
+    const outs=steps.slice(0,k+1).filter(s=>s.o!==undefined).map(s=>esc(s.o));q("out").innerHTML=outs.length?outs.join("\n"):'<span class="sys">(nothing printed yet)</span>';
+    if(o.custom)o.custom(q("custom"),k,st);
+    else{const v=st?st.v:{},prev=k>0?steps[k-1].v:{};q("vars").innerHTML=Object.keys(v).length?Object.entries(v).map(([n,[val,t]])=>`<div class="${!prev[n]||prev[n][0]!==val?"new":""}"><b>${esc(n)}</b><span class="dim">→</span><span class="c-tok">${esc(val)}</span><span class="pill">${t}</span></div>`).join(""):'<span class="dim mono" style="font-size:.8rem">(none yet)</span>';}
+    q("prev").disabled=k<0;q("next").disabled=k>=steps.length-1;}
+  q("next").addEventListener("click",()=>{if(k<steps.length-1){k++;draw();}});
+  q("prev").addEventListener("click",()=>{if(k>=0){k--;draw();}});
+  q("reset").addEventListener("click",()=>{clearInterval(timer);timer=null;q("play").textContent="Play";k=-1;draw();});
+  q("play").addEventListener("click",()=>{if(timer){clearInterval(timer);timer=null;q("play").textContent="Play";return;}if(k>=steps.length-1)k=-1;q("play").textContent="Pause";timer=setInterval(()=>{if(!host.isConnected||k>=steps.length-1){clearInterval(timer);timer=null;q("play").textContent="Play";return;}k++;draw();if(o.onEnd&&k===steps.length-1)o.onEnd();},900);});
+  q("next").addEventListener("click",()=>{if(o.onEnd&&k===steps.length-1)o.onEnd();});
+  draw();
+}
+const fmt=(v,d=2)=>Number(v).toLocaleString("en-IN",{minimumFractionDigits:d,maximumFractionDigits:d});
+
+/* =================== HOME =================== */
+const STEPS=[["Idea","definition, why it exists, analogy, real uses"],["How it works","step by step, interactive"],["Math & internals","formulas, derivations, what happens inside"],["Code","runnable Python, explained line by line"],["Pitfalls & production","mistakes, trade-offs, how it's used in real AI systems"],["Practice","an exercise your code must pass"],["Check","5 questions; 4 right masters the concept"]];
+$("#method").innerHTML=STEPS.map((s,i)=>`<div><b>${i+1} · ${s[0]}</b>${s[1]}</div>`).join("");
+const RINGS=[["Artificial intelligence","Any technique that makes computers act intelligently, including hand-written rules (Stage 1's if/else is the oldest kind of AI).",136,"var(--line2)"],["Machine learning","Systems that learn patterns from data instead of being given rules. Credit scoring with logistic regression or XGBoost (Stages 4–5).",108,"var(--tok)"],["Deep learning","Machine learning with many-layered neural networks that learn their own features from raw data (Stage 6).",80,"var(--hid)"],["Generative AI","Deep models that create new text, images or code, such as LLMs and diffusion models (Stages 8–13).",52,"var(--out)"]];
+function renderRings(sel){let g="";RINGS.forEach((r,i)=>{g+=`<g data-r="${i}" style="cursor:pointer"><circle cx="150" cy="${150+(136-r[2])*.55}" r="${r[2]}" style="fill:color-mix(in srgb,${r[3]} ${sel===i?22:9}%,transparent);stroke:${r[3]}" stroke-width="${sel===i?2.5:1.2}"/><text x="150" y="${150+(136-r[2])*.55-r[2]+18}" text-anchor="middle" font-size="11" font-family="IBM Plex Mono" style="fill:var(--fg)">${r[0]}</text></g>`;});
+  g+=`<g data-r="4" style="cursor:pointer"><rect x="206" y="236" width="86" height="40" rx="8" style="fill:color-mix(in srgb,var(--err) ${sel===4?22:9}%,transparent);stroke:var(--err)"/><text x="249" y="252" text-anchor="middle" font-size="10" font-family="IBM Plex Mono" style="fill:var(--fg)">Agentic AI</text><text x="249" y="266" text-anchor="middle" font-size="8.5" font-family="IBM Plex Mono" style="fill:var(--muted)">LLM + tools + loop</text></g>`;
+  $("#rings").innerHTML=g;const t=sel===4?["Agentic AI","An LLM placed in a loop that plans, calls tools (APIs, databases, code) and checks its own results to finish multi-step tasks, such as an underwriting assistant that gathers documents, runs the credit model and drafts a decision (Stage 14)."]:RINGS[sel];
+  $("#ringTxt").innerHTML=`<b>${t[0]}</b><p class="muted" style="margin-top:4px">${t[1]}</p><p class="dim mono" style="font-size:.74rem;margin-top:8px">Tap a ring.</p>`;
+  $$("#rings [data-r]").forEach(e=>e.addEventListener("click",()=>renderRings(+e.dataset.r)));}
+renderRings(1);
+let openStage=null;
+function renderHome(){
+  renderProgress();const next=CONCEPTS.find(c=>!mastered(c.n))||CONCEPTS[TOTAL-1];
+  $("#resumeBtn").textContent=P.m.length?`Continue: ${next.n}. ${next.t}`:"Start concept 1: Python Fundamentals";
+  $("#resumeNote").textContent=C[next.n]?"":"This concept's lesson isn't built yet. Ask Claude to build it.";
+  const built=Object.keys(C).length,stg=STAGES[next.s];
+  $("#homeStats").innerHTML=`<div class="stat"><span class="v c-out">${P.m.length}</span><span class="k">concepts mastered</span></div><div class="stat"><span class="v">${TOTAL}</span><span class="k">concepts in the path</span></div><div class="stat"><span class="v c-tok">${stg.n}</span><span class="k">current stage</span></div><div class="stat"><span class="v c-emb">${built}</span><span class="k">lessons built so far</span></div>`;
+  if(openStage===null)openStage=next.s;
+  $("#eras").innerHTML=ERAS.map(e=>`<div class="era"><h3 style="color:${e.c}">${e.n}<span>${e.d}</span></h3><div class="stages">${e.s.map(si=>{const s=STAGES[si],k=s.c.filter(c=>mastered(c.n)).length,cur=si===next.s;
+    return `<div class="stg${cur?" cur":""}" style="--ec:${e.c}"><button type="button" data-st="${si}" aria-expanded="${openStage===si}"><span class="sn">${String(s.n).padStart(2,"0")}</span><span style="min-width:0"><span class="st">${esc(s.t)}</span><br><span class="ss">concepts ${s.c[0].n}–${s.c[s.c.length-1].n} · ${k}/${s.c.length} mastered${cur?" · you are here":""}</span></span><span class="sbar"><i style="width:${k/s.c.length*100}%"></i></span></button>
+    ${openStage===si?`<div class="clist">${s.c.map(c=>{const m=mastered(c.n),o=isOpen(c.n),b=!!C[c.n];return `<button type="button" class="cc ${m?"mastered":o?"open":"locked"}" data-c="${c.n}" ${o||m?"":"disabled"} title="${m?"mastered":o?(b?"open":"open · lesson not built yet"):"locked: master the previous concept first"}"><span class="n">${c.n}</span><span class="tt">${esc(c.t)}</span><span class="s">${m?"✓":o?(b?"●":"◌"):"🔒"}</span></button>`;}).join("")}</div>${XREF[s.n]?`<div class="xref">Deeper visual lab: <a href="${LAB}" target="_blank" rel="noopener" style="color:inherit">${XREF[s.n]}</a></div>`:""}`:""}</div>`;}).join("")}</div></div>`).join("");
+  $$("#eras [data-st]").forEach(b=>b.addEventListener("click",()=>{const si=+b.dataset.st;openStage=openStage===si?-1:si;renderHome();}));
+  $$("#eras [data-c]").forEach(b=>b.addEventListener("click",()=>openConcept(+b.dataset.c)));
+}
+$("#resumeBtn").addEventListener("click",()=>{const next=CONCEPTS.find(c=>!mastered(c.n))||CONCEPTS[0];openConcept(next.n);});
+$("#goHome").addEventListener("click",goHome);
+
+/* =================== CONCEPT VIEW =================== */
+let cur={n:0,step:0,cleanup:[]};
+function goHome(){narrStop();$("#concept").hidden=true;$("#home").hidden=false;try{history.replaceState(null,"","#roadmap");}catch(e){}renderHome();window.scrollTo({top:0});}
+function openConcept(n,step){
+  const c=CONCEPTS[n-1];if(!c)return goHome();narrStop();
+  cur={n,step:step||0,cleanup:[]};P.last=n;saveP();
+  $("#home").hidden=true;$("#concept").hidden=false;try{history.replaceState(null,"","#c"+n);}catch(e){}
+  const st=STAGES[c.s],L=C[n],prev=CONCEPTS[n-2],nxt=CONCEPTS[n];
+  $("#crumb").innerHTML=`<button type="button" id="crHome">Roadmap</button><span>›</span><span>Stage ${st.n} · ${esc(st.t)}</span><span>›</span><span>Concept ${n} of ${TOTAL}</span>${mastered(n)?'<span class="pill good">mastered</span>':""}`;
+  $("#crHome").addEventListener("click",goHome);
+  $("#cTitle").textContent=`${n}. ${c.t}`;
+  if(!L){$("#cSub").textContent="This concept is unlocked, but its lesson hasn't been built yet.";$("#cLinks").innerHTML="";$("#steps").innerHTML="";
+    $("#paneHost").innerHTML=`<div class="box" style="display:grid;gap:10px"><h3>Lesson coming next</h3><p class="muted">Lessons are built in order, one concept at a time, so each can be done properly: idea, interactive visual, maths, runnable code, pitfalls, practice and a check. Tell Claude in chat: <span class="mono c-emb">"Build concept ${n}: ${esc(c.t)}"</span>, or <span class="mono c-emb">"Continue Stage ${st.n}"</span>.</p><div class="row"><button class="btn" type="button" id="backRoad">Back to the roadmap</button>${prev?`<button class="btn" type="button" id="backPrev">Revisit ${prev.n}. ${esc(prev.t)}</button>`:""}</div></div>`;
+    $("#backRoad").addEventListener("click",goHome);if(prev)$("#backPrev").addEventListener("click",()=>openConcept(prev.n));
+    $("#prevStep").hidden=true;$("#nextStep").hidden=true;window.scrollTo({top:0});return;}
+  $("#prevStep").hidden=false;$("#nextStep").hidden=false;
+  $("#cSub").textContent=L.sub;
+  $("#cLinks").innerHTML=`<button class="btn sm" type="button" id="listenBtn">🔊 Listen (English · తెలుగు · हिन्दी)</button>${L.builds?`<span class="dim">builds on</span>${L.builds.map(b=>`<span class="pill">${esc(b)}</span>`).join("")}`:""}${L.leads?`<span class="dim">leads to</span>${L.leads.map(b=>`<span class="pill warn">${esc(b)}</span>`).join("")}`:""}`;
+  $("#listenBtn").addEventListener("click",()=>narrStart());
+  setStep(cur.step);window.scrollTo({top:0});
+}
+function setStep(k,fromNarr){
+  cur.cleanup.forEach(f=>{try{f();}catch(e){}});cur.cleanup=[];
+  cur.step=k;const n=cur.n,L=C[n];P.seen[n]=P.seen[n]||[];if(!P.seen[n].includes(k))P.seen[n].push(k);saveP();
+  $("#steps").innerHTML=STEPS.map((s,i)=>`<button type="button" role="tab" aria-selected="${i===k}" class="${i===k?"on":""} ${P.seen[n].includes(i)&&i!==k?"seen":""}" data-k="${i}"><span class="k">${P.seen[n].includes(i)&&i!==k?"✓":i+1}</span><span>${s[0]}</span></button>`).join("");
+  $$("#steps [data-k]").forEach(b=>b.addEventListener("click",()=>{if(!fromNarr)narrStop();setStep(+b.dataset.k);}));
+  const host=$("#paneHost");host.innerHTML='<div class="pane" id="pane"></div>';const pane=$("#pane");
+  const ctx={every:(fn,ms)=>{const t=setInterval(fn,ms);cur.cleanup.push(()=>clearInterval(t));},n};
+  [renderIdea,renderHow,renderMath,renderCode,renderPitfalls,renderPractice,renderCheck][k](pane,L,ctx);
+  $("#prevStep").disabled=k===0;$("#nextStep").textContent=k===6?(CONCEPTS[n]?`Next concept: ${CONCEPTS[n].t} ▶`:"Finish ▶"):`Next: ${STEPS[k+1][0]} ▶`;
+  $("#nextStep").disabled=k===6&&!mastered(n);
+  $("#nextStep").title=k===6&&!mastered(n)?"Pass the check (4/5) to unlock the next concept":"";
+}
+$("#prevStep").addEventListener("click",()=>{narrStop();if(cur.step>0){setStep(cur.step-1);window.scrollTo({top:$("#steps").offsetTop-70,behavior:"smooth"});}});
+$("#nextStep").addEventListener("click",()=>{narrStop();if(cur.step<6){setStep(cur.step+1);window.scrollTo({top:$("#steps").offsetTop-70,behavior:"smooth"});}else if(mastered(cur.n)&&CONCEPTS[cur.n])openConcept(cur.n+1);});
+
+function renderIdea(p,L){const I=L.idea;
+  p.innerHTML=`<p class="lead" id="idDef">${I.def}</p>
+  <div class="cards"><div class="card" id="idWhy" style="--ec:var(--tok)"><div class="eyebrow">Why it exists</div><div>${I.why}</div></div><div class="card" id="idAna" style="--ec:var(--emb)"><div class="eyebrow">Picture it</div><div>${I.analogy}</div></div><div class="card" id="idBank" style="--ec:var(--out)"><div class="eyebrow">In a bank</div><div>${I.bank}</div></div></div>
+  <div class="box" id="idReal"><div class="eyebrow" style="margin-bottom:6px">Where you'll meet it in AI engineering</div><ul>${I.real.map(r=>`<li>${r}</li>`).join("")}</ul></div>
+  ${I.extra||""}`;
+  if(I.mount)I.mount(p);}
+function renderHow(p,L,ctx){p.innerHTML=`<p class="lead">${L.how.intro}</p><div id="howHost"></div>`;L.how.mount($("#howHost"),ctx);}
+function renderMath(p,L,ctx){p.innerHTML=`<p class="lead">${L.math.intro}</p><div id="mathHost" style="display:grid;gap:16px"></div>`;L.math.mount($("#mathHost"),ctx);}
+function renderCode(p,L){const K=L.code;
+  p.innerHTML=`<p class="lead">${K.intro}</p><div><div class="eyebrow" style="margin-bottom:6px">Read it line by line · <span class="mono">${esc(K.file)}</span></div>${listing(K.lines,"codeList")}</div>
+  <div class="box"><div class="eyebrow" style="margin-bottom:8px">Now run it, then change it</div><div id="codeRun"></div><p class="muted" style="font-size:.88rem;margin-top:10px">${K.tryThis||""}</p></div>${K.scratch?`<div class="box" id="scratchBox"><div class="eyebrow" style="margin-bottom:8px">${K.scratch.title}</div><p class="muted" style="margin-bottom:8px">${K.scratch.intro}</p><div id="scratchRun"></div></div>`:""}`;
+  runner($("#codeRun"),{code:K.lines.map(l=>l[0]).join("\n"),expected:K.expected,stdin:K.stdin,h:K.lines.length*22+30});
+  if(K.scratch)runner($("#scratchRun"),{code:K.scratch.code,expected:K.scratch.expected,h:K.scratch.code.split("\n").length*22+30});}
+function renderPitfalls(p,L){const F=L.pitfalls;
+  p.innerHTML=`<div><h3 style="margin-bottom:8px">Common mistakes</h3><div style="display:grid;gap:10px">${F.mistakes.map(m=>`<div class="box"><div class="row" style="justify-content:space-between"><b>${m.t}</b>${m.err?`<span class="pill bad">${esc(m.err)}</span>`:""}</div>${m.bad?`<div class="grid2" style="margin-top:8px"><div><div class="eyebrow c-err" style="margin-bottom:4px">Wrong</div><div class="formula">${hl(m.bad)}</div></div><div><div class="eyebrow c-out" style="margin-bottom:4px">Right</div><div class="formula">${hl(m.good)}</div></div></div>`:""}<p class="muted" style="margin-top:8px">${m.why}</p></div>`).join("")}</div></div>
+  <div><h3 style="margin-bottom:8px">Trade-offs</h3><div class="box scroll">${F.tradeoffs}</div></div>
+  <div><h3 style="margin-bottom:8px">In production AI systems</h3><div class="box">${F.production}</div></div>`;}
+function renderPractice(p,L){const X=L.practice;
+  p.innerHTML=`<div class="box" style="display:grid;gap:8px"><div class="eyebrow c-tok">Exercise</div><h3>${X.title}</h3><div>${X.task}</div></div>
+  <div class="box"><div id="pracRun"></div><div class="row" style="margin-top:10px"><button class="btn primary" type="button" id="pracCheck">✓ Check my code</button><button class="btn" type="button" id="pracHint">Hint</button><button class="btn" type="button" id="pracSol">Show solution</button></div><div class="note warn" id="pracHintBox" hidden style="margin-top:10px">${X.hint}</div><div id="pracSolBox" hidden style="margin-top:10px">${listing(X.solution.split("\n").map(l=>[l]))}</div>
+  <div class="eyebrow" style="margin:12px 0 6px">Tests</div><div class="tests" id="pracTests">${X.checks.map(c=>`<div><span class="d"></span><span>${c}</span></div>`).join("")}</div><p class="note" id="pracMsg" style="margin-top:10px">Write your code, press Run to try it, then Check.</p></div>
+  ${X.project?`<div class="box" style="display:grid;gap:6px"><div class="eyebrow c-hid">Mini-project (optional, on your own machine)</div><div>${X.project}</div></div>`:""}`;
+  const ed=runner($("#pracRun"),{code:X.starter,h:X.starter.split("\n").length*22+60});
+  $("#pracHint").addEventListener("click",()=>{$("#pracHintBox").hidden=false;});
+  $("#pracSol").addEventListener("click",()=>{$("#pracSolBox").hidden=!$("#pracSolBox").hidden;});
+  $("#pracCheck").addEventListener("click",async()=>{$("#pracMsg").textContent="Running the tests…";
+    try{const r=splitOut((await pyRun(ed.get(),{tests:X.tests,ms:8000})).out);
+      const rows=X.checks.map((c,i)=>{const t=r.tests[i];return `<div class="${t?(t.ok?"ok":"no"):"no"}"><span class="d">${t?(t.ok?"✓":"✕"):"!"}</span><span>${c}</span></div>`;}).join("");$("#pracTests").innerHTML=rows;
+      const ok=r.tests.length===X.checks.length&&r.tests.every(t=>t.ok);
+      $("#pracMsg").className="note "+(ok?"good":"bad");
+      $("#pracMsg").innerHTML=ok?`<b class="c-out">All tests pass.</b> ${X.done||"Move on to the check."}`:r.err?`<b class="c-err">Your code raised an error.</b><br><span class="mono" style="font-size:.86rem">${esc(r.err)}</span>`:`<b class="c-err">${r.tests.filter(t=>t.ok).length}/${X.checks.length} tests pass.</b> Run your code to see its output, compare it with the task, or open the hint.`;
+      P.prac=P.prac||{};if(ok){P.prac[cur.n]=1;saveP();}}
+    catch(e){$("#pracMsg").className="note warn";$("#pracMsg").textContent="Python couldn't load in this browser, so the tests can't run here. Compare your code with the solution, or run it on your own machine.";}});
+}
+/* ---- check (quiz) ---- */
+function renderCheck(p,L){
+  const n=cur.n;let seed=((P.att[n]||0)*7919+n*131+Date.now()%997)%100003,quiz=[];
+  p.innerHTML=`<p class="lead">Five questions with new numbers on every attempt. Get <b>4 or more</b> right to master <b>${esc(CONCEPTS[n-1].t)}</b> and unlock the next concept.</p><div id="qs" style="display:grid;gap:12px"></div><div class="row" style="margin-top:14px"><button class="btn primary" type="button" id="qSub">Submit answers</button><button class="btn" type="button" id="qRetry" hidden>Retry with new questions</button><span class="mono dim" id="qAtt" style="font-size:.78rem"></span></div><div class="result" id="qRes" aria-live="polite"></div>`;
+  const id=i=>`q${n}_${i}`;
+  function draw(){quiz=L.quiz(mulberry(seed));
+    $("#qs").innerHTML=quiz.map((q,i)=>`<div class="q"><div class="qh"><span class="mono dim">Q${i+1}</span><span class="qt">${q.type}</span></div><div class="qp">${q.q}</div>
+      ${q.kind==="mcq"?q.opts.map((o,j)=>`<label class="opt" id="${id(i)}o${j}"><input type="radio" name="${id(i)}" value="${j}"><span>${o.t}</span></label>`).join(""):`<input class="txt" id="${id(i)}in" type="text" inputmode="decimal" placeholder="your answer" autocomplete="off" style="max-width:240px">`}<div class="fb" id="${id(i)}fb"></div></div>`).join("");
+    $("#qSub").disabled=false;$("#qRetry").hidden=true;$("#qRes").className="result";$("#qAtt").textContent=P.att[n]?`attempts so far: ${P.att[n]}`:"";}
+  $("#qSub").addEventListener("click",()=>{
+    const missing=quiz.some((q,i)=>q.kind==="mcq"?!document.querySelector(`input[name=${id(i)}]:checked`):!$(`#${id(i)}in`).value.trim());
+    if(missing){$("#qRes").className="result show";$("#qRes").innerHTML='<span class="c-tok">Answer all 5 questions first.</span>';return;}
+    let score=0;const miss=[];
+    quiz.forEach((q,i)=>{const fb=$(`#${id(i)}fb`);let ok,msg;
+      if(q.kind==="mcq"){const j=+document.querySelector(`input[name=${id(i)}]:checked`).value,o=q.opts[j];ok=!!o.ok;msg=o.why;
+        q.opts.forEach((oo,k)=>{const el=$(`#${id(i)}o${k}`);el.classList.toggle("right",!!oo.ok);el.classList.toggle("wrong",k===j&&!oo.ok);el.querySelector("input").disabled=true;});
+        if(!ok)msg+=`<br><b class="c-out" style="display:inline">Right answer:</b> ${q.opts.find(o=>o.ok).t}`;}
+      else{const raw=$(`#${id(i)}in`).value.trim().replace(/,/g,""),v=Number(raw);[ok,msg]=isNaN(v)?[false,"That isn't a number I can read."]:q.check(v);$(`#${id(i)}in`).disabled=true;}
+      if(ok)score++;else miss.push(i+1);fb.className="fb show";fb.innerHTML=`<b class="${ok?"c-out":"c-err"}">${ok?"Correct":"Not quite"}</b>${msg}`;});
+    P.att[n]=(P.att[n]||0)+1;const pass=score>=4;if(pass&&!mastered(n))P.m.push(n);saveP();renderProgress();
+    $("#qSub").disabled=true;$("#qRetry").hidden=false;const nx=CONCEPTS[n];
+    $("#qRes").className="result show";$("#qRes").style.borderColor=pass?"var(--out)":"var(--err)";
+    $("#qRes").innerHTML=pass?`<h3 class="c-out">Mastered · ${score}/5</h3><p class="muted" style="margin-top:6px">${miss.length?`Review Q${miss.join(", Q")} before moving on. `:"No misconceptions detected. "}${nx?`Concept ${nx.n}, <b>${esc(nx.t)}</b>, is now unlocked.`:""}</p>${nx?`<div class="row" style="margin-top:10px"><button class="btn primary" type="button" id="goNext">Open ${nx.n}. ${esc(nx.t)} ▶</button></div>`:""}`
+      :`<h3 class="c-err">${score}/5. Not mastered yet (need 4)</h3><p class="muted" style="margin-top:6px">Read the feedback on Q${miss.join(", Q")}, revisit the matching step, then retry. The questions change each attempt.</p>`;
+    const g=$("#goNext");if(g)g.addEventListener("click",()=>openConcept(nx.n));
+    $("#nextStep").disabled=!mastered(n);$("#nextStep").title="";$("#qAtt").textContent=`attempts so far: ${P.att[n]}`;});
+  $("#qRetry").addEventListener("click",()=>{seed=(seed*7919+13)%1000003;draw();$("#qs").scrollIntoView({behavior:"smooth"});});
+  draw();
+}
+// quiz helpers
+const mcq=(type,q,opts,r)=>({type,kind:"mcq",q,opts:shuffle(opts.slice(),r)});
+const num=(type,q,ans,tol,good,hints)=>({type,kind:"num",q,check:v=>{if(Math.abs(v-ans)<=tol)return [true,good];for(const [x,m] of (hints||[]))if(Math.abs(v-x)<=tol)return [false,m];return [false,`The answer is ${ans}. ${good}`];}});
+const pre=s=>`<pre class="formula" style="margin-top:6px">${hl(s)}</pre>`;
+
+/* =================== NARRATOR (browser voices; English, Telugu, Hindi) =================== */
+const NV={lang:"en",rate:1,voice:"",queue:[],i:0,tok:0,playing:false,safety:null};
+try{const s=JSON.parse(localStorage.getItem("aieng.narr")||"{}");Object.assign(NV,{lang:s.lang||"en",rate:s.rate||1,voice:s.voice||""});}catch(e){}
+const saveNV=()=>{try{localStorage.setItem("aieng.narr",JSON.stringify({lang:NV.lang,rate:NV.rate,voice:NV.voice}));}catch(e){}};
+const synth=("speechSynthesis" in window)?window.speechSynthesis:null;
+const LCODE={en:"en",te:"te",hn:"hi"},BCP={en:"en-US",te:"te-IN",hn:"hi-IN"},LNAME={en:"English",te:"Telugu",hn:"Hindi"};
+const TESTP={en:"Hello! The narrator is working.",te:"నమస్కారం! వ్యాఖ్యాత పని చేస్తోంది.",hn:"नमस्ते! नैरेटर काम कर रहा है।"};
+const badVoices=new Set();let voices=[],lastHush=-1e9,liveUtts=[];
+const IS_SAFARI=/^((?!chrome|chromium|crios|android|edg).)*safari/i.test(navigator.userAgent);
+function loadVoices(){try{voices=synth?synth.getVoices():[];}catch(e){voices=[];}fillVoices();}
+const voicesFor=l=>voices.filter(v=>(v.lang||"").toLowerCase().replace("_","-").startsWith(LCODE[l]));
+function vKey(v){return v?v.voiceURI:"__default";}
+function vLabel(v){return v?`${v.name} (${v.localService?"offline":"online"})`:`device default ${BCP[NV.lang]}`;}
+function candidates(l){const vs=voicesFor(l),pref=vs.find(v=>v.voiceURI===NV.voice);return [...(pref?[pref]:[]),...vs.filter(v=>v.localService&&v!==pref),...vs.filter(v=>!v.localService&&v!==pref),null].filter(v=>!badVoices.has(vKey(v)));}
+function fillVoices(){const sel=$("#nbVoice");if(!sel)return;const vs=voicesFor(NV.lang),c0=candidates(NV.lang)[0];sel.innerHTML=vs.map(v=>`<option value="${esc(v.voiceURI)}"${c0&&v.voiceURI===c0.voiceURI?" selected":""}>${esc(v.name)} · ${v.localService?"offline":"online"}</option>`).join("")+`<option value=""${vs.length?"":" selected"}>device default (${BCP[NV.lang]})</option>`;}
+if(synth){loadVoices();try{synth.addEventListener?synth.addEventListener("voiceschanged",loadVoices):(synth.onvoiceschanged=loadVoices);}catch(e){}setTimeout(loadVoices,700);setTimeout(loadVoices,2500);}
+function setStat(m,bad){const s=$("#nbStat");s.textContent=m;s.style.color=bad?"var(--err)":"var(--muted)";}
+function hush(){try{if(synth&&(synth.speaking||synth.pending)){synth.cancel();lastHush=performance.now();}}catch(e){}}
+const chunksOf=t=>t.split(/(?<=[.!?।])\s+/).map(s=>s.trim()).filter(Boolean);
+function speakText(text,tok,onDone,est,tried){
+  tried=tried||[];if(!synth){NV.safety=setTimeout(onDone,est);return;}
+  const cands=candidates(NV.lang),giveUp=m=>{if(tok!==NV.tok)return;setStat(m,true);clearTimeout(NV.safety);NV.safety=setTimeout(onDone,est);};
+  if(!cands.length){giveUp(`No voice produced sound${tried.length?" (tried: "+tried.join(", ")+")":""}. Captions continue.${NV.lang!=="en"?` For ${LNAME[NV.lang]}, open this page in Microsoft Edge, or add a ${LNAME[NV.lang]} voice in your device's speech settings.`:""}`);return;}
+  const v=cands[0],parts=chunksOf(text);let started=false,doneN=0,dead=false;
+  const retry=why=>{if(dead)return;dead=true;badVoices.add(vKey(v));tried.push(`${vLabel(v)}: ${why}`);hush();clearTimeout(NV.safety);setTimeout(()=>{if(tok===NV.tok)speakText(text,tok,onDone,est,tried);},200);};
+  const go=()=>{if(tok!==NV.tok)return;try{synth.resume();}catch(e){}
+    liveUtts=parts.map(p=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.lang=v?v.lang:BCP[NV.lang];u.rate=NV.rate;
+      u.onstart=()=>{if(!started){started=true;if(v)NV.voice=v.voiceURI;setStat(`Speaking with ${vLabel(v)}`);}};
+      u.onend=()=>{if(tok!==NV.tok||dead)return;if(++doneN===parts.length){clearTimeout(NV.safety);setTimeout(onDone,300);}};
+      u.onerror=e=>{if(e.error==="interrupted"||e.error==="canceled"||dead||tok!==NV.tok)return;if(e.error==="not-allowed"){dead=true;giveUp("The browser blocked speech. Tap ▶ or Test voice.");return;}if(!started)retry("error "+e.error);};return u;});
+    liveUtts.forEach(u=>synth.speak(u));NV.safety=setTimeout(onDone,est*2.5+6000);
+    setTimeout(()=>{if(tok===NV.tok&&!started&&!dead)retry("no sound");},v&&!v.localService?4000:2500);};
+  hush();const since=performance.now()-lastHush;if(!IS_SAFARI&&since<250)setTimeout(go,250-since);else go();
+}
+function narrHalt(){NV.tok++;clearTimeout(NV.safety);hush();}
+function narrStart(){narrHalt();const L=C[cur.n];if(!L||!L.narr)return;NV.queue=L.narr.map(s=>({...s,done:false}));NV.i=0;NV.playing=true;$("#narrBar").hidden=false;document.body.classList.add("narrating");loadVoices();runSeg();}
+function narrStop(){narrHalt();NV.playing=false;$$(".narr-hi").forEach(e=>e.classList.remove("narr-hi"));$("#narrBar").hidden=true;document.body.classList.remove("narrating");}
+function runSeg(){
+  const tok=++NV.tok;clearTimeout(NV.safety);const it=NV.queue[NV.i];
+  if(!it){NV.playing=false;hush();$("#nbPlay").textContent="Replay";$("#nbText").textContent={en:"Finished. Now explore each step, then take the check.",te:"పూర్తయింది. ఇప్పుడు ప్రతి స్టెప్‌ను చూసి, తర్వాత చెక్ రాయండి.",hn:"पूरा हुआ। अब हर स्टेप देखिए, फिर चेक दीजिए।"}[NV.lang];return;}
+  $("#nbPlay").textContent="Pause";const text=it[NV.lang]||it.en;
+  $("#nbTitle").textContent=`${CONCEPTS[cur.n-1].t} · ${STEPS[it.step][0]} · ${NV.i+1}/${NV.queue.length}`;$("#nbText").textContent=text;$("#nbText").lang=BCP[NV.lang];
+  $("#nbProg").style.width=((NV.i+1)/NV.queue.length*100)+"%";
+  const est=Math.max(2500,text.length/(NV.lang==="en"?14:11)/NV.rate*1000);
+  speakText(text,tok,()=>{if(tok!==NV.tok||!NV.playing)return;NV.i++;runSeg();},est);
+  if(cur.step!==it.step)setStep(it.step,true);
+  $$(".narr-hi").forEach(e=>e.classList.remove("narr-hi"));
+  const el=it.sel?document.querySelector(it.sel):null;if(el){el.classList.add("narr-hi");el.scrollIntoView({behavior:"smooth",block:"center"});}
+  if(it.act&&!it.done){it.done=true;setTimeout(()=>{try{it.act();}catch(e){}},150);}
+}
+$("#nbLang").value=NV.lang;$("#nbRate").value=String(NV.rate);
+const restartSeg=()=>{if(NV.playing&&NV.i<NV.queue.length){narrHalt();runSeg();}};
+$("#nbLang").addEventListener("change",e=>{NV.lang=e.target.value;NV.voice="";saveNV();fillVoices();restartSeg();});
+$("#nbRate").addEventListener("change",e=>{NV.rate=+e.target.value;saveNV();restartSeg();});
+$("#nbVoice").addEventListener("change",e=>{NV.voice=e.target.value;badVoices.delete(e.target.value||"__default");saveNV();restartSeg();});
+$("#nbPlay").addEventListener("click",()=>{if(NV.playing){narrHalt();NV.playing=false;$("#nbPlay").textContent="Resume";}else{if(NV.i>=NV.queue.length){NV.i=0;NV.queue.forEach(q=>q.done=false);}NV.playing=true;runSeg();}});
+$("#nbPrev").addEventListener("click",()=>{narrHalt();NV.i=Math.max(0,NV.i-1);if(NV.queue[NV.i])NV.queue[NV.i].done=false;NV.playing=true;runSeg();});
+$("#nbNext").addEventListener("click",()=>{narrHalt();NV.i=Math.min(NV.queue.length,NV.i+1);NV.playing=true;runSeg();});
+$("#nbStop").addEventListener("click",narrStop);
+$("#nbTest").addEventListener("click",()=>{if(!synth){setStat("This browser has no speech engine. Try Chrome, Edge or Safari.",true);return;}if(NV.playing){NV.playing=false;$("#nbPlay").textContent="Resume";}narrHalt();badVoices.clear();loadVoices();const t=NV.tok;setStat(`Testing ${LNAME[NV.lang]} voices…`);speakText(TESTP[NV.lang],t,()=>{},3500);});
+
+/* =================== CONCEPT 1 · PYTHON FUNDAMENTALS =================== */
+C[1]={
+ sub:"What a program is, how Python runs it line by line, and why Python became the language of AI.",
+ leads:["Variables and Data Types"],
+ idea:{
+  def:"<b>Python</b> is a programming language: a precise, readable way to give a computer step-by-step instructions. A <b>program</b> is a plain text file (ending in <code>.py</code>) full of <b>statements</b>. The <b>Python interpreter</b> reads that file and carries out the statements one at a time, from top to bottom.",
+  why:"Computers only follow exact instructions. Python makes those instructions short and readable, and it has the biggest collection of AI libraries (NumPy, pandas, scikit-learn, PyTorch, Hugging Face). Almost every AI system you'll build in this path is written or controlled in Python.",
+  analogy:"A recipe card read by a very literal cook. The cook does exactly what each line says, in order, and stops at the first line that makes no sense, even if it's only a spelling mistake.",
+  bank:"A nightly script reads the day's transactions, totals deposits and withdrawals per branch, and emails a summary. That script is a Python program: a list of steps the computer repeats every night without getting tired.",
+  real:["Data preparation: cleaning millions of loan records with pandas (Stage 3)","Model training: the training loop of a credit-risk model or an LLM (Stages 4, 6, 16)","Serving: a FastAPI service that scores applications in real time (Stage 15)","Agents: Python code that lets an LLM call tools and APIs (Stage 14)"]},
+ how:{intro:"Step through a real program. Watch which line runs, how the computer remembers values, and what gets printed. The interpreter never skips ahead or goes back unless the code tells it to.",
+  mount(h){const code='# Daily branch summary\nbranch = "Hyderabad Main"\ndeposits = 125000\nwithdrawals = 48000\nnet = deposits - withdrawals\nprint("Branch:", branch)\nprint("Net cash flow:", net)';
+   const B=["\"Hyderabad Main\"","str"],D=["125000","int"],Wd=["48000","int"],N=["77000","int"];
+   stepper(h,code,[{l:0,v:{},n:"A <b>comment</b>. Everything after <code>#</code> is for humans, so Python ignores it."},
+    {l:1,v:{branch:B},n:"Python creates the text <code>\"Hyderabad Main\"</code> and attaches the name <b>branch</b> to it."},
+    {l:2,v:{branch:B,deposits:D},n:"A whole number, 125000, gets the name <b>deposits</b>."},
+    {l:3,v:{branch:B,deposits:D,withdrawals:Wd},n:"Another number, named <b>withdrawals</b>."},
+    {l:4,v:{branch:B,deposits:D,withdrawals:Wd,net:N},n:"The right side is worked out first: 125000 − 48000 = 77000. Then the result is named <b>net</b>."},
+    {l:5,v:{branch:B,deposits:D,withdrawals:Wd,net:N},o:"Branch: Hyderabad Main",n:"<code>print</code> shows values on the screen. Commas separate the values, and print puts a space between them."},
+    {l:6,v:{branch:B,deposits:D,withdrawals:Wd,net:N},o:"Net cash flow: 77000",n:"The last line runs and the program ends. Every line ran once, top to bottom."}]);}},
+ math:{intro:"There's no formula for this concept, but there is an important mechanism: Python first translates your code into <b>bytecode</b>, simple instructions for a <b>stack machine</b>, then runs those instructions. Step through how <code>net = deposits - withdrawals</code> really executes.",
+  mount(h){const ins=[["LOAD_NAME","deposits","Push the value named deposits onto the stack",["125000"]],["LOAD_NAME","withdrawals","Push the value named withdrawals",["125000","48000"]],["BINARY_OP","-","Pop the top two values, subtract, push the result",["77000"]],["STORE_NAME","net","Pop the result and attach the name net to it",[]]];
+   h.innerHTML=`<div class="grid2"><div class="box"><div class="eyebrow" style="margin-bottom:6px">Bytecode for line 5 (what <code>dis</code> shows)</div><div id="bcList" style="display:grid;gap:6px"></div><div class="row" style="margin-top:10px"><button class="btn primary sm" type="button" id="bcNext">Next instruction ▶</button><button class="btn sm" type="button" id="bcReset">Reset</button></div></div><div class="box"><div class="eyebrow" style="margin-bottom:6px">The stack</div><div id="bcStack" style="min-height:120px;display:flex;flex-direction:column-reverse;gap:6px;justify-content:flex-start"></div><p class="note" id="bcNote" style="margin-top:10px">Press Next instruction.</p></div></div>
+   <div class="box scroll"><div class="eyebrow" style="margin-bottom:6px">Interpreted vs compiled</div><table class="t"><tr><th></th><th>Python (interpreted)</th><th>C / C++ / Rust (compiled)</th></tr><tr><td>How it runs</td><td>Source → bytecode → interpreter, at run time</td><td>Source → machine code before running</td></tr><tr><td>Speed of pure loops</td><td>Slower (roughly 10–100×)</td><td>Fast</td></tr><tr><td>Speed to write and change</td><td>Very fast</td><td>Slower</td></tr><tr><td>In AI</td><td>Controls everything; heavy maths is handed to C/CUDA libraries</td><td>Inside those libraries (NumPy, PyTorch kernels)</td></tr></table></div>
+   <p class="muted">That last row is the key idea: when you write <code>a @ b</code> on two big matrices in NumPy or PyTorch, Python only <i>asks</i> optimised C or GPU code to do the multiplication. You get Python's simplicity and C's speed.</p>`;
+   let k=0;const draw=()=>{$("#bcList").innerHTML=ins.map((x,i)=>`<div class="row" style="padding:6px 8px;border-radius:8px;border:1px solid ${i===k-1?"var(--tok)":"var(--line)"};font-family:var(--f-mono);font-size:.84rem;opacity:${i<k?1:.55}"><b style="min-width:96px">${x[0]}</b><span class="c-emb">${x[1]}</span></div>`).join("");
+    const st=k?ins[k-1][3]:[];$("#bcStack").innerHTML=st.length?st.map(v=>`<div style="padding:8px;border-radius:8px;background:var(--panel2);border:1px solid var(--line2);font-family:var(--f-mono);text-align:center">${v}</div>`).join(""):'<span class="dim mono" style="font-size:.8rem">(empty)</span>';
+    $("#bcNote").innerHTML=k?ins[k-1][2]+(k===4?". Done: <b>net</b> → 77000.":""):"Press Next instruction.";$("#bcNext").disabled=k>=ins.length;};
+   $("#bcNext").addEventListener("click",()=>{k++;draw();});$("#bcReset").addEventListener("click",()=>{k=0;draw();});draw();}},
+ code:{file:"loan_summary.py",intro:"Your first complete program. Read each line with its explanation, then run it. Python really runs here in your browser.",
+  lines:[["# loan_summary.py: my first Python program","A comment: notes for people. Python skips it."],["customer = \"Asha Rao\"","Text goes inside quotes. This is called a string."],["loan_amount = 500000","A whole number (an integer). No commas or ₹ inside numbers."],["annual_rate = 9.5","A number with a decimal point (a float)."],["print(\"Customer:\", customer)","print shows its values, separated by spaces."],["print(\"Loan amount:\", loan_amount)","The name is replaced by its value, 500000."],["print(\"Yearly interest:\", loan_amount * annual_rate / 100)","Python works out the maths first: 500000 × 9.5 ÷ 100 = 47500.0, then prints it."]],
+  expected:"Customer: Asha Rao\nLoan amount: 500000\nYearly interest: 47500.0",
+  tryThis:"Try it: change the rate to 11, add a line that prints the monthly interest (divide by 12), or misspell <code>print</code> to see what an error looks like."},
+ pitfalls:{mistakes:[
+   {t:"Python is case-sensitive",err:"NameError",bad:'Print("Approved")',good:'print("Approved")',why:"<code>Print</code> and <code>print</code> are different names to Python. Only the lowercase one exists, so the capitalised one stops the program with a NameError."},
+   {t:"Unexpected indentation",err:"IndentationError",bad:'total = 100\n    print(total)',good:'total = 100\nprint(total)',why:"In Python, spaces at the start of a line mean something: they mark a block (you'll use this with if and loops). A stray indent is an error."},
+   {t:"Unclosed quotes or brackets",err:"SyntaxError",bad:'print("Loan approved)',good:'print("Loan approved")',why:"Every opening quote or bracket needs a matching closing one. The error is reported where Python got confused, which can be the line after the real mistake."},
+   {t:"Old Python 2 tutorials",err:"SyntaxError",bad:'print "Hello"',good:'print("Hello")',why:"Python 2 ended in 2020. Use Python 3.10 or newer, where print is a function and always needs brackets."}],
+  tradeoffs:`<table class="t"><tr><th>Choice</th><th>Good for</th><th>Watch out for</th></tr><tr><td>Notebook (Jupyter)</td><td>Exploring data, trying models, charts</td><td>Cells run out of order; hard to test and deploy</td></tr><tr><td>Script / package (<code>.py</code>)</td><td>Pipelines, training jobs, APIs</td><td>Needs structure (modules, tests)</td></tr><tr><td>Python vs Java/Go for serving</td><td>Python: same language as the model</td><td>Python is slower for pure loops; heavy work must go to libraries</td></tr></table>`,
+  production:`<ul><li>Teams explore in notebooks, then move the code into <code>.py</code> modules with tests before anything reaches production.</li><li>Code style follows <b>PEP 8</b> and is checked automatically (ruff, black), because many people read the same code.</li><li>Python is the "glue": it loads data, calls C/CUDA libraries for the maths, and wires models into APIs. Performance problems are usually solved by moving loops into those libraries (Stage 3, NumPy).</li></ul>`},
+ practice:{title:"Fix the loan receipt",task:"This program has <b>three bugs</b>. Fix them so it prints exactly these three lines:<pre class=\"formula\" style=\"margin-top:8px\">=== Loan Receipt ===\nCustomer: Ravi Kumar\nAmount: 300000</pre>Press Run to see the first error, fix it, run again, and repeat.",
+  starter:'# Fix the 3 bugs\nPrint("=== Loan Receipt ===")\nprint("Customer:" "Ravi Kumar")\n  print("Amount:", 300000)',
+  checks:["The program runs without errors","Line 1 is “=== Loan Receipt ===”","Line 2 is “Customer: Ravi Kumar” (with a space)","Line 3 is “Amount: 300000”"],
+  tests:'g, out = run_user()\nlines = out.strip().split("\\n")\ncheck("runs", True)\ncheck("l1", len(lines) > 0 and lines[0].strip() == "=== Loan Receipt ===")\ncheck("l2", len(lines) > 1 and lines[1].strip() == "Customer: Ravi Kumar")\ncheck("l3", len(lines) > 2 and lines[2].strip() == "Amount: 300000")',
+  hint:"1) <code>Print</code> must be lowercase. 2) Two strings next to each other are glued together with no space: use a comma between <code>\"Customer:\"</code> and <code>\"Ravi Kumar\"</code>. 3) Remove the spaces before the last <code>print</code>.",
+  solution:'print("=== Loan Receipt ===")\nprint("Customer:", "Ravi Kumar")\nprint("Amount:", 300000)',
+  project:"Install Python 3.12 from python.org (or use VS Code with the Python extension). Create <code>loan_summary.py</code>, paste the program from the Code step, and run <code>python loan_summary.py</code> in a terminal. Getting this working on your own machine is the real first milestone."},
+ quiz(r){const a=1000*(40+Math.floor(r()*80)),b=1000*(5+Math.floor(r()*30)),k=4+Math.floor(r()*3);
+  const prints=Array.from({length:k},(_,i)=>`print("step ${i+1}")`);const ci=1+Math.floor(r()*(k-1));prints[ci]="# "+prints[ci];
+  return [
+   mcq("Predict the output",`What does this print?${pre(`deposits = ${a}\nwithdrawals = ${b}\nprint("Net:", deposits - withdrawals)`)}`,[
+    {t:`<code>Net: ${a-b}</code>`,ok:true,why:"The subtraction is worked out first, then print separates its two values with a space."},
+    {t:`<code>Net:${a-b}</code>`,why:"print puts a space between values separated by commas."},
+    {t:`<code>Net: deposits - withdrawals</code>`,why:"Only text inside quotes is printed literally. Names and maths outside quotes are evaluated."},
+    {t:"An error",why:"Both names exist and are numbers, so subtraction works."}],r),
+   mcq("Conceptual","What does the Python interpreter do with your <code>.py</code> file?",[
+    {t:"Translates it to bytecode, then executes the statements one by one from top to bottom",ok:true,why:"Correct. That's why an error on line 10 still lets lines 1–9 run."},
+    {t:"Runs all lines at the same time",why:"Statements run in order, one after another."},
+    {t:"Turns it into a Windows .exe before running",why:"Python doesn't produce machine-code executables by default. It compiles to bytecode and interprets it."},
+    {t:"Checks only the last line",why:"Every statement runs, in order."}],r),
+   mcq("Debugging",`Which error does this program raise?${pre('print("Loan approved")\nPrint("EMI ready")')}`,[
+    {t:"NameError on line 2, after line 1 has already printed",ok:true,why:"Case matters: <code>Print</code> doesn't exist. Line 1 runs first, so its output appears before the error."},
+    {t:"SyntaxError before anything runs",why:"The syntax is valid. The problem is an unknown name, found only when line 2 runs."},
+    {t:"No error; both lines print",why:"<code>Print</code> with a capital P is not defined."},
+    {t:"IndentationError",why:"Nothing is indented."}],r),
+   num("Trace",`How many lines does this program print?${pre(prints.join("\n"))}`,k-1,0,`Lines starting with # are comments and never run, so ${k-1} lines are printed.`,[[k,"One of those lines is a comment (it starts with #), so it doesn't run."]]),
+   mcq("Production","Why is Python the main language of AI even though pure Python loops are slow?",[
+    {t:"Python is readable and has the AI libraries; the heavy maths runs inside optimised C/CUDA code those libraries call",ok:true,why:"Correct. Python orchestrates, and compiled code does the number crunching."},
+    {t:"Python is the fastest programming language",why:"Pure Python is much slower than C or Rust. Its speed in AI comes from libraries."},
+    {t:"Only Python can run on GPUs",why:"GPUs are programmed with CUDA (C++). Python calls into that code."},
+    {t:"AI models are written in English, which Python understands",why:"Python doesn't understand English. It's a precise language with strict rules."}],r)];},
+ narr:[
+  {step:0,sel:"#idDef",en:"Python is a programming language. A program is a text file of statements, and the Python interpreter runs them one at a time, from top to bottom.",te:"పైథాన్ ఒక ప్రోగ్రామింగ్ భాష. ప్రోగ్రామ్ అంటే స్టేట్‌మెంట్‌లు ఉన్న టెక్స్ట్ ఫైల్. పైథాన్ ఇంటర్‌ప్రెటర్ వాటిని పై నుంచి కిందికి ఒక్కొక్కటిగా నడుపుతుంది.",hn:"पाइथन एक प्रोग्रामिंग भाषा है। प्रोग्राम स्टेटमेंट से भरी एक टेक्स्ट फ़ाइल है, और पाइथन इंटरप्रेटर उन्हें ऊपर से नीचे, एक-एक करके चलाता है।"},
+  {step:0,sel:"#idWhy",en:"Python is readable, and it has the biggest collection of AI libraries, so almost every AI system is built or controlled with it.",te:"పైథాన్ సులభంగా చదవగలిగేది, దానికి అతిపెద్ద ఏఐ లైబ్రరీల సేకరణ ఉంది. అందుకే దాదాపు ప్రతి ఏఐ సిస్టమ్ దానితోనే తయారవుతుంది.",hn:"पाइथन पढ़ने में आसान है, और इसके पास एआई लाइब्रेरी का सबसे बड़ा संग्रह है, इसलिए लगभग हर एआई सिस्टम इसी से बनता है।"},
+  {step:0,sel:"#idAna",en:"Think of a recipe card and a very literal cook. The cook follows each line exactly, in order, and stops at the first line that makes no sense.",te:"ఒక వంటకం కార్డు, అక్షరాలా పాటించే వంటవాడిని ఊహించండి. అతను ప్రతి లైన్‌ను క్రమంగా అలాగే పాటిస్తాడు, అర్థం కాని మొదటి లైన్ దగ్గర ఆగిపోతాడు.",hn:"एक रेसिपी कार्ड और एक बिल्कुल शब्दशः चलने वाले रसोइये की कल्पना कीजिए। वह हर लाइन ठीक क्रम में करता है, और पहली बेतुकी लाइन पर रुक जाता है।"},
+  {step:1,sel:"#howHost",en:"Press Next line to watch the program run. Each line runs once, values get names, and print shows results on the screen.",te:"ప్రోగ్రామ్ నడవడం చూడటానికి నెక్స్ట్ లైన్ నొక్కండి. ప్రతి లైన్ ఒకసారి నడుస్తుంది, విలువలకు పేర్లు వస్తాయి, ప్రింట్ ఫలితాలను తెరపై చూపిస్తుంది.",hn:"प्रोग्राम चलते देखने के लिए नेक्स्ट लाइन दबाइए। हर लाइन एक बार चलती है, मानों को नाम मिलते हैं, और प्रिंट नतीजे स्क्रीन पर दिखाता है।"},
+  {step:3,sel:"#codeList",en:"Here is your first complete program, explained line by line. Run it, then change the numbers and run it again.",te:"ఇది మీ మొదటి పూర్తి ప్రోగ్రామ్, లైన్ వారీగా వివరించబడింది. దాన్ని నడపండి, తర్వాత సంఖ్యలు మార్చి మళ్లీ నడపండి.",hn:"यह आपका पहला पूरा प्रोग्राम है, लाइन दर लाइन समझाया गया। इसे चलाइए, फिर नंबर बदलकर दोबारा चलाइए।"}]
+};
+
+/* =================== CONCEPT 2 · VARIABLES AND DATA TYPES =================== */
+function exactDouble(x){const dv=new DataView(new ArrayBuffer(8));dv.setFloat64(0,x);const hi=dv.getUint32(0),lo=dv.getUint32(4);const sign=hi>>>31,ex=(hi>>>20)&0x7ff;let mant=(BigInt(hi&0xfffff)<<32n)|BigInt(lo);
+  const bits=sign+" "+ex.toString(2).padStart(11,"0")+" "+mant.toString(2).padStart(52,"0");if(ex===0x7ff)return {bits,dec:String(x)};
+  let e=ex===0?-1074:ex-1075;if(ex!==0)mant|=1n<<52n;let s;
+  if(e>=0)s=(mant<<BigInt(e)).toString();else{const k=-e,num=mant*5n**BigInt(k);let str=num.toString().padStart(k+1,"0");s=(str.slice(0,str.length-k)+"."+str.slice(str.length-k)).replace(/0+$/,"").replace(/\.$/,"");}
+  return {bits,dec:(sign?"-":"")+s};}
+const pyRepr=v=>{if(typeof v==="boolean")return v?"True":"False";if(Number.isInteger(v)&&Math.abs(v)<1e16)return String(v);let s=String(v);if(/e/.test(s))s=s.replace(/e([+-])(\d)$/,"e$10$2").replace(/e(\d)/,"e+$1");return s;};
+C[2]={
+ sub:"Names that point to values, the five basic types, and why money should never be a float.",
+ builds:["Python Fundamentals"],leads:["Operators and Expressions"],
+ idea:{
+  def:"A <b>variable</b> is a <b>name</b> that refers to a value stored in memory. You create one with <code>=</code>: <code>age = 34</code>. Every value has a <b>data type</b> that decides what you can do with it. The basic ones are <code>int</code> (whole numbers), <code>float</code> (decimals), <code>str</code> (text), <code>bool</code> (True/False) and <code>None</code> (no value).",
+  why:"Programs need to remember data and reuse it: an applicant's income, a score, a decision. Types stop nonsense: you can add two numbers, but adding a number to a name makes no sense, so Python refuses.",
+  analogy:"Variables are <b>name tags</b>, not boxes. <code>age = 34</code> ties the tag “age” to the value 34. <code>b = a</code> adds a second tag to the <i>same</i> value; it doesn't copy it.",
+  bank:"A loan application is a set of typed values: name <code>str</code>, age <code>int</code>, monthly income <code>float</code>, is_salaried <code>bool</code>, guarantor <code>None</code> if there isn't one. A web form sends <i>everything</i> as text, so converting types is daily work.",
+  real:["Model inputs: features are numbers (float32), token IDs are int64, labels are int or bool","Data cleaning: a “price” column read as str must be converted before any maths (Stage 3)","APIs: request fields are validated by type with pydantic (Stage 15)","Memory: float32 vs float16 vs int8 decides whether an LLM fits on a device (Stage 18)"]},
+ how:{intro:"Step through the assignments and watch the name tags. Notice what happens to <b>backup</b> when <b>balance</b> changes: Python never changes the number 1000. It moves the tag to a new value.",
+  mount(h){const code='balance = 1000\nbackup = balance\nbalance = balance + 500\nname = "Asha"\nis_active = True\nguarantor = None\nprint(balance, backup, type(name))';
+   const OB={a:["1000","int"],b:["1500","int"],c:["\"Asha\"","str"],d:["True","bool"],e:["None","NoneType"]};
+   const S=[{l:0,t:{balance:"a"},n:"Python creates the value 1000 (an <b>int</b>) and ties the tag <b>balance</b> to it."},{l:1,t:{balance:"a",backup:"a"},n:"<b>backup</b> is tied to the <i>same</i> value. Nothing is copied: there's one 1000 with two tags."},{l:2,t:{balance:"b",backup:"a"},n:"The right side is computed first (1500, a new value), then the <b>balance</b> tag moves to it. <b>backup</b> still points at 1000."},{l:3,t:{balance:"b",backup:"a",name:"c"},n:"Text in quotes is a <b>str</b>."},{l:4,t:{balance:"b",backup:"a",name:"c",is_active:"d"},n:"<b>True</b> and <b>False</b> (capitalised) are the two <b>bool</b> values."},{l:5,t:{balance:"b",backup:"a",name:"c",is_active:"d",guarantor:"e"},n:"<b>None</b> means “no value yet”. It's not 0 and not an empty string."},{l:6,t:{balance:"b",backup:"a",name:"c",is_active:"d",guarantor:"e"},o:"1500 1000 <class 'str'>",n:"<code>type()</code> tells you any value's type."}];
+   stepper(h,code,S.map(s=>({l:s.l,o:s.o,n:s.n,t:s.t})),{custom:(el,k,st)=>{const t=st?st.t:{};const used=[...new Set(Object.values(t))];
+     el.innerHTML=`<div class="eyebrow" style="margin-bottom:6px">Name tags → values in memory</div><div class="grid2" style="gap:10px;grid-template-columns:minmax(0,1fr) minmax(0,1fr)"><div style="display:grid;gap:6px;align-content:start">${Object.entries(t).map(([n,o])=>`<div class="row" style="gap:6px;font-family:var(--f-mono);font-size:.84rem;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:4px 8px"><b>${n}</b><span class="dim">→</span><span class="c-tok">#${"abcde".indexOf(o)+1}</span></div>`).join("")||'<span class="dim mono" style="font-size:.8rem">(no names yet)</span>'}</div><div style="display:grid;gap:6px;align-content:start">${Object.keys(OB).filter(o=>used.includes(o)||(o==="a"&&k>=0)).map(o=>{const refs=Object.entries(t).filter(([,v])=>v===o).map(([n])=>n);return `<div style="border:1px solid ${refs.length?"var(--line2)":"var(--line)"};border-radius:8px;padding:6px 8px;background:var(--panel2);opacity:${refs.length?1:.5}"><div class="row" style="justify-content:space-between"><span class="mono c-tok">#${"abcde".indexOf(o)+1} ${esc(OB[o][0])}</span><span class="pill">${OB[o][1]}</span></div><div class="mono dim" style="font-size:.72rem">tags: ${refs.join(", ")||"none"}</div></div>`;}).join("")}</div></div>`;}});}},
+ math:{intro:"Inside the computer every value is bits. Integers are stored exactly. Floats use 64-bit <b>IEEE 754</b> binary scientific notation, which cannot represent most decimals exactly. Type an amount and see what is <i>really</i> stored.",
+  mount(h){h.innerHTML=`<div class="formula">float value = (−1)^sign × 1.mantissa (binary) × 2^(exponent − 1023)
+             1 bit         52 bits                 11 bits</div>
+   <div class="box"><div class="row" style="margin-bottom:10px"><label class="f" style="flex:1 1 200px">a decimal amount<input class="txt" id="fpIn" type="text" value="0.1"></label><div class="row" style="align-self:end">${["0.1","0.25","19.99","1234567.89","0.3"].map(v=>`<button class="btn sm" type="button" data-fp="${v}">${v}</button>`).join("")}</div></div><div id="fpOut" style="display:grid;gap:8px"></div></div>
+   <div class="grid2"><div class="box"><div class="eyebrow" style="margin-bottom:6px">Add ₹0.10 ten times with floats</div><div id="fpSum" class="console" style="max-height:none"></div></div><div class="box"><div class="eyebrow" style="margin-bottom:6px">Why banks care</div><p>Rounding errors of 0.00000000000000006 look tiny, but across 10 crore transactions, interest postings and reconciliations they produce totals that don't match. Store money as <b>integer paise</b> (₹19.99 → 1999) or use Python's <code>Decimal</code>, which works in base 10 exactly.</p><div class="formula" style="margin-top:8px">0.1 + 0.2              → 0.30000000000000004
+Decimal("0.1") + Decimal("0.2") → 0.3
+10 + 20 (paise)        → 30</div></div></div>
+   <div class="box"><div class="eyebrow" style="margin-bottom:6px">Integers are exact (and unlimited in Python)</div><div class="row"><label class="f" style="flex:1 1 200px">an integer<input class="txt" id="intIn" type="text" value="85000"></label></div><div id="intOut" class="formula" style="margin-top:8px"></div></div>`;
+   const fp=()=>{const x=parseFloat($("#fpIn").value);if(isNaN(x)){$("#fpOut").innerHTML='<span class="muted">Type a number.</span>';return;}const d=exactDouble(x),[s,e,m]=d.bits.split(" "),raw=$("#fpIn").value.trim(),nrm=raw.includes(".")?raw.replace(/0+$/,"").replace(/\.$/,""):raw,exact=d.dec===nrm||d.dec===String(x)&&/^-?\d+$/.test(d.dec);
+    $("#fpOut").innerHTML=`<div class="scroll"><div class="mono" style="font-size:.74rem;white-space:nowrap"><span class="c-err">${s}</span> <span class="c-emb">${e}</span> <span class="c-tok">${m}</span></div></div><div class="mono dim" style="font-size:.72rem"><span class="c-err">sign</span> · <span class="c-emb">exponent (11 bits)</span> · <span class="c-tok">mantissa (52 bits)</span></div><div>Exactly stored value:</div><div class="formula" style="white-space:normal;overflow-wrap:anywhere">${d.dec}</div><div class="${exact?"c-out":"c-tok"}">${exact?"Stored exactly.":"Not exact: the nearest binary fraction is stored. Python prints the shortest form that rounds back to it, which hides the error."}</div>`;};
+   $("#fpIn").addEventListener("input",fp);$$("[data-fp]").forEach(b=>b.addEventListener("click",()=>{$("#fpIn").value=b.dataset.fp;fp();}));fp();
+   let s=0,lines=["total = 0.0"];for(let i=1;i<=10;i++){s+=0.1;lines.push(`after ${String(i).padStart(2)} additions: ${pyRepr(s)}`);}lines.push(`total == 1.0  → ${pyRepr(s===1)}`);$("#fpSum").textContent=lines.join("\n");
+   const it=()=>{const v=$("#intIn").value.trim();let b;try{b=BigInt(v);}catch(e){$("#intOut").textContent="Type a whole number.";return;}const bin=(b<0n?-b:b).toString(2);$("#intOut").textContent=`${v} in binary = ${b<0n?"-":""}${bin}\n${bin.length} bits · Python ints grow as needed, so 2**100 = ${(2n**100n).toString()} is exact.`;};
+   $("#intIn").addEventListener("input",it);it();}},
+ code:{file:"applicant.py",intro:"The five basic types on a real loan applicant, type conversion, and the float-vs-Decimal lesson in code.",
+  lines:[["applicant = \"Asha Rao\"","str: text in quotes"],["age = 34","int: a whole number"],["monthly_income = 85000.0","float: has a decimal point"],["is_salaried = True","bool: True or False, capitalised"],["guarantor = None","None: deliberately “no value”"],["print(type(age), type(monthly_income), type(is_salaried), type(guarantor))","type() reports each value's type"],["income_text = \"85000\"","Web forms and CSV files give you text, even for numbers"],["yearly = int(income_text) * 12","int() converts text to a number before maths. Without it, \"85000\" * 12 repeats the text 12 times!"],["print(yearly)","1020000"],["print(0.1 + 0.2)","Float rounding shows up: 0.30000000000000004"],["from decimal import Decimal","Decimal does exact base-10 maths"],["print(Decimal(\"0.1\") + Decimal(\"0.2\"))","Prints 0.3 exactly. Create Decimals from strings, not floats."],["print(f\"{applicant} earns ₹{monthly_income:,.2f} per month\")","An f-string puts values inside text. :,.2f means thousands separators and 2 decimals."]],
+  expected:"<class 'int'> <class 'float'> <class 'bool'> <class 'NoneType'>\n1020000\n0.30000000000000004\n0.3\nAsha Rao earns ₹85,000.00 per month",
+  tryThis:"Try it: remove <code>int(...)</code> on line 8 and run it. Then try <code>print(\"85000\" + 12)</code> and read the TypeError."},
+ pitfalls:{mistakes:[
+   {t:"Mixing text and numbers",err:"TypeError",bad:'income = "85000"\nprint(income + 5000)',good:'income = int("85000")\nprint(income + 5000)',why:"Values from forms, files and input() are strings. Convert them with int() or float() before doing maths."},
+   {t:"Using float for money",bad:'fee = 0.1 + 0.2\nprint(fee == 0.3)   # False',good:'from decimal import Decimal\nfee = Decimal("0.1") + Decimal("0.2")\nprint(fee == Decimal("0.3"))  # True',why:"Binary floats can't store most decimals exactly. Use Decimal or integer paise for amounts. (Floats are fine for model features and probabilities.)"},
+   {t:"Shadowing built-in names",err:"TypeError",bad:'list = [1, 2]\nstr = "abc"\nstr(5)',good:'loan_ids = [1, 2]\nlabel = "abc"\nstr(5)',why:"Naming a variable list, str, type or sum hides Python's own function with that name, causing confusing errors later."},
+   {t:"Confusing None, 0 and \"\"",bad:'if guarantor == 0:\n    print("no guarantor")',good:'if guarantor is None:\n    print("no guarantor")',why:"None means missing, 0 is a real number, \"\" is empty text. In credit data, a missing income is not the same as zero income, and models must treat them differently."}],
+  tradeoffs:`<table class="t"><tr><th>Approach</th><th>Pros</th><th>Cons</th></tr><tr><td>Dynamic typing (Python)</td><td>Fast to write; one name can hold any type</td><td>Type mistakes appear only when that line runs</td></tr><tr><td>Type hints <code>age: int = 34</code></td><td>Editors and mypy catch mistakes before running; self-documenting</td><td>Not enforced at run time by Python itself</td></tr><tr><td>float vs Decimal vs int paise</td><td>float: fast, for ML maths · Decimal: exact money · paise: exact and fast</td><td>float: rounding · Decimal: slower · paise: remember to divide by 100 for display</td></tr></table>`,
+  production:`<ul><li>APIs validate types at the boundary with <b>pydantic</b>: a request with <code>"age": "thirty"</code> is rejected before it reaches the model.</li><li>pandas columns have <b>dtypes</b>; a numeric column read as text (dtype <code>object</code>) silently breaks feature engineering.</li><li>Model weights are floats whose size you choose: float32 (4 bytes), float16/bfloat16 (2), int8 (1). That choice sets memory and speed (Stage 17–18).</li><li>Ledgers and accounting systems store money in integer minor units or decimals, never binary floats.</li></ul>`},
+ practice:{title:"Form data to interest",task:"A loan form sends every field as text. Convert the two values, compute the yearly interest (<code>principal × rate ÷ 100</code>) into a variable called <code>yearly_interest</code>, and print exactly:<pre class=\"formula\" style=\"margin-top:8px\">Yearly interest: ₹21,250.00</pre>Your code must still work if the form values change.",
+  starter:'principal_text = "250000"\nrate_text = "8.5"\n# 1. convert both to numbers\n# 2. compute yearly_interest\n# 3. print it with an f-string: thousands separators, 2 decimals\n',
+  checks:["Prints exactly “Yearly interest: ₹21,250.00”","yearly_interest is a number equal to 21250","Still correct when the form says 100000 at 8.5% (₹8,500.00)"],
+  tests:'g, out = run_user()\ncheck("out", out.strip() == "Yearly interest: ₹21,250.00")\nv = g.get("yearly_interest")\ncheck("var", isinstance(v, (int, float)) and abs(v - 21250) < 1e-6)\ng2, out2 = run_user(SRC.replace(\'"250000"\', \'"100000"\'))\ncheck("again", out2.strip() == "Yearly interest: ₹8,500.00")',
+  hint:"<code>principal = int(principal_text)</code> and <code>rate = float(rate_text)</code>. Then <code>print(f\"Yearly interest: ₹{yearly_interest:,.2f}\")</code>.",
+  solution:'principal_text = "250000"\nrate_text = "8.5"\nprincipal = int(principal_text)\nrate = float(rate_text)\nyearly_interest = principal * rate / 100\nprint(f"Yearly interest: ₹{yearly_interest:,.2f}")',
+  project:"Write <code>applicant_card.py</code> that stores 6 fields of a loan applicant (use each basic type at least once) and prints a neatly aligned card with f-strings, e.g. <code>f\"{'Income':<10}₹{income:>12,.2f}\"</code>."},
+ quiz(r){const a=[10,12,20,36][Math.floor(r()*4)],b=[2,3,4][Math.floor(r()*3)],d=String(2+Math.floor(r()*7)),m=2+Math.floor(r()*3),v=100*(3+Math.floor(r()*40)),k=50*(1+Math.floor(r()*9));
+  return [
+   mcq("Predict the type",`What does <code>print(type(${a} / ${b}))</code> show?`,[
+    {t:"<code>&lt;class 'float'&gt;</code>",ok:true,why:`<code>/</code> always gives a float in Python 3, even when it divides evenly (${a} / ${b} = ${pyRepr(a/b)}${Number.isInteger(a/b)?".0":""}). Use // for whole-number division.`},
+    {t:"<code>&lt;class 'int'&gt;</code>",why:"Both inputs are ints, but true division <code>/</code> always returns a float."},
+    {t:"<code>&lt;class 'str'&gt;</code>",why:"There's no text involved."},{t:"An error",why:"Dividing two ints is fine."}],r),
+   mcq("Predict the output",`What does this print?${pre(`x = "${d}"\ny = ${m}\nprint(x * y)`)}`,[
+    {t:`<code>${d.repeat(m)}</code>`,ok:true,why:`x is a <b>string</b>, and string × int repeats the text ${m} times.`},
+    {t:`<code>${(+d)*m}</code>`,why:`That would need x to be the number ${d}, but it's the text "${d}".`},
+    {t:"A TypeError",why:"str × int is allowed (repetition). str + int is the one that fails."},
+    {t:`<code>${d} ${m}</code>`,why:"The values are multiplied, not printed side by side."}],r),
+   num("Trace",`What is printed?${pre(`a = ${v}\nb = a\na = a + ${k}\nprint(b)`)}`,v,0,`b was tied to the value ${v}. Line 3 creates a new value ${v+k} and moves only the tag a. b still shows ${v}.`,[[v+k,`a moved to ${v+k}, but b still points at the old value ${v}. Numbers are never changed in place.`]]),
+   mcq("Production","A ledger adds ₹0.10 fees as floats and the daily total is off by ₹0.0000000001. What's the right fix?",[
+    {t:"Store amounts as Decimal (from strings) or as integer paise",ok:true,why:"Both are exact for base-10 money. Floats can't represent 0.10 exactly."},
+    {t:"Round the total at the end of the day",why:"Rounding hides the symptom but errors can still accumulate across many operations and systems."},
+    {t:"Use float32 instead of float64",why:"float32 is <i>less</i> precise, so errors get bigger."},
+    {t:"Nothing; the error is too small to matter",why:"Across crores of transactions, and in reconciliation checks that need exact equality, it matters."}],r),
+   mcq("Debugging",`What happens?${pre('age = input("Age? ")   # user types 34\nprint(age + 1)')}`,[
+    {t:"TypeError: input() returns a str, and str + int isn't allowed",ok:true,why:"Convert first: <code>age = int(input(\"Age? \"))</code>."},
+    {t:"Prints 35",why:"input() always gives text, so age is \"34\", not 34."},
+    {t:"Prints 341",why:"That's text concatenation, which needs two strings: \"34\" + \"1\"."},
+    {t:"SyntaxError",why:"The syntax is fine; the problem appears at run time."}],r)];},
+ narr:[
+  {step:0,sel:"#idDef",en:"A variable is a name that refers to a value. Every value has a type, such as int for whole numbers, float for decimals, str for text, bool for true or false, and None for no value.",te:"వేరియబుల్ అంటే ఒక విలువను సూచించే పేరు. ప్రతి విలువకు ఒక టైప్ ఉంటుంది: పూర్ణ సంఖ్యలకు ఇంట్, దశాంశాలకు ఫ్లోట్, టెక్స్ట్‌కు స్ట్రింగ్, ట్రూ లేదా ఫాల్స్‌కు బూల్, విలువ లేకపోతే నన్.",hn:"वेरिएबल एक नाम है जो किसी मान की ओर इशारा करता है। हर मान का एक टाइप होता है: पूरे नंबर के लिए इंट, दशमलव के लिए फ़्लोट, टेक्स्ट के लिए स्ट्रिंग, सही या ग़लत के लिए बूल, और कोई मान न हो तो नन।"},
+  {step:0,sel:"#idAna",en:"Think of variables as name tags, not boxes. Writing b equals a puts a second tag on the same value. Nothing is copied.",te:"వేరియబుల్స్‌ను పెట్టెలుగా కాకుండా పేరు ట్యాగ్‌లుగా ఊహించండి. బీ ఈక్వల్స్ ఏ అని రాస్తే అదే విలువకు రెండో ట్యాగ్ పడుతుంది. ఏదీ కాపీ కాదు.",hn:"वेरिएबल को डिब्बे नहीं, नाम के टैग समझिए। बी बराबर ए लिखने से उसी मान पर दूसरा टैग लग जाता है। कुछ भी कॉपी नहीं होता।"},
+  {step:1,sel:"#howHost",en:"Step through and watch the tags. When balance changes, Python creates a new value and moves the balance tag. Backup still points at the old one.",te:"స్టెప్ వారీగా చూస్తూ ట్యాగ్‌లను గమనించండి. బ్యాలెన్స్ మారినప్పుడు పైథాన్ కొత్త విలువను సృష్టించి బ్యాలెన్స్ ట్యాగ్‌ను కదుపుతుంది. బ్యాకప్ ఇంకా పాత విలువనే చూపిస్తుంది.",hn:"स्टेप दर स्टेप टैग देखिए। जब बैलेंस बदलता है, पाइथन नया मान बनाकर बैलेंस का टैग वहाँ ले जाता है। बैकअप अब भी पुराने मान पर है।"},
+  {step:2,sel:"#fpOut",en:"Floats are stored in binary, so most decimals like zero point one are not exact. For money, banks use Decimal or whole paise.",te:"ఫ్లోట్‌లు బైనరీలో నిల్వ అవుతాయి, కాబట్టి సున్నా పాయింట్ ఒకటి లాంటి చాలా దశాంశాలు ఖచ్చితంగా ఉండవు. డబ్బు కోసం బ్యాంకులు డెసిమల్ లేదా పైసలను వాడతాయి.",hn:"फ़्लोट बाइनरी में रखे जाते हैं, इसलिए शून्य दशमलव एक जैसे ज़्यादातर दशमलव सटीक नहीं होते। पैसे के लिए बैंक डेसिमल या पूरे पैसे इस्तेमाल करते हैं।"},
+  {step:3,sel:"#codeList",en:"This program uses all five basic types, converts form text into a number, and shows the difference between float and Decimal.",te:"ఈ ప్రోగ్రామ్ ఐదు ప్రాథమిక టైప్‌లనూ వాడుతుంది, ఫారమ్ టెక్స్ట్‌ను సంఖ్యగా మారుస్తుంది, ఫ్లోట్ మరియు డెసిమల్ మధ్య తేడాను చూపిస్తుంది.",hn:"यह प्रोग्राम पाँचों बुनियादी टाइप इस्तेमाल करता है, फ़ॉर्म के टेक्स्ट को नंबर में बदलता है, और फ़्लोट व डेसिमल का फ़र्क दिखाता है।"}]
+};
+
+/* =================== CONCEPT 3 · OPERATORS AND EXPRESSIONS =================== */
+// tiny Python-expression parser + step-by-step evaluator
+function exTok(s){const out=[],re=/\s*(\d+\.\d*|\.\d+|\d+|\*\*|\/\/|<=|>=|==|!=|[-+*/%()<>]|and\b|or\b|not\b|True\b|False\b)/y;let m,i=0;s=s.trim();
+  while(i<s.length){re.lastIndex=i;m=re.exec(s);if(!m)throw new Error("I can't read “"+s.slice(i).trim().slice(0,8)+"”. Use numbers, + - * / // % **, comparisons, and/or/not, and brackets.");out.push(m[1]);i=re.lastIndex;while(s[i]===" ")i++;}return out;}
+const BP={or:1,and:2,"<":4,">":4,"<=":4,">=":4,"==":4,"!=":4,"+":5,"-":5,"*":6,"/":6,"//":6,"%":6,"**":8};
+function exParse(src){const t=exTok(src);let p=0;const peek=()=>t[p],next=()=>t[p++];
+  function nud(){const x=next();if(x===undefined)throw new Error("The expression ends too early.");
+    if(x==="(" ){const e=expr(0);if(next()!==")")throw new Error("A bracket isn't closed.");e.par=true;return e;}
+    if(x==="-"||x==="+")return {t:"un",op:x,e:expr(7)};if(x==="not")return {t:"un",op:"not",e:expr(3)};
+    if(x==="True"||x==="False")return lit(x==="True");if(/^[\d.]/.test(x))return lit(/\./.test(x)?parseFloat(x):parseInt(x,10),/\./.test(x));throw new Error("Unexpected “"+x+"”.");}
+  function expr(min){let l=nud();for(;;){const op=peek();if(op===undefined||op===")")break;const bp=BP[op];if(bp===undefined)throw new Error("Unexpected “"+op+"”.");if(bp<=min&&!(op==="**"&&bp>min))break;if(bp<=min)break;next();const r=expr(op==="**"?7:bp);l={t:"bin",op,l,r};}return l;}
+  const e=expr(0);if(p<t.length)throw new Error("Unexpected “"+t[p]+"”.");return e;}
+function lit(v,isF){return {t:"lit",v,f:typeof v==="number"&&(isF||!Number.isInteger(v))};}
+const truthy=n=>n.v!==0&&n.v!==false;
+function pyOp(op,a,b){const ai=!a.f,bi=!b.f,A=+a.v,B=+b.v,iv=ai&&bi;
+  switch(op){case"+":return lit(A+B,!iv);case"-":return lit(A-B,!iv);case"*":return lit(A*B,!iv);
+   case"/":if(B===0)throw new Error("ZeroDivisionError: division by zero");return lit(A/B,true);
+   case"//":if(B===0)throw new Error("ZeroDivisionError: integer division by zero");return lit(Math.floor(A/B),!iv);
+   case"%":if(B===0)throw new Error("ZeroDivisionError: modulo by zero");return lit(A-B*Math.floor(A/B),!iv);
+   case"**":return lit(Math.pow(A,B),!(iv&&B>=0));
+   case"<":return lit(A<B);case">":return lit(A>B);case"<=":return lit(A<=B);case">=":return lit(A>=B);case"==":return lit(A===B);case"!=":return lit(A!==B);}}
+const show=n=>typeof n.v==="boolean"?(n.v?"True":"False"):n.f?pyRepr(n.v).replace(/^(-?\d+)$/,"$1.0"):String(n.v);
+function exStep(n){// returns [newNode, description] for the first reducible node in Python's evaluation order
+  if(n.t==="lit")return null;
+  if(n.t==="un"){if(n.e.t!=="lit"){const s=exStep(n.e);return s&&[{...n,e:s[0]},s[1],s[2]];}const v=n.op==="not"?lit(!truthy(n.e)):lit(n.op==="-"?-n.e.v:+n.e.v,n.e.f);return [v,`${n.op==="not"?"not":"unary "+n.op} ${show(n.e)} → ${show(v)}`,n];}
+  if(n.l.t!=="lit"){const s=exStep(n.l);return s&&[{...n,l:s[0]},s[1],s[2]];}
+  if(n.op==="and"||n.op==="or"){const t=truthy(n.l),stop=n.op==="and"?!t:t;return stop?[n.l,`${show(n.l)} ${n.op} … → ${show(n.l)}: <b>short-circuit</b>, the right side is never evaluated`,n]:[n.r,`${show(n.l)} is ${t?"truthy":"falsy"}, so “${n.op}” returns its right side`,n];}
+  if(n.r.t!=="lit"){const s=exStep(n.r);return s&&[{...n,r:s[0]},s[1],s[2]];}
+  const v=pyOp(n.op,n.l,n.r);return [v,`${show(n.l)} ${n.op} ${show(n.r)} → ${show(v)}`,n];}
+function exStr(n,target){let s;if(n.t==="lit")s=show(n);else if(n.t==="un")s=(n.op==="not"?"not ":n.op)+exStr(n.e,target);else s=`${exStr(n.l,target)} ${n.op} ${exStr(n.r,target)}`;if(n.par&&n.t!=="lit")s="("+s+")";return n===target?`<mark style="background:color-mix(in srgb,var(--tok) 30%,transparent);color:var(--fg);border-radius:4px;padding:0 2px">${s}</mark>`:s;}
+C[3]={
+ sub:"How Python combines values with arithmetic, comparison and logical operators, in which order, and the EMI formula every lender uses.",
+ builds:["Variables and Data Types"],leads:["Conditional Statements"],
+ idea:{
+  def:"An <b>operator</b> is a symbol that combines values: <code>+ - * / // % **</code> for arithmetic, <code>== != &lt; &gt; &lt;= &gt;=</code> for comparison, and <code>and or not</code> for logic. An <b>expression</b> is any combination that produces a value, such as <code>principal * rate / 100</code>. Python evaluates expressions using fixed <b>precedence</b> rules.",
+  why:"All computation is expressions: interest, EMIs, risk scores, loss functions, attention scores. Knowing exactly how Python evaluates them avoids silent wrong answers like <code>-2 ** 2</code> being −4.",
+  analogy:"School maths rules (BODMAS): brackets first, then powers, then × and ÷, then + and −. Python adds a few extra operators, but works the same way.",
+  bank:"The EMI on every home loan in India is one expression: <code>P * r * (1 + r) ** n / ((1 + r) ** n - 1)</code>. Eligibility checks are comparison and logical expressions: <code>score &gt;= 700 and foir &lt;= 0.5</code>.",
+  real:["Loss functions such as mean squared error are expressions over predictions (Stage 6)","NumPy applies the same operators to millions of numbers at once (Stage 3)","Feature engineering: ratios such as debt-to-income (Stage 3)","Attention: Q·Kᵀ / √d is an expression (Stage 8)"]},
+ how:{intro:"Pick an expression or type your own. Press <b>Next step</b> and Python's evaluation order is revealed one operation at a time. The highlighted part is what runs next.",
+  mount(h){const PRE=["500000 * 9 / 100 / 12","2 + 3 * 4 ** 2","-2 ** 2","17 // 5 * 5 + 17 % 5","(1 + 0.0075) ** 12 - 1","750 >= 700 and 0.35 <= 0.5","0 and 1 / 0"];
+   h.innerHTML=`<div class="box"><div class="row" style="margin-bottom:10px">${PRE.map(p=>`<button class="btn sm mono" type="button" data-ex="${esc(p)}">${esc(p)}</button>`).join("")}</div><label class="f">expression<input class="txt mono" id="exIn" type="text" value="${PRE[1]}" autocomplete="off"></label>
+   <div class="row" style="margin-top:10px"><button class="btn primary sm" type="button" id="exNext">Next step ▶</button><button class="btn sm" type="button" id="exAll">All steps</button><button class="btn sm" type="button" id="exReset">Reset</button></div>
+   <div class="scroll" style="margin-top:12px"><div id="exNow" class="mono" style="font-size:1.25rem;white-space:nowrap;padding:6px 0"></div></div><div id="exLog" class="console" style="margin-top:8px"></div></div>
+   <div class="box scroll"><div class="eyebrow" style="margin-bottom:6px">Precedence, highest first</div><table class="t"><tr><th>Operators</th><th>Meaning</th><th>Example</th></tr><tr><td class="mono">( )</td><td>brackets</td><td class="mono">(2 + 3) * 4 → 20</td></tr><tr><td class="mono">**</td><td>power (right to left)</td><td class="mono">2 ** 3 ** 2 → 512</td></tr><tr><td class="mono">-x</td><td>negation (weaker than **)</td><td class="mono">-2 ** 2 → -4</td></tr><tr><td class="mono">* / // %</td><td>multiply, divide, floor-divide, remainder</td><td class="mono">17 // 5 → 3, 17 % 5 → 2</td></tr><tr><td class="mono">+ -</td><td>add, subtract</td><td class="mono">2 + 3 * 4 → 14</td></tr><tr><td class="mono">== != &lt; &gt; &lt;= &gt;=</td><td>comparison → True/False</td><td class="mono">750 &gt;= 700 → True</td></tr><tr><td class="mono">not</td><td>logical NOT</td><td class="mono">not True → False</td></tr><tr><td class="mono">and</td><td>both true (stops early if left is false)</td><td class="mono">0 and 1/0 → 0</td></tr><tr><td class="mono">or</td><td>either true (stops early if left is true)</td><td class="mono">"" or "N/A" → "N/A"</td></tr></table></div>`;
+   let node,log;const reset=()=>{log=[];try{node=exParse($("#exIn").value);$("#exNow").innerHTML=exStr(node,(exStep(node)||[])[2]);$("#exLog").innerHTML='<span class="sys">Press Next step.</span>';}catch(e){node=null;$("#exNow").textContent="";$("#exLog").innerHTML=`<span class="err">${esc(e.message)}</span>`;}upd();};
+   const upd=()=>{$("#exNext").disabled=!node||node.t==="lit";$("#exAll").disabled=$("#exNext").disabled;};
+   const step=()=>{if(!node||node.t==="lit")return;try{const [nn,d]=exStep(node);node=nn;log.push(`${log.length+1}. ${d}`);const nx=exStep(node);$("#exNow").innerHTML=exStr(node,nx?nx[2]:null)+(node.t==="lit"?'  <span class="c-out" style="font-size:.9rem">← final value</span>':"");}catch(e){log.push(`<span class="err">${esc(e.message)}</span>`);node=null;}$("#exLog").innerHTML=log.join("\n");upd();};
+   $("#exNext").addEventListener("click",step);$("#exAll").addEventListener("click",()=>{for(let i=0;i<40&&node&&node.t!=="lit";i++)step();});$("#exReset").addEventListener("click",reset);$("#exIn").addEventListener("input",reset);
+   $$("[data-ex]").forEach(b=>b.addEventListener("click",()=>{$("#exIn").value=b.dataset.ex;reset();}));reset();}},
+ math:{intro:"Derive the EMI formula used by every bank, then change the loan and watch the same expression recompute.",
+  mount(h){h.innerHTML=`<div class="formula">Loan P, monthly rate r (= annual% ÷ 12 ÷ 100), n months, payment E each month.
+
+Balance after month 1:  B₁ = P(1 + r) − E
+Balance after month 2:  B₂ = B₁(1 + r) − E = P(1 + r)² − E(1 + r) − E
+…
+After n months:         Bₙ = P(1 + r)ⁿ − E[(1 + r)ⁿ⁻¹ + … + (1 + r) + 1]
+Geometric series:       1 + x + … + xⁿ⁻¹ = (xⁿ − 1) / (x − 1),  with x = 1 + r
+So                      Bₙ = P(1 + r)ⁿ − E · ((1 + r)ⁿ − 1) / r
+Loan is repaid: Bₙ = 0  ⇒  <b class="c-tok">E = P · r · (1 + r)ⁿ / ((1 + r)ⁿ − 1)</b></div>
+   <div class="grid2"><div class="box ctrls" style="grid-template-columns:1fr"><label class="f">loan amount P: <b id="emPv"></b><input type="range" id="emP" min="100000" max="5000000" step="50000" value="2500000"></label><label class="f">annual rate: <b id="emRv"></b><input type="range" id="emR" min="6" max="18" step="0.25" value="8.5"></label><label class="f">tenure: <b id="emNv"></b><input type="range" id="emN" min="12" max="360" step="12" value="240"></label></div>
+   <div class="box"><div class="stats" id="emStats"></div><div class="formula" id="emExpr" style="margin-top:10px;white-space:pre-wrap"></div><div id="emBar" style="display:flex;height:22px;border-radius:6px;overflow:hidden;margin-top:10px"></div><div class="mono dim" style="font-size:.72rem;margin-top:4px"><span class="c-emb">■ principal</span>  <span class="c-err">■ interest</span> of everything you repay</div></div></div>`;
+   const f=()=>{const P0=+$("#emP").value,R=+$("#emR").value,n=+$("#emN").value,r=R/12/100,g=Math.pow(1+r,n),E=P0*r*g/(g-1),tot=E*n,I=tot-P0;
+    $("#emPv").textContent="₹"+fmt(P0,0);$("#emRv").textContent=R+"%";$("#emNv").textContent=`${n} months (${n/12} years)`;
+    $("#emStats").innerHTML=`<div class="stat"><span class="v c-tok">₹${fmt(E)}</span><span class="k">EMI per month</span></div><div class="stat"><span class="v c-err">₹${fmt(I,0)}</span><span class="k">total interest</span></div><div class="stat"><span class="v">${(I/P0*100).toFixed(0)}%</span><span class="k">interest ÷ loan</span></div>`;
+    $("#emExpr").textContent=`r    = ${R} / 12 / 100 = ${r.toFixed(6)}\ng    = (1 + r) ** ${n} = ${g.toFixed(4)}\nemi  = ${P0} * r * g / (g - 1) = ${E.toFixed(2)}`;
+    $("#emBar").innerHTML=`<span style="width:${P0/tot*100}%;background:var(--emb)"></span><span style="width:${I/tot*100}%;background:var(--err)"></span>`;};
+   ["#emP","#emR","#emN"].forEach(s=>$(s).addEventListener("input",f));f();}},
+ code:{file:"emi.py",intro:"The EMI formula from the Math step as real Python, plus floor division, remainders, f-string formatting and a logical check.",
+  lines:[["principal = 500000",""],["annual_rate = 9.0",""],["months = 66",""],["r = annual_rate / 12 / 100","/ always gives a float: 0.0075 per month"],["growth = (1 + r) ** months","** is “to the power of”. Brackets make 1 + r happen first."],["emi = principal * r * growth / (growth - 1)","The EMI formula. * and / run left to right."],["print(round(emi, 2))","round(x, 2) keeps 2 decimals for display"],["years, extra = divmod(months, 12)","divmod gives both months // 12 and months % 12"],["print(years, \"years\", extra, \"months\")","5 years 6 months"],["total_interest = emi * months - principal","Everything repaid minus what was borrowed"],["print(f\"Total interest: {total_interest:,.0f}\")",":,.0f adds thousands separators and no decimals"],["print(emi > 9000 and months <= 84)","Comparisons give True/False; and needs both to be True"]],
+  expected:"9632.62\n5 years 6 months\nTotal interest: 135,753\nTrue",
+  tryThis:"Try it: change <code>months</code> to 240 and the rate to 8.5. Then remove the brackets in <code>(1 + r) ** months</code> and see how far the answer moves."},
+ pitfalls:{mistakes:[
+   {t:"/ vs //",bad:'pages = 25 / 10      # 2.5',good:'pages = 25 // 10     # 2 (floor)\nleft = 25 % 10       # 5',why:"<code>/</code> always returns a float. Use <code>//</code> for whole-number division and <code>%</code> for the remainder (e.g. months → years and months)."},
+   {t:"Power binds tighter than minus",bad:'x = -2 ** 2          # -4',good:'x = (-2) ** 2        # 4',why:"Python computes 2 ** 2 first, then negates it. Add brackets when you mean the negative number."},
+   {t:"Comparing floats with ==",bad:'0.1 + 0.2 == 0.3     # False',good:'import math\nmath.isclose(0.1 + 0.2, 0.3)  # True',why:"Floats carry tiny rounding errors (concept 2). Compare them with a tolerance."},
+   {t:"= is not ==",err:"SyntaxError",bad:'if score = 750:',good:'if score == 750:',why:"One = assigns a value; two == compares. Python refuses = inside a condition."},
+   {t:"Floor division with negatives",bad:'-7 // 2              # -4, not -3',good:'int(-7 / 2)          # -3 (truncate)',why:"// rounds <i>down</i> (towards minus infinity). Know which one your business rule needs."}],
+  tradeoffs:`<table class="t"><tr><th>Approach</th><th>When</th><th>Why</th></tr><tr><td>Plain Python operators</td><td>One loan, one value</td><td>Clear and simple</td></tr><tr><td>NumPy array operators</td><td>A million loans at once</td><td>The same <code>*</code> runs in C over whole arrays: often 50–100× faster (Stage 3)</td></tr><tr><td><code>round()</code> vs Decimal quantize</td><td>Display vs ledger</td><td>round() uses banker's rounding on floats (round(2.5) → 2); money needs explicit Decimal rounding rules</td></tr></table>`,
+  production:`<ul><li>Pricing engines compute EMI, APR and fees with expressions like these, using Decimal and explicit rounding rules agreed with finance.</li><li>Model features are mostly expressions: <code>debt / income</code>, <code>log(1 + amount)</code>, <code>days_past_due // 30</code>.</li><li>In PyTorch the same operators build a <b>computational graph</b>, which is how gradients get computed automatically (Stage 6).</li><li>Short-circuit <code>and/or</code> is used for safe checks: <code>income &gt; 0 and debt / income &lt; 0.5</code> never divides by zero.</li></ul>`},
+ practice:{title:"Write the EMI calculator",task:"Using the variables given, compute the monthly rate <code>r</code>, the <code>emi</code>, and the <code>total_interest</code>. Print exactly two lines (2 decimals):<pre class=\"formula\" style=\"margin-top:8px\">EMI: 10338.05\nTotal interest: 1281132.95</pre>The tests also re-run your code with a different loan.",
+  starter:'principal = 1200000\nannual_rate = 8.4\nmonths = 240\n# r = ...\n# emi = ...\n# total_interest = ...\n# print(f"EMI: {emi:.2f}")\n',
+  checks:["emi is correct for ₹12,00,000 at 8.4% over 240 months","Prints “EMI: 10338.05” and “Total interest: 1281132.95”","Still correct for ₹5,00,000 at 9% over 60 months (EMI 10379.18)"],
+  tests:'def ref(p, a, n):\n    r = a / 12 / 100\n    g = (1 + r) ** n\n    return p * r * g / (g - 1)\ng, out = run_user()\ncheck("emi", abs(g.get("emi", 0) - ref(1200000, 8.4, 240)) < 0.01)\nlines = [l.strip() for l in out.strip().split("\\n")]\ncheck("out", lines[:2] == ["EMI: 10338.05", "Total interest: 1281132.95"])\nsrc = SRC.replace("1200000", "500000").replace("8.4", "9.0").replace("240", "60")\ng2, out2 = run_user(src)\ncheck("again", abs(g2.get("emi", 0) - 10379.18) < 0.01)',
+  hint:"<code>r = annual_rate / 12 / 100</code>, then <code>emi = principal * r * (1 + r) ** months / ((1 + r) ** months - 1)</code>. Total interest is <code>emi * months - principal</code>. Print with <code>f\"{x:.2f}\"</code>.",
+  solution:'principal = 1200000\nannual_rate = 8.4\nmonths = 240\nr = annual_rate / 12 / 100\nemi = principal * r * (1 + r) ** months / ((1 + r) ** months - 1)\ntotal_interest = emi * months - principal\nprint(f"EMI: {emi:.2f}")\nprint(f"Total interest: {total_interest:.2f}")',
+  project:"Extend it into a comparison: for tenures of 10, 15, 20 and 25 years, print the EMI and total interest side by side (you'll make this neat with loops in concept 5)."},
+ quiz(r){const a=17+Math.floor(r()*44),b=3+Math.floor(r()*7),R=[6,9,12,18][Math.floor(r()*4)],k=3+Math.floor(r()*3);
+  return [
+   num("Compute",`What is <code>${a} // ${b}</code>?`,Math.floor(a/b),0,`// is floor division: ${a} ÷ ${b} = ${(a/b).toFixed(3)}, rounded down to ${Math.floor(a/b)}.`,[[a/b,"That's / (true division). // drops the fractional part."]]),
+   num("Compute",`What is <code>${a} % ${b}</code>?`,a%b,0,`% is the remainder: ${a} = ${b} × ${Math.floor(a/b)} + <b>${a%b}</b>.`,[[Math.floor(a/b),"That's the quotient (//). % gives what's left over."]]),
+   mcq("Predict the output",`What does <code>print(-${k} ** 2)</code> show?`,[
+    {t:`<code>${-(k*k)}</code>`,ok:true,why:`** binds tighter than the minus sign, so it's −(${k}²) = ${-(k*k)}.`},
+    {t:`<code>${k*k}</code>`,why:`That would be <code>(-${k}) ** 2</code>. Without brackets the minus is applied last.`},
+    {t:`<code>${-2*k}</code>`,why:"** is power, not multiplication."},{t:"An error",why:"It's valid Python."}],r),
+   num("Banking maths",`A loan's annual rate is <b>${R}%</b>. What monthly rate <code>r</code> goes into the EMI formula (as a decimal, not a percent)?`,R/1200,0.00005,`r = ${R} / 12 / 100 = ${(R/1200).toFixed(4)}.`,[[R/12,"That's the monthly rate in percent. The formula needs it as a decimal: divide by 100 too."],[R/100,"That's the yearly rate as a decimal. Divide by 12 for monthly."]]),
+   mcq("Conceptual","<code>0.1 + 0.2 == 0.3</code> is False. What's the right way to compare two floats?",[
+    {t:"<code>math.isclose(a, b)</code>, which allows a tiny tolerance",ok:true,why:"Floats carry rounding error, so test “close enough”."},
+    {t:"Use <code>is</code> instead of <code>==</code>",why:"<code>is</code> checks whether two names point at the same object. That's wrong for numbers."},
+    {t:"Convert both to int first",why:"int(0.3) is 0, so you'd lose the value entirely."},
+    {t:"Use <code>=</code>",why:"= assigns; it doesn't compare."}],r)];},
+ narr:[
+  {step:0,sel:"#idDef",en:"Operators combine values. Arithmetic operators compute numbers, comparison operators give true or false, and logical operators combine conditions. An expression is anything that produces a value.",te:"ఆపరేటర్లు విలువలను కలుపుతాయి. అంకగణిత ఆపరేటర్లు సంఖ్యలను లెక్కిస్తాయి, పోలిక ఆపరేటర్లు ట్రూ లేదా ఫాల్స్ ఇస్తాయి, లాజికల్ ఆపరేటర్లు షరతులను కలుపుతాయి. విలువను ఇచ్చే ఏదైనా ఒక ఎక్స్‌ప్రెషన్.",hn:"ऑपरेटर मानों को जोड़ते हैं। गणित वाले ऑपरेटर नंबर निकालते हैं, तुलना वाले ऑपरेटर सही या ग़लत देते हैं, और लॉजिकल ऑपरेटर शर्तों को जोड़ते हैं। जो कुछ भी मान दे, वह एक्सप्रेशन है।"},
+  {step:0,sel:"#idBank",en:"The EMI on every home loan is a single Python expression, and every eligibility rule is a comparison joined with and or or.",te:"ప్రతి హోమ్ లోన్ ఈఎంఐ ఒకే పైథాన్ ఎక్స్‌ప్రెషన్, ప్రతి అర్హత నియమం యాండ్ లేదా ఆర్‌తో కలిపిన పోలిక.",hn:"हर होम लोन की ईएमआई एक ही पाइथन एक्सप्रेशन है, और हर पात्रता नियम एंड या ऑर से जुड़ी एक तुलना है।"},
+  {step:1,sel:"#howHost",act:()=>{const b=document.querySelector('[data-ex="-2 ** 2"]');if(b)b.click();},en:"Python follows fixed precedence rules. Watch minus two to the power two: the power runs first, so the answer is minus four.",te:"పైథాన్ నిర్దిష్ట ప్రాధాన్య నియమాలను పాటిస్తుంది. మైనస్ రెండు పవర్ రెండు చూడండి: పవర్ ముందు నడుస్తుంది, కాబట్టి జవాబు మైనస్ నాలుగు.",hn:"पाइथन तय प्राथमिकता के नियम मानता है। माइनस दो की घात दो देखिए: घात पहले चलती है, इसलिए जवाब माइनस चार है।"},
+  {step:2,sel:"#emStats",en:"The EMI formula comes from a geometric series. Move the sliders and see how a longer tenure lowers the EMI but raises the total interest.",te:"ఈఎంఐ సూత్రం జ్యామితీయ శ్రేణి నుంచి వస్తుంది. స్లైడర్లను కదిపి, ఎక్కువ కాలం ఈఎంఐని తగ్గించి మొత్తం వడ్డీని ఎలా పెంచుతుందో చూడండి.",hn:"ईएमआई का फ़ॉर्मूला ज्यामितीय श्रेणी से आता है। स्लाइडर हिलाइए और देखिए कि लंबी अवधि ईएमआई घटाती है पर कुल ब्याज बढ़ाती है।"}]
+};
+
+/* =================== CONCEPT 4 · CONDITIONAL STATEMENTS =================== */
+C[4]={
+ sub:"Making decisions with if, elif and else: the loan-approval logic every bank runs, and the Boolean algebra behind it.",
+ builds:["Operators and Expressions"],leads:["Loops and Iterations","Decision Trees (concept 99)"],
+ idea:{
+  def:"A <b>conditional statement</b> runs a block of code only when a condition is True. Python checks <code>if</code>, then each <code>elif</code> (“else if”) in order, and runs the <b>first</b> branch whose condition is True. <code>else</code> catches everything left. The block belongs to the condition because it's <b>indented</b>.",
+  why:"Programs must react to data: approve or decline, pick a risk band, route a request, retry or stop. Without conditions, a program does the same thing every time.",
+  analogy:"A loan officer's checklist: “Age outside policy? Decline. Score below 650? Decline. Too much existing debt? Refer. Otherwise approve.” The officer stops at the first rule that applies.",
+  bank:"Credit policy is written as conditions: hard declines (age, fraud flags), score cut-offs, FOIR (fixed obligations to income ratio) limits, and pricing bands. Even when an ML model scores the applicant, these rules wrap around the model.",
+  real:["Decision trees and gradient boosting learn thousands of if/else splits from data (Stages 4–5)","Guardrails around LLMs: if the output contains an account number, block it (Stage 14)","Routing: if the question is about loans, send it to the loans agent","Training code: if validation loss stopped improving, stop early (Stage 6)"]},
+ how:{intro:"Move the sliders. The applicant flows through the policy from top to bottom. Each condition shows whether it was True or False, the branch that runs is highlighted, and every later branch is skipped.",
+  mount(h){const CODE=[["foir = (existing_emi + new_emi) / income"],["if age < 21 or age > 60:"],["    decision = \"Decline: age policy\""],["elif score < 650:"],["    decision = \"Decline: low credit score\""],["elif foir > 0.5:"],["    decision = \"Refer: high obligations\""],["elif score >= 750:"],["    decision = \"Approve: best rate\""],["else:"],["    decision = \"Approve: standard rate\""]];
+   h.innerHTML=`<div class="grid2"><div class="box ctrls" style="grid-template-columns:1fr 1fr"><label class="f">credit score: <b id="dfSv"></b><input type="range" id="dfS" min="300" max="900" value="712"></label><label class="f">age: <b id="dfAv"></b><input type="range" id="dfA" min="18" max="70" value="34"></label><label class="f">monthly income: <b id="dfIv"></b><input type="range" id="dfI" min="15000" max="300000" step="5000" value="90000"></label><label class="f">existing EMIs: <b id="dfEv"></b><input type="range" id="dfE" min="0" max="150000" step="1000" value="20000"></label><label class="f" style="grid-column:1/-1">new loan EMI: <b id="dfNv"></b><input type="range" id="dfN" min="2000" max="150000" step="1000" value="18000"></label></div>
+   <div class="box" style="display:grid;gap:10px;align-content:start"><div class="eyebrow">Decision</div><div id="dfDec" style="font-family:var(--f-display);font-size:1.5rem"></div><div id="dfFoir" class="mono" style="font-size:.86rem"></div><p class="muted" style="font-size:.86rem">FOIR = fixed obligations ÷ income. Many Indian lenders cap it at 50–60%.</p></div></div>
+   <div style="margin-top:12px">${listing(CODE.map(l=>[l[0],""]),"dfCode")}</div>`;
+   const f=()=>{const s=+$("#dfS").value,a=+$("#dfA").value,inc=+$("#dfI").value,e=+$("#dfE").value,n=+$("#dfN").value,foir=(e+n)/inc;
+    $("#dfSv").textContent=s;$("#dfAv").textContent=a;$("#dfIv").textContent="₹"+fmt(inc,0);$("#dfEv").textContent="₹"+fmt(e,0);$("#dfNv").textContent="₹"+fmt(n,0);
+    const conds=[[1,a<21||a>60,`${a} < 21 or ${a} > 60`],[3,s<650,`${s} < 650`],[5,foir>0.5,`${foir.toFixed(2)} > 0.5`],[7,s>=750,`${s} >= 750`]];
+    const rows=$$("#dfCode tr"),ex=$$("#dfCode td.ex");rows.forEach(r=>{r.classList.remove("hl","dimmed");});ex.forEach(x=>x.innerHTML="");
+    ex[0].innerHTML=`<span class="c-emb">foir = ${foir.toFixed(3)}</span>`;let taken=-1;
+    for(const [li,v,txt] of conds){if(taken>=0){rows[li].classList.add("dimmed");rows[li+1].classList.add("dimmed");ex[li].innerHTML='<span class="dim">skipped (a branch already ran)</span>';continue;}
+      ex[li].innerHTML=`<span class="${v?"c-out":"c-err"}">${txt} → ${v?"True":"False"}</span>`;if(v){taken=li+1;}else rows[li+1].classList.add("dimmed");}
+    if(taken<0){taken=10;ex[9].innerHTML='<span class="c-out">no condition was True → else</span>';}else{rows[9].classList.add("dimmed");rows[10].classList.add("dimmed");}
+    rows[taken].classList.add("hl");const dec=CODE[taken][0].split('"')[1];$("#dfDec").textContent=dec;$("#dfDec").style.color=dec.startsWith("Approve")?"var(--out)":dec.startsWith("Refer")?"var(--tok)":"var(--err)";
+    $("#dfFoir").innerHTML=`FOIR = (${fmt(e,0)} + ${fmt(n,0)}) / ${fmt(inc,0)} = <b>${(foir*100).toFixed(1)}%</b>`;};
+   ["#dfS","#dfA","#dfI","#dfE","#dfN"].forEach(s=>$(s).addEventListener("input",f));f();}},
+ math:{intro:"Conditions are <b>Boolean algebra</b>: values that are True or False, combined with and, or and not. Toggle A and B to fill the truth tables, and check De Morgan's laws, which let you rewrite any rule safely.",
+  mount(h){h.innerHTML=`<div class="grid2"><div class="box"><div class="row" style="margin-bottom:10px"><button class="btn sm" type="button" id="tA"></button><button class="btn sm" type="button" id="tB"></button></div><div id="tRes" class="formula"></div><p class="muted" style="font-size:.86rem;margin-top:8px">A = “score ≥ 700”, B = “FOIR ≤ 0.5”.</p></div>
+   <div class="box scroll"><table class="t" id="tTab"></table></div></div>
+   <div class="formula">De Morgan's laws
+not (A and B)  ==  (not A) or (not B)
+not (A or B)   ==  (not A) and (not B)
+
+“Not (good score and low debt)” means “bad score OR high debt”.</div>
+   <div class="box"><div class="eyebrow" style="margin-bottom:6px">Truthiness: what counts as False in an if</div><div class="row" id="truthy"></div><p class="muted" style="font-size:.86rem;margin-top:8px">So <code>if guarantor_name:</code> means “if it's not empty and not None”.</p></div>`;
+   let A=true,B=false;const tf=v=>v?'<span class="c-out">True</span>':'<span class="c-err">False</span>';
+   const f=()=>{$("#tA").innerHTML=`A = ${tf(A)}`;$("#tB").innerHTML=`B = ${tf(B)}`;$("#tRes").innerHTML=`A and B        → ${tf(A&&B)}\nA or B         → ${tf(A||B)}\nnot A          → ${tf(!A)}\nnot (A and B)  → ${tf(!(A&&B))}\n(not A) or (not B) → ${tf(!A||!B)}`;
+    $("#tTab").innerHTML=`<tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th><th>not (A and B)</th></tr>`+[[true,true],[true,false],[false,true],[false,false]].map(([a,b])=>`<tr style="${a===A&&b===B?"background:color-mix(in srgb,var(--tok) 14%,transparent)":""}"><td>${tf(a)}</td><td>${tf(b)}</td><td>${tf(a&&b)}</td><td>${tf(a||b)}</td><td>${tf(!(a&&b))}</td></tr>`).join("");};
+   $("#tA").addEventListener("click",()=>{A=!A;f();});$("#tB").addEventListener("click",()=>{B=!B;f();});f();
+   $("#truthy").innerHTML=[["0","f"],["0.0","f"],['""',"f"],["None","f"],["[]","f"],["{}","f"],["False","f"],["1","t"],["-5","t"],['"0"',"t"],['" "',"t"],["[0]","t"]].map(([v,t])=>`<span class="pill ${t==="f"?"bad":"good"}">${esc(v)} → ${t==="f"?"falsy":"truthy"}</span>`).join("");}},
+ code:{file:"credit_band.py",intro:"A credit band and an approval decision: if/elif/else, a conditional expression, membership with <code>in</code>, and a combined condition.",
+  lines:[["score = 712",""],["income = 90000",""],["existing_emi = 20000",""],["new_emi = 18000",""],["foir = (existing_emi + new_emi) / income","0.4222… (42% of income already committed)"],["if score >= 750:","Checked first. Order matters: put the strictest rule first."],["    band = \"A\"","Indented 4 spaces: this line belongs to the if"],["elif score >= 700:","Only checked when the if above was False"],["    band = \"B\"","712 ≥ 700, so this runs and the rest is skipped"],["elif score >= 650:",""],["    band = \"C\"",""],["else:","Runs only when nothing above was True"],["    band = \"D\"",""],["print(\"Band:\", band, \"| FOIR:\", round(foir, 2))","Band: B | FOIR: 0.42"],["rate = 8.5 if band == \"A\" else 10.0","A conditional expression: one value or another, in one line"],["if band in (\"A\", \"B\") and foir <= 0.5:","in checks membership; and needs both sides True"],["    print(f\"Approved at {rate}%\")",""],["else:",""],["    print(\"Refer to credit officer\")",""]],
+  expected:"Band: B | FOIR: 0.42\nApproved at 10.0%",
+  tryThis:"Try it: set <code>score = 760</code>, then <code>new_emi = 40000</code>. Then swap the order of the first two conditions and see why order matters."},
+ pitfalls:{mistakes:[
+   {t:"Wrong order of elif",bad:'if score >= 650:\n    band = "C"\nelif score >= 750:\n    band = "A"   # never runs',good:'if score >= 750:\n    band = "A"\nelif score >= 650:\n    band = "C"',why:"Python stops at the first True condition. A loose check first swallows every case below it."},
+   {t:"Comparing to several values",bad:'if band == "A" or "B":   # always True',good:'if band == "A" or band == "B":\n# or: if band in ("A", "B"):',why:"\"B\" on its own is a non-empty string, which is truthy, so the whole condition is always True. A classic bug in policy code."},
+   {t:"Missing colon or indentation",err:"SyntaxError",bad:'if score > 700\nprint("good")',good:'if score > 700:\n    print("good")',why:"Every if/elif/else line ends with a colon, and its block is indented (4 spaces is the standard)."},
+   {t:"Gaps at the boundaries",bad:'if score > 700: band = "B"\nelif score < 700: band = "C"\n# score == 700 gets no band',good:'if score >= 700: band = "B"\nelse: band = "C"',why:"Test the exact cut-off values (699, 700, 701). Credit policies are full of boundary bugs."}],
+  tradeoffs:`<table class="t"><tr><th>Approach</th><th>Strength</th><th>Weakness</th></tr><tr><td>Hand-written if/else rules</td><td>Transparent, easy to audit and explain to regulators</td><td>Brittle; can't capture subtle patterns in data</td></tr><tr><td>Lookup tables / rule engines</td><td>Business users can change thresholds without code</td><td>Another system to test and version</td></tr><tr><td>Learned model (logistic regression, XGBoost)</td><td>Finds patterns across hundreds of features</td><td>Needs data, monitoring and explanations (SHAP, Stage 5)</td></tr><tr><td><code>match</code> statement (3.10+)</td><td>Clean branching on the shape or value of data</td><td>Overkill for simple comparisons</td></tr></table>`,
+  production:`<ul><li>Real underwriting is a hybrid: <b>policy rules</b> (hard declines, regulatory limits) run before and after an <b>ML score</b>.</li><li>Every branch is logged with a <b>reason code</b> (“Declined: FOIR &gt; 50%”) because customers and regulators must be told why.</li><li>Rules live in version control and are tested at the boundaries, exactly like your practice task.</li><li>Decision trees (concept 99) are learned if/elif chains, so this concept is the foundation for tree models.</li></ul>`},
+ practice:{title:"Encode the credit policy",task:"<code>score</code> and <code>foir</code> are already set for you by the tests, so <b>don't assign them</b>. Set <code>decision</code> to:<ul style=\"margin-top:6px\"><li><code>\"Decline\"</code> if the score is below 650</li><li><code>\"Refer\"</code> if the score is 650 or more but FOIR is above 0.5</li><li><code>\"Approve\"</code> otherwise</li></ul>The tests try five applicants, including the exact boundaries.",
+  starter:'# score and foir are given; do not assign them\ndecision = "?"\n',
+  checks:["Score 600, FOIR 0.30 → Decline","Score 700, FOIR 0.60 → Refer","Score 800, FOIR 0.40 → Approve","Boundary: score 650, FOIR 0.50 → Approve","Boundary: score 649, FOIR 0.10 → Decline"],
+  tests:'for s, f, want in [(600, 0.3, "Decline"), (700, 0.6, "Refer"), (800, 0.4, "Approve"), (650, 0.5, "Approve"), (649, 0.1, "Decline")]:\n    g, out = run_user(score=s, foir=f)\n    check(f"{s} {f}", g.get("decision") == want)',
+  hint:"Order: first <code>if score &lt; 650:</code>, then <code>elif foir &gt; 0.5:</code>, then <code>else:</code>. Use exactly the strings \"Decline\", \"Refer\", \"Approve\".",
+  solution:'if score < 650:\n    decision = "Decline"\nelif foir > 0.5:\n    decision = "Refer"\nelse:\n    decision = "Approve"',
+  project:"Write <code>policy.py</code> for a personal-loan policy with 6 rules (age, score, FOIR, employment type, loan-to-income, existing defaults). Print a reason code for every decision, and write down 10 boundary test cases with their expected decisions."},
+ quiz(r){const s=560+Math.floor(r()*300),band=s>=750?"A":s>=700?"B":s>=650?"C":"D",inc=10000*(5+Math.floor(r()*15)),e=1000*(5+Math.floor(r()*25)),n=1000*(5+Math.floor(r()*25)),fo=Math.round((e+n)/inc*100)/100;
+  return [
+   mcq("Trace",`Which band does a score of <b>${s}</b> get?${pre('if score >= 750:\n    band = "A"\nelif score >= 700:\n    band = "B"\nelif score >= 650:\n    band = "C"\nelse:\n    band = "D"')}`,["A","B","C","D"].map(b=>({t:`<code>"${b}"</code>`,ok:b===band,why:b===band?`Python checks from the top and takes the first True condition for ${s}.`:`Check the conditions in order for ${s}: the first True one wins.`})),r),
+   mcq("Debugging",`An analyst writes <code>if band == "A" or "B":</code>. What happens?`,[
+    {t:"The condition is always True, because the string \"B\" is truthy on its own",ok:true,why:"Write <code>band == \"A\" or band == \"B\"</code>, or <code>band in (\"A\", \"B\")</code>."},
+    {t:"It checks whether band is A or B",why:"That's what was meant, but Python reads it as <code>(band == \"A\") or (\"B\")</code>."},
+    {t:"SyntaxError",why:"It's valid syntax, which is why the bug is dangerous."},
+    {t:"It's True only when band is \"B\"",why:"It's True for every band, because \"B\" is truthy."}],r),
+   mcq("Conceptual","Which of these values are all <b>falsy</b> in an <code>if</code>?",[
+    {t:'<code>0</code>, <code>""</code>, <code>None</code> and <code>[]</code>',ok:true,why:"Zero, empty containers and None are falsy. Almost everything else is truthy."},
+    {t:'<code>0</code>, <code>"0"</code> and <code>False</code>',why:'<code>"0"</code> is a non-empty string, so it is truthy.'},
+    {t:'<code>" "</code> and <code>[0]</code>',why:"A space is a non-empty string, and [0] is a list with one item. Both are truthy."},
+    {t:"Only <code>False</code>",why:"Python also treats 0, empty containers and None as false."}],r),
+   mcq("Boolean algebra","Which condition is equivalent to <code>not (score &gt;= 700 and foir &lt;= 0.5)</code>?",[
+    {t:"<code>score &lt; 700 or foir &gt; 0.5</code>",ok:true,why:"De Morgan: not (A and B) = (not A) or (not B)."},
+    {t:"<code>score &lt; 700 and foir &gt; 0.5</code>",why:"The and must become or when you push the not inside."},
+    {t:"<code>score &lt;= 700 or foir &gt;= 0.5</code>",why:"The opposite of ≥ 700 is &lt; 700 (not ≤), and the opposite of ≤ 0.5 is &gt; 0.5."},
+    {t:"<code>not score &gt;= 700 and foir &lt;= 0.5</code>",why:"The not now applies only to the first part."}],r),
+   num("Banking maths",`Income ₹${fmt(inc,0)}, existing EMIs ₹${fmt(e,0)}, new EMI ₹${fmt(n,0)}. What is the FOIR (as a decimal, 2 places)?`,fo,0.006,`FOIR = (${e} + ${n}) / ${inc} = ${((e+n)/inc).toFixed(3)}. ${fo>0.5?"Above 0.5, so this application would be referred.":"At or below 0.5, so it passes this rule."}`,[[n/inc,"Include the existing EMIs too: FOIR counts all fixed obligations."],[fo*100,"Give it as a decimal, not a percentage."]])];},
+ narr:[
+  {step:0,sel:"#idDef",en:"A conditional runs code only when a condition is true. Python checks if, then each elif in order, and runs only the first branch that is true. Else catches the rest.",te:"కండిషనల్ ఒక షరతు నిజమైనప్పుడు మాత్రమే కోడ్‌ను నడుపుతుంది. పైథాన్ ఇఫ్, తర్వాత ప్రతి ఎలిఫ్‌ను క్రమంగా చూసి, నిజమైన మొదటి బ్రాంచ్‌ను మాత్రమే నడుపుతుంది. మిగిలినవి ఎల్స్‌లోకి వెళ్తాయి.",hn:"कंडीशनल तभी कोड चलाता है जब शर्त सही हो। पाइथन पहले इफ़, फिर हर एलिफ़ को क्रम से जाँचता है, और सिर्फ़ पहली सही शाखा चलाता है। बाकी सब एल्स में जाता है।"},
+  {step:0,sel:"#idAna",en:"It works like a loan officer's checklist. The officer stops at the first rule that applies.",te:"ఇది లోన్ ఆఫీసర్ చెక్‌లిస్ట్ లాగా పనిచేస్తుంది. వర్తించే మొదటి నియమం దగ్గర ఆఫీసర్ ఆగిపోతాడు.",hn:"यह लोन अधिकारी की चेकलिस्ट जैसा काम करता है। अधिकारी पहले लागू होने वाले नियम पर रुक जाता है।"},
+  {step:1,sel:"#dfCode",en:"Move the sliders. Each condition shows true or false, the branch that runs is highlighted, and everything after it is skipped.",te:"స్లైడర్లను కదపండి. ప్రతి షరతు ట్రూ లేదా ఫాల్స్ చూపిస్తుంది, నడిచే బ్రాంచ్ హైలైట్ అవుతుంది, దాని తర్వాతవన్నీ వదిలివేయబడతాయి.",hn:"स्लाइडर हिलाइए। हर शर्त सही या ग़लत दिखाती है, चलने वाली शाखा हाइलाइट हो जाती है, और उसके बाद का सब छोड़ दिया जाता है।"},
+  {step:2,sel:"#tTab",en:"Conditions follow Boolean algebra. De Morgan's law says not A and B is the same as not A or not B.",te:"షరతులు బూలియన్ ఆల్జీబ్రాను పాటిస్తాయి. నాట్ ఏ యాండ్ బీ అంటే నాట్ ఏ ఆర్ నాట్ బీ అని డీ మోర్గాన్ నియమం చెబుతుంది.",hn:"शर्तें बूलियन बीजगणित मानती हैं। डी मॉर्गन का नियम कहता है कि नॉट ए एंड बी, नॉट ए ऑर नॉट बी के बराबर है।"}]
+};
+
+/* =================== CONCEPT 5 · LOOPS AND ITERATIONS =================== */
+C[5]={
+ sub:"Repeating work with for and while: a loan amortisation schedule, savings goals, and the loop at the heart of every training run.",
+ builds:["Conditional Statements"],leads:["Lists, Tuples, Sets and Dictionaries","Training loops (Stage 6)"],
+ idea:{
+  def:"A <b>loop</b> repeats a block of code. A <code>for</code> loop runs once for each item in a sequence, such as <code>range(1, 13)</code> for 12 months. A <code>while</code> loop keeps running <b>as long as</b> a condition is True. <code>break</code> leaves a loop early and <code>continue</code> skips to the next round.",
+  why:"Real work is repetitive: every month of a loan, every transaction in a file, every customer in a portfolio, every batch in a training run. Loops let a few lines of code process millions of items.",
+  analogy:"A bank teller serving a queue: take the next customer, do the same steps, repeat until the queue is empty (a while loop). Or ticking through 12 monthly statements one by one (a for loop).",
+  bank:"An amortisation schedule is a loop: each month, interest = balance × r, principal paid = EMI − interest, new balance = balance − principal paid. After the last month the balance is exactly zero.",
+  real:["The training loop: for each epoch, for each batch: predict, compute loss, update weights (Stages 6, 16)","Batch scoring: loop over 50 lakh accounts each night to refresh risk scores","Retries: while the API call fails and attempts &lt; 3, wait and retry (Stage 15)","Agents: while the task isn't finished, think, call a tool, read the result (Stage 14)"]},
+ how:{intro:"Set up a loan and run the loop. Each iteration highlights the line that runs, adds a row to the schedule and shrinks the balance bar. Use Step to go one line at a time.",
+  mount(h,ctx){h.innerHTML=`<div class="box ctrls" style="margin-bottom:12px"><label class="f">loan: <b id="amPv"></b><input type="range" id="amP" min="50000" max="1000000" step="10000" value="300000"></label><label class="f">annual rate: <b id="amRv"></b><input type="range" id="amR" min="6" max="24" step="0.5" value="12"></label><label class="f">months: <b id="amNv"></b><input type="range" id="amN" min="3" max="24" value="6"></label></div>
+   <div class="grid2"><div style="display:grid;gap:10px;align-content:start">${listing([["balance = principal"],["for month in range(1, months + 1):"],["    interest = balance * r"],["    principal_part = emi - interest"],["    balance = balance - principal_part"],["    print(month, interest, principal_part, balance)"],["print(\"Loan closed\")"]],"amCode")}<div class="row"><button class="btn primary sm" type="button" id="amStep">Step ▶</button><button class="btn sm" type="button" id="amPlay">Play</button><button class="btn sm" type="button" id="amFast">Run all</button><button class="btn sm" type="button" id="amReset">Reset</button></div><div class="mono" id="amVars" style="font-size:.84rem"></div></div>
+   <div style="display:grid;gap:10px;align-content:start"><svg id="amSvg" viewBox="0 0 440 170" style="width:100%;height:auto;display:block" role="img" aria-label="Balance after each month"></svg><div class="scroll" style="max-height:260px;overflow-y:auto"><table class="t" id="amTab"></table></div></div></div>`;
+   let S;const setup=()=>{const P0=+$("#amP").value,R=+$("#amR").value,n=+$("#amN").value,r=R/1200,emi=P0*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+    $("#amPv").textContent="₹"+fmt(P0,0);$("#amRv").textContent=R+"%";$("#amNv").textContent=n;S={P0,r,n,emi,bal:P0,month:0,line:-1,rows:[],int:0,pp:0,done:false};draw();};
+   const step=()=>{if(S.done)return;
+    if(S.line===-1){S.line=0;}
+    else if(S.line===0||S.line===5){if(S.month<S.n){S.month++;S.line=1;}else{S.line=6;S.done=true;}if(S.line===1){}}
+    else if(S.line===1){S.line=2;S.int=S.bal*S.r;}
+    else if(S.line===2){S.line=3;S.pp=S.emi-S.int;}
+    else if(S.line===3){S.line=4;S.bal=S.bal-S.pp;}
+    else if(S.line===4){S.line=5;S.rows.push([S.month,S.int,S.pp,Math.abs(S.bal)<0.005?0:S.bal]);}
+    draw();};
+   const draw=()=>{const rows=$$("#amCode tr");rows.forEach(r=>r.classList.remove("hl"));if(S.line>=0)rows[S.line].classList.add("hl");
+    $("#amVars").innerHTML=`emi = ${fmt(S.emi)} · r = ${S.r.toFixed(5)}<br>month = ${S.month||"–"} · interest = ${S.line>=2&&S.month?fmt(S.int):"–"} · principal_part = ${S.line>=3&&S.month?fmt(S.pp):"–"}<br>balance = <b class="c-tok">${fmt(Math.abs(S.bal)<0.005?0:S.bal)}</b>${S.done?' · <span class="c-out">loop finished: Loan closed</span>':""}`;
+    $("#amTab").innerHTML=`<tr><th>month</th><th>interest</th><th>principal</th><th>balance</th></tr>`+S.rows.map(x=>`<tr><td>${x[0]}</td><td class="c-err">${fmt(x[1])}</td><td class="c-emb">${fmt(x[2])}</td><td>${fmt(x[3])}</td></tr>`).join("");
+    const W=440,H=170,l=8,bw=(W-l*2)/S.n;let g="";for(let i=0;i<S.n;i++){const row=S.rows[i],v=row?row[3]:null,x=l+i*bw,top=v===null?null:12+(1-v/S.P0)*(H-34);
+      g+=`<rect x="${x+2}" y="12" width="${bw-4}" height="${H-34}" rx="3" style="fill:var(--panel2)"/>`;if(v!==null&&v>0)g+=`<rect x="${x+2}" y="${top}" width="${bw-4}" height="${H-22-top}" rx="3" style="fill:var(--tok)"/>`;
+      if(S.n<=12||i%2===0)g+=`<text x="${x+bw/2}" y="${H-6}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono" style="fill:var(--muted)">${i+1}</text>`;}
+    $("#amSvg").innerHTML=g+`<text x="${l}" y="9" font-size="9" font-family="IBM Plex Mono" style="fill:var(--muted)">balance left after each month</text>`;
+    $("#amStep").disabled=S.done;$("#amFast").disabled=S.done;};
+   let timer=null;const stop=()=>{clearInterval(timer);timer=null;$("#amPlay").textContent="Play";};
+   $("#amStep").addEventListener("click",()=>{stop();step();});$("#amFast").addEventListener("click",()=>{stop();while(!S.done)step();});
+   $("#amPlay").addEventListener("click",()=>{if(timer){stop();return;}$("#amPlay").textContent="Pause";timer=setInterval(()=>{if(!document.contains($("#amSvg"))||S.done){stop();return;}step();},350);});
+   $("#amReset").addEventListener("click",()=>{stop();setup();});["#amP","#amR","#amN"].forEach(s=>$(s).addEventListener("input",()=>{stop();setup();}));setup();}},
+ math:{intro:"A loop that updates a value is a <b>recurrence</b>. The amortisation loop has a closed form you can check, and it explains why early EMIs are mostly interest.",
+  mount(h){h.innerHTML=`<div class="formula">Recurrence (one loop iteration):   B_k = B_(k−1) · (1 + r) − E
+Interest in month k:   I_k = r · B_(k−1)
+Principal in month k:  p_k = E − I_k = p_1 · (1 + r)^(k−1)    ← grows geometrically
+Check: p_1 + p_2 + … + p_n = P   (all the principal is repaid)
+Total interest = n · E − P
+
+Loop cost: a for loop over n items does n iterations → O(n) time.
+Nested loops over n and m items → O(n · m).  Training = epochs × batches iterations.</div>
+   <div class="box"><div class="ctrls" style="margin-bottom:10px"><label class="f">loan: <b id="arPv"></b><input type="range" id="arP" min="500000" max="10000000" step="100000" value="3000000"></label><label class="f">annual rate: <b id="arRv"></b><input type="range" id="arR" min="6" max="15" step="0.25" value="8.5"></label><label class="f">years: <b id="arNv"></b><input type="range" id="arN" min="5" max="30" value="20"></label></div>
+   <svg id="arSvg" viewBox="0 0 440 200" style="width:100%;height:auto;display:block" role="img" aria-label="Interest and principal share of each EMI over time"></svg><p class="note" id="arNote" style="margin-top:8px"></p></div>`;
+   const f=()=>{const P0=+$("#arP").value,R=+$("#arR").value,y=+$("#arN").value,n=y*12,r=R/1200,E=P0*r*Math.pow(1+r,n)/(Math.pow(1+r,n)-1);
+    $("#arPv").textContent="₹"+fmt(P0,0);$("#arRv").textContent=R+"%";$("#arNv").textContent=y;
+    let b=P0,yi=[];for(let k=1;k<=n;k++){const I=b*r,p=E-I;b-=p;const yr=Math.ceil(k/12)-1;yi[yr]=yi[yr]||[0,0];yi[yr][0]+=I;yi[yr][1]+=p;}
+    const W=440,H=200,l=8,bw=(W-l*2)/y,mx=E*12;let g="";yi.forEach(([I,p],i)=>{const x=l+i*bw,hI=I/mx*(H-36),hp=p/mx*(H-36);g+=`<rect x="${x+1}" y="${H-22-hI-hp}" width="${bw-2}" height="${hp}" style="fill:var(--emb)"/><rect x="${x+1}" y="${H-22-hI}" width="${bw-2}" height="${hI}" style="fill:var(--err)"/>`;if(y<=15||i%5===4||i===0)g+=`<text x="${x+bw/2}" y="${H-8}" text-anchor="middle" font-size="9" font-family="IBM Plex Mono" style="fill:var(--muted)">${i+1}</text>`;});
+    g+=`<text x="${l}" y="11" font-size="9.5" font-family="IBM Plex Mono"><tspan style="fill:var(--err)">■ interest</tspan>  <tspan style="fill:var(--emb)">■ principal</tspan>  <tspan style="fill:var(--muted)">paid in each year</tspan></text>`;$("#arSvg").innerHTML=g;
+    const half=yi.findIndex(([I,p])=>p>I);$("#arNote").innerHTML=`EMI ₹${fmt(E)}. In year 1, <b class="c-err">${(yi[0][0]/(E*12)*100).toFixed(0)}%</b> of what you pay is interest. Principal overtakes interest in <b>year ${half+1}</b>. Total interest: ₹${fmt(E*n-P0,0)}.`;};
+   ["#arP","#arR","#arN"].forEach(s=>$(s).addEventListener("input",f));f();}},
+ code:{file:"schedule.py",intro:"A real amortisation schedule with a <code>for</code> loop, then a <code>while</code> loop that finds how long a savings goal takes.",
+  lines:[["principal = 300000",""],["r = 0.12 / 12","12% a year → 1% a month"],["months = 6",""],["emi = principal * r * (1 + r) ** months / ((1 + r) ** months - 1)","The EMI formula from concept 3"],["print(f\"EMI: {emi:.2f}\")",""],["balance = principal","The loop will keep updating this one variable"],["for month in range(1, months + 1):","range(1, 7) gives 1, 2, 3, 4, 5, 6. The end is excluded, hence + 1."],["    interest = balance * r","Indented lines run once per month"],["    principal_part = emi - interest",""],["    balance = balance - principal_part","Updates the running balance"],["    print(f\"{month:>2} interest {interest:8.2f} principal {principal_part:9.2f} balance {abs(balance):10.2f}\")",":8.2f pads to width 8 with 2 decimals; abs() hides a tiny −0.00 from float rounding"],["saved = 0","Now a while loop: we don't know the number of months in advance"],["m = 0",""],["while saved < 100000:","Checked before every round; stops once the goal is reached"],["    saved = saved * 1.005 + 8000","0.5% monthly interest, then deposit ₹8,000"],["    m += 1","Same as m = m + 1. Forget this and the count is wrong; forget the line above and the loop never ends."],["print(\"Goal reached in\", m, \"months, saved\", round(saved))",""]],
+  expected:"EMI: 51764.51\n 1 interest  3000.00 principal  48764.51 balance  251235.49\n 2 interest  2512.35 principal  49252.16 balance  201983.33\n 3 interest  2019.83 principal  49744.68 balance  152238.66\n 4 interest  1522.39 principal  50242.12 balance  101996.53\n 5 interest  1019.97 principal  50744.54 balance   51251.99\n 6 interest   512.52 principal  51251.99 balance       0.00\nGoal reached in 13 months, saved 107178",
+  tryThis:"Try it: change <code>months</code> to 12. Add <code>if month == 3: continue</code> inside the loop and see which row disappears (the balance still updates, so think about why it's a bad idea here)."},
+ pitfalls:{mistakes:[
+   {t:"Off-by-one with range",bad:'for month in range(1, 12):\n    ...   # only 11 months',good:'for month in range(1, 13):\n    ...   # 12 months',why:"range(start, stop) stops <i>before</i> stop. range(12) gives 0 to 11."},
+   {t:"A while loop that never ends",bad:'while saved < goal:\n    print(saved)      # saved never changes',good:'while saved < goal:\n    saved += deposit',why:"Something inside the loop must move the condition towards False. Production code also caps attempts: <code>while ok is False and tries &lt; 3</code>."},
+   {t:"Changing a list while looping over it",bad:'for loan in loans:\n    if loan == 0:\n        loans.remove(loan)',good:'loans = [x for x in loans if x != 0]',why:"Removing items shifts the positions, so some items are skipped. Build a new list instead (comprehensions, concept 14)."},
+   {t:"Python loops over big data",bad:'total = 0\nfor x in amounts:   # 10 million items\n    total += x * 1.18',good:'import numpy as np\ntotal = (np.array(amounts) * 1.18).sum()',why:"Each Python iteration has overhead. For millions of numbers, NumPy runs the loop in C, often 50–100× faster (Stage 3)."}],
+  tradeoffs:`<table class="t"><tr><th>Loop</th><th>Use when</th><th>Example</th></tr><tr><td><code>for</code></td><td>You know the items or the count</td><td>Every month of a 240-month loan</td></tr><tr><td><code>while</code></td><td>You loop until something happens</td><td>Until the savings goal is reached; until the API succeeds</td></tr><tr><td>Vectorised (NumPy/pandas)</td><td>Same maths on many numbers</td><td>EMI for a million loans in one line</td></tr><tr><td>Comprehension</td><td>Building a new list from an old one</td><td><code>[a * 1.18 for a in amounts]</code></td></tr></table>`,
+  production:`<ul><li>Every model is trained by nested loops: <code>for epoch in range(E): for batch in loader: …</code>. Stage 6 builds exactly this.</li><li>Batch jobs loop over records in chunks so memory stays bounded, and log progress every N items.</li><li>Retry loops use exponential backoff (wait 1s, 2s, 4s…) and a maximum attempt count, so one failing service can't hang the system.</li><li>LLM agents are a <code>while</code> loop: think → act → observe, until done or a step limit is hit (Stage 14).</li></ul>`},
+ practice:{title:"Months to clear a credit-card balance",task:"<code>balance</code>, <code>monthly_rate</code> and <code>payment</code> are set by the tests, so <b>don't assign them</b>. Each month: interest is added (<code>balance = balance * (1 + monthly_rate)</code>), then the payment is subtracted. Count the months until the balance is 0 or less, and store the count in <code>months</code>.<br><br>If the payment is not more than the first month's interest, the debt can never be cleared: set <code>months = None</code> and don't loop (otherwise your loop would never end).",
+  starter:'# balance, monthly_rate and payment are given\nmonths = 0\n',
+  checks:["₹50,000 at 3%/month paying ₹5,000 → correct count","₹10,000 at 2%/month paying ₹10,000 → 2 months","₹1,000 at 1%/month paying ₹2,000 → 1 month","₹1,00,000 at 3%/month paying ₹3,000 → None (never cleared)"],
+  tests:'def ref(b, r, p):\n    if p <= b * r:\n        return None\n    m = 0\n    while b > 0:\n        b = b * (1 + r) - p\n        m += 1\n    return m\nfor b, r, p in [(50000, 0.03, 5000), (10000, 0.02, 10000), (1000, 0.01, 2000), (100000, 0.03, 3000)]:\n    g, out = run_user(balance=b, monthly_rate=r, payment=p)\n    check(f"{b}", g.get("months") == ref(b, r, p))',
+  hint:"First <code>if payment &lt;= balance * monthly_rate: months = None</code>. Otherwise <code>while balance &gt; 0:</code> update the balance and add 1 to <code>months</code>.",
+  solution:'if payment <= balance * monthly_rate:\n    months = None\nelse:\n    months = 0\n    while balance > 0:\n        balance = balance * (1 + monthly_rate) - payment\n        months += 1',
+  project:"Build <code>amortise.py</code>: ask for loan, rate and years with input(), print a yearly summary table (interest and principal paid per year) using a loop inside a loop, and show the month when principal first exceeds interest."},
+ quiz(r){const a=1+Math.floor(r()*5),s=[1,2,3][Math.floor(r()*3)],b=a+5+Math.floor(r()*12),cnt=Math.max(0,Math.ceil((b-a)/s)),n=5+Math.floor(r()*20);
+  const L=shuffle([300+Math.floor(r()*500),-20,0,1500+Math.floor(r()*500),200+Math.floor(r()*300)],r);let tot=0;for(const x of L){if(x<=0)continue;if(x>1000)break;tot+=x;}
+  const N=1000*(10+Math.floor(r()*90)),B=[32,64,128][Math.floor(r()*3)],E=2+Math.floor(r()*4),steps=Math.ceil(N/B)*E;
+  return [
+   num("Trace",`How many times does the loop body run?${pre(`for i in range(${a}, ${b}, ${s}):\n    print(i)`)}`,cnt,0,`range(${a}, ${b}, ${s}) starts at ${a}, steps by ${s}, and stops before ${b}: ${cnt} values.`,[[cnt+1,`The stop value ${b} is excluded.`]]),
+   num("Trace",`What is printed?${pre(`total = 0\nfor i in range(1, ${n} + 1):\n    total += i\nprint(total)`)}`,n*(n+1)/2,0,`1 + 2 + … + ${n} = ${n}×${n+1}/2 = ${n*(n+1)/2}.`,[[n*(n-1)/2,`range(1, ${n} + 1) includes ${n}.`]]),
+   mcq("Predict the output",`What does this print?${pre(`total = 0\nfor amt in [${L.join(", ")}]:\n    if amt <= 0:\n        continue\n    if amt > 1000:\n        break\n    total += amt\nprint(total)`)}`,[...new Set([tot,L.filter(x=>x>0&&x<=1000).reduce((a,b)=>a+b,0),L.filter(x=>x>0).reduce((a,b)=>a+b,0),L.reduce((a,b)=>a+b,0)])].slice(0,4).map((v,i)=>({t:`<code>${v}</code>`,ok:v===tot,why:v===tot?"continue skips the non-positive amounts; break stops the whole loop at the first amount over 1000, so later amounts are never added.":"Trace it item by item: continue skips just that item, but break ends the loop completely."})),r),
+   mcq("Debugging",`What happens when this runs?${pre('saved = 0\nwhile saved < 100000:\n    print("Saving...")')}`,[
+    {t:"It never stops, because saved never changes inside the loop",ok:true,why:"The condition stays True forever. Something in the body must move it towards False."},
+    {t:"It prints once",why:"while repeats as long as the condition is True."},
+    {t:"It doesn't run, because saved starts at 0",why:"0 < 100000 is True, so it runs, and keeps running."},
+    {t:"Python stops it after 100 rounds",why:"Python has no automatic limit. (This page stops runaway code after a few seconds, but a server wouldn't.)"}],r),
+   num("Training loops",`A training set has <b>${N.toLocaleString("en-IN")}</b> examples, the batch size is <b>${B}</b>, and you train for <b>${E}</b> epochs. How many times does the inner (batch) loop body run in total? (A final smaller batch still counts.)`,steps,0,`Batches per epoch = ceil(${N} / ${B}) = ${Math.ceil(N/B)}; × ${E} epochs = ${steps}.`,[[Math.floor(N/B)*E,"The last partial batch still runs: use ceiling, not floor."],[Math.ceil(N/B),`Multiply by the ${E} epochs.`]])];},
+ narr:[
+  {step:0,sel:"#idDef",en:"A loop repeats a block of code. A for loop runs once for each item in a sequence. A while loop keeps running as long as its condition is true.",te:"లూప్ ఒక కోడ్ బ్లాక్‌ను పునరావృతం చేస్తుంది. ఫర్ లూప్ ఒక క్రమంలోని ప్రతి అంశానికి ఒకసారి నడుస్తుంది. వైల్ లూప్ దాని షరతు నిజంగా ఉన్నంతకాలం నడుస్తూనే ఉంటుంది.",hn:"लूप कोड के एक ब्लॉक को दोहराता है। फ़ॉर लूप किसी क्रम की हर चीज़ के लिए एक बार चलता है। व्हाइल लूप तब तक चलता रहता है जब तक उसकी शर्त सही है।"},
+  {step:0,sel:"#idBank",en:"A loan schedule is a loop. Each month, interest is added, the EMI pays some principal, and the balance shrinks until it reaches zero.",te:"లోన్ షెడ్యూల్ ఒక లూప్. ప్రతి నెల వడ్డీ కలుస్తుంది, ఈఎంఐ కొంత అసలును చెల్లిస్తుంది, బ్యాలెన్స్ సున్నాకు చేరే వరకు తగ్గుతుంది.",hn:"लोन शेड्यूल एक लूप है। हर महीने ब्याज जुड़ता है, ईएमआई कुछ मूलधन चुकाती है, और बैलेंस शून्य होने तक घटता है।"},
+  {step:1,sel:"#amCode",en:"Press step to run the loop one line at a time, or play to watch every month. The highlighted line is running now.",te:"లూప్‌ను ఒక్కో లైన్‌గా నడపడానికి స్టెప్ నొక్కండి, లేదా ప్రతి నెలా చూడటానికి ప్లే నొక్కండి. హైలైట్ అయిన లైన్ ఇప్పుడు నడుస్తోంది.",hn:"लूप को एक-एक लाइन चलाने के लिए स्टेप दबाइए, या हर महीना देखने के लिए प्ले। हाइलाइट की गई लाइन अभी चल रही है।"},
+  {step:2,sel:"#arSvg",en:"In a long home loan, the early years are mostly interest. The principal part grows every month, so later EMIs repay the loan much faster.",te:"దీర్ఘకాల హోమ్ లోన్‌లో మొదటి సంవత్సరాలు ఎక్కువగా వడ్డీయే. అసలు భాగం ప్రతి నెలా పెరుగుతుంది, కాబట్టి తర్వాతి ఈఎంఐలు లోన్‌ను చాలా వేగంగా తీరుస్తాయి.",hn:"लंबे होम लोन में शुरुआती साल ज़्यादातर ब्याज होते हैं। मूलधन का हिस्सा हर महीने बढ़ता है, इसलिए बाद की ईएमआई लोन जल्दी चुकाती हैं।"}]
+};
+
+/* =================== START =================== */
+renderProgress();
+(function route(){const m=/^#c(\d+)$/.exec(location.hash||"");if(m&&+m[1]>=1&&+m[1]<=TOTAL&&(isOpen(+m[1])||mastered(+m[1])))openConcept(+m[1]);else renderHome();})();
+window.addEventListener("hashchange",()=>{const m=/^#c(\d+)$/.exec(location.hash||"");if(m&&+m[1]!==cur.n&&(isOpen(+m[1])||mastered(+m[1])))openConcept(+m[1]);else if(!m&&!$("#concept").hidden)goHome();});
+window.__AIENG={C,CONCEPTS,P,pyRun,openConcept,setStep,splitOut};
+})();
+
+</script>
