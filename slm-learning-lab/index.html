@@ -3393,6 +3393,7 @@ const NARR={
 
 /* ---- engine ---- */
 const NV={lang:"en",rate:1,cap:true,voice:"",queue:[],i:0,tok:0,playing:false,safety:null};
+const badVoices=new Set();let liveUtts=[];
 try{const s=JSON.parse(localStorage.getItem("slmlab.narr")||"{}");Object.assign(NV,{lang:s.lang||"en",rate:s.rate||1,cap:s.cap!==false,voice:s.voice||""});}catch(e){}
 const saveNV=()=>{try{localStorage.setItem("slmlab.narr",JSON.stringify({lang:NV.lang,rate:NV.rate,cap:NV.cap,voice:NV.voice}));}catch(e){}};
 const synth=("speechSynthesis" in window)?window.speechSynthesis:null;
@@ -3403,8 +3404,8 @@ function loadVoices(){try{voices=synth?synth.getVoices():[];}catch(e){voices=[];
 const voicesFor=l=>voices.filter(v=>(v.lang||"").toLowerCase().replace("_","-").startsWith(LCODE[l]));
 function pickVoice(l){const vs=voicesFor(l);if(!vs.length)return null;return vs.find(v=>v.voiceURI===NV.voice)||vs.find(v=>/google|natural|neural|online|enhanced|premium/i.test(v.name))||vs[0];}
 function setStat(msg,bad){const s=$("#nbStat");if(s){s.textContent=msg;s.style.color=bad?"var(--err)":"var(--muted)";}}
-function fillVoices(){const sel=$("#nbVoice");if(!sel)return;const vs=voicesFor(NV.lang),cur=pickVoice(NV.lang);
-  sel.innerHTML=(vs.length?vs.map(v=>`<option value="${esc(v.voiceURI)}"${cur&&v.voiceURI===cur.voiceURI?" selected":""}>${esc(v.name)}</option>`).join(""):"")+`<option value=""${vs.length?"":" selected"}>device default (${BCP[NV.lang]})</option>`;
+function fillVoices(){const sel=$("#nbVoice");if(!sel)return;const vs=voicesFor(NV.lang),cur=(typeof candidates==="function"?candidates(NV.lang)[0]:null)||null;
+  sel.innerHTML=(vs.length?vs.map(v=>`<option value="${esc(v.voiceURI)}"${cur&&v.voiceURI===cur.voiceURI?" selected":""}>${esc(v.name)} · ${v.localService?"offline":"online"}</option>`).join(""):"")+`<option value=""${vs.length?"":" selected"}>device default (${BCP[NV.lang]})</option>`;
   const w=$("#nbWarn");if(!w)return;
   w.innerHTML=!synth?"This browser has no speech engine, so only captions will play. Try Chrome, Edge or Safari.":
     (voices.length&&!vs.length)?`No ${LNAME[NV.lang]} voice is listed on this device. The device default will be tried. If you hear nothing, install one: Android → Settings → Google Text-to-speech → Install voice data; Windows → Settings → Time & language → Speech → Add voices; Mac/iPhone → Accessibility → Spoken Content → Voices.`:"";}
@@ -3412,27 +3413,43 @@ if(synth){loadVoices();try{synth.addEventListener?synth.addEventListener("voices
 function narrItems(id){const m=id.match(/-(code|ex|quiz)$/);return NARR[id]||(m?NARR_GENERIC[m[1]]:null);}
 const panelTitle=id=>{const h=document.querySelector(`#${id} .phead h3`);return h?h.textContent:"";};
 function clearHi(){$$(".narr-hi").forEach(e=>e.classList.remove("narr-hi"));}
-function hush(){try{if(synth&&(synth.speaking||synth.pending))synth.cancel();}catch(e){}}
+let lastHush=-1e9;const IS_SAFARI=/^((?!chrome|chromium|crios|android|edg).)*safari/i.test(navigator.userAgent);
+function hush(){try{if(synth&&(synth.speaking||synth.pending)){synth.cancel();lastHush=performance.now();}}catch(e){}}
 function narrHalt(){NV.tok++;clearTimeout(NV.safety);hush();}
 function narrStart(queue){narrHalt();queue.forEach(q=>q.done=false);NV.queue=queue;NV.i=0;NV.playing=true;$("#narrBar").hidden=false;document.body.classList.add("narrating");loadVoices();runSeg(true);}
 function narrStop(){narrHalt();NV.playing=false;clearHi();$("#narrBar").hidden=true;document.body.classList.remove("narrating");}
 const chunksOf=t=>t.split(/(?<=[.!?।])\s+/).map(s=>s.trim()).filter(Boolean);
-/* speak() runs synchronously inside the click that started it: iOS/Safari block speech started later */
-function speakText(text,tok,onDone,est){
+/* Voice cascade: the chosen voice, then offline voices, then online ones, then the device default.
+   A voice that doesn't start within a few seconds is skipped for the rest of the session. */
+function vKey(v){return v?v.voiceURI:"__default";}
+function vLabel(v){return v?`${v.name} (${v.localService?"offline":"online"})`:`device default ${BCP[NV.lang]}`;}
+function candidates(l){const vs=voicesFor(l),pref=vs.find(v=>v.voiceURI===NV.voice);
+  const list=[...(pref?[pref]:[]),...vs.filter(v=>v.localService&&v!==pref),...vs.filter(v=>!v.localService&&v!==pref),null];
+  return list.filter(v=>!badVoices.has(vKey(v)));}
+function speakText(text,tok,onDone,est,tried){
+  tried=tried||[];
   if(!synth){NV.safety=setTimeout(onDone,est);return;}
-  hush();
-  const v=pickVoice(NV.lang),parts=chunksOf(text);let started=false,doneN=0,failed=false;
-  const fallback=msg=>{if(failed||tok!==NV.tok)return;failed=true;setStat(msg,true);clearTimeout(NV.safety);NV.safety=setTimeout(onDone,est);};
-  try{
+  const cands=candidates(NV.lang);
+  const giveUp=msg=>{if(tok!==NV.tok)return;setStat(msg,true);clearTimeout(NV.safety);NV.safety=setTimeout(onDone,est);};
+  if(!cands.length){giveUp(`No voice produced sound${tried.length?". Tried: "+tried.join(", "):""}. Captions continue. ${NV.lang==="en"?"Press Test voice, or try Microsoft Edge.":`Microsoft Edge on Windows has natural ${LNAME[NV.lang]} voices; Chrome on Windows has ${NV.lang==="te"?"none for Telugu":"only an online Hindi voice"}.`}`);return;}
+  const v=cands[0],parts=chunksOf(text);let started=false,doneN=0,dead=false;
+  const go=()=>{
+    if(tok!==NV.tok)return;
     try{synth.resume();}catch(e){}
-    parts.forEach((p,k)=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.lang=v?v.lang:BCP[NV.lang];u.rate=NV.rate;
-      u.onstart=()=>{if(!started){started=true;setStat(`Speaking with ${v?v.name:"the device's default "+LNAME[NV.lang]+" voice"}`,false);}};
-      u.onend=()=>{if(tok!==NV.tok||failed)return;doneN++;if(doneN===parts.length){clearTimeout(NV.safety);setTimeout(onDone,300);}};
-      u.onerror=e=>{if(e.error==="interrupted"||e.error==="canceled")return;fallback(`Speech error "${e.error}"${e.error==="not-allowed"?": the browser blocked audio. Tap ▶ again or press Test voice.":e.error==="language-unavailable"||e.error==="voice-unavailable"?`: no ${LNAME[NV.lang]} voice is installed.`:"."} Captions continue.`);};
-      synth.speak(u);});
-    NV.safety=setTimeout(onDone,est*2.5+5000);
-    setTimeout(()=>{if(tok===NV.tok&&!started&&!failed)fallback(`No sound started (${voices.length} voices reported by the browser). Captions continue. Press Test voice to check your device, or try Chrome or Edge.`);},3000);
-  }catch(e){fallback("Speech failed: "+e.message+". Captions continue.");}
+    liveUtts=parts.map(p=>{const u=new SpeechSynthesisUtterance(p);if(v)u.voice=v;u.lang=v?v.lang:BCP[NV.lang];u.rate=NV.rate;
+      u.onstart=()=>{if(!started){started=true;if(v)NV.voice=v.voiceURI;setStat(`Speaking with ${vLabel(v)}`,false);fillVoices();}};
+      u.onend=()=>{if(tok!==NV.tok||dead)return;doneN++;if(doneN===parts.length){clearTimeout(NV.safety);setTimeout(onDone,300);}};
+      u.onerror=e=>{if(e.error==="interrupted"||e.error==="canceled"||dead||tok!==NV.tok)return;if(e.error==="not-allowed"){dead=true;giveUp(`The browser blocked speech ("not-allowed"). Tap ▶ or Test voice to allow it. Captions continue.`);return;}if(!started)retry(`error ${e.error}`);};
+      return u;});
+    liveUtts.forEach(u=>synth.speak(u));               // references kept in liveUtts so Chrome doesn't drop their events
+    NV.safety=setTimeout(onDone,est*2.5+6000);
+    setTimeout(()=>{if(tok===NV.tok&&!started&&!dead)retry("no sound");},v&&!v.localService?4000:2500);
+  };
+  const retry=why=>{if(dead)return;dead=true;badVoices.add(vKey(v));tried.push(`${vLabel(v)}: ${why}`);setStat(`${vLabel(v)} didn't start, trying the next voice…`,true);hush();clearTimeout(NV.safety);
+    setTimeout(()=>{if(tok===NV.tok)speakText(text,tok,onDone,est,tried);},200);};
+  hush();const since=performance.now()-lastHush;
+  if(!IS_SAFARI&&since<250)setTimeout(go,250-since);  // Chrome drops speech requested right after cancel()
+  else go();                                          // otherwise speak inside the click (needed on iPhone/Safari)
 }
 function runSeg(scroll){
   const tok=++NV.tok;clearTimeout(NV.safety);const it=NV.queue[NV.i];
@@ -3461,7 +3478,7 @@ $("#nbLang").value=NV.lang;$("#nbRate").value=String(NV.rate);$("#nbCap").checke
 const restartSeg=()=>{if(NV.playing&&NV.i<NV.queue.length){narrHalt();runSeg(false);}};
 $("#nbLang").addEventListener("change",e=>{NV.lang=e.target.value;NV.voice="";saveNV();fillVoices();restartSeg();});
 $("#nbRate").addEventListener("change",e=>{NV.rate=+e.target.value;saveNV();restartSeg();});
-$("#nbVoice").addEventListener("change",e=>{NV.voice=e.target.value;saveNV();restartSeg();});
+$("#nbVoice").addEventListener("change",e=>{NV.voice=e.target.value;badVoices.delete(e.target.value||"__default");saveNV();restartSeg();});
 $("#nbCap").addEventListener("change",e=>{NV.cap=e.target.checked;saveNV();$("#nbText").hidden=!NV.cap;});
 $("#nbPlay").addEventListener("click",()=>{if(NV.playing){narrHalt();NV.playing=false;$("#nbPlay").textContent="Resume";setStat("Paused.",false);}else{if(NV.i>=NV.queue.length){NV.i=0;NV.queue.forEach(q=>q.done=false);}NV.playing=true;runSeg(false);}});
 $("#nbPrev").addEventListener("click",()=>{narrHalt();NV.i=Math.max(0,NV.i-1);if(NV.queue[NV.i])NV.queue[NV.i].done=false;NV.playing=true;runSeg(false);});
@@ -3469,12 +3486,10 @@ $("#nbNext").addEventListener("click",()=>{narrHalt();NV.i=Math.min(NV.queue.len
 $("#nbStop").addEventListener("click",narrStop);
 $("#nbTest").addEventListener("click",()=>{
   if(!synth){setStat("No speech engine in this browser. Try Chrome, Edge or Safari.",true);return;}
-  const wasPlaying=NV.playing;if(wasPlaying){narrHalt();NV.playing=false;$("#nbPlay").textContent="Resume";}
-  hush();loadVoices();const v=pickVoice(NV.lang),u=new SpeechSynthesisUtterance(TESTP[NV.lang]);if(v)u.voice=v;u.lang=v?v.lang:BCP[NV.lang];u.rate=NV.rate;let ok=false;
-  u.onstart=()=>{ok=true;setStat(`Test is playing with ${v?v.name:"the device default voice"}. If you can't hear it, check your volume and that this tab isn't muted.`,false);};
-  u.onerror=e=>setStat(`Test failed: "${e.error}". ${voices.length} voices reported${voicesFor(NV.lang).length?"":`, none for ${LNAME[NV.lang]}`}.`,true);
-  try{synth.resume();}catch(e){}synth.speak(u);
-  setTimeout(()=>{if(!ok)setStat(`The browser accepted the request but no speech started (${voices.length} voices, ${voicesFor(NV.lang).length} for ${LNAME[NV.lang]}). Speech may be blocked inside this viewer. Captions still work.`,true);},3000);
+  if(NV.playing){NV.playing=false;$("#nbPlay").textContent="Resume";}
+  narrHalt();badVoices.clear();loadVoices();const t=NV.tok;
+  setStat(`Testing ${LNAME[NV.lang]} voices…`,false);
+  speakText(TESTP[NV.lang],t,()=>{if(t===NV.tok){const s=$("#nbStat").textContent;if(/^Speaking/.test(s))setStat(s.replace("Speaking with","Test finished with")+". If you heard it, press Resume.",false);}},3500);
 });
 fillVoices();
 
