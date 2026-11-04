@@ -1040,6 +1040,205 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 3 ====================== -->
+  <section id="stage3" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 03 · unlocked</div>
+      <h2>Giving numbers meaning: embeddings</h2>
+      <p>A token ID like 46 is just a name tag. This stage turns each ID into a list of numbers whose geometry captures meaning. Similar words land close together, directions encode relationships, and a position signal tells the model where each word sits.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 3 sections">
+      <button type="button" data-go="p3-why">1 · Why not just IDs?</button>
+      <button type="button" data-go="p3-look">2 · The embedding matrix</button>
+      <button type="button" data-go="p3-map">3 · Meaning map</button>
+      <button type="button" data-go="p3-cos">4 · Cosine similarity</button>
+      <button type="button" data-go="p3-pe">5 · Positional encoding</button>
+      <button type="button" data-go="p3-mix">6 · Token + position</button>
+      <button type="button" data-go="p3-train">7 · Watch them learn</button>
+      <button type="button" data-go="p3-code">8 · Code</button>
+      <button type="button" data-go="p3-ex">9 · Exercise</button>
+      <button type="button" data-go="p3-quiz">10 · Assessment</button>
+    </nav>
+
+    <!-- 1 WHY -->
+    <div class="panel" id="p3-why">
+      <div class="phead"><span class="tag">01</span><h3>Why can't the model just use the ID numbers?</h3><span class="sim illus">illustrative vectors</span>
+        <p class="plain">IDs are arbitrary: "cat" = 12 and "dog" = 13 are neighbours only by accident. <em>One-hot</em> vectors (all zeros, a single 1) fix that, but they make every word <em>equally unrelated</em> to every other. <em>Dense embeddings</em> give each word a short list of real numbers in which similar words get similar numbers. Flip between the two and compare the similarity grids.</p></div>
+      <div class="row" style="margin-bottom:12px"><button class="btn primary" id="whyOne" type="button">One-hot vectors</button><button class="btn" id="whyDense" type="button">Dense embeddings (d = 8)</button></div>
+      <div class="grid2">
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px" id="whyVT"></div><div class="scroll" id="whyVecs"></div><p class="note" id="whyNote" style="margin-top:10px"></p></div>
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Cosine similarity between every pair</div><div class="scroll" id="whySim"></div></div>
+      </div>
+      <div class="facts">
+        <div><b>One-hot</b><div class="formula">onehot(i) ∈ {0,1}<sup>V</sup>, cos = 0 for any two different words</div></div>
+        <div><b>Dense embedding</b><ul><li>A row of real numbers, length d ≪ V</li><li>V = 32,000 but d = 256: about 125× shorter</li><li>Similar meaning → similar direction</li></ul></div>
+        <div><b>Inside an SLM</b>The very first layer of every SLM is an embedding table. All later layers only ever see these vectors, never the IDs.</div>
+      </div>
+    </div>
+
+    <!-- 2 LOOKUP -->
+    <div class="panel" id="p3-look">
+      <div class="phead"><span class="tag">02</span><h3>The embedding matrix: a lookup table of vectors</h3><span class="sim illus">illustrative values · real mechanics</span>
+        <p class="plain">The embedding matrix <em>E</em> has one row per vocabulary word and <em>d</em> columns. "Embedding a token" just means <em>copying the row at its ID</em>. Press Play to watch each token fetch its row, then change d to make every row wider or narrower.</p></div>
+      <div class="row" style="margin-bottom:12px">
+        <label class="field" style="flex:1 1 260px">Sentence<input class="txt" id="lkIn" type="text" value="the queen approved the loan" autocomplete="off"></label>
+        <label class="field" style="flex:0 1 200px">Embedding size d: <b id="lkDv"></b><input id="lkD" type="range" min="0" max="5" value="3"></label>
+        <div class="row" style="align-self:end"><button class="btn primary" id="lkPlay" type="button">Play lookup</button></div>
+      </div>
+      <div class="grid2">
+        <div class="box"><div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="eyebrow">E: shape <span id="lkEs" class="c-emb"></span></span><span class="mono dim" id="lkPar" style="font-size:.75rem"></span></div><div class="scroll" id="lkE" style="max-height:440px;overflow-y:auto"></div></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="eyebrow">Output: one row per token</span><span class="shape" id="lkOs"></span></div><div class="scroll" id="lkOut"></div></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Same thing as a matrix multiplication</div><div id="lkOH" class="scroll"></div></div>
+          <div class="predict" id="lkPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">x<sub>t</sub> = E[id<sub>t</sub>] = onehot(id<sub>t</sub>) · E</div></div>
+        <div><b>Shapes</b><ul><li><span class="c-emb">E</span>: [V, d], learnable</li><li>ids: [T] → output: [T, d]</li><li>Batch: [B, T] → [B, T, d]</li></ul></div>
+        <div><b>Inside an SLM</b>In PyTorch this is <span class="mono">nn.Embedding(V, d)</span>. Its V × d numbers start random and are trained by backpropagation like every other weight (Stage 1, panel 08).</div>
+      </div>
+    </div>
+
+    <!-- 3 MAP -->
+    <div class="panel" id="p3-map">
+      <div class="phead"><span class="tag">03</span><h3>The meaning map: an embedding space you can explore</h3><span class="sim illus">illustrative embeddings · real geometry & PCA</span>
+        <p class="plain">Each dot is one word's embedding, flattened from d dimensions down to 2 so you can see it. <em>Click a word</em> to see its nearest neighbours. Shrink d and the groups crowd and overlap, because there's no longer enough room to keep meanings apart. Then try word arithmetic.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <svg class="plot" id="mapSvg" viewBox="0 0 480 400" role="img" aria-label="2D projection of word embeddings"></svg>
+          <div class="row" id="mapLeg" style="gap:10px;font-size:.74rem;font-family:var(--f-mono);margin-top:6px"></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" style="display:grid;gap:10px">
+            <label class="field">Embedding size d: <b id="mapDv"></b><input id="mapD" type="range" min="0" max="5" value="3"></label>
+            <div class="stats" id="mapStats"></div>
+          </div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Nearest neighbours of <span class="c-tok" id="mapSel"></span> (cosine, in all d dims)</div><div class="bars" id="mapNN"></div></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Word arithmetic</div>
+            <div class="row" style="gap:6px;align-items:center;font-family:var(--f-mono)"><select id="anA" class="txt" style="width:auto"></select>−<select id="anB" class="txt" style="width:auto"></select>+<select id="anC" class="txt" style="width:auto"></select>≈</div>
+            <div class="bars" id="anOut" style="margin-top:8px"></div></div>
+          <div class="predict" id="mapPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formulas</b><div class="formula" style="white-space:normal">nearest(w) = argmax<sub>v</sub> cos(e<sub>w</sub>, e<sub>v</sub>) · king − man + woman ≈ queen</div></div>
+        <div><b>About this map</b><ul><li>Vectors are <b>illustrative</b>: built from hidden meaning features, then randomly mixed into d dims</li><li>The 2D view is real <b>PCA</b>, which keeps the 2 directions of greatest spread</li><li>2D loses information, so trust the cosine list over the picture</li></ul></div>
+        <div><b>Inside an SLM</b>Trained embeddings show the same effects: synonyms cluster, and relations become roughly consistent directions. Individual dimensions are usually <b>not</b> human-readable. Meaning lives in directions, not in single numbers.</div>
+      </div>
+    </div>
+
+    <!-- 4 COSINE -->
+    <div class="panel" id="p3-cos">
+      <div class="phead"><span class="tag">04</span><h3>Cosine similarity: measuring how alike two words are</h3><span class="sim real">live calculation</span>
+        <p class="plain">Cosine similarity compares <em>directions</em> and ignores lengths: +1 is the same direction, 0 is unrelated, −1 is opposite. It's the dot product from Stage 1, divided by both lengths. Try "Stretch A ×2": the dot product doubles but the cosine doesn't move.</p></div>
+      <div class="row" style="margin-bottom:12px;gap:8px">
+        <label class="field">word A<select id="csA" class="txt"></select></label>
+        <label class="field">word B<select id="csB" class="txt"></select></label>
+        <div class="row" style="align-self:end"><button class="btn" id="csScale" type="button">Stretch A ×2</button><button class="btn" id="csSwap" type="button">Random pair</button></div>
+      </div>
+      <div class="grid2">
+        <div class="box"><div class="scroll" id="csVecs"></div><div class="formula" id="csF" style="margin-top:10px;white-space:normal"></div></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="stats" id="csStats"></div><div class="gauge" style="margin-top:12px"><i id="csG"></i></div><div class="glabels"><span>−1 opposite</span><span>0 unrelated</span><span>+1 same</span></div></div>
+          <div class="predict" id="csPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">cos(a, b) = (a · b) / (|a| |b|)</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-emb">a · b</span>: Σ aᵢbᵢ (Stage 1)</li><li><span class="c-tok">|a|</span>: √(Σ aᵢ²), the length</li><li>Range: −1 … +1</li></ul></div>
+        <div><b>Inside an SLM</b>Semantic search, retrieval (RAG) and duplicate detection rank texts by cosine similarity of their embeddings. Inside attention the raw dot product is used, so length matters there.</div>
+      </div>
+    </div>
+
+    <!-- 5 PE -->
+    <div class="panel" id="p3-pe">
+      <div class="phead"><span class="tag">05</span><h3>Positional encoding: a fingerprint for every position</h3><span class="sim real">exact sinusoidal formula</span>
+        <p class="plain">Attention looks at all tokens at once, so on its own it doesn't know their order. We add a <em>position vector</em> to each token. The classic recipe uses <em>waves</em>: low dimensions wiggle fast, high dimensions slowly, like the second, minute and hour hands of a clock. Each position gets a unique fingerprint. Hover over the heatmap.</p></div>
+      <div class="row" style="margin-bottom:12px">
+        <button class="btn primary" id="peSin" type="button">Sinusoidal (fixed formula)</button><button class="btn" id="peLrn" type="button">Learned (before training)</button>
+        <label class="field" style="flex:0 1 220px">d_model: <b id="peDv"></b><input id="peD" type="range" min="0" max="3" value="2"></label>
+      </div>
+      <div class="grid2">
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">PE[position, dimension]: 64 positions × d</div>
+          <canvas id="peCv" width="640" height="512" style="width:100%;height:auto;border-radius:8px;display:block;cursor:crosshair" aria-label="Positional encoding heatmap"></canvas>
+          <div class="mono" id="peRead" style="font-size:.8rem;margin-top:6px;min-height:1.4em" aria-live="polite"></div></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">Four dimensions as waves across positions</div><svg class="plot" id="peWave" viewBox="0 0 420 180" role="img" aria-label="Sine waves of different frequencies"></svg></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">Similarity PE(p) · PE(q): nearby positions look alike</div><canvas id="peSim" width="256" height="256" style="width:100%;max-width:260px;height:auto;border-radius:6px;display:block;margin:0 auto" aria-label="Position similarity matrix"></canvas></div>
+          <div class="predict" id="pePred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula" style="white-space:normal">PE(pos, 2i) = sin(pos / 10000<sup>2i/d</sup>) · PE(pos, 2i+1) = cos(pos / 10000<sup>2i/d</sup>)</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-tok">pos</span>: token position 0, 1, 2…</li><li><span class="c-emb">i</span>: dimension pair index</li><li>10000<sup>2i/d</sup>: sets each wave's wavelength</li></ul></div>
+        <div><b>Inside an SLM</b>GPT-2 uses <b>learned</b> position embeddings, an [C, d] table trained like E. Most modern SLMs use <b>RoPE</b>, which rotates Q and K by position-dependent angles from these same sinusoids. Both give every position a unique signal.</div>
+      </div>
+    </div>
+
+    <!-- 6 MIX -->
+    <div class="panel" id="p3-mix">
+      <div class="phead"><span class="tag">06</span><h3>Token + position: what the first layer really sees</h3><span class="sim illus">illustrative E · exact PE</span>
+        <p class="plain">The input to the Transformer is <em>x = E[token] + PE[position]</em>. The same word at two positions now gets two different vectors. And sentences with the same words in a different order stop looking identical.</p></div>
+      <label class="field" style="margin-bottom:12px">Sentence (repeat a word to compare it at two positions)<input class="txt" id="mxIn" type="text" value="the dog chased the cat" autocomplete="off"></label>
+      <div class="box"><div class="scroll" id="mxRows"></div><p class="note" id="mxDup" style="margin-top:10px"></p></div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="box"><div class="eyebrow" style="margin-bottom:6px">Word order test</div>
+          <div class="row" style="gap:8px"><input class="txt" id="ordA" type="text" value="dog chased cat" style="flex:1 1 140px" autocomplete="off"><input class="txt" id="ordB" type="text" value="cat chased dog" style="flex:1 1 140px" autocomplete="off"></div>
+          <div id="ordOut" style="margin-top:10px"></div></div>
+        <div class="predict" id="mxPred"></div>
+      </div>
+    </div>
+
+    <!-- 7 TRAIN -->
+    <div class="panel" id="p3-train">
+      <div class="phead"><span class="tag">07</span><h3>Watch embeddings learn from text</h3><span class="sim real">real training (word2vec-style, d = 2)</span>
+        <p class="plain">This is real learning. Every word starts at a <em>random</em> point. Words that appear in the same sentence <em>pull together</em>, and random pairs <em>push apart</em>. That's the word2vec idea: "you shall know a word by the company it keeps". Press Train and watch groups form, with nobody telling the model what the words mean.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <svg class="plot" id="trSvg" viewBox="0 0 480 400" role="img" aria-label="Embeddings moving during training"></svg>
+          <div class="row" style="justify-content:center;margin-top:8px"><button class="btn primary" id="trPlay" type="button">Train</button><button class="btn" id="trStep" type="button">1 epoch</button><button class="btn" id="trReset" type="button">New random start</button></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" style="display:grid;gap:10px">
+            <label class="field">Learning rate: <b id="trLrV"></b><input id="trLr" type="range" min="1" max="20" value="6"></label>
+            <div class="stats" id="trStats"></div>
+          </div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">Training loss per epoch</div><svg class="plot" id="trLoss" viewBox="0 0 320 120" role="img" aria-label="Loss curve"></svg></div>
+          <div class="box note" style="border-left:0">The colours are only for you: the model never sees them. They're assigned by hand (animals, banking, ML, people) so you can check whether training discovered the groups by itself. Only words that appear 2+ times are trained, and very common words like "the" are skipped.</div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Objective (skip-gram, negative sampling)</b><div class="formula" style="white-space:normal">maximise log σ(u<sub>w</sub>·u<sub>c</sub>) + Σ<sub>neg</sub> log σ(−u<sub>w</sub>·u<sub>n</sub>)</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-emb">u<sub>w</sub>, u<sub>c</sub></span>: vectors of a word and its context word</li><li><span class="c-err">n</span>: randomly drawn "negative" words</li><li>σ: sigmoid, which turns a dot product into a probability</li></ul></div>
+        <div><b>Inside an SLM</b>An SLM doesn't train embeddings separately. Its embedding rows get gradients from the next-token loss along with everything else. The effect is the same: tokens used in similar contexts end up with similar vectors.</div>
+      </div>
+    </div>
+
+    <!-- 8 CODE -->
+    <div class="panel" id="p3-code">
+      <div class="phead"><span class="tag">08</span><h3>Code it on your CPU</h3>
+        <p>An embedding layer with shapes, sinusoidal and learned positions, and a tiny word2vec you can train in seconds.</p></div>
+      <div class="code" id="code3"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <!-- 9 EXERCISE -->
+    <div class="panel" id="p3-ex">
+      <div class="phead"><span class="tag">09</span><h3>Hands-on exercise: four missions</h3><p>The checks read the panels' live state.</p></div>
+      <div class="box">
+        <div class="checks" id="ex3Checks"></div>
+        <div class="row" style="margin-top:14px"><button class="btn primary" id="ex3Btn" type="button">Check missions</button></div>
+        <p class="note" id="ex3Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p>
+      </div>
+    </div>
+
+    <!-- 10 QUIZ -->
+    <div class="panel" id="p3-quiz">
+      <div class="phead"><span class="tag">10</span><h3>Stage 3 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 4. Use a calculator for the numerical ones.</p></div>
+      <div id="quiz3"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -1087,7 +1286,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -2540,6 +2739,348 @@ function makeQuiz2(seed){
   ];
 }
 mountQuiz(2,$("#quiz2"),makeQuiz2);
+
+/* =================== STAGE 3 =================== */
+const S3G={animal:["Animals","#f3b955"],finance:["Banking","#62e3a2"],people:["People","#52d3e2"],royal:["Royalty","#a993ff"],ml:["ML","#ff7d93"],action:["Actions","#c9d6dd"],func:["Function words","#5a7380"]};
+const S3W=[
+ ["cat","animal",[1,0,0,0,0,0,0,0]],["dog","animal",[1,0,0,0,0,0,.1,0]],["mouse","animal",[.9,0,0,0,0,.2,0,0]],["horse","animal",[1,0,0,0,0,0,.2,0]],["kitten","animal",[1,0,0,0,.3,0,0,1]],["puppy","animal",[1,0,0,0,0,0,0,1]],
+ ["bank","finance",[0,1,0,0,0,0,0,0]],["loan","finance",[0,1,0,0,0,0,.2,0]],["account","finance",[0,1,0,0,0,.1,0,0]],["fee","finance",[0,.9,0,0,0,0,.1,0]],["interest","finance",[0,.9,0,0,0,0,0,0]],["mortgage","finance",[0,1,0,0,0,0,.2,0]],["credit","finance",[0,1,0,0,0,.1,0,0]],["deposit","finance",[0,1,0,0,0,0,.3,0]],
+ ["man","people",[0,0,1,0,0,0,0,0]],["woman","people",[0,0,1,0,1,0,0,0]],["boy","people",[0,0,1,0,0,0,0,1]],["girl","people",[0,0,1,0,1,0,0,1]],["customer","people",[0,.5,1,0,0,0,0,0]],["agent","people",[0,.4,1,0,0,0,.1,0]],
+ ["king","royal",[0,0,1,1,0,0,0,0]],["queen","royal",[0,0,1,1,1,0,0,0]],["prince","royal",[0,0,1,1,0,0,0,1]],["princess","royal",[0,0,1,1,1,0,0,1]],
+ ["model","ml",[0,0,0,0,0,1,0,0]],["token","ml",[0,0,0,0,0,1,0,0]],["vector","ml",[0,0,0,0,0,1,0,0]],["data","ml",[0,.1,0,0,0,1,0,0]],["neural","ml",[0,0,0,0,0,1,0,0]],["text","ml",[0,0,0,0,0,.9,0,0]],
+ ["approved","action",[0,.6,0,0,0,0,1,0]],["paid","action",[0,.7,0,0,0,0,1,0]],["lend","action",[0,.8,0,0,0,0,1,0]],["chased","action",[.4,0,0,0,0,0,1,0]],["ran","action",[.3,0,.2,0,0,0,1,0]],["learned","action",[0,0,.2,0,0,.5,1,0]],["predicts","action",[0,0,0,0,0,.6,1,0]],
+ ["the","func",[0,0,0,0,0,0,0,0]],["a","func",[0,0,0,0,0,0,0,0]],["is","func",[0,0,0,0,0,0,0,0]]
+];
+const S3IDX=new Map(S3W.map((w,i)=>[w[0],i]));
+const S3CONT=S3W.filter(w=>w[1]!=="func").map(w=>w[0]);
+const S3DS=[2,3,4,8,16,32];
+function gauss(r){const u=Math.max(1e-9,r()),v=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const s3Cache={};
+function s3Space(d){
+  if(s3Cache[d])return s3Cache[d];
+  const r=mulberry(1234+d),R=Array.from({length:d},()=>Array.from({length:8},()=>gauss(r)));
+  const vec={};
+  S3W.forEach(([w,,f])=>{const rn=mulberry(hashSeed(w)+d*7);vec[w]=R.map(row=>row.reduce((s,x,k)=>s+x*f[k],0)+0.18*gauss(rn));});
+  vec["<unk>"]=(()=>{const rn=mulberry(99+d);return Array.from({length:d},()=>0.18*gauss(rn));})();
+  return (s3Cache[d]={vec,d});
+}
+const s3Emb=(w,d)=>{const s=s3Space(d);return s.vec[w]||s.vec["<unk>"];};
+const dotv=(a,b)=>a.reduce((s,x,i)=>s+x*b[i],0),normv=a=>Math.sqrt(dotv(a,a)),cosv=(a,b)=>{const n=normv(a)*normv(b);return n?dotv(a,b)/n:0;};
+const simCol=v=>v>=0?`rgba(98,227,162,${(Math.min(1,v)*.85+.06).toFixed(2)})`:`rgba(255,125,147,${(Math.min(1,-v)*.85+.06).toFixed(2)})`;
+const c3=(v,extra="")=>`<span class="cell" style="background:${cellCol(v)}" title="${v.toFixed(4)}" ${extra}>${v.toFixed(2)}</span>`;
+let embDi=3;
+function nnList(w,d,k){const a=s3Emb(w,d);return S3CONT.filter(x=>x!==w).map(x=>({w:x,c:cosv(a,s3Emb(x,d))})).sort((p,q)=>q.c-p.c).slice(0,k);}
+function nnAcc(d){let ok=0;S3CONT.forEach(w=>{const g=S3W[S3IDX.get(w)][1];const n=nnList(w,d,1)[0];if(S3W[S3IDX.get(n.w)][1]===g)ok++;});return ok/S3CONT.length;}
+const grpOf=w=>S3IDX.has(w)?S3W[S3IDX.get(w)][1]:"func";
+
+/* ---- 1. why ---- */
+const WHYW=["cat","dog","bank","loan","king","queen","model","data"];let whyMode="one";
+function simTable(words,vecs){return `<table class="pg"><tr><th></th>${words.map(w=>`<th style="text-align:center;color:var(--tok)">${w}</th>`).join("")}</tr>${words.map((a,i)=>`<tr><th style="color:var(--tok)">${a}</th>${words.map((b,j)=>{const c=cosv(vecs[i],vecs[j]);return `<td style="background:${simCol(c)};color:var(--fg)">${c.toFixed(2)}</td>`;}).join("")}</tr>`).join("")}</table>`;}
+function renderWhy(){
+  $("#whyOne").classList.toggle("primary",whyMode==="one");$("#whyDense").classList.toggle("primary",whyMode==="dense");
+  const vecs=whyMode==="one"?WHYW.map((_,i)=>WHYW.map((_,j)=>i===j?1:0)):WHYW.map(w=>s3Emb(w,8));
+  $("#whyVT").textContent=whyMode==="one"?"One-hot vectors: length V = 8 (a real vocabulary would make them 32,000 long)":"Dense embeddings: length d = 8, every number used";
+  $("#whyVecs").innerHTML=`<div class="vecs">${WHYW.map((w,i)=>`<div class="vrow" style="grid-template-columns:70px repeat(8,minmax(34px,1fr))"><span class="lbl">${w}</span>${vecs[i].map(v=>whyMode==="one"?`<span class="cell" style="background:${v?"var(--tok)":"var(--bg)"};color:${v?"#1a1206":"var(--dim)"}">${v}</span>`:c3(v)).join("")}</div>`).join("")}</div>`;
+  $("#whySim").innerHTML=simTable(WHYW,vecs);
+  $("#whyNote").innerHTML=whyMode==="one"?"Every pair scores <b>0</b>: cat is exactly as far from dog as it is from loan. The model would have to learn everything about every word from scratch, and the vectors waste memory (one 1 among 32,000 zeros).":"Now <b class=\"c-out\">cat–dog</b>, <b class=\"c-out\">bank–loan</b> and <b class=\"c-out\">king–queen</b> score high, while unrelated pairs sit near 0. What's learned about one word now helps its neighbours.";
+}
+$("#whyOne").addEventListener("click",()=>{whyMode="one";renderWhy();});$("#whyDense").addEventListener("click",()=>{whyMode="dense";renderWhy();});renderWhy();
+
+/* ---- 2. lookup ---- */
+const LKV=["<unk>",...S3W.map(w=>w[0])];const LKID=new Map(LKV.map((w,i)=>[w,i]));
+let lkRun=0;
+function lkDraw(hi,outN){
+  const d=S3DS[+$("#lkD").value],toks=($("#lkIn").value.toLowerCase().match(/[a-z]+/g)||[]).slice(0,10),ids=toks.map(t=>LKID.has(t)?LKID.get(t):0);
+  $("#lkDv").textContent=d;$("#lkEs").textContent=`[${LKV.length}, ${d}]`;$("#lkPar").textContent=`${(LKV.length*d).toLocaleString()} learnable numbers`;
+  const cw=d>16?"22px":d>8?"30px":"38px";
+  $("#lkE").innerHTML=`<div class="vecs">${LKV.map((w,i)=>`<div class="vrow${hi===i?" last":""}" id="lkr${i}" style="grid-template-columns:90px repeat(${d},${cw});min-width:0;${hi===i?"outline:2px solid var(--out);border-radius:4px":""}"><span class="lbl">${i} · ${esc(w)}</span>${s3Emb(w,d).map(v=>`<span class="cell" style="background:${cellCol(v)};font-size:${d>8?"0":".62rem"};animation:none" title="${v.toFixed(3)}">${d>8?"":v.toFixed(1)}</span>`).join("")}</div>`).join("")}</div>`;
+  const n=outN===undefined?toks.length:outN;
+  $("#lkOs").textContent=`[T, d] = [${toks.length}, ${d}]`;
+  $("#lkOut").innerHTML=`<div class="vecs">${toks.slice(0,n).map((t,i)=>`<div class="vrow" style="grid-template-columns:110px repeat(${d},${cw});min-width:0"><span class="lbl${ids[i]===0?" c-err":""}">${esc(t)} → id ${ids[i]}</span>${s3Emb(LKV[ids[i]],d).map(v=>`<span class="cell" style="background:${cellCol(v)};font-size:${d>8?"0":".62rem"}">${d>8?"":v.toFixed(1)}</span>`).join("")}</div>`).join("")}</div>`;
+  const id0=ids[0]||0;
+  $("#lkOH").innerHTML=toks.length?`<div class="mono" style="font-size:.75rem;margin-bottom:4px">onehot(<span class="c-tok">${esc(toks[0])}</span>) has a single 1 at index ${id0}:</div><div style="display:flex;gap:1px;flex-wrap:wrap">${LKV.map((_,i)=>`<span style="width:9px;height:14px;border-radius:2px;background:${i===id0?"var(--tok)":"var(--line)"}" title="${i}"></span>`).join("")}</div><div class="mono" style="font-size:.75rem;margin-top:6px">[1 × ${LKV.length}] · E [${LKV.length} × ${d}] = [1 × ${d}]: <span class="c-out">exactly row ${id0} of E</span>. Copying the row is just a faster way to do this multiplication.</div>`:"";
+}
+$("#lkPlay").addEventListener("click",async()=>{const id=++lkRun;const toks=($("#lkIn").value.toLowerCase().match(/[a-z]+/g)||[]).slice(0,10);
+  for(let i=0;i<toks.length;i++){if(id!==lkRun)return;const rid=LKID.has(toks[i])?LKID.get(toks[i]):0;lkDraw(rid,i);const row=$("#lkr"+rid),box=$("#lkE");if(row)box.scrollTop=row.offsetTop-box.offsetTop-80;await sleep(800);if(id!==lkRun)return;lkDraw(rid,i+1);await sleep(450);}
+  if(id===lkRun)lkDraw(null);});
+$("#lkD").addEventListener("input",()=>{lkRun++;lkDraw(null);});$("#lkIn").addEventListener("input",()=>{lkRun++;lkDraw(null);});
+lkDraw(null);
+predictBox($("#lkPred"),{q:"The word \"the\" appears twice in the sentence. Are its two output rows the same or different?",opts:["Exactly the same","Slightly different","Completely different"],ok:0,
+  why:"The lookup only depends on the ID, so the same ID gives the same row. The model can't yet tell the two \"the\"s apart. That's exactly why positional encoding (panels 05–06) is added next."});
+
+/* ---- 3. map ---- */
+let mapSel="loan";
+function pca2(pts){
+  const n=pts.length,d=pts[0].length,mu=Array(d).fill(0);pts.forEach(p=>p.forEach((x,i)=>mu[i]+=x/n));
+  const X=pts.map(p=>p.map((x,i)=>x-mu[i]));const C=Array.from({length:d},(_,i)=>Array.from({length:d},(_,j)=>X.reduce((s,p)=>s+p[i]*p[j],0)/n));
+  const tr=C.reduce((s,r,i)=>s+r[i],0);const vs=[],ls=[];
+  for(let k=0;k<Math.min(2,d);k++){let v=Array.from({length:d},(_,i)=>Math.sin(i+1+k));for(let it=0;it<80;it++){const w=C.map(r=>dotv(r,v));const nn=normv(w)||1;v=w.map(x=>x/nn);}
+    const lam=dotv(v,C.map(r=>dotv(r,v)));vs.push(v);ls.push(lam);for(let i=0;i<d;i++)for(let j=0;j<d;j++)C[i][j]-=lam*v[i]*v[j];}
+  if(vs.length<2)vs.push(Array(d).fill(0));
+  return {proj:X.map(p=>[dotv(p,vs[0]),dotv(p,vs[1])]),ve:(ls.reduce((a,b)=>a+b,0))/(tr||1)};
+}
+function renderMap(){
+  const d=S3DS[embDi];$("#mapD").value=embDi;$("#mapDv").textContent=d;
+  const words=S3CONT,P=pca2(words.map(w=>s3Emb(w,d)));let pr=P.proj;
+  const bi=words.indexOf("bank"),ki=words.indexOf("king");if(pr[bi][0]<0)pr=pr.map(p=>[-p[0],p[1]]);if(pr[ki][1]<0)pr=pr.map(p=>[p[0],-p[1]]);
+  const W=480,H=400,m=34,xs=pr.map(p=>p[0]),ys=pr.map(p=>p[1]),x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  const X=x=>18+(x-x0)/((x1-x0)||1)*(W-18-84),Y=y=>H-m-(y-y0)/((y1-y0)||1)*(H-2*m);
+  const nn=nnList(mapSel,d,3),si=words.indexOf(mapSel);
+  let g=`<rect x="0" y="0" width="${W}" height="${H}" rx="10" style="fill:var(--bg)"/>`;
+  nn.forEach(o=>{const j=words.indexOf(o.w);g+=`<line x1="${X(pr[si][0])}" y1="${Y(pr[si][1])}" x2="${X(pr[j][0])}" y2="${Y(pr[j][1])}" style="stroke:var(--out)" stroke-width="1.5" stroke-dasharray="4 3"/><text x="${(X(pr[si][0])+X(pr[j][0]))/2}" y="${(Y(pr[si][1])+Y(pr[j][1]))/2-4}" font-size="9" text-anchor="middle" style="fill:var(--out)" font-family="IBM Plex Mono">${o.c.toFixed(2)}</text>`;});
+  words.forEach((w,i)=>{const col=S3G[grpOf(w)][1],sel=w===mapSel;g+=`<g data-w="${w}" style="cursor:pointer"><circle cx="${X(pr[i][0])}" cy="${Y(pr[i][1])}" r="${sel?8:5.5}" style="fill:${col};stroke:${sel?"#fff":"var(--bg)"}" stroke-width="${sel?2.5:1.5}"/><text x="${X(pr[i][0])+8}" y="${Y(pr[i][1])+4}" font-size="${sel?12:10.5}" font-weight="${sel?700:400}" style="fill:${col}" font-family="IBM Plex Mono">${w}</text></g>`;});
+  $("#mapSvg").innerHTML=g;
+  $("#mapSel").textContent=mapSel;
+  $("#mapNN").innerHTML=nnList(mapSel,d,6).map(o=>`<div class="bar"><span class="lbl" style="color:${S3G[grpOf(o.w)][1]}">${o.w}</span><span class="trk"><span class="fill" style="display:block;width:${Math.max(0,o.c*100).toFixed(1)}%"></span></span><span class="val">${o.c.toFixed(3)}</span></div>`).join("");
+  const acc=nnAcc(d);
+  $("#mapStats").innerHTML=`<div class="stat"><span class="v c-emb">${d}</span><span class="k">dimensions</span></div><div class="stat"><span class="v ${acc>=.9?"c-out":acc>=.7?"c-tok":"c-err"}">${(acc*100).toFixed(0)}%</span><span class="k">nearest neighbour in same group</span></div><div class="stat"><span class="v">${(P.ve*100).toFixed(0)}%</span><span class="k">spread kept by 2D view</span></div>`;
+  renderAnalogy();renderCos();
+}
+$("#mapSvg").addEventListener("click",e=>{const g=e.target.closest("[data-w]");if(g){mapSel=g.dataset.w;renderMap();}});
+$("#mapD").addEventListener("input",e=>{embDi=+e.target.value;renderMap();});
+$("#mapLeg").innerHTML=Object.entries(S3G).filter(([k])=>k!=="func").map(([k,[n,c]])=>`<span><i class="lg" style="background:${c}"></i>${n}</span>`).join("");
+["anA","anB","anC"].forEach((id,i)=>{$("#"+id).innerHTML=S3CONT.map(w=>`<option>${w}</option>`).join("");$("#"+id).value=["king","man","woman"][i];$("#"+id).addEventListener("change",renderAnalogy);});
+let anTop=null;
+function renderAnalogy(){
+  const d=S3DS[embDi],A=$("#anA").value,B=$("#anB").value,C=$("#anC").value;const v=s3Emb(A,d).map((x,i)=>x-s3Emb(B,d)[i]+s3Emb(C,d)[i]);
+  const res=S3CONT.filter(w=>![A,B,C].includes(w)).map(w=>({w,c:cosv(v,s3Emb(w,d))})).sort((p,q)=>q.c-p.c).slice(0,4);anTop=res[0].w;
+  $("#anOut").innerHTML=res.map((o,i)=>`<div class="bar${i?"":" pick"}"><span class="lbl" style="color:${S3G[grpOf(o.w)][1]}">${i?"":"→ "}${o.w}</span><span class="trk"><span class="fill" style="display:block;width:${Math.max(0,o.c*100).toFixed(1)}%"></span></span><span class="val">${o.c.toFixed(3)}</span></div>`).join("")+`<p class="note" style="margin-top:6px">${A} − ${B} removes "${B}-ness" and + ${C} adds "${C}-ness". The answer is the word closest to the result (the inputs themselves are excluded).</p>`;
+}
+predictBox($("#mapPred"),{q:"What happens to the groups if you shrink the embeddings to d = 2?",opts:["They stay just as separate","They crowd and overlap","Every word lands on the same spot"],ok:1,
+  why:"There are 8 hidden meaning features but only 2 numbers to store them, so different meanings must share directions. Nearest-neighbour accuracy drops. Real SLMs use d = 128–4096 to leave room for thousands of meanings.",onReveal:()=>{embDi=0;renderMap();}});
+
+/* ---- 4. cosine lab ---- */
+let csK=1;
+["csA","csB"].forEach((id,i)=>{$("#"+id).innerHTML=S3CONT.map(w=>`<option>${w}</option>`).join("");$("#"+id).value=["king","queen"][i];$("#"+id).addEventListener("change",()=>{csK=1;renderCos();});});
+function renderCos(){
+  const d=S3DS[embDi],A=s3Emb($("#csA").value,d).map(x=>x*csK),B=s3Emb($("#csB").value,d),pr=A.map((x,i)=>x*B[i]);
+  const dt=dotv(A,B),na=normv(A),nb=normv(B),c=cosv(A,B),eu=Math.sqrt(A.reduce((s,x,i)=>s+(x-B[i])**2,0));
+  const cw=d>16?"28px":"40px",row=(l,v,col)=>`<div class="vrow" style="grid-template-columns:100px repeat(${d},${cw});min-width:0"><span class="lbl" style="color:${col}">${l}</span>${v.map(x=>`<span class="cell" style="background:${cellCol(x)};font-size:${d>16?".5rem":".62rem"}" title="${x.toFixed(4)}">${x.toFixed(d>16?1:2)}</span>`).join("")}</div>`;
+  $("#csVecs").innerHTML=`<div class="vecs">${row(`A: ${$("#csA").value}${csK>1?" ×"+csK:""}`,A,"var(--emb)")}${row("B: "+$("#csB").value,B,"var(--tok)")}${row("A × B",pr,"var(--out)")}</div>`;
+  $("#csF").innerHTML=`cos = (Σ A×B) / (|A| |B|) = ${dt.toFixed(3)} / (${na.toFixed(3)} × ${nb.toFixed(3)}) = <b class="c-out">${c.toFixed(4)}</b>`;
+  $("#csStats").innerHTML=`<div class="stat"><span class="v c-out">${c.toFixed(3)}</span><span class="k">cosine</span></div><div class="stat"><span class="v">${dt.toFixed(2)}</span><span class="k">dot product</span></div><div class="stat"><span class="v">${na.toFixed(2)} / ${nb.toFixed(2)}</span><span class="k">lengths |A| / |B|</span></div><div class="stat"><span class="v c-tok">${eu.toFixed(2)}</span><span class="k">Euclidean distance</span></div>`;
+  $("#csG").style.left=((c+1)/2*100).toFixed(1)+"%";
+}
+$("#csScale").addEventListener("click",()=>{csK=csK>=8?1:csK*2;renderCos();});
+$("#csSwap").addEventListener("click",()=>{const r=()=>S3CONT[Math.floor(Math.random()*S3CONT.length)];$("#csA").value=r();$("#csB").value=r();csK=1;renderCos();});
+predictBox($("#csPred"),{q:"You stretch vector A to twice its length. What happens to cosine similarity and to the dot product?",opts:["Both double","Cosine stays the same, dot product doubles","Both stay the same"],ok:1,
+  why:"Cosine divides by |A|, which doubles too, so the stretch cancels out. The dot product doubles, and so does the Euclidean distance's sensitivity to length. That's why cosine is the standard measure of semantic similarity.",onReveal:()=>{csK=2;renderCos();}});
+
+/* ---- 5. positional encoding ---- */
+const PEDS=[16,32,64,128];let peMode="sin";const PEP=64;
+const peSinV=(pos,i,d)=>{const k=Math.floor(i/2),f=pos/Math.pow(10000,2*k/d);return i%2===0?Math.sin(f):Math.cos(f);};
+const peLrnV=(pos,i)=>{const r=mulberry(pos*977+i*31+5);return Math.max(-1,Math.min(1,gauss(r)*.45));};
+const peVal=(pos,i,d)=>peMode==="sin"?peSinV(pos,i,d):peLrnV(pos,i);
+const rgbV=v=>{const a=Math.min(1,Math.abs(v));return v>=0?[Math.round(9+73*a),Math.round(16+195*a),Math.round(21+205*a)]:[Math.round(9+246*a),Math.round(16+109*a),Math.round(21+126*a)];};
+function renderPE(){
+  const d=PEDS[+$("#peD").value];$("#peDv").textContent=d;$("#peSin").classList.toggle("primary",peMode==="sin");$("#peLrn").classList.toggle("primary",peMode==="lrn");
+  const cv=$("#peCv"),ctx=cv.getContext("2d"),cw=640/d,ch=512/PEP;
+  for(let p=0;p<PEP;p++)for(let i=0;i<d;i++){const [r,g,b]=rgbV(peVal(p,i,d));ctx.fillStyle=`rgb(${r},${g},${b})`;ctx.fillRect(i*cw,p*ch,Math.ceil(cw),Math.ceil(ch));}
+  ctx.fillStyle="rgba(255,255,255,.75)";ctx.font="500 15px IBM Plex Mono, monospace";ctx.fillText("dimension →",8,505);ctx.save();ctx.translate(16,120);ctx.fillText("position ↓",0,0);ctx.restore();
+  // waves
+  const dims=[0,2,Math.round(d/4)*1-(Math.round(d/4)%2),d-2],cols=["#ff7d93","#f3b955","#52d3e2","#a993ff"],W=420,H=180,l=30,r=10,t=10,b=24;
+  const X=p=>l+p/(PEP-1)*(W-l-r),Y=v=>t+(1-(v+1)/2)*(H-t-b);
+  let g=`<line x1="${l}" x2="${W-r}" y1="${Y(0)}" y2="${Y(0)}" style="stroke:var(--line2)"/><text x="${l-5}" y="${Y(1)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">1</text><text x="${l-5}" y="${Y(-1)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">−1</text><text x="${W-r}" y="${H-6}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">position 63</text><text x="${l}" y="${H-6}" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">0</text>`;
+  dims.forEach((dm,k)=>{const pts=[];for(let p=0;p<PEP;p+=peMode==="sin"?.25:1)pts.push(`${X(p).toFixed(1)},${Y(peVal(p,dm,d)).toFixed(1)}`);g+=`<polyline points="${pts.join(" ")}" style="fill:none;stroke:${cols[k]}" stroke-width="1.8"/>`;
+    const lam=2*Math.PI*Math.pow(10000,2*Math.floor(dm/2)/d);g+=`<text x="${W-r}" y="${t+10+k*12}" text-anchor="end" font-size="9.5" style="fill:${cols[k]}" font-family="IBM Plex Mono">dim ${dm}${peMode==="sin"?` · wavelength ${lam<1000?lam.toFixed(1):lam.toExponential(1)}`:""}</text>`;});
+  $("#peWave").innerHTML=g;
+  // similarity
+  const sc=$("#peSim"),sx=sc.getContext("2d"),cs=256/PEP,vec=p=>Array.from({length:d},(_,i)=>peVal(p,i,d));const V=Array.from({length:PEP},(_,p)=>vec(p));
+  for(let p=0;p<PEP;p++)for(let q=0;q<PEP;q++){const c=cosv(V[p],V[q]);const [r,gg,bb]=rgbV(c);sx.fillStyle=`rgb(${r},${gg},${bb})`;sx.fillRect(q*cs,p*cs,Math.ceil(cs),Math.ceil(cs));}
+}
+$("#peCv").addEventListener("mousemove",e=>{const d=PEDS[+$("#peD").value],rc=e.target.getBoundingClientRect(),i=Math.floor((e.clientX-rc.left)/rc.width*d),p=Math.floor((e.clientY-rc.top)/rc.height*PEP);if(i<0||p<0||i>=d||p>=PEP)return;const k=Math.floor(i/2);
+  $("#peRead").innerHTML=`pos <span class="c-tok">${p}</span>, dim <span class="c-emb">${i}</span> = <b>${peVal(p,i,d).toFixed(4)}</b>`+(peMode==="sin"?` <span class="dim">· ${i%2?"cos":"sin"}(${p} / 10000^(${2*k}/${d})) · wavelength ≈ ${(2*Math.PI*Math.pow(10000,2*k/d)).toFixed(1)} positions</span>`:` <span class="dim">· random until training shapes it</span>`);});
+$("#peSin").addEventListener("click",()=>{peMode="sin";renderPE();});$("#peLrn").addEventListener("click",()=>{peMode="lrn";renderPE();});$("#peD").addEventListener("input",renderPE);
+renderPE();$("#peRead").innerHTML='<span class="dim">Hover the heatmap to read any value.</span>';
+predictBox($("#pePred"),{q:"As the position goes up, which dimension's value changes fastest?",opts:["dimension 0","dimension d − 2","they all change at the same speed"],ok:0,
+  why:"Dimension 0 has wavelength 2π ≈ 6.3 positions and flips constantly. Dimension d−2 has a wavelength of almost 63,000 positions and barely moves. Fast waves tell neighbouring positions apart, and slow waves place a token in the long run of the text, like the seconds and hours hands of a clock."});
+
+/* ---- 6. token + position ---- */
+let mxMinDup=1;
+function xVec(w,p,d){const e=s3Emb(w,d);return e.map((v,i)=>v+peSinV(p,i,d));}
+function renderMix(){
+  const toks=($("#mxIn").value.toLowerCase().match(/[a-z]+/g)||[]).slice(0,10),d=8;
+  const row=(lab,v,col)=>`<div class="vrow" style="grid-template-columns:80px repeat(8,minmax(30px,1fr));min-width:0"><span class="lbl" style="color:${col}">${lab}</span>${v.map(x=>`<span class="cell" style="background:${cellCol(x)};font-size:.6rem">${x.toFixed(2)}</span>`).join("")}</div>`;
+  $("#mxRows").innerHTML=toks.map((t,p)=>`<div style="display:grid;grid-template-columns:minmax(0,1fr) 16px minmax(0,1fr) 16px minmax(0,1fr);gap:6px;align-items:center;margin-bottom:8px;min-width:720px">${row(`E[${t}]`,s3Emb(t,d),"var(--tok)")}<span class="mmop" style="font-size:1rem">+</span>${row(`PE[${p}]`,Array.from({length:d},(_,i)=>peSinV(p,i,d)),"var(--hid)")}<span class="mmop" style="font-size:1rem">=</span>${row(`x${p}`,xVec(t,p,d),"var(--out)")}</div>`).join("");
+  const seen={},msgs=[];mxMinDup=1;
+  toks.forEach((t,p)=>{(seen[t]=seen[t]||[]).push(p);});
+  Object.entries(seen).filter(([w,ps])=>ps.length>1).forEach(([t,ps])=>{for(let a=0;a<ps.length;a++)for(let b=a+1;b<ps.length;b++){const c=cosv(xVec(t,ps[a],d),xVec(t,ps[b],d));if(grpOf(t)!=="func")mxMinDup=Math.min(mxMinDup,c);msgs.push(`<b class="c-tok">${t}</b> at positions ${ps[a]} and ${ps[b]}: E rows identical (cos 1.000) → x vectors cos <b class="c-out">${c.toFixed(3)}</b>`);}});
+  $("#mxDup").innerHTML=msgs.length?msgs.slice(0,6).join("<br>")+(msgs.length>6?`<br><span class="dim">+ ${msgs.length-6} more pairs</span>`:"")+"<br><span class=\"dim\">Notice: content words (strong embeddings) keep their identity, with cos above 0.9. Small function-word vectors are reshaped much more by position.</span>":"Repeat a word (like <span class='mono'>the</span>) to compare one word at two positions.";
+  const A=($("#ordA").value.toLowerCase().match(/[a-z]+/g)||[]),B=($("#ordB").value.toLowerCase().match(/[a-z]+/g)||[]);
+  const common=[...new Set(A)].filter(w=>B.includes(w)).slice(0,4);
+  $("#ordOut").innerHTML=common.length?`<table class="tbl"><tr><th>word</th><th>pos in A / B</th><th>without PE</th><th>with PE</th></tr>${common.map(w=>{const pa=A.indexOf(w),pb=B.indexOf(w),c=cosv(xVec(w,pa,d),xVec(w,pb,d));return `<tr><td class="c-tok">${w}</td><td>${pa} / ${pb}</td><td class="c-err">1.000</td><td class="${c<.999?"c-out":"c-err"}">${c.toFixed(3)}</td></tr>`;}).join("")}</table><p class="note" style="margin-top:8px">Without positions the model gets the same <i>set</i> of vectors for both sentences, so it can't tell who chased whom. With PE, a word's vector carries where it stands.</p>`:'<p class="muted">Use the same words in both sentences, in a different order.</p>';
+}
+["#mxIn","#ordA","#ordB"].forEach(s=>$(s).addEventListener("input",renderMix));renderMix();
+predictBox($("#mxPred"),{q:"\"dog chased cat\" vs \"cat chased dog\". If there's no positional encoding, what does the Transformer receive?",opts:["Two different sets of vectors","The same set of vectors, in a different order","Nothing, because it crashes"],ok:1,
+  why:"Each word looks up the same E row in both sentences. Attention treats its inputs as a set, so without PE the meaning-changing word order is invisible. Adding PE gives the 'dog' at position 0 a different vector from the 'dog' at position 2."});
+
+/* ---- 7. live word2vec ---- */
+const TRSTOP=new Set("the a an on to of is and for with from at each it can we one more are into under between about which used has have s ' . , next time early her good lost online it".split(" "));
+const TRG={cat:"animal",dog:"animal",mouse:"animal",bed:"animal",mat:"animal",rug:"animal",park:"animal",sat:"animal",slept:"animal",chased:"animal",ran:"animal",
+ model:"ml",text:"ml",token:"ml",tokens:"ml",data:"ml",word:"ml",words:"ml",learns:"ml",predicts:"ml",vector:"ml",probability:"ml",probabilities:"ml",laptop:"ml",fast:"ml",slow:"ml",learn:"ml",small:"ml",large:"ml",
+ bank:"finance",loan:"finance",account:"finance",fee:"finance",interest:"finance",rate:"finance",balance:"finance",approved:"finance",paid:"finance",savings:"finance",accounts:"finance",lending:"finance",rates:"finance",lower:"finance",low:"finance",high:"finance",
+ customer:"people",agent:"people",customers:"people",borrower:"people",lender:"people",asked:"people",helped:"people",answered:"people"};
+const tr={words:[],idx:null,pairs:[],U:[],epoch:0,hist:[],timer:null};
+(function(){const sents=[...CORPUS,...EXTRA2].map(s=>preTok(s).filter(w=>!TRSTOP.has(w)));const f={};sents.forEach(s=>s.forEach(w=>f[w]=(f[w]||0)+1));
+  tr.words=Object.keys(f).filter(w=>f[w]>=2);tr.idx=new Map(tr.words.map((w,i)=>[w,i]));
+  sents.forEach(s=>{const k=s.filter(w=>tr.idx.has(w)).map(w=>tr.idx.get(w));for(let a=0;a<k.length;a++)for(let b=0;b<k.length;b++)if(a!==b&&k[a]!==k[b])tr.pairs.push([k[a],k[b]]);});})();
+let trSeed=7;
+function trReset(){clearInterval(tr.timer);tr.timer=null;$("#trPlay").textContent="Train";const r=mulberry(trSeed++);tr.U=tr.words.map(()=>[gauss(r)*.35,gauss(r)*.35]);tr.epoch=0;tr.hist=[];trRender();}
+const sig=x=>1/(1+Math.exp(-x));
+function trEpoch(){
+  const lr=+$("#trLr").value/100,U=tr.U,n=U.length,P=tr.pairs.slice();let L=0;
+  for(let i=P.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[P[i],P[j]]=[P[j],P[i]];}
+  for(const [w,c] of P){const uw=U[w],uc=U[c];let s=uw[0]*uc[0]+uw[1]*uc[1],g=1-sig(s);L+=-Math.log(sig(s)+1e-9);
+    const dw=[g*uc[0],g*uc[1]],dc=[g*uw[0],g*uw[1]];
+    for(let k=0;k<2;k++){const nI=Math.floor(Math.random()*n);if(nI===w||nI===c)continue;const un=U[nI],sn=uw[0]*un[0]+uw[1]*un[1],gn=sig(sn);L+=-Math.log(1-gn+1e-9);dw[0]-=gn*un[0];dw[1]-=gn*un[1];un[0]-=lr*gn*uw[0];un[1]-=lr*gn*uw[1];}
+    uw[0]+=lr*dw[0]-lr*.002*uw[0];uw[1]+=lr*dw[1]-lr*.002*uw[1];uc[0]+=lr*dc[0];uc[1]+=lr*dc[1];}
+  tr.epoch++;tr.hist.push(L/P.length);
+}
+function trPurity(){let ok=0,tot=0;tr.words.forEach((w,i)=>{if(!TRG[w])return;let best=-2,bj=-1;tr.words.forEach((v,j)=>{if(j===i||!TRG[v])return;const c=cosv(tr.U[i],tr.U[j]);if(c>best){best=c;bj=j;}});tot++;if(bj>=0&&TRG[tr.words[bj]]===TRG[w])ok++;});return tot?ok/tot:0;}
+function trNN(w){const i=tr.idx.get(w);if(i===undefined)return "–";let best=-2,bj=-1;tr.words.forEach((v,j)=>{if(j===i)return;const c=cosv(tr.U[i],tr.U[j]);if(c>best){best=c;bj=j;}});return tr.words[bj];}
+function trRender(){
+  const W=480,H=400,m=30,mx=Math.max(.5,...tr.U.map(u=>Math.max(Math.abs(u[0]),Math.abs(u[1]))))*1.08,X=x=>W/2+x/mx*(W/2-m),Y=y=>H/2-y/mx*(H/2-m);
+  let g=`<rect x="0" y="0" width="${W}" height="${H}" rx="10" style="fill:var(--bg)"/><line x1="${W/2}" y1="${m/2}" x2="${W/2}" y2="${H-m/2}" style="stroke:var(--line)"/><line x1="${m/2}" y1="${H/2}" x2="${W-m/2}" y2="${H/2}" style="stroke:var(--line)"/>`;
+  tr.words.forEach((w,i)=>{const col=TRG[w]?S3G[TRG[w]][1]:"#5a7380",u=tr.U[i];g+=`<circle cx="${X(u[0]).toFixed(1)}" cy="${Y(u[1]).toFixed(1)}" r="4.5" style="fill:${col}"/><text x="${(X(u[0])+6).toFixed(1)}" y="${(Y(u[1])+3).toFixed(1)}" font-size="9.5" style="fill:${col}" font-family="IBM Plex Mono">${w}</text>`;});
+  $("#trSvg").innerHTML=g;
+  const pur=trPurity();tr.purity=pur;
+  $("#trStats").innerHTML=`<div class="stat"><span class="v">${tr.epoch}</span><span class="k">epochs</span></div><div class="stat"><span class="v c-err">${tr.hist.length?tr.hist[tr.hist.length-1].toFixed(3):"–"}</span><span class="k">loss</span></div><div class="stat"><span class="v ${pur>=.65?"c-out":"c-tok"}">${(pur*100).toFixed(0)}%</span><span class="k">neighbour in same colour</span></div><div class="stat"><span class="v c-tok" style="font-size:1.05rem">${trNN("loan")}</span><span class="k">closest to "loan"</span></div>`;
+  $("#trLrV").textContent=(+$("#trLr").value/100).toFixed(2);
+  const hs=tr.hist.length?tr.hist:[0],LW=320,LH=120,l=36,t=8,b=18,r=8,top=Math.max(...hs)*1.05||1,bot=Math.min(...hs)*.95;
+  const XX=i=>l+i/Math.max(1,hs.length-1)*(LW-l-r),YY=v=>t+(top-v)/((top-bot)||1)*(LH-t-b);
+  $("#trLoss").innerHTML=`<text x="${l-4}" y="${t+6}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${top.toFixed(2)}</text><text x="${l-4}" y="${LH-b}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${bot.toFixed(2)}</text><line x1="${l}" x2="${LW-r}" y1="${LH-b}" y2="${LH-b}" style="stroke:var(--line2)"/>`+(tr.hist.length>1?`<polyline points="${hs.map((v,i)=>`${XX(i).toFixed(1)},${YY(v).toFixed(1)}`).join(" ")}" style="fill:none;stroke:var(--err)" stroke-width="2"/>`:"")+`<text x="${LW-r}" y="${LH-4}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">epoch ${tr.epoch}</text>`;
+}
+$("#trPlay").addEventListener("click",()=>{if(tr.timer){clearInterval(tr.timer);tr.timer=null;$("#trPlay").textContent="Train";return;}$("#trPlay").textContent="Pause";tr.timer=setInterval(()=>{trEpoch();trRender();if(tr.epoch>=400){clearInterval(tr.timer);tr.timer=null;$("#trPlay").textContent="Train";}},90);});
+$("#trStep").addEventListener("click",()=>{trEpoch();trRender();});$("#trReset").addEventListener("click",trReset);$("#trLr").addEventListener("input",trRender);
+trReset();
+
+/* ---- code ---- */
+const CODE3={
+"embeddings_pytorch.py":`import torch
+import torch.nn as nn
+import torch.nn.functional as F
+
+V, d = 1000, 8                        # vocabulary size, embedding width
+emb = nn.Embedding(V, d)              # E: [V, d], random at first
+print(emb.weight.shape)               # torch.Size([1000, 8])
+print(sum(p.numel() for p in emb.parameters()))   # 8000 = V x d
+
+ids = torch.tensor([[2, 57, 91, 57, 3]])          # [B=1, T=5]
+x = emb(ids)                                       # the lookup
+print(x.shape)                                     # torch.Size([1, 5, 8])
+print(torch.equal(x[0, 1], x[0, 3]))               # True: same id -> same row
+
+# lookup == one-hot @ E
+one_hot = F.one_hot(torch.tensor(57), V).float()   # [V]
+print(torch.allclose(one_hot @ emb.weight, emb.weight[57]))   # True
+
+# cosine similarity between two token vectors
+print(F.cosine_similarity(emb.weight[57], emb.weight[91], dim=0))`,
+"positional_encoding.py":`import math, torch
+import torch.nn as nn
+
+def sinusoidal_pe(max_len, d):
+    pe = torch.zeros(max_len, d)
+    pos = torch.arange(max_len).unsqueeze(1)                           # [L, 1]
+    div = torch.exp(torch.arange(0, d, 2) * (-math.log(10000.0) / d))  # 1 / 10000^(2i/d)
+    pe[:, 0::2] = torch.sin(pos * div)                                 # even dims
+    pe[:, 1::2] = torch.cos(pos * div)                                 # odd dims
+    return pe                                                          # [L, d]
+
+V, d, C = 1000, 64, 128
+tok_emb = nn.Embedding(V, d)
+pos_emb = nn.Embedding(C, d)          # learned positions (GPT-2 style)
+pe = sinusoidal_pe(C, d)              # fixed positions (original Transformer)
+
+ids = torch.randint(0, V, (2, 10))    # [B=2, T=10]
+T = ids.shape[1]
+x_learned = tok_emb(ids) + pos_emb(torch.arange(T))   # [2, 10, 64], broadcast over B
+x_sin = tok_emb(ids) + pe[:T]                         # [2, 10, 64]
+print(x_learned.shape, x_sin.shape)
+print(pe[1, :4])     # tensor([0.8415, 0.5403, 0.6816, 0.7318])`,
+"tiny_word2vec.py":`import random, re, torch
+import torch.nn.functional as F
+
+text = """the cat sat on the mat . the dog sat on the rug .
+the bank approved the loan . the customer paid the fee .
+the model reads the text . the model learns from data ."""
+stop = {"the", "on", "from"}
+sents = [[w for w in s.split() if w not in stop]
+         for s in re.split(r"\\s*\\.\\s*", text.lower()) if s.strip()]
+vocab = sorted({w for s in sents for w in s})
+idx = {w: i for i, w in enumerate(vocab)}
+pairs = [(idx[a], idx[b]) for s in sents for a in s for b in s if a != b]
+
+d = 2
+U = torch.randn(len(vocab), d, requires_grad=True)    # one vector per word
+opt = torch.optim.SGD([U], lr=0.1)
+for epoch in range(300):
+    random.shuffle(pairs)
+    w = torch.tensor([p[0] for p in pairs])
+    c = torch.tensor([p[1] for p in pairs])
+    neg = torch.randint(0, len(vocab), (len(pairs), 2))
+    pos_score = (U[w] * U[c]).sum(-1)                     # u_w . u_c   (pull together)
+    neg_score = (U[w].unsqueeze(1) * U[neg]).sum(-1)      # u_w . u_neg (push apart)
+    loss = -(F.logsigmoid(pos_score).mean() + F.logsigmoid(-neg_score).mean())
+    opt.zero_grad(); loss.backward(); opt.step()
+    if epoch % 50 == 0:
+        print(epoch, round(loss.item(), 3))
+
+sim = F.cosine_similarity(U[idx["loan"]], U, dim=-1)
+print([vocab[i] for i in sim.argsort(descending=True)[:4]])   # loan and its neighbours`
+};
+codeBox($("#code3"),CODE3);
+
+/* ---- exercise ---- */
+let ex3Checked=false;
+const EX3=[
+ {t:"<b>Meaning map (panel 03):</b> set d to the <b>smallest</b> size where nearest-neighbour accuracy reaches 90% or more",f:()=>nnAcc(S3DS[embDi])>=.9&&(embDi===0||nnAcc(S3DS[embDi-1])<.9)},
+ {t:"<b>Word arithmetic (panel 03):</b> build an analogy whose answer is <span class=\"c-tok\">princess</span>",f:()=>anTop==="princess"},
+ {t:"<b>Cosine (panel 04):</b> find two <b>different</b> words with cosine similarity above 0.95",f:()=>$("#csA").value!==$("#csB").value&&cosv(s3Emb($("#csA").value,S3DS[embDi]),s3Emb($("#csB").value,S3DS[embDi]))>.95},
+ {t:"<b>Position (panel 06):</b> write a sentence where a repeated <b>content</b> word (not the/a/is) has two vectors with cosine <b>below 0.95</b>",f:()=>mxMinDup<.95},
+ {t:"<b>Learning (panel 07):</b> train until at least 65% of words have a same-colour nearest neighbour",f:()=>(tr.purity||0)>=.65}
+];
+function runEx3(){let ok=0;$("#ex3Checks").innerHTML=EX3.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex3Checked?(r?"ok":"no"):""}"><span class="dot">${ex3Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex3Checked)$("#ex3Msg").innerHTML=ok===EX3.length?'<span class="c-out">All 5 missions complete.</span> You explored, measured, positioned and trained embeddings.':`${ok}/5 missions complete. Hints: prince − boy + girl; for the position mission try a word at positions 0 and 5.`;}
+$("#ex3Btn").addEventListener("click",()=>{ex3Checked=true;runEx3();});
+renderMap();runEx3();
+
+/* ---- quiz ---- */
+function makeQuiz3(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)],ri=(lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
+  let a,b;do{a=[ri(-1,3),ri(0,3),ri(1,3)];b=[ri(0,3),ri(-1,3),ri(1,3)];}while(Math.abs(cosv(a,b))>.999);
+  const ca=cosv(a,b),da=dotv(a,b);
+  const V=pick([5000,8000,16000]),C=pick([256,512,1024]),d=pick([128,256,384]);
+  const p=pick([10,30,50]),pev=Math.sin(p/100);
+  return [
+   {type:"Numerical",kind:"num",q:`Compute the cosine similarity of <span class="mono c-emb">a = [${a.join(", ")}]</span> and <span class="mono c-tok">b = [${b.join(", ")}]</span>. Give 3 decimals.`,
+    check:v=>{if(Math.abs(v-ca)<.006)return [true,`a·b = ${da}, |a| = √${dotv(a,a)} = ${normv(a).toFixed(3)}, |b| = √${dotv(b,b)} = ${normv(b).toFixed(3)} → ${da} / (${normv(a).toFixed(3)} × ${normv(b).toFixed(3)}) = ${ca.toFixed(3)}.`];
+      if(Math.abs(v-da)<1e-6)return [false,`${da} is the dot product. Cosine also divides by both lengths: ${da} / (${normv(a).toFixed(3)} × ${normv(b).toFixed(3)}) = ${ca.toFixed(3)}.`];
+      return [false,`Step by step: a·b = ${da}; |a| = ${normv(a).toFixed(3)}; |b| = ${normv(b).toFixed(3)}; cos = ${ca.toFixed(3)}. Panel 04 shows each step.`];}},
+   {type:"Numerical",kind:"num",q:`A GPT-2-style SLM has vocabulary V = ${V.toLocaleString()}, context length C = ${C} with <b>learned</b> position embeddings, and d = ${d}. How many parameters are in its token + position embedding tables together?`,
+    check:v=>{const ans=V*d+C*d;if(Math.abs(v-ans)<.5)return [true,`Token table V×d = ${(V*d).toLocaleString()} plus position table C×d = ${(C*d).toLocaleString()}, total ${ans.toLocaleString()}.`];
+      if(v===V*d)return [false,`That's only the token table. The learned position table adds C × d = ${(C*d).toLocaleString()}. Total ${ans.toLocaleString()}.`];
+      if(v===V*C)return [false,`V × C mixes the wrong sizes. Each table has d columns: V×d + C×d = ${ans.toLocaleString()}.`];
+      return [false,`Two tables, both d wide: ${V}×${d} + ${C}×${d} = ${ans.toLocaleString()}.`];}},
+   {type:"Conceptual",kind:"mcq",q:"Why do SLMs use dense learned embeddings instead of one-hot vectors as their token representation?",opts:shuffle([
+     {t:"One-hot makes every pair of words equally unrelated (cosine 0), and wastes V numbers per token. Dense vectors are short and let similar words share what they learn.",ok:true,why:"Correct. Panel 01 shows the identity-matrix similarity grid for one-hot vectors. Dense embeddings put related words close together, so learning about 'loan' also helps 'mortgage'."},
+     {t:"One-hot vectors can't be multiplied by matrices",why:"Misconception: <b>one-hot is incompatible with matmul</b>. One-hot × E works perfectly. It's exactly what the lookup computes (panel 02). The problem is that the vectors carry no similarity."},
+     {t:"Dense embeddings are hand-written by linguists",why:"Misconception: <b>embeddings are designed</b>. They start random and are learned by gradient descent from text (panel 07). Nobody assigns their values."},
+     {t:"One-hot vectors are fine. Dense embeddings only save memory.",why:"Misconception: <b>it's only about memory</b>. Memory matters, but the bigger win is generalisation: one-hot gives the model no notion that two words are similar."}],r)},
+   {type:"Numerical",kind:"num",q:`Sinusoidal positional encoding with d = 4. What is PE(pos = ${p}, dim = 2)? Use radians and give 4 decimals. (dim 2 → i = 1, so the angle is pos / 10000<sup>2/4</sup>.)`,
+    check:v=>{if(Math.abs(v-pev)<.0006)return [true,`10000^(2/4) = 100, angle = ${p}/100 = ${p/100}, sin(${p/100}) = ${pev.toFixed(4)}. Dimension 2 is a sin dimension (even index).`];
+      if(Math.abs(v-Math.sin(p))<.0006)return [false,`You used sin(${p}), which is dimension 0's formula. Dimension 2 divides first: sin(${p}/100) = ${pev.toFixed(4)}.`];
+      if(Math.abs(v-Math.cos(p/100))<.0006)return [false,`Even dimensions use <b>sin</b> and odd ones use cos. sin(${p/100}) = ${pev.toFixed(4)}.`];
+      if(Math.abs(v-Math.sin(p/100*Math.PI/180))<.0006)return [false,`Your calculator is in degrees. The formula uses radians: sin(${p/100} rad) = ${pev.toFixed(4)}.`];
+      return [false,`10000^(2i/d) with i = 1, d = 4 → 10000^0.5 = 100. sin(${p}/100) = sin(${p/100}) = ${pev.toFixed(4)}.`];}},
+   {type:"Practical",kind:"mcq",q:"You add 2,000 new banking tokens (e.g. \"overdraft\", \"KYC\") to a pretrained SLM's tokenizer. What happens to their embeddings?",opts:shuffle([
+     {t:"New rows are appended to E (and the LM head). They start random or as an average of existing rows, and only become meaningful after fine-tuning on banking text.",ok:true,why:"Correct. In Hugging Face this is <span class='mono'>model.resize_token_embeddings(len(tokenizer))</span>. The new rows carry no meaning until gradients from domain text shape them (Stage 10)."},
+     {t:"They automatically get meaningful vectors from their spelling",why:"Misconception: <b>embeddings come from spelling</b>. A new ID is a new, untrained row. Spelling only matters to the tokenizer."},
+     {t:"Nothing changes: the embedding matrix size is fixed by the architecture",why:"Misconception: <b>E's size is fixed</b>. E has one row per vocabulary entry, so V must grow by 2,000 or the new IDs index past the end of the matrix and crash."},
+     {t:"They reuse the row of the <unk> token",why:"Misconception: <b>new tokens map to &lt;unk&gt;</b>. Then they'd all be identical and the whole point of adding them would be lost. Each needs its own row."}],r)}
+  ];
+}
+mountQuiz(3,$("#quiz3"),makeQuiz3);
 
 showStage(0);window.scrollTo(0,0);
 })();
