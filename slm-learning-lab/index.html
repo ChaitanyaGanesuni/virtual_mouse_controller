@@ -1260,6 +1260,172 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 4 ====================== -->
+  <section id="stage4" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 04 · unlocked</div>
+      <h2>Neural networks: neurons, layers and learning</h2>
+      <p>Every SLM is built from one tiny part, repeated millions of times: a neuron that adds up weighted inputs and bends the result. This stage starts with one neuron, finds out what it can't do, and then builds a network that can. You can add neurons, drag weights and watch it learn.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 4 sections">
+      <button type="button" data-go="p4-perc">1 · The perceptron</button>
+      <button type="button" data-go="p4-act">2 · Activation functions</button>
+      <button type="button" data-go="p4-net">3 · Build a network</button>
+      <button type="button" data-go="p4-train">4 · Train it</button>
+      <button type="button" data-go="p4-ffn">5 · Inside an SLM</button>
+      <button type="button" data-go="p4-code">6 · Code</button>
+      <button type="button" data-go="p4-ex">7 · Exercise</button>
+      <button type="button" data-go="p4-quiz">8 · Assessment</button>
+    </nav>
+
+    <!-- 1 PERCEPTRON -->
+    <div class="panel" id="p4-perc">
+      <div class="phead"><span class="tag">01</span><h3>The perceptron: one neuron drawing one line</h3><span class="sim real">real learning rule</span>
+        <p class="plain">A perceptron weighs its inputs, adds a bias, and answers <em>yes (1)</em> or <em>no (0)</em>. Geometrically, it draws <em>one straight line</em> and says yes on one side. Move the sliders, or press Learn and watch it fix its own mistakes. Then try XOR.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <div class="row" id="pcData" style="margin-bottom:8px"></div>
+          <svg class="plot" id="pcSvg" viewBox="0 0 400 340" role="img" aria-label="Perceptron decision line over four points"></svg>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box ctrls" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+            <label class="field">w₁ = <b id="pcw1v"></b><input type="range" id="pcw1" min="-30" max="30" value="10"></label>
+            <label class="field">w₂ = <b id="pcw2v"></b><input type="range" id="pcw2" min="-30" max="30" value="10"></label>
+            <label class="field">b = <b id="pcbv"></b><input type="range" id="pcb" min="-30" max="30" value="-15"></label>
+          </div>
+          <div class="box"><div class="scroll" id="pcTbl"></div><div class="row" style="margin-top:10px"><button class="btn primary" id="pcLearn" type="button">Learn (perceptron rule)</button><button class="btn" id="pcStep" type="button">One correction</button><button class="btn" id="pcReset" type="button">Reset</button></div><p class="narr" id="pcNarr" style="margin-top:10px" aria-live="polite"></p></div>
+          <div class="predict" id="pcPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula" style="white-space:normal">ŷ = step(w₁x₁ + w₂x₂ + b) · learning rule: w ← w + η (y − ŷ) x</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-tok">x₁, x₂</span>: inputs</li><li><span class="c-hid">w, b</span>: weights and bias, the things it learns</li><li><span class="c-out">ŷ</span>: prediction, <span class="c-err">y</span>: correct answer</li></ul></div>
+        <div><b>Inside an SLM</b>Every neuron in an SLM is this same weighted sum. The difference is a smooth activation instead of a hard step, so gradients can flow (Stage 1, panel 08), and millions of neurons working together instead of one.</div>
+      </div>
+    </div>
+
+    <!-- 2 ACTIVATIONS -->
+    <div class="panel" id="p4-act">
+      <div class="phead"><span class="tag">02</span><h3>Activation functions: the bend that makes networks powerful</h3><span class="sim real">exact functions</span>
+        <p class="plain">After the weighted sum, every neuron passes its value <em>z</em> through an activation function. Without that bend, stacking layers is pointless, because many straight lines combined are still one straight line. Pick a function, drag z, and compare its slope, which is what backpropagation needs.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <div class="row" id="afBtns" style="margin-bottom:8px"></div>
+          <svg class="plot" id="afSvg" viewBox="0 0 420 260" role="img" aria-label="Activation function and its derivative"></svg>
+          <label class="field" style="margin-top:8px">z = <b id="afZv"></b><input type="range" id="afZ" min="-50" max="50" value="10"></label>
+          <label class="row" style="font-size:.85rem;color:var(--muted);margin-top:6px"><input type="checkbox" id="afDer" checked> show the derivative (slope) as a dashed line</label>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" id="afRead"></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Why bend at all? A 1 → 3 → 1 network, same weights</div>
+            <div class="row" style="margin-bottom:6px"><button class="btn" id="stLin" type="button">No activation (linear)</button><button class="btn primary" id="stRelu" type="button">With ReLU</button><button class="btn" id="stRand" type="button">New random weights</button></div>
+            <svg class="plot" id="stSvg" viewBox="0 0 420 170" role="img" aria-label="Network output with and without activation"></svg><p class="note" id="stNote" style="margin-top:6px"></p></div>
+          <div class="predict" id="afPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formulas</b><div class="formula" style="white-space:normal">ReLU(z) = max(0, z) · σ(z) = 1/(1+e<sup>−z</sup>) · tanh(z) · GELU(z) ≈ z·σ(1.702 z)</div></div>
+        <div><b>What to compare</b><ul><li><span class="c-out">Output range</span>: ReLU 0…∞, σ 0…1, tanh −1…1</li><li><span class="c-err">Slope</span>: σ and tanh flatten at the ends (vanishing gradients)</li><li>ReLU's slope is exactly 0 for z &lt; 0 ("dead" neurons)</li></ul></div>
+        <div><b>Inside an SLM</b>The feed-forward layers of GPT-2 and most SLMs use <b>GELU</b> (or the closely related SwiGLU), a smooth ReLU that keeps a small gradient for negative values. Sigmoid survives inside gates. Tanh mostly appears in older RNNs.</div>
+      </div>
+    </div>
+
+    <!-- 3 NETWORK -->
+    <div class="panel" id="p4-net">
+      <div class="phead"><span class="tag">03</span><h3>Build a network: neurons, layers, weights, biases</h3><span class="sim real">real forward & backward pass</span>
+        <p class="plain">This is a real neural network. <em>Add or remove neurons and layers</em> with + and −, <em>click any line</em> to change its weight, and <em>click any circle</em> to change its bias. Then press Forward to watch the input flow through, and Backward to see how much each weight is to blame.</p></div>
+      <div class="row" style="margin-bottom:10px" id="nnCtl">
+        <button class="btn" id="nnAddL" type="button">+ hidden layer</button><button class="btn" id="nnDelL" type="button">− hidden layer</button>
+        <label class="field" style="flex:0 0 auto">hidden activation<select id="nnAct" class="txt" style="width:auto"><option value="tanh">tanh</option><option value="relu">ReLU</option><option value="sigmoid">sigmoid</option></select></label>
+        <span class="pill">parameters: <b id="nnParams"></b></span>
+      </div>
+      <div class="box"><div class="scroll"><svg id="nnSvg" viewBox="0 0 760 380" style="min-width:600px;width:100%;height:auto;display:block" role="img" aria-label="Editable neural network diagram"></svg></div>
+        <div class="narr" id="nnNarr" style="margin-top:8px" aria-live="polite"></div>
+        <div class="row" style="margin-top:10px"><button class="btn primary" id="nnF" type="button">1 · Forward pass</button><button class="btn" id="nnB" type="button">2 · Backward pass</button><button class="btn" id="nnU" type="button">3 · Update weights</button><button class="btn" id="nnRand" type="button">Random weights</button></div>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="box ctrls" style="grid-template-columns:repeat(3,minmax(0,1fr))">
+          <label class="field">input x₁ = <b id="nnx1v"></b><input type="range" id="nnx1" min="-10" max="10" value="5"></label>
+          <label class="field">input x₂ = <b id="nnx2v"></b><input type="range" id="nnx2" min="-10" max="10" value="-5"></label>
+          <label class="field">target y<select id="nnY" class="txt"><option value="1">1</option><option value="0">0</option></select></label>
+          <div style="grid-column:1/-1" id="nnEdit" class="box"></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box"><div class="stats" id="nnStats"></div></div>
+          <div class="predict" id="nnPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formulas</b><div class="formula" style="white-space:normal">forward: a⁽ˡ⁺¹⁾ = σ(W⁽ˡ⁾ a⁽ˡ⁾ + b⁽ˡ⁾) · backward: δ⁽ˡ⁾ = (W⁽ˡ⁾ᵀ δ⁽ˡ⁺¹⁾) ⊙ σ′(z⁽ˡ⁾)</div></div>
+        <div><b>What the parts mean</b><ul><li><span class="c-tok">Input layer</span>: just the numbers you feed in</li><li><span class="c-hid">Hidden layers</span>: learned intermediate features</li><li><span class="c-out">Output layer</span>: the answer, here σ → a probability</li><li>Line thickness = |weight|, <span class="c-emb">cyan</span> + / <span class="c-err">rose</span> −</li></ul></div>
+        <div><b>Inside an SLM</b>A layer is one matrix multiply plus a bias plus an activation, exactly as here. An SLM layer just has hundreds of neurons per layer and processes every token's vector at once (panel 05).</div>
+      </div>
+    </div>
+
+    <!-- 4 TRAIN -->
+    <div class="panel" id="p4-train">
+      <div class="phead"><span class="tag">04</span><h3>Train it: watch the decision boundary learn</h3><span class="sim real">real gradient descent, in your browser</span>
+        <p class="plain">The network from panel 03 now learns from <em>data</em>: dots of two colours. The background shows its current answer for every point on the map. Press Train and watch it bend its boundary to separate the colours. Too few neurons, and it simply can't.</p></div>
+      <div class="grid2">
+        <div class="box">
+          <div class="row" id="trnData" style="margin-bottom:8px"></div>
+          <canvas id="trnCv" width="600" height="600" style="width:100%;max-width:440px;height:auto;aspect-ratio:1;display:block;margin:0 auto;border-radius:10px;border:1px solid var(--line2)" aria-label="Decision boundary"></canvas>
+          <div class="row" style="justify-content:center;margin-top:10px"><button class="btn primary" id="trnPlay" type="button">Train</button><button class="btn" id="trnStep" type="button">10 steps</button><button class="btn" id="trnReset" type="button">Re-initialise weights</button></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" style="display:grid;gap:10px">
+            <label class="field">Learning rate: <b id="trnLrV"></b><input type="range" id="trnLr" min="1" max="30" value="10"></label>
+            <div class="stats" id="trnStats"></div>
+            <p class="note" id="trnArch"></p>
+          </div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">Loss (binary cross-entropy)</div><svg class="plot" id="trnLoss" viewBox="0 0 320 120" role="img" aria-label="Loss curve"></svg></div>
+          <div class="predict" id="trnPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Loss & update</b><div class="formula" style="white-space:normal">L = −[y log p + (1−y) log(1−p)] · W ← W − η ∂L/∂W</div></div>
+        <div><b>What to watch</b><ul><li><span class="c-emb">Cyan</span> area: the network says class 1, <span class="c-err">rose</span>: class 0</li><li>Accuracy = share of dots on their colour's side</li><li>The diagram in panel 03 updates as the weights change</li></ul></div>
+        <div><b>Inside an SLM</b>This is the same loop as SLM training: forward pass, loss, backward pass, update. The SLM's "dots" are billions of next-token examples, and its output picks among V tokens instead of 2 colours.</div>
+      </div>
+    </div>
+
+    <!-- 5 FFN -->
+    <div class="panel" id="p4-ffn">
+      <div class="phead"><span class="tag">05</span><h3>From this network to an SLM's feed-forward block</h3><span class="sim illus">illustrative values · exact shapes and counts</span>
+        <p class="plain">Inside every Transformer block there is a small neural network just like the one you built: <em>widen</em> each token's vector 4×, apply <em>GELU</em>, then <em>shrink</em> it back. It runs on every token separately. Press Play to watch the vectors expand and contract.</p></div>
+      <div class="grid2">
+        <div class="box"><div class="scroll" id="ffnViz"></div><div class="row" style="margin-top:10px"><button class="btn primary" id="ffnPlay" type="button">Play</button></div></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" style="display:grid;gap:10px"><label class="field">d_model = <b id="ffnDv"></b><input id="ffnD" type="range" min="0" max="5" value="2"></label><div class="stats" id="ffnStats"></div></div>
+          <div class="predict" id="ffnPred"></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Formula</b><div class="formula">FFN(x) = W₂ · GELU(W₁ x + b₁) + b₂</div></div>
+        <div><b>Shapes</b><ul><li><span class="c-emb">x</span>: [T, d]</li><li><span class="c-hid">W₁</span>: [d, 4d] → hidden [T, 4d]</li><li><span class="c-hid">W₂</span>: [4d, d] → output [T, d]</li></ul></div>
+        <div><b>Inside an SLM</b>The FFN holds about <b>two-thirds</b> of each block's parameters, roughly 8d² of the block's 12d². Research suggests much of a model's factual knowledge is stored in these weights. Attention (Stage 5) moves information between tokens; the FFN processes each token on its own.</div>
+      </div>
+    </div>
+
+    <!-- 6 CODE -->
+    <div class="panel" id="p4-code">
+      <div class="phead"><span class="tag">06</span><h3>Code it on your CPU</h3><p>A network from scratch in NumPy (forward + backprop, it learns XOR), the same thing in PyTorch, and the SLM feed-forward block.</p></div>
+      <div class="code" id="code4"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <!-- 7 EXERCISE -->
+    <div class="panel" id="p4-ex">
+      <div class="phead"><span class="tag">07</span><h3>Hands-on exercise: four missions</h3><p>The checks read the panels' live state.</p></div>
+      <div class="box"><div class="checks" id="ex4Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex4Btn" type="button">Check missions</button></div><p class="note" id="ex4Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <!-- 8 QUIZ -->
+    <div class="panel" id="p4-quiz">
+      <div class="phead"><span class="tag">08</span><h3>Stage 4 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 5, the Transformer.</p></div>
+      <div id="quiz4"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -1324,7 +1490,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -3120,6 +3286,361 @@ function makeQuiz3(seed){
 }
 mountQuiz(3,$("#quiz3"),makeQuiz3);
 
+/* =================== STAGE 4 =================== */
+const s4sig=z=>1/(1+Math.exp(-z));
+/* ---- 1. perceptron ---- */
+const PCD={AND:[[0,0,0],[0,1,0],[1,0,0],[1,1,1]],OR:[[0,0,0],[0,1,1],[1,0,1],[1,1,1]],XOR:[[0,0,0],[0,1,1],[1,0,1],[1,1,0]]};
+const pc={set:"AND",w1:1,w2:1,b:-1.5,ptr:0,n:0,timer:null,hi:-1};
+const pcPred=(x1,x2)=>pc.w1*x1+pc.w2*x2+pc.b>0?1:0;
+function pcSetData(k){pc.set=k;pcStop();pc.n=0;pc.hi=-1;$("#pcNarr").textContent=`Dataset ${k}. Cyan dots should get 1, rose dots 0.`;renderPC();}
+$("#pcData").innerHTML='<span class="eyebrow">Data</span>'+Object.keys(PCD).map(k=>`<button type="button" class="btn" data-pd="${k}">${k}</button>`).join("");
+$$("#pcData [data-pd]").forEach(b=>b.addEventListener("click",()=>pcSetData(b.dataset.pd)));
+function renderPC(){
+  $$("#pcData [data-pd]").forEach(b=>b.classList.toggle("primary",b.dataset.pd===pc.set));
+  ["w1","w2","b"].forEach(k=>{$("#pc"+k).value=Math.round(pc[k]*10);$("#pc"+k+"v").textContent=pc[k].toFixed(1);});
+  const W=400,H=340,l=40,r=14,t=14,bm=36,X=x=>l+(x+.5)/2*(W-l-r),Y=y=>t+(1.5-y)/2*(H-t-bm);
+  let g="";const N=20;
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++){const x=-.5+2*(i+.5)/N,y=-.5+2*(j+.5)/N,p=pcPred(x,y);g+=`<rect x="${X(x-1/N)}" y="${Y(y+1/N)}" width="${(W-l-r)/N+.5}" height="${(H-t-bm)/N+.5}" style="fill:${p?"rgba(82,211,226,.13)":"rgba(255,125,147,.09)"}"/>`;}
+  [0,1].forEach(v=>{g+=`<line x1="${X(v)}" x2="${X(v)}" y1="${t}" y2="${H-bm}" style="stroke:var(--line)"/><line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${X(v)}" y="${H-bm+16}" text-anchor="middle" font-size="11" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text><text x="${l-8}" y="${Y(v)+4}" text-anchor="end" font-size="11" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text>`;});
+  g+=`<text x="${W-r}" y="${H-6}" text-anchor="end" font-size="11" style="fill:var(--muted)" font-family="IBM Plex Mono">x₁ →</text><text x="${l}" y="${t+2}" font-size="11" style="fill:var(--muted)" font-family="IBM Plex Mono">↑ x₂</text>`;
+  // decision line w1 x + w2 y + b = 0
+  const pts=[];const xs=[-.5,1.5];
+  if(Math.abs(pc.w2)>1e-6)xs.forEach(x=>pts.push([x,-(pc.w1*x+pc.b)/pc.w2]));else if(Math.abs(pc.w1)>1e-6){const x=-pc.b/pc.w1;pts.push([x,-.5],[x,1.5]);}
+  if(pts.length===2)g+=`<defs><clipPath id="pcclip"><rect x="${l}" y="${t}" width="${W-l-r}" height="${H-t-bm}"/></clipPath></defs><line clip-path="url(#pcclip)" x1="${X(pts[0][0])}" y1="${Y(pts[0][1])}" x2="${X(pts[1][0])}" y2="${Y(pts[1][1])}" style="stroke:var(--tok)" stroke-width="3"/>`;
+  PCD[pc.set].forEach(([x1,x2,y],i)=>{const ok=pcPred(x1,x2)===y;g+=`<circle cx="${X(x1)}" cy="${Y(x2)}" r="${i===pc.hi?20:15}" style="fill:${y?"var(--emb)":"var(--err)"};stroke:${ok?"var(--bg)":"#fff"}" stroke-width="${ok?2:4}"/><text x="${X(x1)}" y="${Y(x2)+5}" text-anchor="middle" font-size="13" font-weight="700" style="fill:#071318" font-family="IBM Plex Mono">${ok?"✓":"✗"}</text>`;});
+  $("#pcSvg").innerHTML=g;
+  const rows=PCD[pc.set].map(([x1,x2,y])=>{const z=pc.w1*x1+pc.w2*x2+pc.b,p=z>0?1:0;return `<tr><td>${x1}</td><td>${x2}</td><td class="c-tok">${y}</td><td>${z.toFixed(2)}</td><td class="${p===y?"c-out":"c-err"}">${p} ${p===y?"✓":"✗"}</td></tr>`;}).join("");
+  const ok=PCD[pc.set].filter(([x1,x2,y])=>pcPred(x1,x2)===y).length;pc.ok=ok;
+  $("#pcTbl").innerHTML=`<table class="tbl"><tr><th>x₁</th><th>x₂</th><th>target y</th><th>z = w·x + b</th><th>ŷ = step(z)</th></tr>${rows}</table><p style="margin-top:6px;font-weight:600;color:${ok===4?"var(--out)":"var(--tok)"}">${ok}/4 correct</p>`;
+}
+function pcCorrect(){
+  const D=PCD[pc.set];
+  for(let k=0;k<4;k++){const i=(pc.ptr+k)%4,[x1,x2,y]=D[i],p=pcPred(x1,x2);if(p!==y){const e=.5*(y-p);pc.w1+=e*x1;pc.w2+=e*x2;pc.b+=e;pc.ptr=(i+1)%4;pc.hi=i;pc.n++;
+    $("#pcNarr").innerHTML=`Correction ${pc.n}: point (${x1}, ${x2}) should be <b>${y}</b> but got ${p}. Rule: w ← w + 0.5 × (${y} − ${p}) × x → w₁ = ${pc.w1.toFixed(1)}, w₂ = ${pc.w2.toFixed(1)}, b = ${pc.b.toFixed(1)}`;renderPC();return true;}}
+  pc.hi=-1;$("#pcNarr").innerHTML=`<span class="c-out">All 4 points correct after ${pc.n} corrections.</span> The line now separates the two colours.`;renderPC();return false;
+}
+function pcStop(){clearInterval(pc.timer);pc.timer=null;$("#pcLearn").textContent="Learn (perceptron rule)";}
+$("#pcLearn").addEventListener("click",()=>{if(pc.timer){pcStop();return;}$("#pcLearn").textContent="Pause";pc.timer=setInterval(()=>{if(!pcCorrect())pcStop();else if(pc.n>=30){pcStop();$("#pcNarr").innerHTML+=`<br><b class="c-err">30 corrections and it's still wrong.</b> No straight line can put both cyan corners on one side and both rose corners on the other. A single neuron can't learn ${pc.set}. Panel 03 adds a hidden layer.`;}},650);});
+$("#pcStep").addEventListener("click",()=>{pcStop();pcCorrect();});
+$("#pcReset").addEventListener("click",()=>{pcStop();Object.assign(pc,{w1:0,w2:0,b:0,n:0,ptr:0,hi:-1});$("#pcNarr").textContent="Weights reset to 0. Press Learn.";renderPC();});
+["w1","w2","b"].forEach(k=>$("#pc"+k).addEventListener("input",e=>{pc[k]=+e.target.value/10;pc.hi=-1;renderPC();}));
+pcSetData("AND");
+predictBox($("#pcPred"),{q:"Can a single perceptron learn XOR (output 1 when exactly one input is 1)?",opts:["Yes, with enough corrections","No, never","Only with a bigger learning rate"],ok:1,
+  why:"XOR's two '1' points sit on opposite corners. Any straight line that puts both on one side also takes in a '0' point. This limit (Minsky & Papert, 1969) is exactly why networks need hidden layers.",onReveal:()=>{pcSetData("XOR");Object.assign(pc,{w1:0,w2:0,b:0});$("#pcLearn").click();}});
+
+/* ---- 2. activations ---- */
+const AF={relu:{n:"ReLU",f:z=>Math.max(0,z),d:z=>z>0?1:0,note:"Range 0 … ∞. Slope is 1 for positive z and 0 for negative z: cheap and strong, but a neuron stuck below 0 stops learning (a 'dead' ReLU)."},
+ sigmoid:{n:"Sigmoid",f:s4sig,d:z=>{const s=s4sig(z);return s*(1-s);},note:"Range 0 … 1, like a probability. Its slope is at most 0.25 and almost 0 for |z| > 4, so gradients shrink layer after layer (vanishing gradients)."},
+ tanh:{n:"Tanh",f:Math.tanh,d:z=>1-Math.tanh(z)**2,note:"Range −1 … 1, centred on 0. Its slope is at most 1, but it also flattens for large |z|."},
+ gelu:{n:"GELU",f:z=>z*s4sig(1.702*z),d:z=>{const s=s4sig(1.702*z);return s+1.702*z*s*(1-s);},note:"A smooth ReLU: it lets a little negative signal through, so neurons don't die. Used in GPT-2 and most SLMs."},
+ linear:{n:"None",f:z=>z,d:()=>1,note:"No bend at all. Stacking layers with no activation collapses into one linear layer (see the demo on the right)."}};
+let afK="relu";
+$("#afBtns").innerHTML=Object.entries(AF).map(([k,v])=>`<button type="button" class="btn" data-af="${k}">${v.n}</button>`).join("");
+$$("#afBtns [data-af]").forEach(b=>b.addEventListener("click",()=>{afK=b.dataset.af;renderAF();}));
+function afSet(k){afK=k;renderAF();}
+function renderAF(){
+  $$("#afBtns [data-af]").forEach(b=>b.classList.toggle("primary",b.dataset.af===afK));
+  const F=AF[afK],z=+$("#afZ").value/10,W=420,H=260,l=34,r=12,t=12,bm=26,y0=-1.5,y1=3.5,X=x=>l+(x+5)/10*(W-l-r),Y=y=>t+(y1-y)/(y1-y0)*(H-t-bm);
+  let g=`<defs><clipPath id="afclip"><rect x="${l}" y="${t}" width="${W-l-r}" height="${H-t-bm}"/></clipPath></defs>`;
+  for(let x=-5;x<=5;x++)g+=`<line x1="${X(x)}" x2="${X(x)}" y1="${t}" y2="${H-bm}" style="stroke:var(--line)"/>${x%5===0?`<text x="${X(x)}" y="${H-10}" text-anchor="middle" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono">${x}</text>`:""}`;
+  [-1,0,1,2,3].forEach(v=>g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:${v===0?"var(--line2)":"var(--line)"}"/><text x="${l-5}" y="${Y(v)+3}" text-anchor="end" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text>`);
+  const curve=fn=>{const p=[];for(let i=0;i<=200;i++){const x=-5+i/20;p.push(`${X(x).toFixed(1)},${Y(fn(x)).toFixed(1)}`);}return p.join(" ");};
+  g+=`<g clip-path="url(#afclip)"><polyline points="${curve(F.f)}" style="fill:none;stroke:var(--out)" stroke-width="3"/>${$("#afDer").checked?`<polyline points="${curve(F.d)}" style="fill:none;stroke:var(--err)" stroke-width="2" stroke-dasharray="6 4"/>`:""}`;
+  const fz=F.f(z),dz=F.d(z);
+  g+=`<line x1="${X(z-1.2)}" y1="${Y(fz-1.2*dz)}" x2="${X(z+1.2)}" y2="${Y(fz+1.2*dz)}" style="stroke:var(--tok)" stroke-width="1.5"/></g><line x1="${X(z)}" x2="${X(z)}" y1="${t}" y2="${H-bm}" style="stroke:var(--tok)" stroke-dasharray="3 3"/><circle cx="${X(z)}" cy="${Y(fz)}" r="7" style="fill:var(--out);stroke:var(--bg)" stroke-width="2"/>${$("#afDer").checked?`<circle cx="${X(z)}" cy="${Y(dz)}" r="5" style="fill:var(--err)"/>`:""}<text x="${W-r}" y="${t+12}" text-anchor="end" font-size="11" style="fill:var(--out)" font-family="IBM Plex Mono">${F.n}(z)</text>${$("#afDer").checked?`<text x="${W-r}" y="${t+26}" text-anchor="end" font-size="11" style="fill:var(--err)" font-family="IBM Plex Mono">slope ${F.n}′(z)</text>`:""}`;
+  $("#afSvg").innerHTML=g;$("#afZv").textContent=z.toFixed(1);
+  $("#afRead").innerHTML=`<div class="stats"><div class="stat"><span class="v c-tok">${z.toFixed(2)}</span><span class="k">input z</span></div><div class="stat"><span class="v c-out">${fz.toFixed(3)}</span><span class="k">${F.n}(z), the output</span></div><div class="stat"><span class="v c-err">${dz.toFixed(3)}</span><span class="k">slope, used by backprop</span></div></div><p class="note" style="margin-top:10px">${F.note}</p>`;
+}
+$("#afZ").addEventListener("input",renderAF);$("#afDer").addEventListener("change",renderAF);renderAF();
+let stMode="relu",stSeed=3;
+function renderST(){
+  $("#stLin").classList.toggle("primary",stMode==="lin");$("#stRelu").classList.toggle("primary",stMode==="relu");
+  const r=mulberry(stSeed),w1=[0,1,2].map(()=>gauss(r)*1.4),b1=[0,1,2].map(()=>gauss(r)),w2=[0,1,2].map(()=>gauss(r)),b2=gauss(r)*.3;
+  const f=x=>w2.reduce((s,w,k)=>{const z=w1[k]*x+b1[k];return s+w*(stMode==="relu"?Math.max(0,z):z);},b2);
+  const W=420,H=170,l=30,rr=10,t=10,bm=20,xs=[];for(let i=0;i<=120;i++)xs.push(-3+i/20);const ys=xs.map(f),mn=Math.min(...ys),mx=Math.max(...ys);
+  const X=x=>l+(x+3)/6*(W-l-rr),Y=y=>t+(mx-y)/((mx-mn)||1)*(H-t-bm);
+  let g=`<line x1="${l}" x2="${W-rr}" y1="${H-bm}" y2="${H-bm}" style="stroke:var(--line2)"/><text x="${W-rr}" y="${H-4}" text-anchor="end" font-size="10" style="fill:var(--dim)" font-family="IBM Plex Mono">input x →</text><polyline points="${xs.map((x,i)=>`${X(x).toFixed(1)},${Y(ys[i]).toFixed(1)}`).join(" ")}" style="fill:none;stroke:${stMode==="relu"?"var(--out)":"var(--tok)"}" stroke-width="2.5"/>`;
+  if(stMode==="relu")[0,1,2].forEach(k=>{const kx=-b1[k]/w1[k];if(kx>-3&&kx<3)g+=`<circle cx="${X(kx)}" cy="${Y(f(kx))}" r="5" style="fill:var(--hid)"/>`;});
+  $("#stSvg").innerHTML=g;
+  const slope=w2.reduce((s,w,k)=>s+w*w1[k],0);
+  $("#stNote").innerHTML=stMode==="lin"?`Three neurons with no activation, and still one straight line: y = ${slope.toFixed(2)}·x + c. Extra layers add nothing.`:`With ReLU each hidden neuron adds a <span class="c-hid">bend</span> (violet dots). More neurons, more bends, any shape. That's where a network's power comes from.`;
+}
+$("#stLin").addEventListener("click",()=>{stMode="lin";renderST();});$("#stRelu").addEventListener("click",()=>{stMode="relu";renderST();});$("#stRand").addEventListener("click",()=>{stSeed++;renderST();});renderST();
+predictBox($("#afPred"),{q:"For sigmoid at z = 6, the output is almost 1. What is its slope (derivative) there?",opts:["About 1","About 0.0025","About 0.25"],ok:1,
+  why:"σ′(z) = σ(z)(1 − σ(z)) = 0.9975 × 0.0025 ≈ 0.0025. A saturated sigmoid passes back almost no gradient, so deep sigmoid networks learn very slowly. ReLU and GELU avoid this.",onReveal:()=>{afK="sigmoid";$("#afZ").value=50;$("#afZ").value=50;renderAF();$("#afZ").value=50;}});
+
+/* ---- 3. network ---- */
+const nn={sizes:[2,3,1],act:"tanh",W:[],b:[],x:[.5,-.5],y:1,fwd:2,bwd:0,act_e:null,sel:null,run:0,seed:11};
+const A4={tanh:{f:Math.tanh,d:(z,a)=>1-a*a},relu:{f:z=>Math.max(0,z),d:z=>z>0?1:0},sigmoid:{f:s4sig,d:(z,a)=>a*(1-a)}};
+function nnInit(seed){const r=mulberry(seed);nn.W=[];nn.b=[];for(let l=0;l<nn.sizes.length-1;l++){const ni=nn.sizes[l],no=nn.sizes[l+1],s=Math.sqrt(2/(ni+no))*1.6;nn.W.push(Array.from({length:no},()=>Array.from({length:ni},()=>gauss(r)*s)));nn.b.push(Array.from({length:no},()=>gauss(r)*.1));}}
+function nnResize(sizes){const r=mulberry(nn.seed+sizes.join("").length*7+Date.now()%97),W=[],b=[];
+  for(let l=0;l<sizes.length-1;l++){const ni=sizes[l],no=sizes[l+1],s=Math.sqrt(2/(ni+no))*1.6;
+    W.push(Array.from({length:no},(_,j)=>Array.from({length:ni},(_,i)=>(nn.W[l]&&nn.W[l][j]&&nn.W[l][j][i]!==undefined&&nn.sizes[l]===ni)?nn.W[l][j][i]:(nn.W[l]&&nn.W[l][j]&&nn.W[l][j][i]!==undefined&&l<nn.sizes.length-1?nn.W[l][j][i]:gauss(r)*s))));
+    b.push(Array.from({length:no},(_,j)=>nn.b[l]&&nn.b[l][j]!==undefined?nn.b[l][j]:gauss(r)*.1));}
+  nn.sizes=sizes;nn.W=W;nn.b=b;nn.sel=null;nn.bwd=0;nn.fwd=sizes.length-1;}
+function nnForward(x){const as=[x],zs=[];for(let l=0;l<nn.W.length;l++){const a=as[l],z=nn.W[l].map((row,j)=>row.reduce((s,w,i)=>s+w*a[i],nn.b[l][j]));zs.push(z);as.push(l===nn.W.length-1?z.map(s4sig):z.map(A4[nn.act].f));}return {as,zs,p:as[as.length-1][0]};}
+function nnBackward(c,y){const L=nn.W.length,dW=[],db=[],ds=[];let dz=[c.p-y];
+  for(let l=L-1;l>=0;l--){ds[l+1]=dz;dW[l]=dz.map(d=>c.as[l].map(a=>d*a));db[l]=dz.slice();
+    if(l>0){const da=c.as[l].map((_,i)=>dz.reduce((s,d,j)=>s+nn.W[l][j][i]*d,0));dz=da.map((v,i)=>v*A4[nn.act].d(c.zs[l-1][i],c.as[l][i]));}}
+  return {dW,db,ds};}
+const bce=(p,y)=>-(y*Math.log(Math.max(p,1e-9))+(1-y)*Math.log(Math.max(1-p,1e-9)));
+const nnParams=()=>nn.W.reduce((s,Wl,l)=>s+Wl.length*Wl[0].length+nn.b[l].length,0);
+function nnPos(){const L=nn.sizes.length,xs=nn.sizes.map((_,l)=>70+l*(620/(L-1)));return nn.sizes.map((n,l)=>{const sp=n>1?Math.min(66,300/(n-1)):0;return Array.from({length:n},(_,j)=>[xs[l],200+(j-(n-1)/2)*sp]);});}
+function renderNN(){
+  const c=nnForward(nn.x),g=nn.bwd>0?nnBackward(c,nn.y):null,P=nnPos(),L=nn.sizes.length;let maxG=1e-9;
+  if(g)g.dW.forEach(m=>m.forEach(r=>r.forEach(v=>maxG=Math.max(maxG,Math.abs(v)))));
+  let s="";
+  for(let l=0;l<L-1;l++)for(let j=0;j<nn.sizes[l+1];j++)for(let i=0;i<nn.sizes[l];i++){
+    const [x1,y1]=P[l][i],[x2,y2]=P[l+1][j],w=nn.W[l][j][i];
+    const showG=g&&l>=L-1-nn.bwd,gv=showG?g.dW[l][j][i]:0;
+    const col=showG?"var(--err)":w>=0?"var(--emb)":"var(--err)",wd=showG?1+Math.abs(gv)/maxG*6:1+Math.min(5,Math.abs(w)*1.8);
+    const anim=nn.act_e&&nn.act_e.l===l?(nn.act_e.d==="f"?" ef":" eb"):"",sel=nn.sel&&nn.sel.t==="w"&&nn.sel.l===l&&nn.sel.i===i&&nn.sel.j===j;
+    s+=`<line class="edge${anim}" x1="${x1+20}" y1="${y1}" x2="${x2-20}" y2="${y2}" style="stroke:${sel?"#fff":col};stroke-width:${wd.toFixed(2)};opacity:${showG?.35+.65*Math.abs(gv)/maxG:.8}"/><line data-w="${l},${i},${j}" x1="${x1+20}" y1="${y1}" x2="${x2-20}" y2="${y2}" style="stroke:transparent;stroke-width:12;cursor:pointer"/>`;}
+  P.forEach((col,l)=>{const lab=l===0?"input":l===L-1?"output (σ)":`hidden ${l} (${nn.act})`;
+    s+=`<text x="${col[0][0]}" y="22" text-anchor="middle" font-size="11" style="fill:var(--muted)" font-family="IBM Plex Mono">${lab}</text>`;
+    if(l>0&&l<L-1)s+=`<g data-add="${l}" style="cursor:pointer"><rect x="${col[0][0]-38}" y="30" width="34" height="20" rx="5" style="fill:var(--panel2);stroke:var(--line2)"/><text x="${col[0][0]-21}" y="44" text-anchor="middle" font-size="12" style="fill:var(--out)" font-family="IBM Plex Mono">+ n</text></g><g data-del="${l}" style="cursor:pointer"><rect x="${col[0][0]+4}" y="30" width="34" height="20" rx="5" style="fill:var(--panel2);stroke:var(--line2)"/><text x="${col[0][0]+21}" y="44" text-anchor="middle" font-size="12" style="fill:var(--err)" font-family="IBM Plex Mono">− n</text></g>`;
+    col.forEach(([x,y],j)=>{const shown=l<=nn.fwd,a=c.as[l][j],sel=nn.sel&&nn.sel.t==="b"&&nn.sel.l===l&&nn.sel.j===j;
+      const fill=shown?(l===L-1?`rgba(98,227,162,${(.15+.75*a).toFixed(2)})`:cellCol(a*1.5)):"var(--panel2)";
+      const ring=l===0?"var(--tok)":l===L-1?"var(--out)":"var(--hid)";
+      s+=`<g ${l>0?`data-b="${l},${j}" style="cursor:pointer"`:""}><circle cx="${x}" cy="${y}" r="20" style="fill:${fill};stroke:${sel?"#fff":ring}" stroke-width="${sel?3.5:2}"/><text x="${x}" y="${y+4}" text-anchor="middle" font-size="11" font-weight="600" style="fill:var(--fg)" font-family="IBM Plex Mono">${shown?a.toFixed(2):"?"}</text></g>`;
+      if(l===0)s+=`<text x="${x-28}" y="${y+4}" text-anchor="end" font-size="12" style="fill:var(--tok)" font-family="IBM Plex Mono">x${j+1}</text>`;
+      if(l>0&&g&&l>=L-nn.bwd)s+=`<text x="${x}" y="${y+34}" text-anchor="middle" font-size="9.5" style="fill:var(--err)" font-family="IBM Plex Mono">δ=${g.ds[l][j].toFixed(2)}</text>`;
+      else if(l>0)s+=`<text x="${x}" y="${y+34}" text-anchor="middle" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">b=${nn.b[l-1][j].toFixed(2)}</text>`;
+      if(l===L-1)s+=`<text x="${x+28}" y="${y+4}" font-size="12" style="fill:var(--out)" font-family="IBM Plex Mono">ŷ</text>`;});});
+  $("#nnSvg").innerHTML=s;
+  $("#nnParams").textContent=nnParams();$("#nnAct").value=nn.act;
+  ["x1","x2"].forEach((k,i)=>{$("#nn"+k).value=Math.round(nn.x[i]*10);$("#nn"+k+"v").textContent=nn.x[i].toFixed(1);});
+  const L0=bce(c.p,nn.y);
+  $("#nnStats").innerHTML=`<div class="stat"><span class="v c-out">${c.p.toFixed(3)}</span><span class="k">output ŷ</span></div><div class="stat"><span class="v c-tok">${nn.y}</span><span class="k">target y</span></div><div class="stat"><span class="v c-err">${L0.toFixed(3)}</span><span class="k">loss</span></div><div class="stat"><span class="v c-hid">${nnParams()}</span><span class="k">parameters</span></div>`;
+  nn.out=c.p;
+  // editor
+  const ed=$("#nnEdit");
+  if(nn.sel&&nn.sel.t==="w"){const {l,i,j}=nn.sel,v=nn.W[l][j][i];ed.innerHTML=`<label class="field">weight from ${l===0?"input x"+(i+1):`hidden ${l} neuron ${i+1}`} → ${l+1===L-1?"output":`hidden ${l+1} neuron ${j+1}`}: <b>${v.toFixed(2)}</b><input type="range" id="nnSl" min="-400" max="400" value="${Math.round(v*100)}"></label>`;$("#nnSl").addEventListener("input",e=>{nn.W[l][j][i]=+e.target.value/100;nn.bwd=0;renderNN();});}
+  else if(nn.sel&&nn.sel.t==="b"){const {l,j}=nn.sel,v=nn.b[l-1][j];ed.innerHTML=`<label class="field">bias of ${l===L-1?"the output":`hidden ${l} neuron ${j+1}`}: <b>${v.toFixed(2)}</b><input type="range" id="nnSl" min="-400" max="400" value="${Math.round(v*100)}"></label>`;$("#nnSl").addEventListener("input",e=>{nn.b[l-1][j]=+e.target.value/100;nn.bwd=0;renderNN();});}
+  else ed.innerHTML='<p class="muted" style="font-size:.88rem">Click any <b>line</b> to edit its weight, or any hidden/output <b>circle</b> to edit its bias. Use <b>+ n / − n</b> above a hidden layer to add or remove neurons.</p>';
+  if(typeof renderTrn==="function"&&trn.ready)renderTrnStats();
+}
+$("#nnSvg").addEventListener("click",e=>{
+  const w=e.target.closest("[data-w]"),bb=e.target.closest("[data-b]"),ad=e.target.closest("[data-add]"),dl=e.target.closest("[data-del]");
+  if(ad){const l=+ad.dataset.add;if(nn.sizes[l]<6){const s=nn.sizes.slice();s[l]++;nnResize(s);}renderNN();return;}
+  if(dl){const l=+dl.dataset.del;if(nn.sizes[l]>1){const s=nn.sizes.slice();s[l]--;nnResize(s);}renderNN();return;}
+  if(w){const [l,i,j]=w.dataset.w.split(",").map(Number);nn.sel={t:"w",l,i,j};renderNN();return;}
+  if(bb){const [l,j]=bb.dataset.b.split(",").map(Number);nn.sel={t:"b",l,j};renderNN();}
+});
+$("#nnAddL").addEventListener("click",()=>{if(nn.sizes.length<5){const s=nn.sizes.slice();s.splice(s.length-1,0,3);nn.sizes=s;nnInit(++nn.seed);nn.sel=null;nn.bwd=0;nn.fwd=s.length-1;renderNN();}});
+$("#nnDelL").addEventListener("click",()=>{if(nn.sizes.length>3){const s=nn.sizes.slice();s.splice(s.length-2,1);nn.sizes=s;nnInit(++nn.seed);nn.sel=null;nn.bwd=0;nn.fwd=s.length-1;renderNN();}});
+$("#nnAct").addEventListener("change",e=>{nn.act=e.target.value;nn.bwd=0;renderNN();});
+["x1","x2"].forEach((k,i)=>$("#nn"+k).addEventListener("input",e=>{nn.x[i]=+e.target.value/10;nn.bwd=0;renderNN();}));
+$("#nnY").addEventListener("change",e=>{nn.y=+e.target.value;nn.bwd=0;renderNN();});
+$("#nnRand").addEventListener("click",()=>{nnInit(++nn.seed);nn.bwd=0;nn.sel=null;renderNN();$("#nnNarr").textContent="New random weights. Press Forward to see what this network computes.";});
+const f2s=v=>(v<0?"(":"")+v.toFixed(2)+(v<0?")":"");
+$("#nnF").addEventListener("click",async()=>{const id=++nn.run,L=nn.sizes.length;nn.bwd=0;nn.fwd=0;renderNN();const c=nnForward(nn.x);
+  for(let l=0;l<L-1;l++){if(id!==nn.run)return;nn.act_e={l,d:"f"};nn.fwd=l+1;renderNN();
+    const a=c.as[l],w=nn.W[l][0],z=c.zs[l][0],out=l===L-2,terms=w.map((wi,i)=>`${f2s(wi)}×${f2s(a[i])}`);
+    $("#nnNarr").innerHTML=`<b class="c-emb">Layer ${l+1}${out?" (output)":""}.</b> Each neuron adds its weighted inputs and its bias, then bends the result. First neuron: z = ${terms.length>4?terms.slice(0,3).join(" + ")+" + …":terms.join(" + ")} + ${f2s(nn.b[l][0])} = <b>${z.toFixed(3)}</b> → ${out?"σ":nn.act}(z) = <b>${c.as[l+1][0].toFixed(3)}</b>`;
+    await sleep(1600);}
+  if(id!==nn.run)return;nn.act_e=null;renderNN();
+  $("#nnNarr").insertAdjacentHTML("beforeend",`<br><b class="c-out">Prediction ŷ = ${c.p.toFixed(3)}</b>, target ${nn.y} → loss = −log(${nn.y?"ŷ":"1 − ŷ"}) = <b class="c-err">${bce(c.p,nn.y).toFixed(3)}</b>. Now press Backward.`);});
+$("#nnB").addEventListener("click",async()=>{const id=++nn.run,L=nn.sizes.length;nn.fwd=L-1;const c=nnForward(nn.x),g=nnBackward(c,nn.y);
+  for(let k=1;k<=L-1;k++){if(id!==nn.run)return;nn.bwd=k;const l=L-1-k;nn.act_e={l,d:"b"};renderNN();
+    const lay=l+1;$("#nnNarr").innerHTML=k===1?`<b class="c-err">Output error.</b> For sigmoid + cross-entropy the blame at the output is simply δ = ŷ − y = ${c.p.toFixed(3)} − ${nn.y} = <b>${g.ds[lay][0].toFixed(3)}</b>. Each incoming weight's gradient is δ × (its input), e.g. ${g.ds[lay][0].toFixed(3)} × ${c.as[l][0].toFixed(3)} = <b>${g.dW[l][0][0].toFixed(3)}</b>.`
+      :`<b class="c-err">Hidden layer ${lay}.</b> Blame flows back along the weights and is scaled by the activation's slope: δ = (Wᵀ δ<sub>next</sub>) × ${nn.act}′(z). First neuron: δ = <b>${g.ds[lay][0].toFixed(3)}</b>. Thicker rose lines carry bigger gradients, so those weights get the biggest change.`;
+    await sleep(1800);}
+  if(id!==nn.run)return;nn.act_e=null;renderNN();$("#nnNarr").insertAdjacentHTML("beforeend"," Now press Update.");});
+$("#nnU").addEventListener("click",()=>{nn.run++;nn.act_e=null;const c=nnForward(nn.x),g=nnBackward(c,nn.y),before=bce(c.p,nn.y),lr=.5;
+  nn.W.forEach((Wl,l)=>Wl.forEach((row,j)=>row.forEach((_,i)=>{row[i]-=lr*g.dW[l][j][i];})));nn.b.forEach((bl,l)=>bl.forEach((_,j)=>{bl[j]-=lr*g.db[l][j];}));
+  nn.bwd=0;renderNN();const c2=nnForward(nn.x),after=bce(c2.p,nn.y);
+  $("#nnNarr").innerHTML=`<b class="c-tok">Update:</b> every weight moved by −0.5 × its gradient. ŷ went from ${c.p.toFixed(3)} to <b>${c2.p.toFixed(3)}</b> (target ${nn.y}), and the loss from ${before.toFixed(3)} to <b class="${after<before?"c-out":"c-err"}">${after.toFixed(3)}</b>. Press Update a few more times and ŷ heads for the target.`;});
+nnInit(nn.seed);
+predictBox($("#nnPred"),{q:"The network above has layer sizes 2 → 3 → 1. How many parameters (weights + biases) does it have?",opts:["6","13","9"],ok:1,
+  why:"Layer 1: 2×3 weights + 3 biases = 9. Layer 2: 3×1 weights + 1 bias = 4. Total 13. Every connection line is one weight and every non-input circle has one bias. Check the counter as you add neurons."});
+
+/* ---- 4. train ---- */
+const trn={ds:"xor",pts:[],timer:null,steps:0,hist:[],acc:0,loss:0,ready:false};
+const DSETS={line:"Straight split",xor:"XOR",circle:"Circle",spiral:"Spiral (hard)"};
+function genData(k){const r=mulberry({line:1,xor:2,circle:3,spiral:4}[k]),P=[];
+  for(let i=0;i<(k==="spiral"?120:80);i++){let x,y,c;
+    if(k==="line"){x=r()*2-1;y=r()*2-1;c=y>0.4*x-0.1?1:0;}
+    else if(k==="xor"){const qx=r()<.5?-1:1,qy=r()<.5?-1:1;x=qx*.5+gauss(r)*.17;y=qy*.5+gauss(r)*.17;c=qx*qy>0?1:0;}
+    else if(k==="circle"){const rad=r()<.5?r()*.45:.65+r()*.3,a=r()*Math.PI*2;x=rad*Math.cos(a);y=rad*Math.sin(a);c=rad<.55?1:0;}
+    else{c=i%2;const t=(i>>1)/60*3.2+.25,a=t*1.75+c*Math.PI;x=t/3.6*Math.cos(a)+gauss(r)*.03;y=t/3.6*Math.sin(a)+gauss(r)*.03;}
+    P.push([Math.max(-1,Math.min(1,x)),Math.max(-1,Math.min(1,y)),c]);}
+  return P;}
+$("#trnData").innerHTML='<span class="eyebrow">Data</span>'+Object.entries(DSETS).map(([k,v])=>`<button type="button" class="btn" data-ds="${k}">${v}</button>`).join("");
+$$("#trnData [data-ds]").forEach(b=>b.addEventListener("click",()=>trnSet(b.dataset.ds)));
+function trnSet(k){trnStop();trn.ds=k;trn.pts=genData(k);trn.steps=0;trn.hist=[];renderTrn();}
+function trnEval(){let L=0,ok=0;trn.pts.forEach(([x,y,c])=>{const p=nnForward([x,y]).p;L+=bce(p,c);if((p>.5?1:0)===c)ok++;});trn.loss=L/trn.pts.length;trn.acc=ok/trn.pts.length;}
+function trnStep(){const lr=+$("#trnLr").value/10,n=trn.pts.length,gW=nn.W.map(m=>m.map(r=>r.map(()=>0))),gb=nn.b.map(v=>v.map(()=>0));
+  trn.pts.forEach(([x,y,c])=>{const g=nnBackward(nnForward([x,y]),c);g.dW.forEach((m,l)=>m.forEach((r,j)=>r.forEach((v,i)=>gW[l][j][i]+=v/n)));g.db.forEach((v,l)=>v.forEach((d,j)=>gb[l][j]+=d/n));});
+  nn.W.forEach((m,l)=>m.forEach((r,j)=>r.forEach((_,i)=>{r[i]-=lr*gW[l][j][i];})));nn.b.forEach((v,l)=>v.forEach((_,j)=>{v[j]-=lr*gb[l][j];}));trn.steps++;}
+const tcv=$("#trnCv"),tcx=tcv.getContext("2d");
+function renderTrn(){
+  $$("#trnData [data-ds]").forEach(b=>b.classList.toggle("primary",b.dataset.ds===trn.ds));
+  const N=60,S=600/N;
+  for(let i=0;i<N;i++)for(let j=0;j<N;j++){const x=-1+2*(i+.5)/N,y=1-2*(j+.5)/N,p=nnForward([x,y]).p;const edge=Math.abs(p-.5)<.04;
+    const r=Math.round(255*(1-p)+82*p),g=Math.round(125*(1-p)+211*p),bl=Math.round(147*(1-p)+226*p),a=edge?.75:.12+.3*Math.abs(p-.5)*2;
+    tcx.fillStyle=`rgb(9,16,21)`;tcx.fillRect(i*S,j*S,S+1,S+1);tcx.fillStyle=`rgba(${r},${g},${bl},${a.toFixed(2)})`;tcx.fillRect(i*S,j*S,S+1,S+1);}
+  trn.pts.forEach(([x,y,c])=>{const cx=(x+1)/2*600,cy=(1-y)/2*600;tcx.beginPath();tcx.arc(cx,cy,8,0,7);tcx.fillStyle=c?"#52d3e2":"#ff7d93";tcx.fill();tcx.lineWidth=2.5;tcx.strokeStyle="#091015";tcx.stroke();});
+  renderTrnStats();trn.ready=true;
+}
+function renderTrnStats(){
+  trnEval();const hidden=nn.sizes.slice(1,-1);
+  $("#trnStats").innerHTML=`<div class="stat"><span class="v">${trn.steps}</span><span class="k">steps</span></div><div class="stat"><span class="v c-err">${trn.loss.toFixed(3)}</span><span class="k">loss</span></div><div class="stat"><span class="v ${trn.acc>=.95?"c-out":trn.acc>=.8?"c-tok":"c-err"}">${(trn.acc*100).toFixed(0)}%</span><span class="k">accuracy</span></div>`;
+  $("#trnArch").innerHTML=`Network: <span class="mono">${nn.sizes.join(" → ")}</span> (${nn.act}), ${nnParams()} parameters, ${hidden.reduce((a,b)=>a+b,0)} hidden neurons. Change it in panel 03.`;
+  $("#trnLrV").textContent=(+$("#trnLr").value/10).toFixed(1);
+  const hs=trn.hist.length?trn.hist:[trn.loss],W=320,H=120,l=36,t=8,bm=18,r=8,top=Math.max(...hs)*1.05||1;
+  const X=i=>l+i/Math.max(1,hs.length-1)*(W-l-r),Y=v=>t+(top-v)/top*(H-t-bm);
+  $("#trnLoss").innerHTML=`<line x1="${l}" x2="${W-r}" y1="${Y(0)}" y2="${Y(0)}" style="stroke:var(--line2)"/><text x="${l-4}" y="${Y(0)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">0</text><text x="${l-4}" y="${t+6}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${top.toFixed(2)}</text>`+(hs.length>1?`<polyline points="${hs.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ")}" style="fill:none;stroke:var(--err)" stroke-width="2"/>`:"")+`<text x="${W-r}" y="${H-4}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">step ${trn.steps}</text>`;
+}
+function trnStop(){clearInterval(trn.timer);trn.timer=null;$("#trnPlay").textContent="Train";}
+function trnTick(k){for(let i=0;i<k;i++)trnStep();trnEval();trn.hist.push(trn.loss);if(trn.hist.length>300)trn.hist=trn.hist.filter((_,i)=>i%2===0);renderTrn();renderNN();}
+$("#trnPlay").addEventListener("click",()=>{if(trn.timer){trnStop();return;}$("#trnPlay").textContent="Pause";trn.timer=setInterval(()=>{trnTick(6);if(trn.steps>=4000||trn.loss<.02)trnStop();},60);});
+$("#trnStep").addEventListener("click",()=>{trnStop();trnTick(10);});
+$("#trnReset").addEventListener("click",()=>{trnStop();nnInit(++nn.seed);trn.steps=0;trn.hist=[];renderTrn();renderNN();});
+$("#trnLr").addEventListener("input",renderTrnStats);
+trnSet("xor");renderNN();
+predictBox($("#trnPred"),{q:"On the <b>Circle</b> data, can a network with just <b>1 hidden neuron</b> reach high accuracy?",opts:["Yes, if trained long enough","No, it can only draw one straight-ish boundary","Only with ReLU"],ok:1,
+  why:"One hidden neuron gives one bend, so the boundary is still a single line, and a line can't enclose a circle. You need at least 3 hidden neurons, which combine to make a closed curve. Capacity sets what a network <i>can</i> learn; training only finds it.",onReveal:()=>{trnStop();nn.sizes=[2,1,1];nnInit(++nn.seed);trnSet("circle");renderNN();$("#trnPlay").click();}});
+
+/* ---- 5. FFN ---- */
+const FFN_W=["the","bank","approved"],FFN_DS=[64,128,256,512,768,1024];let ffnRun=0,ffnShow=[3,3,3];
+const ffnR=mulberry(77),W1f=Array.from({length:32},()=>Array.from({length:8},()=>gauss(ffnR)*.5)),W2f=Array.from({length:8},()=>Array.from({length:32},()=>gauss(ffnR)*.25));
+const gelu=z=>z*s4sig(1.702*z);
+function ffnVec(w){const x=s3Emb(w,8).map(v=>v*.6),h=W1f.map(r=>r.reduce((s,v,i)=>s+v*x[i],0)),g=h.map(gelu),y=W2f.map(r=>r.reduce((s,v,i)=>s+v*g[i],0));return {x,h,g,y};}
+function renderFFN(){
+  const cell=(v,w)=>`<span style="display:inline-block;width:${w}px;height:20px;border-radius:2px;background:${cellCol(v*1.4)}" title="${v.toFixed(3)}"></span>`;
+  const row=(lab,v,w,col,on)=>`<div style="display:flex;align-items:center;gap:8px;opacity:${on?1:.12};transition:opacity .4s"><span class="mono" style="width:150px;font-size:.72rem;color:${col};text-align:right">${lab}</span><span style="display:flex;gap:1px">${v.map(x=>cell(x,w)).join("")}</span></div>`;
+  $("#ffnViz").innerHTML=`<div style="display:grid;gap:14px;min-width:560px">${FFN_W.map((w,k)=>{const f=ffnVec(w),s=ffnShow[k];return `<div style="display:grid;gap:3px"><span class="tk tk${k}" style="justify-self:start">token ${k}: ${w}</span>${row("x  [d = 8]",f.x,22,"var(--emb)",s>=0)}${row("W₁x + b₁  [4d = 32]",f.h,10,"var(--hid)",s>=1)}${row("GELU(…)  [32]",f.g,10,"var(--out)",s>=2)}${row("W₂ · … + b₂  [8]",f.y,22,"var(--emb)",s>=3)}</div>`;}).join("")}</div><p class="note" style="margin-top:10px">Same W₁ and W₂ for all three tokens. The tokens never interact inside the FFN. After GELU, negative values (rose) shrink towards 0.</p>`;
+  const d=FFN_DS[+$("#ffnD").value],ffn=8*d*d+5*d,att=4*d*d+4*d,blk=ffn+att+4*d;$("#ffnDv").textContent=d;
+  $("#ffnStats").innerHTML=`<div class="stat"><span class="v c-hid">${fmtN(ffn)}</span><span class="k">FFN parameters (8d² + 5d)</span></div><div class="stat"><span class="v">${fmtN(att)}</span><span class="k">attention parameters (4d² + 4d)</span></div><div class="stat"><span class="v c-out">${(ffn/blk*100).toFixed(0)}%</span><span class="k">FFN share of the block</span></div><div class="stat"><span class="v">${fmtN(16*d*d)}</span><span class="k">FFN FLOPs per token</span></div>`;
+}
+$("#ffnPlay").addEventListener("click",async()=>{const id=++ffnRun;ffnShow=[-1,-1,-1];renderFFN();for(let k=0;k<3;k++)for(let s=0;s<=3;s++){if(id!==ffnRun)return;ffnShow[k]=s;renderFFN();await sleep(500);}});
+$("#ffnD").addEventListener("input",renderFFN);renderFFN();
+predictBox($("#ffnPred"),{q:"In a GPT-2-size block (d = 768), which part holds more parameters?",opts:["Attention","The feed-forward network","They're equal"],ok:1,
+  why:"FFN: 8 × 768² ≈ 4.7M. Attention: 4 × 768² ≈ 2.4M. The FFN is about two-thirds of every block, which is why it's often described as the model's memory.",onReveal:()=>{$("#ffnD").value=4;renderFFN();}});
+
+/* ---- code ---- */
+const CODE4={
+"mlp_numpy.py":`import numpy as np
+
+rng = np.random.default_rng(0)
+X = np.array([[0, 0], [0, 1], [1, 0], [1, 1]], dtype=float)
+y = np.array([[0], [1], [1], [0]], dtype=float)          # XOR
+
+# a 2 -> 4 -> 1 network
+W1 = rng.normal(0, 1, (2, 4)); b1 = np.zeros(4)
+W2 = rng.normal(0, 1, (4, 1)); b2 = np.zeros(1)
+sigmoid = lambda z: 1 / (1 + np.exp(-z))
+
+lr = 0.5
+for step in range(5000):
+    # forward pass
+    z1 = X @ W1 + b1;  a1 = np.tanh(z1)          # hidden layer  [4 examples, 4 neurons]
+    z2 = a1 @ W2 + b2; p = sigmoid(z2)           # output        [4, 1]
+    loss = -np.mean(y * np.log(p) + (1 - y) * np.log(1 - p))
+    # backward pass: chain rule, layer by layer
+    dz2 = (p - y) / len(X)                       # sigmoid + cross-entropy
+    dW2 = a1.T @ dz2;  db2 = dz2.sum(0)
+    dz1 = (dz2 @ W2.T) * (1 - a1 ** 2)           # tanh'(z) = 1 - tanh(z)^2
+    dW1 = X.T @ dz1;   db1 = dz1.sum(0)
+    # update
+    W1 -= lr * dW1; b1 -= lr * db1
+    W2 -= lr * dW2; b2 -= lr * db2
+    if step % 1000 == 0:
+        print(step, round(loss, 4))
+
+print(p.round(3).ravel())    # close to [0, 1, 1, 0]`,
+"mlp_pytorch.py":`import torch
+import torch.nn as nn
+
+X = torch.tensor([[0., 0.], [0., 1.], [1., 0.], [1., 1.]])
+y = torch.tensor([[0.], [1.], [1.], [0.]])
+
+model = nn.Sequential(nn.Linear(2, 4), nn.Tanh(), nn.Linear(4, 1))
+print(sum(p.numel() for p in model.parameters()))     # 17 = (2*4+4) + (4*1+1)
+
+opt = torch.optim.SGD(model.parameters(), lr=0.5)
+loss_fn = nn.BCEWithLogitsLoss()        # sigmoid + cross-entropy in one stable op
+for step in range(3000):
+    loss = loss_fn(model(X), y)         # forward
+    opt.zero_grad()
+    loss.backward()                     # backward: autograd does the chain rule
+    opt.step()                          # update
+
+print(torch.sigmoid(model(X)).round(decimals=3).ravel())`,
+"ffn_block.py":`import torch
+import torch.nn as nn
+
+class FeedForward(nn.Module):
+    """The MLP inside every Transformer block."""
+    def __init__(self, d_model, mult=4, dropout=0.0):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(d_model, mult * d_model),    # widen  [.., d] -> [.., 4d]
+            nn.GELU(),                             # bend
+            nn.Linear(mult * d_model, d_model),    # shrink [.., 4d] -> [.., d]
+            nn.Dropout(dropout),
+        )
+
+    def forward(self, x):          # x: [B, T, d], applied to every token independently
+        return self.net(x)
+
+ffn = FeedForward(d_model=128)
+x = torch.randn(2, 10, 128)        # 2 sequences, 10 tokens each
+print(ffn(x).shape)                # torch.Size([2, 10, 128])
+print(sum(p.numel() for p in ffn.parameters()))   # 131712 = 8*128^2 + 5*128`
+};
+codeBox($("#code4"),CODE4);
+
+/* ---- exercise ---- */
+let ex4Checked=false;
+const EX4=[
+ {t:"<b>Perceptron (panel 01):</b> on the <b>OR</b> data, get all 4 points correct",f:()=>pc.set==="OR"&&pc.ok===4},
+ {t:"<b>Network (panel 03):</b> with target y = 1, make the output ŷ reach <b>0.95 or more</b> by editing weights or pressing Update",f:()=>nn.y===1&&(nn.out||0)>=.95},
+ {t:"<b>Training (panel 04):</b> reach <b>95%+</b> accuracy on <b>XOR</b> using <b>at most 4</b> hidden neurons in total",f:()=>trn.ds==="xor"&&trn.acc>=.95&&nn.sizes.slice(1,-1).reduce((a,b)=>a+b,0)<=4},
+ {t:"<b>Training (panel 04):</b> reach <b>90%+</b> accuracy on the <b>Circle</b> data",f:()=>trn.ds==="circle"&&trn.acc>=.9}
+];
+function runEx4(){let ok=0;$("#ex4Checks").innerHTML=EX4.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex4Checked?(r?"ok":"no"):""}"><span class="dot">${ex4Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex4Checked)$("#ex4Msg").innerHTML=ok===EX4.length?'<span class="c-out">All 4 missions complete.</span> You hand-tuned a perceptron, steered a network and trained it to solve problems a single neuron cannot.':`${ok}/4 missions complete. Hints: the circle needs 3+ hidden neurons; if training stalls, press Re-initialise or try a learning rate around 1.0.`;}
+$("#ex4Btn").addEventListener("click",()=>{ex4Checked=true;runEx4();});runEx4();
+
+/* ---- quiz ---- */
+function makeQuiz4(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)],ri=(lo,hi)=>lo+Math.floor(r()*(hi-lo+1));
+  const w=[ri(-3,3),ri(-3,3)],x=[ri(-2,3),ri(-2,3)],b=ri(-3,3),z=w[0]*x[0]+w[1]*x[1]+b,rel=Math.max(0,z);
+  const sizes=pick([[4,8,1],[3,5,2],[10,16,8,1],[2,6,6,1],[8,32,8]]),pc4=sizes.slice(0,-1).reduce((s,n,i)=>s+n*sizes[i+1]+sizes[i+1],0),noB=sizes.slice(0,-1).reduce((s,n,i)=>s+n*sizes[i+1],0);
+  const a=pick([.2,.5,.7,.9]),da=a*(1-a);
+  return [
+   {type:"Numerical",kind:"num",q:`A ReLU neuron has weights <span class="mono">w = [${w.join(", ")}]</span>, bias <span class="mono">b = ${b}</span>, and gets input <span class="mono">x = [${x.join(", ")}]</span>. What does it output?`,
+    check:v=>{if(Math.abs(v-rel)<1e-9)return [true,`z = (${w[0]})(${x[0]}) + (${w[1]})(${x[1]}) + (${b}) = ${z}. ReLU(${z}) = ${rel}${z<0?": negative values become 0.":"."}`];
+      if(z<0&&Math.abs(v-z)<1e-9)return [false,`You found z = ${z} correctly but forgot the activation. ReLU turns any negative z into <b>0</b>.`];
+      if(Math.abs(v-(z-b))<1e-9)return [false,`The bias is missing. z = w·x + b = ${z-b} + (${b}) = ${z}, then ReLU gives ${rel}.`];
+      return [false,`z = (${w[0]})(${x[0]}) + (${w[1]})(${x[1]}) + (${b}) = ${z}, so ReLU(z) = max(0, ${z}) = ${rel}.`];}},
+   {type:"Numerical",kind:"num",q:`A fully connected network has layer sizes <b>${sizes.join(" → ")}</b>. How many trainable parameters (weights + biases) does it have?`,
+    check:v=>{if(v===pc4)return [true,`${sizes.slice(0,-1).map((n,i)=>`(${n}×${sizes[i+1]} + ${sizes[i+1]})`).join(" + ")} = ${pc4}.`];
+      if(v===noB)return [false,`That counts the weights only. Every neuron after the input layer also has a bias: ${sizes.slice(1).join(" + ")} more, total ${pc4}.`];
+      if(v===sizes.reduce((a,b)=>a+b,0))return [false,`That counts neurons, not parameters. Each pair of adjacent layers is connected all-to-all: ${sizes.slice(0,-1).map((n,i)=>`${n}×${sizes[i+1]}`).join(" + ")} weights, plus biases. Total ${pc4}.`];
+      return [false,`For each layer: inputs × outputs weights + outputs biases. ${sizes.slice(0,-1).map((n,i)=>`(${n}×${sizes[i+1]} + ${sizes[i+1]})`).join(" + ")} = ${pc4}.`];}},
+   {type:"Conceptual",kind:"mcq",q:"Why can't a single perceptron learn XOR, while a network with one hidden layer can?",opts:shuffle([
+     {t:"A perceptron can only draw one straight line, and XOR's classes can't be split by any straight line. A hidden layer combines several lines into a bent boundary.",ok:true,why:"Correct. XOR is not linearly separable (panel 01). Hidden neurons each draw a line, and the output combines them (panel 04)."},
+     {t:"The perceptron learning rate is too small for XOR",why:"Misconception: <b>it just needs more training</b>. No learning rate helps. The best possible straight line still misclassifies a point. Panel 01 shows it correcting forever."},
+     {t:"XOR needs more than two inputs",why:"Misconception: <b>XOR needs more data</b>. XOR has exactly two inputs. The problem is the <i>shape</i> of the boundary, not the number of inputs."},
+     {t:"Perceptrons have no bias term",why:"Misconception: <b>the bias is missing</b>. Perceptrons do have a bias (it shifts the line), but shifting or rotating one line still can't separate XOR."}],r)},
+   {type:"Numerical",kind:"num",q:`A sigmoid neuron outputs <b>a = σ(z) = ${a}</b>. What is its derivative da/dz at this point?`,
+    check:v=>{if(Math.abs(v-da)<.0006)return [true,`σ′(z) = a(1 − a) = ${a} × ${(1-a).toFixed(1)} = ${da.toFixed(3)}.`];
+      if(Math.abs(v-a)<1e-6)return [false,`That's the output itself. The slope is a(1 − a) = ${a} × ${(1-a).toFixed(1)} = ${da.toFixed(3)}.`];
+      if(Math.abs(v-(1-a))<1e-6)return [false,`You need both factors: a × (1 − a) = ${da.toFixed(3)}.`];
+      return [false,`For sigmoid, σ′(z) = σ(z)(1 − σ(z)) = ${a} × ${(1-a).toFixed(1)} = ${da.toFixed(3)}. Its maximum is 0.25, at a = 0.5.`];}},
+   {type:"Practical",kind:"mcq",q:"You train a deep ReLU network. The loss stops improving, and you find that 40% of the hidden neurons output 0 for <i>every</i> input. What's the likely cause and fix?",opts:shuffle([
+     {t:"\"Dead\" ReLUs: a too-large update pushed their z below 0 forever, so their gradient is 0. Lower the learning rate, use better initialisation, or switch to GELU / LeakyReLU.",ok:true,why:"Correct. ReLU's slope is exactly 0 for z &lt; 0 (panel 02), so a neuron stuck there gets no gradient and never recovers. GELU keeps a small slope, which is one reason SLMs use it."},
+     {t:"The network is too small, so add more ReLU layers",why:"Misconception: <b>more layers fix stalled training</b>. Extra ReLU layers can die the same way and make it worse. The problem is zero gradients, not capacity."},
+     {t:"Switch the hidden layers to sigmoid to get bigger gradients",why:"Misconception: <b>sigmoid has bigger gradients</b>. Sigmoid's slope is at most 0.25 and vanishes when it saturates. That trades dead neurons for vanishing gradients."},
+     {t:"Train for many more epochs and they will come back",why:"Misconception: <b>time heals dead neurons</b>. Their gradient is exactly 0, so no number of extra steps changes their incoming weights."}],r)}
+  ];
+}
+mountQuiz(4,$("#quiz4"),makeQuiz4);
+
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -3390,6 +3911,75 @@ const NARR={
  {sel:"#trStats",en:"The loss falls and more words find a neighbour of the same colour. A real language model learns its embeddings the same way, from context alone.",
   te:"లాస్ తగ్గుతుంది, ఎక్కువ పదాలకు అదే రంగు పొరుగు పదం దొరుకుతుంది. నిజమైన లాంగ్వేజ్ మోడల్ కూడా తన ఎంబెడింగ్స్‌ను కేవలం సందర్భం నుంచే ఇలాగే నేర్చుకుంటుంది.",hn:"लॉस घटता है और ज़्यादा शब्दों को उसी रंग का पड़ोसी मिलता है। असली लैंग्वेज मॉडल भी अपनी एम्बेडिंग सिर्फ़ संदर्भ से ऐसे ही सीखता है।"}]
 };
+
+/* ---- narration for stage 4 ---- */
+NARR_INTRO[4]={en:"Welcome to Stage four, neural networks. We start with a single neuron, discover what it cannot do, and then build and train a network that can.",
+ te:"స్టేజ్ నాలుగుకు స్వాగతం. ఇది న్యూరల్ నెట్‌వర్క్స్. ఒక్క న్యూరాన్‌తో మొదలుపెట్టి, అది ఏం చేయలేదో తెలుసుకుని, ఆ పని చేయగల నెట్‌వర్క్‌ను నిర్మించి ట్రైన్ చేద్దాం.",
+ hn:"स्टेज फ़ोर में आपका स्वागत है, यानी न्यूरल नेटवर्क। हम एक न्यूरॉन से शुरू करेंगे, देखेंगे कि वह क्या नहीं कर सकता, और फिर ऐसा नेटवर्क बनाकर ट्रेन करेंगे जो कर सके।"};
+Object.assign(NARR,{
+"p4-perc":[
+ {sel:"#pcSvg",act:()=>pcSetData("AND"),en:"A perceptron draws one straight line. On one side it answers one, on the other side zero. The cyan dots should get one, and the rose dots zero.",
+  te:"పర్సెప్ట్రాన్ ఒకే సరళ రేఖ గీస్తుంది. ఒక వైపు ఒకటి అని, మరో వైపు సున్నా అని జవాబిస్తుంది. నీలి చుక్కలకు ఒకటి, గులాబీ చుక్కలకు సున్నా రావాలి.",
+  hn:"परसेप्ट्रॉन एक सीधी रेखा खींचता है। एक तरफ़ वह एक कहता है, दूसरी तरफ़ शून्य। नीले बिंदुओं को एक और गुलाबी बिंदुओं को शून्य मिलना चाहिए।"},
+ {sel:"#pcNarr",act:()=>{Object.assign(pc,{w1:0,w2:0,b:0,n:0});renderPC();$("#pcLearn").click();},en:"Press learn. Each time it gets a point wrong, it nudges its weights towards the right answer. For AND, a few corrections are enough.",
+  te:"లెర్న్ నొక్కండి. ఒక బిందువును తప్పుగా చెప్పిన ప్రతిసారి, అది తన వెయిట్లను సరైన జవాబు వైపు కొంచెం జరుపుతుంది. ఆండ్ కోసం కొన్ని సవరణలు చాలు.",
+  hn:"लर्न दबाइए। हर बार जब वह किसी बिंदु को गलत बताता है, अपने वेट को सही जवाब की ओर थोड़ा खिसकाता है। एंड के लिए कुछ सुधार काफ़ी हैं।"},
+ {sel:"#pcSvg",act:()=>{pcSetData("XOR");Object.assign(pc,{w1:0,w2:0,b:0});renderPC();$("#pcLearn").click();},en:"Now XOR. The two cyan dots sit on opposite corners. No single straight line can separate them, so the perceptron never stops making mistakes.",
+  te:"ఇప్పుడు ఎక్స్‌ఓఆర్. రెండు నీలి చుక్కలు ఎదురెదురు మూలల్లో ఉన్నాయి. ఏ ఒక్క సరళ రేఖా వాటిని విడదీయలేదు, కాబట్టి పర్సెప్ట్రాన్ తప్పులు చేస్తూనే ఉంటుంది.",
+  hn:"अब एक्सओआर। दोनों नीले बिंदु आमने-सामने के कोनों पर हैं। कोई एक सीधी रेखा उन्हें अलग नहीं कर सकती, इसलिए परसेप्ट्रॉन गलतियाँ करता ही रहता है।"},
+ {sel:"#pcTbl",en:"This famous limit is why networks need hidden layers, which we build in panel three.",
+  te:"ఈ ప్రసిద్ధ పరిమితి వల్లే నెట్‌వర్క్‌లకు హిడెన్ లేయర్లు కావాలి. వాటిని మనం ప్యానెల్ మూడులో నిర్మిస్తాం.",
+  hn:"इसी मशहूर सीमा के कारण नेटवर्क को हिडन लेयर चाहिए, जिन्हें हम पैनल तीन में बनाएँगे।"}],
+"p4-act":[
+ {sel:"#afSvg",act:()=>afSet("relu"),en:"After adding up its inputs, each neuron bends the result with an activation function. ReLU keeps positive values and turns negative ones into zero.",
+  te:"ఇన్‌పుట్లను కలిపిన తర్వాత, ప్రతి న్యూరాన్ ఫలితాన్ని యాక్టివేషన్ ఫంక్షన్‌తో వంచుతుంది. రెలూ ధనాత్మక విలువలను ఉంచి, రుణాత్మకాలను సున్నా చేస్తుంది.",
+  hn:"इनपुट जोड़ने के बाद, हर न्यूरॉन नतीजे को एक्टिवेशन फ़ंक्शन से मोड़ता है। रेलू धनात्मक मान रखता है और ऋणात्मक को शून्य कर देता है।"},
+ {sel:"#afRead",act:()=>{afSet("sigmoid");$("#afZ").value=45;renderAF();},en:"Sigmoid squashes everything between zero and one. But look at the dashed slope: far from the middle it is almost zero, so learning slows down.",
+  te:"సిగ్మాయిడ్ అన్నింటినీ సున్నా, ఒకటి మధ్యకు కుదిస్తుంది. కానీ చుక్కల వాలు గీతను చూడండి: మధ్యకు దూరంగా అది దాదాపు సున్నా, కాబట్టి నేర్చుకోవడం నెమ్మదిస్తుంది.",
+  hn:"सिग्मॉइड सब कुछ शून्य और एक के बीच दबा देता है। लेकिन डैश वाली ढलान देखिए: बीच से दूर यह लगभग शून्य है, इसलिए सीखना धीमा हो जाता है।"},
+ {sel:"#afSvg",act:()=>{afSet("gelu");$("#afZ").value=10;renderAF();},en:"GELU is a smooth version of ReLU. Most small language models use it.",
+  te:"జెలూ అనేది రెలూ యొక్క మృదువైన రూపం. చాలా చిన్న లాంగ్వేజ్ మోడల్స్ దీన్నే వాడతాయి.",
+  hn:"जेलू, रेलू का एक चिकना रूप है। ज़्यादातर छोटे लैंग्वेज मॉडल यही इस्तेमाल करते हैं।"},
+ {sel:"#stSvg",act:"#stLin",en:"Without any activation, three neurons together still make one straight line. Extra layers add nothing.",
+  te:"యాక్టివేషన్ లేకుండా మూడు న్యూరాన్లు కలిసినా ఒకే సరళ రేఖ వస్తుంది. అదనపు పొరలు ఏమీ జోడించవు.",
+  hn:"बिना एक्टिवेशन के तीन न्यूरॉन मिलकर भी एक सीधी रेखा ही बनाते हैं। अतिरिक्त परतें कुछ नहीं जोड़तीं।"},
+ {sel:"#stSvg",act:"#stRelu",en:"With ReLU, each neuron adds a bend. Bends let a network draw curved boundaries and fit almost any shape.",
+  te:"రెలూతో ప్రతి న్యూరాన్ ఒక వంపు జోడిస్తుంది. వంపుల వల్ల నెట్‌వర్క్ వంకర సరిహద్దులు గీసి దాదాపు ఏ ఆకారానికైనా సరిపోగలదు.",
+  hn:"रेलू के साथ हर न्यूरॉन एक मोड़ जोड़ता है। मोड़ों से नेटवर्क घुमावदार सीमाएँ बना सकता है और लगभग किसी भी आकार में फ़िट हो सकता है।"}],
+"p4-net":[
+ {sel:"#nnSvg",en:"This is a real network. Inputs are on the left, hidden neurons in the middle, and the answer on the right. Thick lines are big weights: cyan is positive, rose is negative.",
+  te:"ఇది నిజమైన నెట్‌వర్క్. ఎడమవైపు ఇన్‌పుట్లు, మధ్యలో హిడెన్ న్యూరాన్లు, కుడివైపు జవాబు. మందమైన గీతలు పెద్ద వెయిట్లు: నీలం ధనాత్మకం, గులాబీ రుణాత్మకం.",
+  hn:"यह एक असली नेटवर्क है। बाईं ओर इनपुट, बीच में हिडन न्यूरॉन, और दाईं ओर जवाब। मोटी रेखाएँ बड़े वेट हैं: नीला धनात्मक, गुलाबी ऋणात्मक।"},
+ {sel:"#nnNarr",act:"#nnF",en:"The forward pass. Each neuron adds up its weighted inputs plus its bias, applies its activation, and passes the result on.",
+  te:"ఫార్వర్డ్ పాస్. ప్రతి న్యూరాన్ తన వెయిటెడ్ ఇన్‌పుట్లను, బయాస్‌ను కలిపి, యాక్టివేషన్ వర్తింపజేసి, ఫలితాన్ని ముందుకు పంపుతుంది.",
+  hn:"फ़ॉरवर्ड पास। हर न्यूरॉन अपने वेटेड इनपुट और बायस जोड़ता है, एक्टिवेशन लगाता है, और नतीजा आगे भेजता है।"},
+ {sel:"#nnNarr",act:"#nnB",en:"The backward pass. Starting from the error, each weight learns how much it contributed. The thick rose lines are the biggest culprits.",
+  te:"బ్యాక్‌వర్డ్ పాస్. ఎర్రర్ నుంచి మొదలుపెట్టి, ప్రతి వెయిట్ తాను ఎంత కారణమో తెలుసుకుంటుంది. మందమైన గులాబీ గీతలే పెద్ద దోషులు.",
+  hn:"बैकवर्ड पास। त्रुटि से शुरू करके, हर वेट जानता है कि उसका कितना योगदान था। मोटी गुलाबी रेखाएँ सबसे बड़ी ज़िम्मेदार हैं।"},
+ {sel:"#nnStats",act:"#nnU",en:"Update. Every weight takes a small step to reduce the error, and the output moves towards the target.",
+  te:"అప్‌డేట్. ఎర్రర్ తగ్గించడానికి ప్రతి వెయిట్ ఒక చిన్న అడుగు వేస్తుంది, అవుట్‌పుట్ లక్ష్యం వైపు కదులుతుంది.",
+  hn:"अपडेट। त्रुटि घटाने के लिए हर वेट एक छोटा कदम लेता है, और आउटपुट लक्ष्य की ओर बढ़ता है।"},
+ {sel:"#nnCtl",en:"Use plus and minus to add neurons and layers, and click any line or circle to edit it yourself.",
+  te:"న్యూరాన్లు, పొరలు జోడించడానికి ప్లస్, మైనస్ వాడండి. ఏ గీతనైనా, వృత్తాన్నైనా నొక్కి మీరే మార్చండి.",
+  hn:"न्यूरॉन और परतें जोड़ने के लिए प्लस और माइनस इस्तेमाल करें, और किसी भी रेखा या गोले पर क्लिक करके उसे खुद बदलें।"}],
+"p4-train":[
+ {sel:"#trnCv",act:()=>{trnStop();nn.sizes=[2,3,1];nn.act="tanh";nnInit(++nn.seed);trnSet("xor");renderNN();},en:"Now the network learns from data. The background colour is its answer at every point on the map.",
+  te:"ఇప్పుడు నెట్‌వర్క్ డేటా నుంచి నేర్చుకుంటుంది. నేపథ్య రంగు మ్యాప్‌లోని ప్రతి బిందువు వద్ద దాని జవాబు.",
+  hn:"अब नेटवर्क डेटा से सीखता है। पृष्ठभूमि का रंग मैप के हर बिंदु पर उसका जवाब है।"},
+ {sel:"#trnCv",act:()=>{if(!trn.timer)$("#trnPlay").click();},en:"Each training step runs the forward pass, measures the loss, runs the backward pass, and updates every weight. Watch the boundary bend to fit the dots.",
+  te:"ప్రతి ట్రైనింగ్ అడుగు ఫార్వర్డ్ పాస్ నడిపి, లాస్ కొలిచి, బ్యాక్‌వర్డ్ పాస్ నడిపి, ప్రతి వెయిట్‌ను అప్‌డేట్ చేస్తుంది. సరిహద్దు చుక్కలకు సరిపోయేలా వంగడం చూడండి.",
+  hn:"हर ट्रेनिंग कदम फ़ॉरवर्ड पास चलाता है, लॉस मापता है, बैकवर्ड पास चलाता है, और हर वेट को अपडेट करता है। देखिए सीमा बिंदुओं के हिसाब से कैसे मुड़ती है।"},
+ {sel:"#trnStats",en:"Accuracy rises and the loss falls. If the network is too small, for example one hidden neuron on the circle data, it simply cannot fit, however long it trains.",
+  te:"ఖచ్చితత్వం పెరుగుతుంది, లాస్ తగ్గుతుంది. నెట్‌వర్క్ చాలా చిన్నదైతే, ఉదాహరణకు వృత్తం డేటాపై ఒకే హిడెన్ న్యూరాన్ ఉంటే, ఎంతసేపు ట్రైన్ చేసినా సరిపోదు.",
+  hn:"सटीकता बढ़ती है और लॉस घटता है। अगर नेटवर्क बहुत छोटा हो, जैसे सर्कल डेटा पर एक हिडन न्यूरॉन, तो कितना भी ट्रेन करें, वह फ़िट नहीं हो पाता।"}],
+"p4-ffn":[
+ {sel:"#ffnViz",act:"#ffnPlay",en:"Inside every transformer block sits a small network like the one you built. Each token's vector is widened four times, bent with GELU, and then shrunk back.",
+  te:"ప్రతి ట్రాన్స్‌ఫార్మర్ బ్లాక్ లోపల మీరు నిర్మించినలాంటి చిన్న నెట్‌వర్క్ ఉంటుంది. ప్రతి టోకెన్ వెక్టర్ నాలుగు రెట్లు వెడల్పవుతుంది, జెలూతో వంగుతుంది, మళ్లీ కుదించబడుతుంది.",
+  hn:"हर ट्रांसफ़ॉर्मर ब्लॉक के अंदर आपके बनाए जैसा एक छोटा नेटवर्क होता है। हर टोकन का वेक्टर चार गुना चौड़ा होता है, जेलू से मुड़ता है, और फिर वापस छोटा होता है।"},
+ {sel:"#ffnStats",en:"The same weights are used for every token. This block holds about two thirds of each layer's parameters, and much of the model's knowledge.",
+  te:"ప్రతి టోకెన్‌కు అవే వెయిట్లు వాడతారు. ప్రతి పొర పారామీటర్లలో సుమారు మూడింట రెండు వంతులు, మోడల్ జ్ఞానంలో చాలా భాగం ఈ బ్లాక్‌లోనే ఉంటాయి.",
+  hn:"हर टोकन के लिए वही वेट इस्तेमाल होते हैं। हर परत के लगभग दो-तिहाई पैरामीटर, और मॉडल का बहुत सारा ज्ञान, इसी ब्लॉक में होता है।"}]
+});
 
 /* ---- engine ---- */
 const NV={lang:"en",rate:1,cap:true,voice:"",queue:[],i:0,tok:0,playing:false,safety:null};
