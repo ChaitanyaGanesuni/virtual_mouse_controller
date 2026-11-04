@@ -1760,6 +1760,100 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 8 ====================== -->
+  <section id="stage8" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 08 · unlocked</div>
+      <h2>Training the SLM: the learning loop, live</h2>
+      <p>This is where a model actually learns. Panel 01 trains a real neural language model in your browser: random start, batches, predictions, loss, gradients and weight updates, all visible step by step. Panels 02 and 03 show how optimizers and hyperparameters decide whether training succeeds, stalls, overfits or explodes.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 8 sections">
+      <button type="button" data-go="p8-real">1 · Real training, live</button>
+      <button type="button" data-go="p8-opt">2 · Optimizer race</button>
+      <button type="button" data-go="p8-sim">3 · Hyperparameter lab</button>
+      <button type="button" data-go="p8-code">4 · Code</button>
+      <button type="button" data-go="p8-ex">5 · Exercise</button>
+      <button type="button" data-go="p8-quiz">6 · Assessment</button>
+    </nav>
+
+    <div class="panel" id="p8-real">
+      <div class="phead"><span class="tag">01</span><h3>Real training, live: a neural language model learning in your browser</h3><span class="sim real">real training · real gradients</span>
+        <p class="plain">A one-layer neural language model with a <em>V × V weight table</em> (one row of next-word scores per word) learns from the lab's 44 sentences. Every step it takes a <em>batch</em>, predicts the next word, measures the <em>loss</em>, computes <em>gradients</em> and updates the weights. Press Train and watch the losses fall and the generated text improve.</p></div>
+      <div class="ctrls box" style="margin-bottom:12px">
+        <label class="field">learning rate: <b id="rtLrV"></b><input id="rtLr" type="range" min="0" max="12" value="6"></label>
+        <label class="field">batch size: <b id="rtBV"></b><input id="rtB" type="range" min="0" max="6" value="4"></label>
+        <label class="field">epochs: <b id="rtEV"></b><input id="rtE" type="range" min="1" max="60" value="20"></label>
+        <label class="field">optimizer<select id="rtOpt" class="txt"><option value="sgd">SGD</option><option value="adam" selected>Adam</option><option value="adamw">AdamW (weight decay)</option></select></label>
+        <label class="field">LR schedule<select id="rtSch" class="txt"><option value="const">constant</option><option value="cos" selected>warmup + cosine</option></select></label>
+        <label class="row" style="font-size:.85rem;color:var(--muted);align-self:end"><input type="checkbox" id="rtClip" checked> gradient clipping (max norm 1)</label>
+      </div>
+      <div class="row" style="margin-bottom:12px"><button class="btn primary" id="rtPlay" type="button">Train</button><button class="btn" id="rtStep" type="button">1 step</button><button class="btn" id="rtReset" type="button">Random re-initialisation</button><span class="mono dim" id="rtInfo" style="font-size:.78rem"></span></div>
+      <div class="grid2">
+        <div style="display:grid;gap:12px;align-content:start;min-width:0">
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">This batch: input → prediction vs actual next word</div><div class="scroll" id="rtBatch"></div><div class="formula" id="rtLossF" style="margin-top:8px;white-space:normal"></div></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Weights (10 common words × 10 next words) · outlined = changed this step</div><div class="scroll" id="rtW"></div></div>
+        </div>
+        <div style="display:grid;gap:12px;align-content:start;min-width:0">
+          <div class="box"><div class="stats" id="rtStats"></div></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">Loss: <span class="c-err">training</span> vs <span class="c-emb">validation</span></div><svg class="plot" id="rtLoss" viewBox="0 0 420 170" role="img" aria-label="Training and validation loss"></svg><p class="note" style="margin-top:6px">With only 44 sentences, train for long and the <span class="c-emb">validation</span> line turns <b>up</b> while <span class="c-err">training</span> keeps falling. That is <b>real overfitting</b>: the model memorises word pairs and is surprised by pairs it never saw. The green dot is the checkpoint early stopping would keep.</p></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">Learning rate over training</div><svg class="plot" id="rtSchS" viewBox="0 0 420 80" role="img" aria-label="Learning-rate schedule"></svg></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:4px">The model writes (sampled from “the …”)</div><p class="say narr" id="rtGen"></p></div>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>One training step</b><div class="formula" style="white-space:normal">p = softmax(W[x]) · L = −mean log p[y] · ∂L/∂W[x] = p − onehot(y) · W ← W − η · update</div></div>
+        <div><b>What the parts mean</b><ul><li><span class="c-tok">batch</span>: B random (word, next word) pairs</li><li><span class="c-err">loss</span>: average surprise at the true next word</li><li><span class="c-hid">epoch</span>: one full pass over all training pairs</li><li><span class="c-emb">validation loss</span>: measured on held-out sentences</li></ul></div>
+        <div><b>Inside an SLM</b>A real SLM replaces the V × V table with embeddings plus Transformer blocks, but the loop is identical: batch → forward → loss → backward → clip → AdamW step → schedule. Distinguish this <b>real</b> run from panel 03, which is a <b>simulation</b>.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p8-opt">
+      <div class="phead"><span class="tag">02</span><h3>Optimizer race: SGD vs Momentum vs Adam</h3><span class="sim real">real optimisation on a 2-weight loss</span>
+        <p class="plain">All three start at the same point in Stage 1's narrow valley, with the same learning rate. <em>SGD</em> crawls along the flat direction, <em>momentum</em> builds up speed, and <em>Adam</em> gives each weight its own step size, so it moves well in both directions. Press Race.</p></div>
+      <div class="grid2">
+        <div class="box"><canvas id="orCv" width="640" height="640" style="width:100%;max-width:440px;height:auto;aspect-ratio:1;display:block;margin:0 auto;border-radius:10px;border:1px solid var(--line2)" aria-label="Optimizer trajectories"></canvas><div class="row" style="justify-content:center;margin-top:10px"><button class="btn primary" id="orGo" type="button">Race</button><button class="btn" id="orReset" type="button">Reset</button></div></div>
+        <div style="display:grid;gap:12px;align-content:start"><div class="box"><label class="field">learning rate: <b id="orLrV"></b><input id="orLr" type="range" min="0" max="6" value="2"></label><div id="orTbl" style="margin-top:10px"></div></div><div class="predict" id="orPred"></div></div>
+      </div>
+      <div class="facts">
+        <div><b>Update rules</b><div class="formula" style="white-space:normal">SGD: w −= η g · Momentum: v = βv + g; w −= η v · Adam: m = β₁m + (1−β₁)g; s = β₂s + (1−β₂)g²; w −= η m̂ / (√ŝ + ε)</div></div>
+        <div><b>What the symbols mean</b><ul><li><span class="c-err">g</span>: gradient</li><li><span class="c-tok">m</span>: running average of g (momentum)</li><li><span class="c-hid">s</span>: running average of g², a per-weight scale</li><li>AdamW = Adam + decoupled weight decay</li></ul></div>
+        <div><b>Inside an SLM</b>Practically every SLM trains with <b>AdamW</b> (β₁ = 0.9, β₂ = 0.95–0.999, weight decay ≈ 0.1). Its per-weight scaling copes with the very different gradient sizes in embeddings, attention and FFN layers.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p8-sim">
+      <div class="phead"><span class="tag">03</span><h3>Hyperparameter lab: underfitting, overfitting, divergence</h3><span class="sim illus">simulated curves · not a real run</span>
+        <p class="plain">Real SLM training takes hours, so this panel <em>simulates</em> it with formulas based on known scaling behaviour. Change the settings and see the classic outcomes: <em>too small or too short</em> (underfitting), <em>too big for the data</em> (overfitting), <em>learning rate too high</em> (divergence), and the healthy middle.</p></div>
+      <div class="ctrls box" style="margin-bottom:12px">
+        <label class="field">learning rate: <b id="hsLrV"></b><input id="hsLr" type="range" min="0" max="10" value="5"></label>
+        <label class="field">batch size: <b id="hsBV"></b><input id="hsB" type="range" min="0" max="5" value="3"></label>
+        <label class="field">epochs: <b id="hsEV"></b><input id="hsE" type="range" min="1" max="30" value="8"></label>
+        <label class="field">d_model: <b id="hsDV"></b><input id="hsD" type="range" min="0" max="4" value="1"></label>
+        <label class="field">layers: <b id="hsLV"></b><input id="hsL" type="range" min="1" max="12" value="4"></label>
+        <label class="field">dataset size: <b id="hsSV"></b><input id="hsS" type="range" min="0" max="6" value="3"></label>
+      </div>
+      <div class="grid2">
+        <div class="box"><svg class="plot" id="hsSvg" viewBox="0 0 440 240" role="img" aria-label="Simulated training curves"></svg></div>
+        <div style="display:grid;gap:12px;align-content:start"><div class="box" id="hsVerdict"></div><div class="box"><div class="stats" id="hsStats"></div></div><div class="predict" id="hsPred"></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p8-code">
+      <div class="phead"><span class="tag">04</span><h3>Code it on your CPU</h3><p>A production-style training loop: AdamW, warmup + cosine schedule, gradient clipping, periodic evaluation and keeping the best checkpoint (early stopping). It runs standalone on a small model, and drops straight into TinyGPT from Stage 6.</p></div>
+      <div class="code" id="code8"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <div class="panel" id="p8-ex">
+      <div class="phead"><span class="tag">05</span><h3>Hands-on exercise: five missions</h3><p>The checks read the panels' live state.</p></div>
+      <div class="box"><div class="checks" id="ex8Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex8Btn" type="button">Check missions</button></div><p class="note" id="ex8Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <div class="panel" id="p8-quiz">
+      <div class="phead"><span class="tag">06</span><h3>Stage 8 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 9, evaluation.</p></div>
+      <div id="quiz8"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -1824,7 +1918,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -4818,6 +4912,233 @@ function makeQuiz7(seed){
 mountQuiz(7,$("#quiz7"),makeQuiz7);
 renderPipe7();runEx7();
 
+/* =================== STAGE 8 =================== */
+/* ---- 1. real training: neural bigram LM ---- */
+const RT_LRS=[.001,.002,.005,.01,.02,.05,.1,.2,.5,1,2,5,10],RT_BS=[1,4,8,16,32,64,128];
+const RT_LINES=[...CORPUS,...EXTRA2],RT_TOK=RT_LINES.map(s=>["<s>",...preTok(s)]);
+const RT_VOC=[...new Set(RT_TOK.flat())],RT_ID=new Map(RT_VOC.map((w,i)=>[w,i])),RT_V=RT_VOC.length;
+const rtPairs=f=>{const P=[];RT_TOK.forEach((t,li)=>{if(f(li))for(let i=0;i<t.length-1;i++)P.push([RT_ID.get(t[i]),RT_ID.get(t[i+1])]);});return P;};
+const RT_TR=rtPairs(li=>li%7!==3),RT_VA=rtPairs(li=>li%7===3);
+const rtFreq=(k)=>{const c=new Map();RT_TR.forEach(p=>c.set(p[k],(c.get(p[k])||0)+1));return [...c.entries()].sort((a,b)=>b[1]-a[1]).map(e=>e[0]).filter(i=>RT_VOC[i]!=="<s>"&&RT_VOC[i]!==".").slice(0,10);};
+const RT_ROWS=rtFreq(0),RT_COLS=rtFreq(1);
+const rt={W:null,m:null,v:null,step:0,hist:[],vhist:[],batch:[],dW:new Map(),timer:null,seed:1,sawUp:false,diverged:false,gnorm:0,L0:0};
+function rtInit(){const r=mulberry(rt.seed++);rt.W=new Float32Array(RT_V*RT_V).map(()=>gauss(r)*.1);rt.m=new Float32Array(RT_V*RT_V);rt.v=new Float32Array(RT_V*RT_V);rt.step=0;rt.hist=[];rt.vhist=[];rt.batch=[];rt.dW=new Map();rt.diverged=false;rt.gnorm=0;
+  const l=rtLoss(RT_TR);rt.L0=l;rt.prevL=l;rt.hist.push([0,l]);const v0=rtLoss(RT_VA);rt.vhist.push([0,v0]);rt.best=[0,v0];}
+function rtRow(x){const W=rt.W,o=x*RT_V;let mx=-1e9;for(let j=0;j<RT_V;j++)if(W[o+j]>mx)mx=W[o+j];const p=new Float32Array(RT_V);let z=0;for(let j=0;j<RT_V;j++){p[j]=Math.exp(W[o+j]-mx);z+=p[j];}for(let j=0;j<RT_V;j++)p[j]/=z;return p;}
+function rtLoss(P){const cache=new Map();let L=0;for(const [x,y] of P){let p=cache.get(x);if(!p){p=rtRow(x);cache.set(x,p);}L+=-Math.log(Math.max(p[y],1e-12));}return L/P.length;}
+const rtCfg=()=>({lr0:RT_LRS[+$("#rtLr").value],B:RT_BS[+$("#rtB").value],E:+$("#rtE").value,opt:$("#rtOpt").value,sch:$("#rtSch").value,clip:$("#rtClip").checked});
+function rtTotal(c){return c.E*Math.ceil(RT_TR.length/c.B);}
+function rtLrAt(c,t){const T=rtTotal(c);if(c.sch==="const")return c.lr0;const w=Math.max(1,Math.round(T*.05));if(t<w)return c.lr0*(t+1)/w;const pr=(t-w)/Math.max(1,T-w);return c.lr0*(.1+.9*.5*(1+Math.cos(Math.PI*pr)));}
+function rtStep(){
+  const c=rtCfg(),T=rtTotal(c);if(rt.step>=T||rt.diverged)return false;
+  const r=mulberry(rt.step*977+rt.seed),B=c.B,G=new Map();rt.batch=[];
+  for(let b=0;b<B;b++){const [x,y]=RT_TR[Math.floor(r()*RT_TR.length)],p=rtRow(x);let g=G.get(x);if(!g){g=new Float32Array(RT_V);G.set(x,g);}
+    for(let j=0;j<RT_V;j++)g[j]+=p[j]/B;g[y]-=1/B;
+    if(rt.batch.length<6){let am=0;for(let j=1;j<RT_V;j++)if(p[j]>p[am])am=j;rt.batch.push({x,y,pred:am,py:p[y]});}}
+  let n2=0;G.forEach(g=>{for(let j=0;j<RT_V;j++)n2+=g[j]*g[j];});const norm=Math.sqrt(n2);rt.gnorm=norm;const sc=c.clip&&norm>1?1/norm:1;
+  const lr=rtLrAt(c,rt.step),t=rt.step+1,W=rt.W,M=rt.m,Vv=rt.v;rt.dW=new Map();
+  G.forEach((g,x)=>{const o=x*RT_V;const d=new Float32Array(RT_V);for(let j=0;j<RT_V;j++){const gj=g[j]*sc,k=o+j;let u;
+      if(c.opt==="sgd")u=lr*gj;else{M[k]=.9*M[k]+.1*gj;Vv[k]=.999*Vv[k]+.001*gj*gj;const mh=M[k]/(1-Math.pow(.9,t)),vh=Vv[k]/(1-Math.pow(.999,t));u=lr*mh/(Math.sqrt(vh)+1e-8);if(c.opt==="adamw")u+=lr*.05*W[k];}
+      W[k]-=u;d[j]=-u;}rt.dW.set(x,d);});
+  rt.step++;
+  if(rt.step%5===0||rt.step===1||rt.step===T){const l=rtLoss(RT_TR);if(!isFinite(l)){rt.diverged=true;rt.sawUp=true;return false;}const vl=rtLoss(RT_VA);rt.hist.push([rt.step,l]);rt.vhist.push([rt.step,vl]);if(l>rt.prevL+.25||l>rt.L0+.3||vl>rt.L0+1)rt.sawUp=true;rt.prevL=l;if(vl<rt.best[1])rt.best=[rt.step,vl];rt.bestEver=Math.min(rt.bestEver||9,vl);}
+  return rt.step<T;
+}
+function rtGen(){const r=mulberry(rt.step+7);let x=RT_ID.get("the"),out=["the"];for(let i=0;i<12;i++){const p=rtRow(x);let u=r(),acc=0,k=0;for(;k<RT_V;k++){acc+=p[k];if(u<=acc)break;}k=Math.min(k,RT_V-1);if(RT_VOC[k]==="<s>")break;out.push(RT_VOC[k]);x=k;if(RT_VOC[k]===".")break;}return out.join(" ");}
+function renderRT(){
+  const c=rtCfg(),T=rtTotal(c),lr=rtLrAt(c,Math.max(0,rt.step-1));
+  $("#rtLrV").textContent=c.lr0;$("#rtBV").textContent=c.B;$("#rtEV").textContent=c.E;
+  $("#rtInfo").textContent=`${RT_V} words in the vocabulary · ${RT_TR.length} training pairs · ${RT_VA.length} validation pairs · ${(RT_V*RT_V).toLocaleString()} weights`;
+  $("#rtBatch").innerHTML=rt.batch.length?`<table class="tbl"><tr><th>input x</th><th>predicted</th><th>actual y</th><th>p(actual)</th><th>loss −log p</th></tr>${rt.batch.map(b=>`<tr><td class="c-tok">${esc(RT_VOC[b.x])}</td><td class="${b.pred===b.y?"c-out":"c-err"}">${esc(RT_VOC[b.pred])} ${b.pred===b.y?"✓":"✗"}</td><td class="c-out">${esc(RT_VOC[b.y])}</td><td>${(b.py*100).toFixed(1)}%</td><td class="c-err">${(-Math.log(Math.max(b.py,1e-12))).toFixed(2)}</td></tr>`).join("")}</table>`:'<p class="muted">Press <b>1 step</b> to see a batch.</p>';
+  const last=rt.hist[rt.hist.length-1],lastV=rt.vhist[rt.vhist.length-1];
+  $("#rtLossF").innerHTML=rt.batch.length?`batch loss = mean of −log p(actual) over ${c.B} examples · gradient norm ${rt.gnorm.toFixed(2)}${c.clip&&rt.gnorm>1?` → <span class="c-tok">clipped to 1.00</span>`:""} · step size η = ${lr.toExponential(2)}`:`random start: every word is about equally likely, so the loss ≈ ln(${RT_V}) = ${Math.log(RT_V).toFixed(2)}`;
+  let w=`<table class="pg"><tr><th></th>${RT_COLS.map(j=>`<th style="text-align:center;color:var(--out)">${esc(RT_VOC[j])}</th>`).join("")}</tr>`;
+  RT_ROWS.forEach(i=>{const d=rt.dW.get(i);w+=`<tr><th style="color:var(--tok)">${esc(RT_VOC[i])}</th>${RT_COLS.map(j=>{const v=rt.W[i*RT_V+j],ch=d&&Math.abs(d[j])>1e-4;return `<td style="background:${cellCol(v/2)};color:var(--fg);${ch?"outline:2px solid "+(d[j]>0?"var(--out)":"var(--err)")+";":""}" title="${v.toFixed(3)}">${v.toFixed(1)}</td>`;}).join("")}</tr>`;});
+  $("#rtW").innerHTML=w+"</table>";
+  const ep=rt.step*c.B/RT_TR.length;
+  $("#rtStats").innerHTML=`<div class="stat"><span class="v">${rt.step}/${T}</span><span class="k">steps</span></div><div class="stat"><span class="v">${ep.toFixed(1)}</span><span class="k">epochs done</span></div><div class="stat"><span class="v c-err">${rt.diverged?"NaN":last[1].toFixed(3)}</span><span class="k">training loss</span></div><div class="stat"><span class="v c-emb">${rt.diverged?"NaN":lastV[1].toFixed(3)}</span><span class="k">validation loss</span></div>`;
+  // loss chart
+  const W=420,H=170,l=34,r=8,t=8,b=20,top=Math.max(rt.L0,...rt.hist.map(h=>Math.min(h[1],rt.L0*1.5)))*1.05,X=s=>l+s/Math.max(1,T)*(W-l-r),Y=v=>t+(top-Math.min(v,top))/top*(H-t-b);
+  const pl=a=>a.map(([s,v])=>`${X(s).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  let g="";[0,1,2,3,4,5].forEach(v=>{if(v<=top)g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l-4}" y="${Y(v)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text>`;});
+  $("#rtLoss").innerHTML=g+`<polyline points="${pl(rt.hist)}" style="fill:none;stroke:var(--err)" stroke-width="2"/><polyline points="${pl(rt.vhist)}" style="fill:none;stroke:var(--emb)" stroke-width="2"/><circle cx="${X(rt.best[0])}" cy="${Y(rt.best[1])}" r="5" style="fill:var(--out);stroke:var(--bg)" stroke-width="2"/><text x="${Math.min(X(rt.best[0])+7,W-140)}" y="${Y(rt.best[1])+14}" font-size="9" style="fill:var(--out)" font-family="IBM Plex Mono">best val ${rt.best[1].toFixed(2)} (early stop)</text><text x="${W-r}" y="${H-5}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">step ${rt.step} of ${T}</text>`+(rt.diverged?`<text x="${W/2}" y="${H/2}" text-anchor="middle" font-size="14" font-weight="700" style="fill:var(--err)" font-family="IBM Plex Sans">DIVERGED (NaN): lower the learning rate</text>`:"");
+  // schedule
+  const pts=[];for(let i=0;i<=60;i++){const s=Math.round(i/60*(T-1));pts.push(`${(10+i/60*400).toFixed(1)},${(70-rtLrAt(c,s)/c.lr0*60).toFixed(1)}`);}
+  $("#rtSchS").innerHTML=`<polyline points="${pts.join(" ")}" style="fill:none;stroke:var(--tok)" stroke-width="2"/><circle cx="${10+Math.min(1,rt.step/Math.max(1,T))*400}" cy="${70-rtLrAt(c,Math.min(T-1,rt.step))/c.lr0*60}" r="5" style="fill:var(--tok)"/><text x="10" y="78" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${c.sch==="cos"?"5% warm-up, then cosine decay to 10%":"constant"}</text>`;
+  $("#rtGen").textContent=rtGen();
+}
+function rtStop(){clearInterval(rt.timer);rt.timer=null;$("#rtPlay").textContent="Train";}
+$("#rtPlay").addEventListener("click",()=>{if(rt.timer){rtStop();return;}const c=rtCfg();if(rt.step>=rtTotal(c)||rt.diverged)rtInit();$("#rtPlay").textContent="Pause";rt.timer=setInterval(()=>{let go=true;for(let i=0;i<3&&go;i++)go=rtStep();renderRT();if(!go)rtStop();},50);});
+$("#rtStep").addEventListener("click",()=>{rtStop();rtStep();renderRT();});
+$("#rtReset").addEventListener("click",()=>{rtStop();rtInit();renderRT();});
+["#rtLr","#rtB","#rtE"].forEach(s=>$(s).addEventListener("input",renderRT));["#rtOpt","#rtSch","#rtClip"].forEach(s=>$(s).addEventListener("change",renderRT));
+rtInit();
+
+/* ---- 2. optimizer race ---- */
+const OR_LRS=[.01,.02,.05,.1,.2,.3,.45],OR_COL={sgd:"#ff7d93",mom:"#f3b955",adam:"#62e3a2"},OR_N={sgd:"SGD",mom:"Momentum",adam:"Adam"};
+const orS={timer:null};
+function orReset(){clearInterval(orS.timer);orS.timer=null;orS.k=0;["sgd","mom","adam"].forEach(o=>{orS[o]={p:[[2.6,1.4]],v:[0,0],m:[0,0],s:[0,0],done:null,dead:false};});renderOR();}
+function orStep(){const lr=OR_LRS[+$("#orLr").value],L=LAND.valley;orS.k++;
+  ["sgd","mom","adam"].forEach(o=>{const S=orS[o];if(S.done||S.dead)return;const [x,y]=S.p[S.p.length-1],g=L.g(x,y);let n;
+    if(o==="sgd")n=[x-lr*g[0],y-lr*g[1]];
+    else if(o==="mom"){S.v=[.9*S.v[0]+g[0],.9*S.v[1]+g[1]];n=[x-lr*S.v[0],y-lr*S.v[1]];}
+    else{S.m=S.m.map((m,i)=>.9*m+.1*g[i]);S.s=S.s.map((s,i)=>.999*s+.001*g[i]*g[i]);const t=orS.k;n=[0,1].map(i=>[x,y][i]-lr*(S.m[i]/(1-Math.pow(.9,t)))/(Math.sqrt(S.s[i]/(1-Math.pow(.999,t)))+1e-8));}
+    S.p.push(n);if(!isFinite(n[0])||Math.abs(n[0])>20||Math.abs(n[1])>20)S.dead=true;else if(L.f(...n)<.005)S.done=orS.k;});}
+function renderOR(){const cv=$("#orCv"),c=cv.getContext("2d"),L=LAND.valley,to=(x,y)=>[(x+3)/6*640,(3-y)/6*640];c.drawImage(heat("valley").c,0,0,640,640);
+  ["sgd","mom","adam"].forEach(o=>{const S=orS[o],P=S.p.filter(q=>Math.abs(q[0])<4&&Math.abs(q[1])<4);c.strokeStyle=OR_COL[o];c.lineWidth=3;c.beginPath();P.forEach((q,i)=>{const [a,b]=to(...q);i?c.lineTo(a,b):c.moveTo(a,b);});c.stroke();const last=P[P.length-1];if(last){const [a,b]=to(...last);c.fillStyle=OR_COL[o];c.beginPath();c.arc(a,b,9,0,7);c.fill();c.strokeStyle="#091015";c.lineWidth=2;c.stroke();}});
+  const [mx,my]=to(0,0);c.strokeStyle="#fff";c.lineWidth=3;c.beginPath();c.moveTo(mx-9,my-9);c.lineTo(mx+9,my+9);c.moveTo(mx+9,my-9);c.lineTo(mx-9,my+9);c.stroke();
+  $("#orLrV").textContent=OR_LRS[+$("#orLr").value];
+  $("#orTbl").innerHTML=`<table class="tbl" style="width:100%"><tr><th>optimizer</th><th>loss now</th><th>status</th></tr>${["sgd","mom","adam"].map(o=>{const S=orS[o],q=S.p[S.p.length-1];return `<tr><td style="color:${OR_COL[o]};font-weight:600">${OR_N[o]}</td><td>${S.dead?"∞":L.f(...q).toFixed(4)}</td><td>${S.dead?'<span class="c-err">diverged</span>':S.done?`<span class="c-out">reached the minimum in ${S.done} steps</span>`:`step ${orS.k}`}</td></tr>`;}).join("")}</table>`;
+  orS.adamWon=!!orS.adam.done;}
+$("#orGo").addEventListener("click",()=>{orReset();orS.timer=setInterval(()=>{orStep();renderOR();if(orS.k>=150||["sgd","mom","adam"].every(o=>orS[o].done||orS[o].dead)){clearInterval(orS.timer);orS.timer=null;}},45);});
+$("#orReset").addEventListener("click",orReset);$("#orLr").addEventListener("input",orReset);
+orReset();
+predictBox($("#orPred"),{q:"In this narrow valley with learning rate 0.05, which optimizer reaches the minimum first?",opts:["SGD","Momentum","Adam"],ok:2,
+  why:"The valley is 20× steeper in one direction than the other. SGD's single step size is tiny along the flat direction. Adam rescales each weight by its own gradient history, so it moves at a similar pace in both directions. Momentum helps too, but it overshoots and oscillates.",onReveal:()=>{$("#orLr").value=2;$("#orGo").click();}});
+
+/* ---- 3. hyperparameter simulator ---- */
+const HS_LR=[1e-5,3e-5,1e-4,3e-4,1e-3,3e-3,1e-2,3e-2,1e-1,3e-1,1],HS_B=[8,16,32,64,128,256],HS_D=[64,128,256,512,768],HS_S=[.1,.3,1,3,10,30,100];
+let hsSawOver=false,hsRegime="";
+function renderHS(){
+  const lr=HS_LR[+$("#hsLr").value],B=HS_B[+$("#hsB").value],E=+$("#hsE").value,d=HS_D[+$("#hsD").value],L=+$("#hsL").value,MB=HS_S[+$("#hsS").value];
+  $("#hsLrV").textContent=lr.toExponential(0);$("#hsBV").textContent=B;$("#hsEV").textContent=E;$("#hsDV").textContent=d;$("#hsLV").textContent=L;$("#hsSV").textContent=MB>=1?MB+" MB":MB*1000+" KB";
+  const N=12*L*d*d+8000*d,D=MB*2.5e5,T=256,spe=Math.max(1,D/(B*T)),lrOpt=3e-3*Math.sqrt(B/64)*Math.sqrt(256/d),ratio=lr/lrOpt;
+  const Lbest=1.35+2.4*Math.pow(N/1e5,-.3)+1.9*Math.pow(D/1e6,-.28),L0=Math.log(8000),tau=900*Math.pow(d/256,.3),rho=N/(D/20);
+  const speed=Math.min(ratio,1.4),rng=mulberry(+$("#hsLr").value*131+B+E+d+L+MB*7),noise=.06*Math.sqrt(64/B)*(ratio>4?3:1);
+  const pts=[];let minV=1e9,minE=0;
+  for(let i=0;i<=120;i++){const e=i/120*E,steps=e*spe;let tr,va;
+    if(ratio>12&&steps>40){tr=Math.min(12,L0+(steps-40)/40);va=tr;}
+    else{const conv=Lbest+(L0-Lbest)*Math.exp(-steps*speed/tau);const over=rho>1?Math.min(Lbest-.4,.22*Math.max(0,e-1)*Math.sqrt(rho)):0;tr=conv-over+(ratio>4?.25:0);va=conv+(rho>1?.11*Math.max(0,e-1)*Math.sqrt(rho):0)+(ratio>4?.25:0);}
+    tr+=gauss(rng)*noise*(i?1:0);va+=gauss(rng)*noise*.6*(i?1:0);pts.push([e,tr,va]);if(va<minV){minV=va;minE=e;}}
+  const fin=pts[pts.length-1];
+  const W=440,H=240,l=34,r=10,t=10,b=26,top=L0+.8,X=e=>l+e/E*(W-l-r),Y=v=>t+(top-Math.max(0,Math.min(v,top)))/top*(H-t-b);
+  let g="";[0,2,4,6,8].forEach(v=>g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l-4}" y="${Y(v)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text>`);
+  for(let e=0;e<=E;e+=Math.max(1,Math.round(E/6)))g+=`<text x="${X(e)}" y="${H-8}" text-anchor="middle" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${e}</text>`;
+  g+=`<text x="${W-r}" y="${H-8}" text-anchor="end" font-size="9" style="fill:var(--muted)" font-family="IBM Plex Mono">epochs</text>`;
+  g+=`<polyline points="${pts.map(p=>`${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" ")}" style="fill:none;stroke:var(--err)" stroke-width="2"/><polyline points="${pts.map(p=>`${X(p[0]).toFixed(1)},${Y(p[2]).toFixed(1)}`).join(" ")}" style="fill:none;stroke:var(--emb)" stroke-width="2"/>`;
+  if(fin[2]-minV>.15)g+=`<line x1="${X(minE)}" x2="${X(minE)}" y1="${t}" y2="${H-b}" style="stroke:var(--out)" stroke-dasharray="4 3"/><text x="${X(minE)+4}" y="${t+12}" font-size="10" style="fill:var(--out)" font-family="IBM Plex Mono">best checkpoint (early stop)</text>`;
+  g+=`<text x="${l+6}" y="${t+12}" font-size="10" style="fill:var(--err)" font-family="IBM Plex Mono">train</text><text x="${l+50}" y="${t+12}" font-size="10" style="fill:var(--emb)" font-family="IBM Plex Mono">validation</text>`;
+  $("#hsSvg").innerHTML=g;
+  let reg,col,why;
+  if(ratio>12){reg="Diverged";col="var(--err)";why="The learning rate is far too high: updates overshoot and the loss explodes (NaN in real training). Lower it 10×, add warm-up and gradient clipping.";}
+  else if(ratio<.1){reg="Underfitting: learning too slowly";col="var(--tok)";why="The learning rate is so small the model barely moves. Both curves stay high. Raise the learning rate.";}
+  else if(fin[2]-minV>.15){reg="Overfitting";col="var(--err)";why=`The model (${fmtN(N)} parameters) is too big for ${fmtN(D)} tokens of data (~${(D/N).toFixed(1)} tokens per parameter). Training loss keeps falling while validation rises. Fix: more data, a smaller model, fewer epochs (early stopping) or dropout.`;hsSawOver=true;}
+  else if(fin[2]>Lbest+.6||fin[2]>4.2){reg="Underfitting";col="var(--tok)";why="Both losses are still high. The model is too small, or training is too short. Add epochs, layers or width.";}
+  else if(ratio>4){reg="Unstable";col="var(--tok)";why="It trains, but noisily and to a worse loss. Lower the learning rate a little or use a bigger batch.";}
+  else{reg="Good fit";col="var(--out)";why="Both losses fall together and the gap stays small. This is healthy training. For more gains, add data and model size together.";}
+  hsRegime=reg;
+  $("#hsVerdict").innerHTML=`<div class="eyebrow">Simulated outcome</div><h3 style="color:${col};margin:4px 0 6px">${reg}</h3><p>${why}</p>`;
+  $("#hsStats").innerHTML=`<div class="stat"><span class="v c-hid">${fmtN(N)}</span><span class="k">parameters</span></div><div class="stat"><span class="v c-tok">${fmtN(D)}</span><span class="k">training tokens</span></div><div class="stat"><span class="v">${(D/N).toFixed(1)}</span><span class="k">tokens / parameter (~20 is a good target)</span></div><div class="stat"><span class="v">${fmtN(Math.round(spe*E))}</span><span class="k">optimizer steps</span></div>`;
+}
+["#hsLr","#hsB","#hsE","#hsD","#hsL","#hsS"].forEach(s=>$(s).addEventListener("input",renderHS));renderHS();
+predictBox($("#hsPred"),{q:"A 3.5M-parameter model trains for 30 epochs on just 100 KB of text. What do the curves look like?",opts:["Both losses fall together","Training loss falls, validation loss turns upward (overfitting)","Both stay flat"],ok:1,
+  why:"100 KB ≈ 25K tokens, under 0.01 tokens per parameter. The model can memorise the whole set, so training loss drops while validation climbs after the first epochs. Keep the checkpoint at the validation minimum, or get more data.",onReveal:()=>{$("#hsS").value=0;$("#hsE").value=30;$("#hsD").value=2;$("#hsL").value=4;$("#hsLr").value=5;renderHS();}});
+
+/* ---- code ---- */
+codeBox($("#code8"),{"train_loop.py":`import math, torch, torch.nn as nn, torch.nn.functional as F
+
+def lr_at(step, max_steps, peak_lr, warmup=50, min_ratio=0.1):
+    if step < warmup:                                            # linear warm-up
+        return peak_lr * (step + 1) / warmup
+    progress = (step - warmup) / max(1, max_steps - warmup)      # cosine decay to 10%
+    return peak_lr * (min_ratio + (1 - min_ratio) * 0.5 * (1 + math.cos(math.pi * progress)))
+
+def logits_of(model, x):
+    out = model(x)
+    return out[0] if isinstance(out, tuple) else out             # TinyGPT returns (logits, loss)
+
+def train(model, get_batch, max_steps=1000, peak_lr=3e-3, eval_every=100, clip=1.0, patience=3):
+    opt = torch.optim.AdamW(model.parameters(), lr=peak_lr, betas=(0.9, 0.95), weight_decay=0.1)
+    best, bad_evals = float("inf"), 0
+    for step in range(max_steps):
+        for g in opt.param_groups:
+            g["lr"] = lr_at(step, max_steps, peak_lr)            # learning-rate schedule
+        x, y = get_batch("train")                                # [B, T] inputs and targets
+        logits = logits_of(model, x)                             # forward pass  [B, T, V]
+        loss = F.cross_entropy(logits.reshape(-1, logits.size(-1)), y.reshape(-1))
+        opt.zero_grad(set_to_none=True)
+        loss.backward()                                          # backpropagation
+        norm = torch.nn.utils.clip_grad_norm_(model.parameters(), clip)   # gradient clipping
+        opt.step()                                               # weight update
+        if step % eval_every == 0 or step == max_steps - 1:
+            model.eval()
+            with torch.no_grad():
+                xv, yv = get_batch("val")
+                lv = logits_of(model, xv)
+                val = F.cross_entropy(lv.reshape(-1, lv.size(-1)), yv.reshape(-1)).item()
+            model.train()
+            print(f"step {step:5d}  lr {opt.param_groups[0]['lr']:.2e}  "
+                  f"train {loss.item():.3f}  val {val:.3f}  |grad| {norm:.2f}")
+            if val < best - 1e-3:
+                best, bad_evals = val, 0
+                torch.save(model.state_dict(), "best.pt")        # keep the best checkpoint
+            else:
+                bad_evals += 1
+                if bad_evals >= patience:                        # early stopping
+                    print("validation stopped improving - early stop")
+                    break
+    return best
+
+if __name__ == "__main__":
+    # standalone demo: the neural bigram model from panel 01, on a tiny text
+    torch.manual_seed(0)
+    text = ("the customer opened a savings account . the bank approved the loan . "
+            "the customer paid the fee . the agent explained the interest rate . ") * 50
+    words = text.split()
+    vocab = sorted(set(words)); stoi = {w: i for i, w in enumerate(vocab)}
+    data = torch.tensor([stoi[w] for w in words])
+    n = int(0.9 * len(data)); splits = {"train": data[:n], "val": data[n:]}
+
+    def get_batch(split, B=32, T=8):
+        d = splits[split]; ix = torch.randint(len(d) - T - 1, (B,))
+        return (torch.stack([d[i:i + T] for i in ix]), torch.stack([d[i + 1:i + T + 1] for i in ix]))
+
+    model = nn.Embedding(len(vocab), len(vocab))      # V x V table: logits = W[x]
+    print("best val loss:", round(train(model, get_batch, max_steps=600, peak_lr=0.1), 3))`});
+
+/* ---- exercise ---- */
+let ex8Checked=false;
+const EX8=[
+ {t:"<b>Real training (panel 01):</b> reach a <b>best validation loss below 3.8</b> (the green early-stopping dot)",f:()=>(rt.bestEver||9)<3.8},
+ {t:"<b>Real overfitting (panel 01):</b> train long enough that <b>training loss drops below 1.5</b>, and watch validation loss rise",f:()=>rt.hist.some(h=>h[1]<1.5)},
+ {t:"<b>Instability (panel 01):</b> find settings where the loss <b>spikes up</b> (try Adam with learning rate 10)",f:()=>rt.sawUp||rt.diverged},
+ {t:"<b>Optimizer race (panel 02):</b> run a race where <b>Adam reaches the minimum</b>",f:()=>!!orS.adamWon},
+ {t:"<b>Hyperparameter lab (panel 03):</b> produce an <b>Overfitting</b> result, then change settings until it says <b>Good fit</b>",f:()=>hsSawOver&&hsRegime==="Good fit"}
+];
+function runEx8(){let ok=0;$("#ex8Checks").innerHTML=EX8.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex8Checked?(r?"ok":"no"):""}"><span class="dot">${ex8Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex8Checked)$("#ex8Msg").innerHTML=ok===EX8.length?'<span class="c-out">All 5 missions complete.</span> You trained a real model, broke it on purpose, and diagnosed fitting problems.':`${ok}/5 missions complete. Hint: Adam, learning rate 0.05, 60 epochs drops training loss to ~1.2; the best validation loss appears early in the run.`;}
+$("#ex8Btn").addEventListener("click",()=>{ex8Checked=true;runEx8();});
+
+/* ---- quiz ---- */
+function makeQuiz8(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)];
+  const D=pick([1000000,2000000,512000]),B=pick([16,32]),T=pick([128,256]),spe=Math.floor(D/(B*T));
+  const peak=pick([6e-4,3e-4,1e-3]),W=pick([1000,2000,4000]),s=pick([250,500,800]),lrw=peak*s/W;
+  return [
+   {type:"Numerical",kind:"num",q:`Your dataset has <b>${D.toLocaleString()} tokens</b>. Each step uses batch size <b>B = ${B}</b> with sequences of <b>T = ${T}</b> tokens. About how many steps make one epoch? (round down)`,
+    check:v=>{if(Math.abs(v-spe)<=1)return [true,`One step sees B × T = ${B*T} tokens, so an epoch is ${D.toLocaleString()} / ${B*T} ≈ ${spe} steps.`];if(Math.abs(v-Math.floor(D/B))<=1)return [false,`You divided by B only. Each sequence also holds T = ${T} tokens: ${D.toLocaleString()} / (${B} × ${T}) ≈ ${spe}.`];return [false,`steps per epoch = tokens / (B × T) = ${D.toLocaleString()} / ${B*T} ≈ ${spe}.`];}},
+   {type:"Numerical",kind:"num",q:`Linear warm-up raises the learning rate from 0 to a peak of <b>${peak}</b> over <b>${W}</b> steps. What is the learning rate at step <b>${s}</b>? (e.g. 1.5e-4)`,
+    check:v=>{if(Math.abs(v-lrw)/lrw<.02)return [true,`peak × step / warm-up = ${peak} × ${s} / ${W} = ${lrw.toExponential(2)}.`];if(Math.abs(v-peak)/peak<.02)return [false,`That's the peak, reached only at step ${W}. At step ${s} you're ${(s/W*100).toFixed(0)}% of the way: ${lrw.toExponential(2)}.`];return [false,`Warm-up is linear: lr = peak × ${s}/${W} = ${lrw.toExponential(2)}.`];}},
+   {type:"Conceptual",kind:"mcq",q:"After many epochs, <b>both</b> training and validation loss are still high and almost flat, and close to each other. What is this, and what helps?",opts:shuffle([
+     {t:"Underfitting: the model is too small or training too short/slow. Try a bigger model, more steps, or a higher learning rate.",ok:true,why:"Correct. Both high and together means the model hasn't captured the patterns, so it needs more capacity or more (effective) training."},
+     {t:"Overfitting: add dropout and stop earlier",why:"Misconception: <b>any bad loss means overfitting</b>. Overfitting shows a <i>gap</i>: low training loss, high validation loss. Here both are high."},
+     {t:"Data leakage: the validation set is contaminated",why:"Misconception: <b>similar losses mean leakage</b>. Leakage makes validation look <i>too good</i>, not stuck high."},
+     {t:"Divergence: lower the learning rate",why:"Misconception: <b>flat means diverged</b>. Divergence shows rising or NaN loss. Flat and high means too little learning."}],r)},
+   {type:"Conceptual",kind:"mcq",q:"Why do almost all SLMs train with Adam/AdamW rather than plain SGD?",opts:shuffle([
+     {t:"Adam keeps a momentum term and a per-weight scale from past gradients, so each weight gets its own effective step size. It's robust when gradient sizes differ hugely across layers.",ok:true,why:"Correct. Panel 02: Adam crosses the narrow valley that SGD crawls along. AdamW also decouples weight decay from that scaling."},
+     {t:"Adam needs no learning rate",why:"Misconception: <b>Adam is hyperparameter-free</b>. It still needs a learning rate, and a schedule, and both matter a lot."},
+     {t:"Adam uses less memory than SGD",why:"Misconception: <b>Adam is lighter</b>. It stores two extra numbers per weight (m and v), roughly 3× the optimizer memory of SGD."},
+     {t:"Adam guarantees the global minimum",why:"Misconception: <b>Adam finds the best possible weights</b>. No optimizer guarantees that. Adam just gets to good solutions faster and more reliably."}],r)},
+   {type:"Practical",kind:"mcq",q:"Your SLM trains smoothly for 3,000 steps, then the loss suddenly spikes and becomes NaN. Which fix should you try first?",opts:shuffle([
+     {t:"Restart from the last good checkpoint with a lower learning rate (or a longer warm-up), and make sure gradient clipping is on",ok:true,why:"Correct. Loss spikes are classic too-large updates. Clipping caps the step size, and a lower peak lr or warm-up prevents the blow-up (panel 01: try a high lr without clipping)."},
+     {t:"Increase the learning rate to escape the bad region",why:"Misconception: <b>more lr escapes problems</b>. That makes oversized updates even bigger."},
+     {t:"Add more layers",why:"Misconception: <b>capacity fixes instability</b>. A deeper model is usually <i>less</i> stable at the same learning rate."},
+     {t:"Ignore it and keep training: NaN goes away",why:"Misconception: <b>NaN recovers</b>. Once weights are NaN every later step is NaN too. You must restart from a checkpoint."}],r)}
+  ];
+}
+mountQuiz(8,$("#quiz8"),makeQuiz8);
+renderRT();runEx8();
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -5318,6 +5639,37 @@ Object.assign(NARR,{
  {sel:"#dmCode",act:'#dmBtns [data-dm="qa"]',en:"For question answering, every answer should be supported by its source text, including honest I don't know cases. Otherwise the model learns to make things up.",
   te:"ప్రశ్నోత్తరాల కోసం ప్రతి జవాబుకు దాని మూల టెక్స్ట్ ఆధారం ఉండాలి, నిజాయితీగా తెలియదు అనే సందర్భాలతో సహా. లేకపోతే మోడల్ కల్పించడం నేర్చుకుంటుంది.",
   hn:"सवाल-जवाब के लिए हर जवाब का आधार उसका स्रोत टेक्स्ट होना चाहिए, ईमानदार मुझे नहीं पता वाले मामलों समेत। वरना मॉडल बातें गढ़ना सीख जाता है।"}]
+});
+
+/* ---- narration for stage 8 ---- */
+NARR_INTRO[8]={en:"Welcome to Stage eight, training. Here a real neural language model learns in your browser, step by step, and you will see what makes training succeed or fail.",
+ te:"స్టేజ్ ఎనిమిదికి స్వాగతం. ఇది ట్రైనింగ్. ఇక్కడ నిజమైన న్యూరల్ లాంగ్వేజ్ మోడల్ మీ బ్రౌజర్‌లోనే అడుగడుగునా నేర్చుకుంటుంది, ట్రైనింగ్ విజయం లేదా విఫలం దేనిపై ఆధారపడుతుందో మీరు చూస్తారు.",
+ hn:"स्टेज एट में आपका स्वागत है, यानी ट्रेनिंग। यहाँ एक असली न्यूरल लैंग्वेज मॉडल आपके ब्राउज़र में कदम-दर-कदम सीखता है, और आप देखेंगे कि ट्रेनिंग किन चीज़ों से सफल या असफल होती है।"};
+Object.assign(NARR,{
+"p8-real":[
+ {sel:"#rtBatch",act:()=>{rtStop();rtInit();rtStep();renderRT();},en:"The model starts from random weights. Each step takes a batch of word pairs, predicts the next word, and measures the loss: how surprised it was by the real next word.",
+  te:"మోడల్ యాదృచ్ఛిక వెయిట్లతో మొదలవుతుంది. ప్రతి అడుగు పద జతల బ్యాచ్ తీసుకుని, తర్వాతి పదాన్ని ఊహించి, లాస్‌ను కొలుస్తుంది: నిజమైన తర్వాతి పదం చూసి అది ఎంత ఆశ్చర్యపోయిందో.",
+  hn:"मॉडल बेतरतीब वेट से शुरू होता है। हर कदम शब्द-जोड़ों का एक बैच लेता है, अगले शब्द का अनुमान लगाता है, और लॉस मापता है: असली अगला शब्द देखकर वह कितना हैरान हुआ।"},
+ {sel:"#rtW",act:()=>{if(!rt.timer)$("#rtPlay").click();},en:"Watch the weights change. Outlined cells were updated this step: green went up, rose went down. Gradients push the weights so the right next words become more likely.",
+  te:"వెయిట్లు మారడం చూడండి. అంచు ఉన్న గడులు ఈ అడుగులో మారాయి: ఆకుపచ్చ పెరిగింది, గులాబీ తగ్గింది. సరైన తర్వాతి పదాలు ఎక్కువ సంభావ్యమయ్యేలా గ్రేడియెంట్లు వెయిట్లను నెడతాయి.",
+  hn:"वेट बदलते देखिए। किनारी वाले खाने इस कदम में बदले: हरा बढ़ा, गुलाबी घटा। ग्रेडिएंट वेट को धकेलते हैं ताकि सही अगले शब्द ज़्यादा संभावित बनें।"},
+ {sel:"#rtLoss",en:"Training loss in rose and validation loss in blue fall together. The generated text below slowly starts to make sense.",
+  te:"గులాబీలో ట్రైనింగ్ లాస్, నీలంలో వాలిడేషన్ లాస్ కలిసి తగ్గుతాయి. కింద తయారైన టెక్స్ట్ నెమ్మదిగా అర్థవంతంగా మారుతుంది.",
+  hn:"गुलाबी में ट्रेनिंग लॉस और नीले में वैलिडेशन लॉस साथ-साथ गिरते हैं। नीचे बना टेक्स्ट धीरे-धीरे समझ में आने लगता है।"}],
+"p8-opt":[
+ {sel:"#orCv",act:"#orGo",en:"Three optimizers race down the same narrow valley. SGD crawls, momentum overshoots, and Adam, with its own step size for each weight, gets there first.",
+  te:"మూడు ఆప్టిమైజర్లు ఒకే ఇరుకైన లోయలో పోటీ పడతాయి. ఎస్‌జీడీ పాకుతుంది, మొమెంటమ్ దాటిపోతుంది, ప్రతి వెయిట్‌కు సొంత అడుగుతో ఆడమ్ ముందుగా చేరుతుంది.",
+  hn:"तीन ऑप्टिमाइज़र एक ही संकरी घाटी में दौड़ते हैं। एसजीडी रेंगता है, मोमेंटम आगे निकल जाता है, और हर वेट के लिए अलग कदम वाला एडम सबसे पहले पहुँचता है।"},
+ {sel:"#orTbl",en:"That is why nearly every small language model is trained with AdamW.",
+  te:"అందుకే దాదాపు ప్రతి చిన్న లాంగ్వేజ్ మోడల్‌ను ఆడమ్‌డబ్ల్యూతో ట్రైన్ చేస్తారు.",
+  hn:"इसीलिए लगभग हर छोटे लैंग्वेज मॉडल को एडम-डब्ल्यू से ट्रेन किया जाता है।"}],
+"p8-sim":[
+ {sel:"#hsSvg",act:()=>{$("#hsS").value=0;$("#hsE").value=30;$("#hsD").value=2;$("#hsL").value=4;$("#hsLr").value=5;renderHS();},en:"This panel simulates longer training runs. With a big model and very little data, training loss keeps falling while validation loss rises. That is overfitting.",
+  te:"ఈ ప్యానెల్ పెద్ద ట్రైనింగ్ రన్‌లను సిమ్యులేట్ చేస్తుంది. పెద్ద మోడల్, చాలా తక్కువ డేటాతో ట్రైనింగ్ లాస్ తగ్గుతూనే ఉంటుంది కానీ వాలిడేషన్ లాస్ పెరుగుతుంది. అదే ఓవర్‌ఫిట్టింగ్.",
+  hn:"यह पैनल लंबे ट्रेनिंग रन का सिमुलेशन करता है। बड़े मॉडल और बहुत कम डेटा के साथ ट्रेनिंग लॉस घटता रहता है पर वैलिडेशन लॉस बढ़ता है। यही ओवरफ़िटिंग है।"},
+ {sel:"#hsVerdict",act:()=>{$("#hsS").value=4;$("#hsE").value=8;renderHS();},en:"Give it much more data and both curves fall together. That's a good fit. The green line marks where early stopping would keep the best checkpoint.",
+  te:"చాలా ఎక్కువ డేటా ఇస్తే రెండు వక్రరేఖలు కలిసి తగ్గుతాయి. అది మంచి ఫిట్. ఆకుపచ్చ గీత, ఎర్లీ స్టాపింగ్ ఉత్తమ చెక్‌పాయింట్‌ను ఎక్కడ ఉంచుతుందో చూపిస్తుంది.",
+  hn:"बहुत ज़्यादा डेटा दीजिए, तो दोनों कर्व साथ-साथ गिरते हैं। यही अच्छा फ़िट है। हरी रेखा बताती है कि अर्ली स्टॉपिंग सबसे अच्छा चेकपॉइंट कहाँ रखेगा।"}]
 });
 
 /* ---- engine ---- */
