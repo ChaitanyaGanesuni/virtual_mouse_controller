@@ -365,6 +365,12 @@ body.narrating main{padding-bottom:190px}
 .pg tr.hirow th{color:#fff!important;text-decoration:underline}
 .pg tr.hirow td{box-shadow:inset 0 0 0 1.5px rgba(243,185,85,.85)}
 table.mt td{min-width:44px}
+.tree{display:grid;gap:3px}
+.tnode{display:flex;justify-content:space-between;gap:10px;text-align:left;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 10px;font-family:var(--f-mono);font-size:.78rem;color:var(--fg)}
+.tnode:hover{border-color:var(--line2)}
+.tnode.on{border-color:var(--emb);background:rgba(82,211,226,.08)}
+.hlline{background:rgba(243,185,85,.16);display:inline-block;width:100%;box-shadow:inset 3px 0 0 var(--tok)}
+.newcode{display:block;background:rgba(98,227,162,.08);box-shadow:inset 3px 0 0 var(--out);animation:pop .4s ease}
 </style>
 
 <header class="top">
@@ -1584,6 +1590,83 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 6 ====================== -->
+  <section id="stage6" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 06 · unlocked</div>
+      <h2>Build a tiny Transformer from scratch</h2>
+      <p>Time to write the real thing. You'll assemble a complete decoder-only model, TinyGPT, in about 130 lines of PyTorch: tokenizer, embeddings, attention heads, causal mask, feed-forward network, blocks and the language-model head. It's small enough to train on your laptop CPU.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 6 sections">
+      <button type="button" data-go="p6-exp">1 · Model explorer</button>
+      <button type="button" data-go="p6-build">2 · Build it step by step</button>
+      <button type="button" data-go="p6-trace">3 · Shape trace</button>
+      <button type="button" data-go="p6-run">4 · Run it on your CPU</button>
+      <button type="button" data-go="p6-ex">5 · Exercise</button>
+      <button type="button" data-go="p6-quiz">6 · Assessment</button>
+    </nav>
+
+    <div class="panel" id="p6-exp">
+      <div class="phead"><span class="tag">01</span><h3>Model explorer: every component, its code, shapes and parameters</h3><span class="sim real">exact counts for your settings</span>
+        <p class="plain">This is the full TinyGPT model as a tree. <em>Click any component</em> to see its Python code, what goes in and comes out, how many parameters it has, the maths it performs, and its role. Change the settings and every number updates.</p></div>
+      <div class="ctrls box" style="margin-bottom:12px">
+        <label class="field">vocab V (characters): <b id="t6Vv"></b><input id="t6V" type="range" min="30" max="120" value="65"></label>
+        <label class="field">d_model: <b id="t6Dv"></b><input id="t6D" type="range" min="0" max="4" value="1"></label>
+        <label class="field">layers N: <b id="t6Nv"></b><input id="t6N" type="range" min="1" max="8" value="4"></label>
+        <label class="field">heads H: <b id="t6Hv"></b><input id="t6H" type="range" min="0" max="3" value="2"></label>
+        <label class="field">block_size C: <b id="t6Cv"></b><input id="t6C" type="range" min="0" max="4" value="1"></label>
+      </div>
+      <div class="grid2">
+        <div class="box"><div id="t6Tree" class="tree"></div><div class="stackbar" id="t6Stack" style="margin-top:12px"></div><div class="row" id="t6Leg" style="margin-top:6px;gap:10px;font-size:.72rem;font-family:var(--f-mono)"></div></div>
+        <div style="display:grid;gap:12px;align-content:start;min-width:0">
+          <div class="box" id="t6Info" aria-live="polite"></div>
+          <div class="code"><div class="tabs"><button type="button" class="on" id="t6CodeT">code</button></div><pre id="t6Code"></pre></div>
+          <div class="predict" id="t6Pred"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="p6-build">
+      <div class="phead"><span class="tag">02</span><h3>Build it step by step: concept first, then code</h3><span class="sim real">the real, runnable script</span>
+        <p class="plain">The model is assembled in 10 steps. Each step explains <em>the idea</em>, then adds <em>the code</em>, with new lines highlighted. By step 10 you have the complete file from panel 04.</p></div>
+      <div class="row" style="margin-bottom:10px"><button class="btn" id="bdPrev" type="button">Back</button><button class="btn primary" id="bdNext" type="button">Next step</button><div class="segs" id="bdSegs" style="margin-left:8px"></div><span class="mono dim" id="bdCount" style="font-size:.78rem"></span></div>
+      <div class="grid2">
+        <div class="box" id="bdExplain" aria-live="polite"></div>
+        <div class="code" style="min-width:0"><div class="tabs"><button type="button" class="on">tiny_gpt.py (so far)</button></div><pre id="bdCode" style="max-height:520px;overflow:auto"></pre></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p6-trace">
+      <div class="phead"><span class="tag">03</span><h3>Shape trace: one forward pass, tensor by tensor</h3><span class="sim real">exact shapes</span>
+        <p class="plain">Getting shapes right is most of the work when you build a model. Press Play to follow one batch through TinyGPT. Every row is a real line of the code, with the exact shape it produces. The settings come from panel 01.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:0 1 200px">batch B: <b id="trBv"></b><input id="trB" type="range" min="1" max="64" value="32"></label><label class="field" style="flex:0 1 200px">sequence length T: <b id="trTv"></b><input id="trT" type="range" min="1" max="64" value="64"></label><div class="row" style="align-self:end"><button class="btn primary" id="trPlay6" type="button">Play</button><button class="btn" id="trAll" type="button">Show all</button></div></div>
+      <div class="box"><div class="scroll" id="trTbl"></div></div>
+      <div class="grid2" style="margin-top:12px"><div class="box note" style="border-left:0" id="trNote"></div><div class="predict" id="trPred"></div></div>
+    </div>
+
+    <div class="panel" id="p6-run">
+      <div class="phead"><span class="tag">04</span><h3>Run it on your CPU</h3><span class="sim illus">runtime is an estimate</span>
+        <p class="plain">Here is the complete file. Save any plain-text file as <span class="mono">input.txt</span> (your own banking FAQs work well), install PyTorch's CPU build, and run <span class="mono">python tiny_gpt.py</span>. The estimator shows roughly how long it will take on a laptop.</p></div>
+      <div class="grid2">
+        <div class="code" id="code6" style="min-width:0"><div class="tabs"></div><pre style="max-height:560px;overflow:auto"></pre></div>
+        <div style="display:grid;gap:12px;align-content:start">
+          <div class="box" style="display:grid;gap:10px"><label class="field">training steps: <b id="rnSv"></b><input id="rnS" type="range" min="1" max="20" value="4"></label><label class="field">CPU speed (effective GFLOP/s): <b id="rnFv"></b><input id="rnF" type="range" min="5" max="200" value="30"></label><div class="stats" id="rnStats"></div></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">What the output looks like (illustrative)</div><pre class="formula" id="rnOut" style="white-space:pre;line-height:1.5;font-size:.78rem"></pre></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="p6-ex">
+      <div class="phead"><span class="tag">05</span><h3>Hands-on exercise: four missions</h3><p>The checks read the panels' live state. Bonus mission: run tiny_gpt.py on your own computer.</p></div>
+      <div class="box"><div class="checks" id="ex6Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex6Btn" type="button">Check missions</button></div><p class="note" id="ex6Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <div class="panel" id="p6-quiz">
+      <div class="phead"><span class="tag">06</span><h3>Stage 6 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 7, preparing the dataset.</p></div>
+      <div id="quiz6"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -1648,7 +1731,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -4136,6 +4219,284 @@ function makeQuiz5(seed){
 }
 mountQuiz(5,$("#quiz5"),makeQuiz5);
 
+/* =================== STAGE 6 =================== */
+const TG_CHUNKS=[
+{t:"Hyperparameters",why:"Every model starts with a few numbers that fix its size: how many sequences per batch (B), how long each sequence is (T, the context window), how wide each token vector is (d), how many heads and layers. These are the same knobs as the size explorer in Stage 0. Small values keep everything CPU-friendly.",code:`# tiny_gpt.py  -  a miniature decoder-only Transformer that trains on a CPU
+import torch, torch.nn as nn, torch.nn.functional as F
+
+# ---- 1. hyperparameters -------------------------------------------------
+batch_size, block_size = 32, 64      # B sequences of T = block_size tokens
+d_model, n_heads, n_layers = 64, 4, 4
+lr, max_steps, eval_every = 3e-3, 2000, 200
+torch.manual_seed(0)
+device = "cpu"
+`},
+{t:"Dataset",why:"A language model learns from plain text, and nothing else. Any file works: a book, your company's FAQs, support chats. More text means less memorising and more generalising. Around 1 MB is enough to see real learning on a CPU.",code:`
+# ---- 2. dataset -----------------------------------------------------------
+text = open("input.txt", encoding="utf-8").read()   # any plain-text file (100 KB+ works well)
+`},
+{t:"Tokenizer + vocabulary",why:"We use the simplest tokenizer from Stage 2: one token per character. The vocabulary is just the sorted set of characters in the text. stoi maps a character to its ID and itos maps back. encode and decode turn text into a list of integers and back.",code:`
+# ---- 3. tokenizer + vocabulary (character level) ---------------------------
+chars = sorted(set(text))
+vocab_size = len(chars)
+stoi = {ch: i for i, ch in enumerate(chars)}
+itos = {i: ch for ch, i in stoi.items()}
+encode = lambda s: [stoi[c] for c in s]
+decode = lambda ids: "".join(itos[i] for i in ids)
+`},
+{t:"Splits and batches",why:"Hold back 10% of the text to check for overfitting (validation). A batch is B random windows of T tokens. The target y is the same window shifted one token to the right, so every position learns to predict the next token. One batch gives B × T training examples.",code:`
+# ---- 4. train / validation split and batches -------------------------------
+data = torch.tensor(encode(text), dtype=torch.long)
+n = int(0.9 * len(data))
+train_data, val_data = data[:n], data[n:]
+
+def get_batch(split):
+    d = train_data if split == "train" else val_data
+    ix = torch.randint(len(d) - block_size - 1, (batch_size,))
+    x = torch.stack([d[i : i + block_size] for i in ix])          # [B, T] inputs
+    y = torch.stack([d[i + 1 : i + block_size + 1] for i in ix])  # [B, T] targets, shifted by 1
+    return x, y
+`},
+{t:"One attention head",why:"Stage 5, panel 04 as code. Three linear layers make Q, K and V. Scores are q·kᵀ scaled by 1/√head_size. The lower-triangular 'tril' buffer is the causal mask: −∞ above the diagonal. Softmax gives the weights, and weights @ V gives the output.",code:`
+# ---- 5. one attention head --------------------------------------------------
+class Head(nn.Module):
+    def __init__(self, head_size):
+        super().__init__()
+        self.key   = nn.Linear(d_model, head_size, bias=False)
+        self.query = nn.Linear(d_model, head_size, bias=False)
+        self.value = nn.Linear(d_model, head_size, bias=False)
+        self.register_buffer("tril", torch.tril(torch.ones(block_size, block_size)))
+
+    def forward(self, x):                                   # x: [B, T, d]
+        B, T, _ = x.shape
+        k, q, v = self.key(x), self.query(x), self.value(x)             # [B, T, hs]
+        att = q @ k.transpose(-2, -1) * k.shape[-1] ** -0.5             # [B, T, T]
+        att = att.masked_fill(self.tril[:T, :T] == 0, float("-inf"))    # causal mask
+        att = F.softmax(att, dim=-1)
+        return att @ v                                                  # [B, T, hs]
+`},
+{t:"Multi-head attention",why:"Run H heads side by side, each head_size = d / H wide. Concatenating their outputs restores width d, and a final linear layer (W_O) mixes the heads together.",code:`
+# ---- 6. multi-head attention ------------------------------------------------
+class MultiHeadAttention(nn.Module):
+    def __init__(self):
+        super().__init__()
+        hs = d_model // n_heads
+        self.heads = nn.ModuleList([Head(hs) for _ in range(n_heads)])
+        self.proj = nn.Linear(d_model, d_model)             # W_O
+
+    def forward(self, x):
+        return self.proj(torch.cat([h(x) for h in self.heads], dim=-1))   # [B, T, d]
+`},
+{t:"Feed-forward network",why:"Stage 4's network, applied to each token separately: widen to 4d, apply GELU, shrink back to d. This is where most parameters live.",code:`
+# ---- 7. feed-forward network ------------------------------------------------
+class FeedForward(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.net = nn.Sequential(nn.Linear(d_model, 4 * d_model), nn.GELU(),
+                                 nn.Linear(4 * d_model, d_model))
+    def forward(self, x):
+        return self.net(x)
+`},
+{t:"Transformer block",why:"LayerNorm before each sub-layer, and a residual add after it: x = x + attn(LN(x)), then x = x + ffn(LN(x)). The shape stays [B, T, d], so blocks can be stacked as deep as you like.",code:`
+# ---- 8. transformer block: LayerNorm + residuals ----------------------------
+class Block(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.ln1, self.attn = nn.LayerNorm(d_model), MultiHeadAttention()
+        self.ln2, self.ffn = nn.LayerNorm(d_model), FeedForward()
+    def forward(self, x):
+        x = x + self.attn(self.ln1(x))     # residual 1
+        x = x + self.ffn(self.ln2(x))      # residual 2
+        return x
+`},
+{t:"Full model + LM head",why:"Token embedding + position embedding, then N blocks, a final LayerNorm, and the language-modelling head: a linear layer that scores all V tokens. Cross-entropy compares those scores with the true next tokens. generate() is the autoregressive loop: predict, sample, append, repeat, cropping to the last block_size tokens.",code:`
+# ---- 9. the full model + language-modelling head -----------------------------
+class TinyGPT(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.tok_emb = nn.Embedding(vocab_size, d_model)
+        self.pos_emb = nn.Embedding(block_size, d_model)
+        self.blocks = nn.Sequential(*[Block() for _ in range(n_layers)])
+        self.ln_f = nn.LayerNorm(d_model)
+        self.lm_head = nn.Linear(d_model, vocab_size)
+
+    def forward(self, idx, targets=None):               # idx: [B, T]
+        B, T = idx.shape
+        x = self.tok_emb(idx) + self.pos_emb(torch.arange(T, device=idx.device))  # [B, T, d]
+        x = self.ln_f(self.blocks(x))                                             # [B, T, d]
+        logits = self.lm_head(x)                                                  # [B, T, V]
+        loss = None
+        if targets is not None:
+            loss = F.cross_entropy(logits.view(B * T, -1), targets.view(B * T))
+        return logits, loss
+
+    @torch.no_grad()
+    def generate(self, idx, max_new_tokens, temperature=1.0):
+        for _ in range(max_new_tokens):
+            logits, _ = self(idx[:, -block_size:])               # crop to the context window
+            probs = F.softmax(logits[:, -1, :] / temperature, dim=-1)
+            idx = torch.cat([idx, torch.multinomial(probs, 1)], dim=1)
+        return idx
+`},
+{t:"Train on the CPU",why:"The Stage 1 loop at full scale: get a batch, forward, loss, backward, AdamW step. Every few hundred steps, measure train and validation loss without gradients. If validation stops falling while training keeps falling, you're overfitting (Stage 8). Finally, generate some text and save the weights.",code:`
+# ---- 10. train on the CPU ------------------------------------------------------
+model = TinyGPT().to(device)
+print(f"{sum(p.numel() for p in model.parameters()):,} parameters")
+opt = torch.optim.AdamW(model.parameters(), lr=lr)
+
+@torch.no_grad()
+def estimate_loss():
+    model.eval()
+    out = {s: torch.stack([model(*get_batch(s))[1] for _ in range(20)]).mean().item()
+           for s in ("train", "val")}
+    model.train()
+    return out
+
+for step in range(max_steps + 1):
+    if step % eval_every == 0:
+        l = estimate_loss()
+        print(f"step {step:5d}  train {l['train']:.3f}  val {l['val']:.3f}")
+    x, y = get_batch("train")
+    _, loss = model(x, y)
+    opt.zero_grad(set_to_none=True)
+    loss.backward()
+    opt.step()
+
+start = torch.zeros((1, 1), dtype=torch.long)
+print(decode(model.generate(start, 300)[0].tolist()))
+torch.save(model.state_dict(), "tiny_gpt.pt")
+`}];
+const TG_FULL=TG_CHUNKS.map(c=>c.code).join("");
+const T6_DS=[32,64,128,192,256],T6_HS=[1,2,4,8],T6_CS=[32,64,128,256,512];
+function t6cfg(){return {V:+$("#t6V").value,d:T6_DS[+$("#t6D").value],N:+$("#t6N").value,H:T6_HS[+$("#t6H").value],C:T6_CS[+$("#t6C").value],B:+$("#trB").value,T:Math.min(+$("#trT").value,T6_CS[+$("#t6C").value])};}
+const t6P=c=>{const {V,d,N,C}=c;return {tok:V*d,pos:C*d,attn:N*(4*d*d+d),ffn:N*(8*d*d+5*d),ln:N*4*d+2*d,head:d*V+V};};
+const t6Tot=c=>Object.values(t6P(c)).reduce((a,b)=>a+b,0);
+const T6C=[
+ {id:"data",lab:"text dataset",lv:0,ch:1,kw:"text =",role:"The raw training material: one long string.",math:"none, just characters",in:c=>"input.txt",out:c=>"str (N characters)",p:c=>0},
+ {id:"tok",lab:"tokenizer: encode / decode",lv:0,ch:2,kw:"code",role:"Turns text into IDs and back (Stage 2). Here, one token per character.",math:"ids = [stoi[c] for c in text]",in:c=>"str",out:c=>"list[int]",p:c=>0},
+ {id:"vocab",lab:"vocabulary: stoi / itos",lv:0,ch:2,kw:"stoi",role:"The lookup tables between characters and IDs. V = number of distinct characters.",math:"V = |set(text)|",in:c=>"characters",out:c=>`${c.V} entries`,p:c=>0},
+ {id:"batch",lab:"get_batch()",lv:0,ch:3,kw:"= torch.stack",role:"Samples B random windows. The targets are the inputs shifted by one token, so every position is a next-token example.",math:"y[t] = x[t+1]",in:c=>"token tensor",out:c=>`x, y: [${c.B}, ${c.T}]`,p:c=>0},
+ {id:"tok_emb",lab:"tok_emb = nn.Embedding(V, d)",lv:1,ch:8,kw:"tok_emb",role:"Looks up a learned d-dim vector for each token ID (Stage 3).",math:"x = E[idx]",in:c=>`idx [${c.B}, ${c.T}]`,out:c=>`[${c.B}, ${c.T}, ${c.d}]`,p:c=>c.V*c.d},
+ {id:"pos_emb",lab:"pos_emb = nn.Embedding(C, d)",lv:1,ch:8,kw:"pos_emb",role:"A learned vector for each position 0…C−1, added to the token vectors.",math:"x = E[idx] + P[0:T]",in:c=>`positions [${c.T}]`,out:c=>`[${c.T}, ${c.d}] (broadcast over B)`,p:c=>c.C*c.d},
+ {id:"blocks",lab:"blocks: N × Block",lv:1,ch:7,kw:"class Block",role:"The stack where tokens exchange information (attention) and get processed (FFN).",math:"x ← x + attn(LN(x)); x ← x + ffn(LN(x))",in:c=>`[${c.B}, ${c.T}, ${c.d}]`,out:c=>`[${c.B}, ${c.T}, ${c.d}]`,p:c=>c.N*(12*c.d*c.d+10*c.d)},
+ {id:"ln",lab:"ln1, ln2 = nn.LayerNorm(d)",lv:2,ch:7,kw:"LayerNorm",role:"Normalises each token vector before each sub-layer (Stage 5, panel 06).",math:"γ(x − μ)/σ + β",in:c=>`[${c.B}, ${c.T}, ${c.d}]`,out:c=>`[${c.B}, ${c.T}, ${c.d}]`,p:c=>4*c.d},
+ {id:"mha",lab:"attn = MultiHeadAttention",lv:2,ch:5,kw:"self.heads",role:"H heads in parallel, concatenated, then mixed by W_O.",math:"concat(head₁…head_H) · W_O",in:c=>`[${c.B}, ${c.T}, ${c.d}]`,out:c=>`[${c.B}, ${c.T}, ${c.d}]`,p:c=>4*c.d*c.d+c.d},
+ {id:"head",lab:"Head × H (q, k, v, causal mask)",lv:3,ch:4,kw:"tril",role:"One attention head: scores, mask, softmax, weighted sum of values.",math:"softmax(QKᵀ/√hs + M)V",in:c=>`[${c.B}, ${c.T}, ${c.d}]`,out:c=>`[${c.B}, ${c.T}, ${c.d/c.H}]  (scores [${c.B}, ${c.T}, ${c.T}])`,p:c=>3*c.d*(c.d/c.H)},
+ {id:"ffn",lab:"ffn = FeedForward",lv:2,ch:6,kw:"nn.Sequential",role:"Per-token MLP: widen, GELU, shrink (Stage 4, panel 05).",math:"W₂ GELU(W₁x + b₁) + b₂",in:c=>`[${c.B}, ${c.T}, ${c.d}]`,out:c=>`[${c.B}, ${c.T}, ${c.d}]  (via ${4*c.d})`,p:c=>8*c.d*c.d+5*c.d},
+ {id:"ln_f",lab:"ln_f = nn.LayerNorm(d)",lv:1,ch:8,kw:"ln_f",role:"A final normalisation before the output layer.",math:"γ(x − μ)/σ + β",in:c=>`[${c.B}, ${c.T}, ${c.d}]`,out:c=>`[${c.B}, ${c.T}, ${c.d}]`,p:c=>2*c.d},
+ {id:"lm_head",lab:"lm_head = nn.Linear(d, V)",lv:1,ch:8,kw:"lm_head",role:"Scores every vocabulary token at every position: the next-token logits.",math:"logits = x Wᵀ + b",in:c=>`[${c.B}, ${c.T}, ${c.d}]`,out:c=>`[${c.B}, ${c.T}, ${c.V}]`,p:c=>c.d*c.V+c.V},
+ {id:"loss",lab:"cross-entropy loss",lv:1,ch:8,kw:"cross_entropy",role:"Compares the logits with the true next tokens (Stage 1, panel 05).",math:"mean −log p(target)",in:c=>`logits [${c.B*c.T}, ${c.V}], targets [${c.B*c.T}]`,out:c=>"scalar []",p:c=>0},
+ {id:"gen",lab:"generate()",lv:1,ch:8,kw:"multinomial",role:"Text generation: predict, sample, append, repeat.",math:"idx ← [idx, sample(softmax(logits[-1]/τ))]",in:c=>"[1, t]",out:c=>"[1, t + n]",p:c=>0}];
+const t6Seen=new Set(["mha"]);let t6Sel="mha";
+function codeHL(code,kw){return hl(code).split("\n").map((l,i)=>{const raw=code.split("\n")[i]||"";return kw&&raw.includes(kw)?`<span class="hlline">${l}</span>`:l;}).join("\n");}
+function renderT6(){
+  const c=t6cfg();$("#t6Vv").textContent=c.V;$("#t6Dv").textContent=c.d;$("#t6Nv").textContent=c.N;$("#t6Hv").textContent=`${c.H} (head size ${c.d/c.H})`;$("#t6Cv").textContent=c.C;
+  $("#t6Tree").innerHTML=`<div class="mono" style="font-size:.78rem;color:var(--hid);margin-bottom:6px">TinyGPT · ${t6Tot(c).toLocaleString()} parameters</div>`+T6C.map(o=>`<button type="button" class="tnode${o.id===t6Sel?" on":""}" data-t6="${o.id}" style="margin-left:${o.lv*18}px"><span>${o.lv?"└ ":""}${esc(o.lab)}</span><span class="mono dim">${o.p(c)?fmtN(o.p(c)):""}${t6Seen.has(o.id)?' <span class="c-out">●</span>':""}</span></button>`).join("");
+  $$("#t6Tree [data-t6]").forEach(b=>b.addEventListener("click",()=>{t6Sel=b.dataset.t6;t6Seen.add(t6Sel);renderT6();}));
+  const o=T6C.find(x=>x.id===t6Sel);
+  $("#t6Info").innerHTML=`<div class="eyebrow">Selected component</div><h3 style="margin:4px 0 8px">${esc(o.lab)}</h3><p style="margin-bottom:10px">${o.role}</p><dl class="kv"><dt>input</dt><dd class="mono c-emb">${o.in(c)}</dd><dt>output</dt><dd class="mono c-out">${o.out(c)}</dd><dt>parameters</dt><dd class="mono c-hid">${o.p(c).toLocaleString()}${["ln","mha","ffn"].includes(o.id)?` per block × ${c.N} = ${(o.p(c)*c.N).toLocaleString()}`:o.id==="head"?` per head × ${c.H} heads × ${c.N} blocks`:""}</dd><dt>maths</dt><dd class="mono">${esc(o.math)}</dd></dl>`;
+  $("#t6Code").innerHTML=codeHL(TG_CHUNKS[o.ch].code.replace(/^\n/,""),o.kw);
+  const P=t6P(c),tot=t6Tot(c),parts=[["token emb",P.tok,"var(--emb)"],["position emb",P.pos,"#2f8f9a"],["attention",P.attn,"var(--hid)"],["feed-forward",P.ffn,"#7a63d9"],["norms",P.ln,"var(--muted)"],["LM head",P.head,"var(--out)"]];
+  $("#t6Stack").innerHTML=parts.map(([n,v,col])=>`<div style="flex-grow:${v};background:${col}" title="${n}: ${v.toLocaleString()}"></div>`).join("");
+  $("#t6Leg").innerHTML=parts.map(([n,v,col])=>`<span><i class="lg" style="background:${col}"></i>${n} ${(v/tot*100).toFixed(0)}%</span>`).join("");
+  renderTrace();renderRun();
+}
+["#t6V","#t6D","#t6N","#t6H","#t6C"].forEach(s=>$(s).addEventListener("input",renderT6));
+predictBox($("#t6Pred"),{q:"With d = 64 and H = 4 heads, what shape does a single <b>Head</b> output for a batch [B, T, 64]?",opts:["[B, T, 64]","[B, T, 16]","[B, T, T]"],ok:1,
+  why:"head_size = d / H = 64 / 4 = 16. The four [B, T, 16] outputs are concatenated back to [B, T, 64]. [B, T, T] is the score grid inside the head, not its output."});
+
+/* ---- build along ---- */
+let bdStep=0;
+function renderBuild(){
+  $("#bdSegs").innerHTML=TG_CHUNKS.map((_,i)=>`<span class="${i<bdStep?"done":i===bdStep?"open":""}"></span>`).join("");$("#bdCount").textContent=`step ${bdStep+1} / ${TG_CHUNKS.length}`;
+  const ch=TG_CHUNKS[bdStep];
+  $("#bdExplain").innerHTML=`<div class="eyebrow">Step ${bdStep+1} · the idea</div><h3 style="margin:4px 0 10px">${ch.t}</h3><p style="font-size:.98rem">${ch.why}</p><p class="note" style="margin-top:12px">${bdStep<TG_CHUNKS.length-1?"Press <b>Next step</b> to add the next piece.":"<span class='c-out'>The model is complete.</span> Panel 04 has the full file to copy and run."}</p>`;
+  const before=TG_CHUNKS.slice(0,bdStep).map(c=>c.code).join(""),now=ch.code;
+  $("#bdCode").innerHTML=(before?`<span style="opacity:.45">${hl(before)}</span>`:"")+`<span class="newcode">${hl(now)}</span>`;
+  const pre=$("#bdCode"),nc=pre.querySelector(".newcode");if(nc)pre.scrollTop=Math.max(0,nc.offsetTop-pre.offsetTop-20);
+  $("#bdPrev").disabled=bdStep===0;$("#bdNext").disabled=bdStep===TG_CHUNKS.length-1;
+}
+$("#bdNext").addEventListener("click",()=>{bdStep=Math.min(TG_CHUNKS.length-1,bdStep+1);renderBuild();});
+$("#bdPrev").addEventListener("click",()=>{bdStep=Math.max(0,bdStep-1);renderBuild();});
+let bdMax=0;$("#bdNext").addEventListener("click",()=>{bdMax=Math.max(bdMax,bdStep);});
+
+/* ---- shape trace ---- */
+let trShown=99,trTimer=null;
+function traceRows(c){const {B,T,d,H,V,N}=c,hs=d/H;return [
+ ["idx, targets = get_batch()",`[${B}, ${T}]`,B*T,"tok"],["tok_emb(idx)",`[${B}, ${T}, ${d}]`,B*T*d,"emb"],["pos_emb(arange(T))",`[${T}, ${d}]`,T*d,"emb"],["x = tok + pos  (broadcast)",`[${B}, ${T}, ${d}]`,B*T*d,"emb"],
+ ["── block 1: ln1(x)",`[${B}, ${T}, ${d}]`,B*T*d,"hid"],[`   q, k, v  (each of ${H} heads)`,`[${B}, ${T}, ${hs}]`,B*T*hs,"tok"],["   att = q @ kᵀ · hs^-0.5",`[${B}, ${T}, ${T}]`,B*T*T,"hid"],["   masked_fill + softmax",`[${B}, ${T}, ${T}]`,B*T*T,"err"],["   att @ v",`[${B}, ${T}, ${hs}]`,B*T*hs,"out"],
+ [`   torch.cat(${H} heads)`,`[${B}, ${T}, ${d}]`,B*T*d,"out"],["   proj (W_O) + residual",`[${B}, ${T}, ${d}]`,B*T*d,"out"],["   ln2 → Linear(d, 4d)",`[${B}, ${T}, ${4*d}]`,B*T*4*d,"hid"],["   GELU → Linear(4d, d) + residual",`[${B}, ${T}, ${d}]`,B*T*d,"out"],
+ [`── blocks 2…${N} (same shapes)`,`[${B}, ${T}, ${d}]`,B*T*d,"muted"],["ln_f(x)",`[${B}, ${T}, ${d}]`,B*T*d,"hid"],["logits = lm_head(x)",`[${B}, ${T}, ${V}]`,B*T*V,"out"],["logits.view(B·T, V)",`[${B*T}, ${V}]`,B*T*V,"out"],["loss = cross_entropy(…)","[] (scalar)",1,"err"]];}
+function renderTrace(){
+  const c=t6cfg();$("#trBv").textContent=c.B;$("#trTv").textContent=c.T;const rows=traceRows(c),mx=Math.max(...rows.map(r=>r[2]));
+  $("#trTbl").innerHTML=`<table class="tbl" style="width:100%"><tr><th>line of code</th><th>shape</th><th>numbers</th><th style="width:30%"></th></tr>${rows.map((r,i)=>`<tr style="opacity:${i<trShown?1:.12};transition:opacity .3s"><td class="mono" style="white-space:pre">${esc(r[0])}</td><td class="mono" style="color:var(--${r[3]})">${r[1]}</td><td class="mono">${r[2].toLocaleString()}</td><td><span style="display:block;height:10px;border-radius:3px;background:var(--${r[3]});width:${Math.max(1,r[2]/mx*100).toFixed(1)}%"></span></td></tr>`).join("")}</table>`;
+  const big=rows.reduce((a,r)=>r[2]>a[2]?r:a);
+  $("#trNote").innerHTML=`One step processes <b>${(c.B*c.T).toLocaleString()}</b> tokens = ${(c.B*c.T).toLocaleString()} next-token predictions at once. Largest tensor: <b>${esc(big[0].trim())}</b> with ${big[2].toLocaleString()} numbers. Attention grids grow with T², logits with V.`;
+}
+$("#trPlay6").addEventListener("click",()=>{clearInterval(trTimer);trShown=0;renderTrace();trTimer=setInterval(()=>{trShown++;renderTrace();if(trShown>18)clearInterval(trTimer);},450);});
+$("#trAll").addEventListener("click",()=>{clearInterval(trTimer);trShown=99;renderTrace();});
+["#trB","#trT"].forEach(s=>$(s).addEventListener("input",renderTrace));
+predictBox($("#trPred"),{q:"With B = 32, T = 64, V = 65, how many numbers are in the logits tensor?",opts:["2,080","133,120","4,096"],ok:1,
+  why:"32 × 64 × 65 = 133,120: one score for every vocabulary token at every position of every sequence. With a 50K-token vocabulary, this becomes the biggest tensor in the model, which is why real SLMs use small vocabularies or chunked losses."});
+
+/* ---- run estimator ---- */
+function renderRun(){
+  const c=t6cfg(),P=t6Tot(c),steps=+$("#rnS").value*500,gf=+$("#rnF").value;$("#rnSv").textContent=steps.toLocaleString();$("#rnFv").textContent=gf;
+  const tok=c.B*c.T,fl=6*P*tok+12*c.N*c.B*c.T*c.T*c.d,sec=fl/(gf*1e9),tot=sec*steps;
+  $("#rnStats").innerHTML=`<div class="stat"><span class="v c-hid">${fmtN(P)}</span><span class="k">parameters</span></div><div class="stat"><span class="v">${tok.toLocaleString()}</span><span class="k">tokens per step</span></div><div class="stat"><span class="v c-tok">${sec<1?(sec*1000).toFixed(0)+" ms":sec.toFixed(1)+" s"}</span><span class="k">per step (est.)</span></div><div class="stat"><span class="v c-out">${fmtT(tot)}</span><span class="k">for ${steps.toLocaleString()} steps</span></div>`;
+  const L0=Math.log(c.V);const sample=[0,.1,.2,.4,.7,1].map(f=>Math.round(f*steps/200)*200);
+  $("#rnOut").textContent=`${P.toLocaleString()} parameters\n`+[...new Set(sample)].map((s,i)=>{const tr=1.25+(L0-1.25)*Math.exp(-s/ (steps*0.18+1)),va=tr+0.05+0.12*(s/steps);return `step ${String(s).padStart(5)}  train ${tr.toFixed(3)}  val ${va.toFixed(3)}`;}).join("\n")+`\n\nThe customer asked about the loan fee and the agent sain the acount was reviewed...`;
+}
+["#rnS","#rnF"].forEach(s=>$(s).addEventListener("input",renderRun));
+codeBox($("#code6"),{"tiny_gpt.py":TG_FULL,"setup.sh":`# CPU-only setup (about 200 MB, no GPU needed)
+python -m venv slm && source slm/bin/activate      # Windows: slm\\Scripts\\activate
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+# any plain-text file works as training data; ~1 MB is a good start
+curl -o input.txt https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt
+python tiny_gpt.py`});
+
+/* ---- exercise ---- */
+let ex6Checked=false;
+const EX6=[
+ {t:"<b>Explorer (panel 01):</b> configure a model with <b>150K–300K parameters</b> and <b>at least 4 layers</b>",f:()=>{const c=t6cfg(),p=t6Tot(c);return p>=150000&&p<=300000&&c.N>=4;}},
+ {t:"<b>Explorer (panel 01):</b> open <b>every</b> component in the tree (15)",f:()=>t6Seen.size>=15},
+ {t:"<b>Build (panel 02):</b> go through all 10 build steps",f:()=>bdMax>=9},
+ {t:"<b>Shape trace (panel 03):</b> set B and T so one step processes <b>exactly 2,048 tokens</b>",f:()=>{const c=t6cfg();return c.B*c.T===2048;}}
+];
+function runEx6(){let ok=0;$("#ex6Checks").innerHTML=EX6.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex6Checked?(r?"ok":"no"):""}"><span class="dot">${ex6Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex6Checked)$("#ex6Msg").innerHTML=ok===EX6.length?'<span class="c-out">All 4 missions complete.</span> Now run tiny_gpt.py on your own machine. That\'s your first SLM.':`${ok}/4 missions complete. Hint: 32 × 64 = 2,048.`;}
+$("#ex6Btn").addEventListener("click",()=>{ex6Checked=true;runEx6();});
+
+/* ---- quiz ---- */
+function makeQuiz6(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)];
+  const B=pick([8,16,32]),T=pick([32,64,128]),V=pick([65,80,96]),n=B*T*V,d=pick([64,128]),H=pick([2,4,8]);
+  return [
+   {type:"Numerical",kind:"num",q:`TinyGPT with batch B = ${B}, sequence length T = ${T} and vocabulary V = ${V}. How many numbers does the <b>logits</b> tensor hold?`,
+    check:v=>{if(v===n)return [true,`[B, T, V] = ${B} × ${T} × ${V} = ${n.toLocaleString()}: a score for every token at every position.`];if(v===B*T)return [false,`That's B × T positions. Each position scores all ${V} tokens: ${n.toLocaleString()}.`];return [false,`logits are [B, T, V] = ${B} × ${T} × ${V} = ${n.toLocaleString()}.`];}},
+   {type:"Conceptual",kind:"mcq",q:"In get_batch(), why is <span class='mono'>y = data[i+1 : i+T+1]</span>, the inputs shifted by one?",opts:shuffle([
+     {t:"So every position t is trained to predict the token at t + 1. One window gives T next-token examples at once.",ok:true,why:"Correct. With the causal mask, position t only sees tokens ≤ t, and its target is token t + 1. That's all of language modelling."},
+     {t:"To leave room for a padding token",why:"Misconception: <b>the shift is padding</b>. Nothing is padded. Windows are cut from continuous text, and the shift creates the targets."},
+     {t:"Because Python slices exclude the last element",why:"Misconception: <b>it's an indexing detail</b>. The +1 is the learning objective itself: the target is the <i>next</i> token."},
+     {t:"To make the validation set different from training",why:"Misconception: <b>the shift creates validation data</b>. Validation comes from the separate 10% split. The shift makes targets for both."}],r)},
+   {type:"Numerical",kind:"num",q:`d_model = ${d} with H = ${H} heads. What is the <b>head size</b> (the last dimension of each Head's output)?`,
+    check:v=>{if(v===d/H)return [true,`head_size = d / H = ${d} / ${H} = ${d/H}. Concatenating the ${H} heads restores ${d}.`];if(v===d)return [false,`${d} is the width after concatenating all heads. Each head gets d / H = ${d/H}.`];return [false,`head_size = d_model / n_heads = ${d} / ${H} = ${d/H}.`];}},
+   {type:"Conceptual",kind:"mcq",q:"Why does generate() call <span class='mono'>self(idx[:, -block_size:])</span> instead of passing the whole idx?",opts:shuffle([
+     {t:"Because pos_emb only has block_size rows. Longer inputs would index past the table, so we keep the last block_size tokens (the context window).",ok:true,why:"Correct. That's Stage 5, panel 07 in code: the model can never see more than its context window, so older tokens are dropped."},
+     {t:"To make generation faster by skipping tokens",why:"Misconception: <b>cropping is an optimisation</b>. It does save compute, but without it the code would crash once the text grew past block_size."},
+     {t:"Because the causal mask needs a square input",why:"Misconception: <b>the mask needs it</b>. The mask is cut to [:T, :T] for any T ≤ block_size. The hard limit is the position-embedding table."},
+     {t:"To remove the start token",why:"Misconception: <b>it trims the start token</b>. It keeps the last block_size tokens, whatever they are."}],r)},
+   {type:"Practical",kind:"mcq",q:"After 5,000 steps your TinyGPT shows <b>train loss 0.9</b> but <b>val loss 2.4 and rising</b>. What is happening, and what should you do?",opts:shuffle([
+     {t:"Overfitting: it's memorising the training text. Use more (or more varied) data, a smaller model, dropout, or stop at the step where val loss was lowest.",ok:true,why:"Correct. The widening gap between train and val loss is the signature of memorisation (Stage 8 simulates it). Early stopping is the quickest fix: keep the checkpoint with the best val loss."},
+     {t:"Underfitting: train longer and make the model bigger",why:"Misconception: <b>a high val loss always means underfitting</b>. Underfitting means <i>both</i> losses stay high. Here train is low, and a bigger model would memorise even more."},
+     {t:"The learning rate is too low: raise it",why:"Misconception: <b>lr fixes overfitting</b>. Train loss is falling well, so the optimiser works. The problem is generalisation."},
+     {t:"The validation set is broken and should be ignored",why:"Misconception: <b>trust only train loss</b>. Validation loss is exactly what warns you that the model won't work on new text."}],r)}
+  ];
+}
+mountQuiz(6,$("#quiz6"),makeQuiz6);
+renderBuild();renderT6();runEx6();
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -4557,6 +4918,47 @@ Object.assign(NARR,{
  {sel:"#cxSvg",act:()=>{$("#cxR").value=4;renderCtx();},en:"Because every token attends to every other, the score grid grows with the square of the context. Double the window and that grid is four times bigger.",
   te:"ప్రతి టోకెన్ మిగతా ప్రతి టోకెన్‌ను చూస్తుంది కాబట్టి, స్కోర్ గ్రిడ్ కాంటెక్స్ట్ వర్గంతో పెరుగుతుంది. విండోను రెట్టింపు చేస్తే ఆ గ్రిడ్ నాలుగు రెట్లు పెద్దదవుతుంది.",
   hn:"क्योंकि हर टोकन बाकी हर टोकन को देखता है, स्कोर ग्रिड संदर्भ के वर्ग के साथ बढ़ता है। खिड़की दोगुनी करें, तो वह ग्रिड चार गुना बड़ा हो जाता है।"}]
+});
+
+/* ---- narration for stage 6 ---- */
+NARR_INTRO[6]={en:"Welcome to Stage six. Now we write the real thing: a complete tiny transformer in about one hundred and thirty lines of PyTorch, small enough to train on a laptop.",
+ te:"స్టేజ్ ఆరుకు స్వాగతం. ఇప్పుడు నిజమైనది రాద్దాం: సుమారు నూట ముప్పై లైన్ల పైటార్చ్‌లో పూర్తి చిన్న ట్రాన్స్‌ఫార్మర్, ల్యాప్‌టాప్‌లో ట్రైన్ చేసేంత చిన్నది.",
+ hn:"स्टेज सिक्स में आपका स्वागत है। अब हम असली चीज़ लिखेंगे: लगभग एक सौ तीस लाइन के पाइटॉर्च में एक पूरा छोटा ट्रांसफ़ॉर्मर, जो लैपटॉप पर ट्रेन हो सके।"};
+Object.assign(NARR,{
+"p6-exp":[
+ {sel:"#t6Tree",en:"This tree is the whole model. Click any component to see its code, its input and output shapes, and its parameters.",
+  te:"ఈ ట్రీ మొత్తం మోడల్. ఏ భాగాన్నైనా నొక్కి దాని కోడ్, ఇన్‌పుట్, అవుట్‌పుట్ షేప్‌లు, పారామీటర్లు చూడండి.",
+  hn:"यह ट्री पूरा मॉडल है। किसी भी हिस्से पर क्लिक करके उसका कोड, इनपुट और आउटपुट शेप, और पैरामीटर देखिए।"},
+ {sel:"#t6Code",act:'#t6Tree [data-t6="head"]',en:"Here is one attention head in code: three linear layers for query, key and value, the scores, the causal mask, and softmax.",
+  te:"ఇది కోడ్‌లో ఒక అటెన్షన్ హెడ్: క్వెరీ, కీ, వాల్యూ కోసం మూడు లీనియర్ లేయర్లు, స్కోర్లు, కాజల్ మాస్క్, సాఫ్ట్‌మాక్స్.",
+  hn:"यह कोड में एक अटेंशन हेड है: क्वेरी, की और वैल्यू के लिए तीन लीनियर लेयर, स्कोर, कॉज़ल मास्क, और सॉफ़्टमैक्स।"},
+ {sel:"#t6Stack",en:"The coloured bar shows where the parameters live. Most sit in the feed-forward networks and attention.",
+  te:"రంగుల బార్ పారామీటర్లు ఎక్కడ ఉన్నాయో చూపిస్తుంది. చాలావరకు ఫీడ్-ఫార్వర్డ్ నెట్‌వర్క్‌లు, అటెన్షన్‌లో ఉంటాయి.",
+  hn:"रंगीन पट्टी दिखाती है कि पैरामीटर कहाँ हैं। ज़्यादातर फ़ीड-फ़ॉरवर्ड नेटवर्क और अटेंशन में होते हैं।"}],
+"p6-build":[
+ {sel:"#bdExplain",act:()=>{bdStep=0;renderBuild();},en:"We build the model in ten steps. Each step first explains the idea, then adds the code, with new lines highlighted in green.",
+  te:"మోడల్‌ను పది దశల్లో నిర్మిస్తాం. ప్రతి దశ ముందు ఆలోచనను వివరించి, తర్వాత కోడ్ జోడిస్తుంది, కొత్త లైన్లు ఆకుపచ్చలో హైలైట్ అవుతాయి.",
+  hn:"हम मॉडल को दस कदमों में बनाते हैं। हर कदम पहले विचार समझाता है, फिर कोड जोड़ता है, और नई लाइनें हरे रंग में दिखती हैं।"},
+ {sel:"#bdCode",act:()=>{bdStep=3;bdMax=Math.max(bdMax,3);renderBuild();},en:"Step four makes training batches. The target is the input shifted by one token, so every position learns to predict the next one.",
+  te:"నాలుగో దశ ట్రైనింగ్ బ్యాచ్‌లను తయారు చేస్తుంది. లక్ష్యం అంటే ఇన్‌పుట్‌ను ఒక టోకెన్ జరిపినది, కాబట్టి ప్రతి స్థానం తర్వాతి టోకెన్‌ను ఊహించడం నేర్చుకుంటుంది.",
+  hn:"चौथा कदम ट्रेनिंग बैच बनाता है। लक्ष्य, इनपुट को एक टोकन खिसकाकर बनता है, इसलिए हर स्थिति अगला टोकन अनुमान लगाना सीखती है।"},
+ {sel:"#bdCode",act:()=>{bdStep=8;bdMax=Math.max(bdMax,8);renderBuild();},en:"Step nine puts everything together: embeddings, blocks, a final normalisation, and the head that scores every token.",
+  te:"తొమ్మిదో దశ అన్నింటినీ కలుపుతుంది: ఎంబెడింగ్స్, బ్లాక్‌లు, చివరి నార్మలైజేషన్, ప్రతి టోకెన్‌కు స్కోర్ ఇచ్చే హెడ్.",
+  hn:"नौवाँ कदम सब कुछ जोड़ता है: एम्बेडिंग, ब्लॉक, आखिरी नॉर्मलाइज़ेशन, और वह हेड जो हर टोकन को स्कोर देता है।"}],
+"p6-trace":[
+ {sel:"#trTbl",act:"#trPlay6",en:"Follow one batch through the model. Every row is a real line of code with the exact shape it produces.",
+  te:"ఒక బ్యాచ్‌ను మోడల్ గుండా అనుసరించండి. ప్రతి వరుస ఒక నిజమైన కోడ్ లైన్, అది ఉత్పత్తి చేసే ఖచ్చితమైన షేప్‌తో.",
+  hn:"एक बैच को मॉडल में चलते हुए देखिए। हर पंक्ति कोड की एक असली लाइन है, उसके बनाए सटीक शेप के साथ।"},
+ {sel:"#trNote",en:"Notice the attention grids grow with the square of the sequence length, and the logits grow with the vocabulary.",
+  te:"గమనించండి: అటెన్షన్ గ్రిడ్లు సీక్వెన్స్ పొడవు వర్గంతో, లాజిట్లు పదకోశంతో పెరుగుతాయి.",
+  hn:"ध्यान दीजिए, अटेंशन ग्रिड अनुक्रम की लंबाई के वर्ग के साथ बढ़ते हैं, और लॉजिट शब्दकोश के साथ।"}],
+"p6-run":[
+ {sel:"#code6",en:"This is the complete file. Save some text as input dot t x t, install the CPU version of PyTorch, and run it.",
+  te:"ఇది పూర్తి ఫైల్. కొంత టెక్స్ట్‌ను ఇన్‌పుట్ డాట్ టీఎక్స్‌టీగా సేవ్ చేసి, పైటార్చ్ సీపీయూ వెర్షన్ ఇన్‌స్టాల్ చేసి, రన్ చేయండి.",
+  hn:"यह पूरी फ़ाइल है। कुछ टेक्स्ट को इनपुट डॉट टीएक्सटी के नाम से सेव करें, पाइटॉर्च का सीपीयू वर्ज़न इंस्टॉल करें, और चलाएँ।"},
+ {sel:"#rnStats",en:"The estimator shows roughly how long training takes. A few hundred thousand parameters train in minutes on a normal laptop.",
+  te:"ట్రైనింగ్‌కు సుమారు ఎంత సమయం పడుతుందో అంచనా చూపిస్తుంది. కొన్ని లక్షల పారామీటర్లు సాధారణ ల్యాప్‌టాప్‌లో నిమిషాల్లో ట్రైన్ అవుతాయి.",
+  hn:"अनुमानक बताता है कि ट्रेनिंग में लगभग कितना समय लगेगा। कुछ लाख पैरामीटर एक आम लैपटॉप पर मिनटों में ट्रेन हो जाते हैं।"}]
 });
 
 /* ---- engine ---- */

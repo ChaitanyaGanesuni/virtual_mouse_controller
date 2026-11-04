@@ -3,6 +3,6 @@
 An interactive, single-file lab for learning how a Small Language Model is built, from basic ideas to deployment.
 Open `index.html` in any browser. It needs no build step and no GPU.
 
-- Stages 0 (Understanding Language Models), 1 (Mathematical Foundations), 2 (Tokenization), 3 (Word Embeddings), 4 (Neural Network Fundamentals) and 5 (Transformer Architecture) are fully built. Stage 1 covers tensors, the dot product, animated matrix multiplication, softmax, cross-entropy, derivatives, gradient descent on a loss landscape and step-by-step backpropagation, each with a "predict first" question.
+- Stages 0 (Understanding Language Models), 1 (Mathematical Foundations), 2 (Tokenization), 3 (Word Embeddings), 4 (Neural Network Fundamentals), 5 (Transformer Architecture) and 6 (Building a Tiny Transformer) are fully built. Stage 1 covers tensors, the dot product, animated matrix multiplication, softmax, cross-entropy, derivatives, gradient descent on a loss landscape and step-by-step backpropagation, each with a "predict first" question.
 - Later stages unlock when you score 4/5 or better on the previous assessment. Progress is saved in your browser.
 - Every panel has a **Listen** button and every stage a **Narrated tour**. They use the browser's built-in speech engine in English, Telugu or Hindi, with captions, and play each panel's animation in step with the narration. If a language's voice isn't installed, the captions still play.
