@@ -1854,6 +1854,90 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 
+  <!-- ====================== STAGE 9 ====================== -->
+  <section id="stage9" hidden>
+    <div class="stagehead">
+      <div class="eyebrow">Stage 09 · unlocked</div>
+      <h2>Evaluating the model: what does “good” mean?</h2>
+      <p>A model that looks great on its training data can still fail in the real world. This stage measures models honestly: loss and perplexity on unseen text, why accuracy alone misleads, how to compare two training runs, and how to spot hallucinations.</p>
+    </div>
+    <nav class="subnav" aria-label="Stage 9 sections">
+      <button type="button" data-go="p9-ppl">1 · Perplexity lab</button>
+      <button type="button" data-go="p9-acc">2 · Beyond accuracy</button>
+      <button type="button" data-go="p9-dash">3 · Compare two models</button>
+      <button type="button" data-go="p9-hall">4 · Hallucinations & limits</button>
+      <button type="button" data-go="p9-code">5 · Code</button>
+      <button type="button" data-go="p9-ex">6 · Exercise</button>
+      <button type="button" data-go="p9-quiz">7 · Assessment</button>
+    </nav>
+
+    <div class="panel" id="p9-ppl">
+      <div class="phead"><span class="tag">01</span><h3>Perplexity lab: how surprised is the model, word by word?</h3><span class="sim real">real models, real probabilities</span>
+        <p class="plain">Two real models (Stage 0's word predictor, trained on <em>100%</em> and on <em>30%</em> of the corpus) read the same sentence. For every word we ask: <em>what probability did you give to the word that actually came next?</em> The average surprise is the loss, and e<sup>loss</sup> is the <em>perplexity</em>: roughly how many words the model was torn between.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:1 1 300px">Test sentence (one it never trained on works best)<input class="txt" id="ppIn" type="text" value="the customer asked about the fee ." autocomplete="off"></label><div class="row" id="ppPre" style="align-self:end"></div></div>
+      <div class="box"><div class="scroll" id="ppTbl"></div></div>
+      <div class="grid2" style="margin-top:12px"><div class="box"><div class="stats" id="ppStats"></div></div><div class="predict" id="ppPred"></div></div>
+      <div class="facts">
+        <div><b>Formulas</b><div class="formula" style="white-space:normal">loss = −(1/N) Σ log p(wₜ | w&lt;ₜ) · perplexity = e<sup>loss</sup></div></div>
+        <div><b>Reading perplexity</b><ul><li>1 = always certain and right (perfect)</li><li>V = a random guess over V words</li><li>Lower is better, and only comparable with the same tokenizer</li></ul></div>
+        <div><b>Inside an SLM</b>Validation and <b>test perplexity</b> are the headline numbers in every training log. Unseen words (like “fee” after “the” for the 30% model) are where perplexity explodes.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p9-acc">
+      <div class="phead"><span class="tag">02</span><h3>Why accuracy isn't enough for language models</h3><span class="sim real">exact calculation</span>
+        <p class="plain">After “the bank approved the …” many words are correct: <em>loan, application, account…</em>. Ten test cases below have a true next word. The model always guesses “loan” first, so its <em>top-1 accuracy stays at 60%</em> however you move the slider. Yet the loss changes a lot. Loss rewards <em>honest confidence</em>, which accuracy can't see.</p></div>
+      <div class="grid2">
+        <div class="box"><label class="field">probability the model puts on its top guess “loan”: <b id="acPV"></b><input id="acP" type="range" min="25" max="99" value="90"></label><div class="bars" id="acBars" style="margin-top:12px"></div><div class="tkrow" id="acCases" style="margin-top:12px"></div></div>
+        <div style="display:grid;gap:12px;align-content:start"><div class="box"><svg class="plot" id="acSvg" viewBox="0 0 420 200" role="img" aria-label="Loss versus confidence"></svg></div><div class="box"><div class="stats" id="acStats"></div></div><div class="predict" id="acPred"></div></div>
+      </div>
+      <div class="facts">
+        <div><b>Key idea</b><div class="formula" style="white-space:normal">accuracy = share of top-1 hits · loss = mean −log p(true word)</div></div>
+        <div><b>Why loss wins</b><ul><li>Many continuations are valid; accuracy marks all but one as wrong</li><li>Accuracy ignores <i>how</i> confident the model was</li><li>Over-confidence on misses is punished hard</li></ul></div>
+        <div><b>Inside an SLM</b>Language models are evaluated with <b>loss/perplexity</b> for raw modelling, and with <b>task benchmarks</b> (QA accuracy, exact match, human ratings) for useful behaviour. A well-<b>calibrated</b> model's confidence matches how often it's right.</div>
+      </div>
+    </div>
+
+    <div class="panel" id="p9-dash">
+      <div class="phead"><span class="tag">03</span><h3>Evaluation dashboard: compare two training runs</h3><span class="sim illus">simulated runs · illustrative samples</span>
+        <p class="plain">Pick two model configurations and compare them the way engineers do: <em>train, validation and test loss</em>, the <em>generalisation gap</em>, a task benchmark and sample outputs. The model with the lowest <em>training</em> loss isn't always the best one.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:1 1 240px"><span class="c-tok">Model A</span><select id="dbA" class="txt"></select></label><label class="field" style="flex:1 1 240px"><span class="c-emb">Model B</span><select id="dbB" class="txt"></select></label></div>
+      <div class="grid2">
+        <div class="box"><svg class="plot" id="dbSvg" viewBox="0 0 440 230" role="img" aria-label="Validation curves of two models"></svg></div>
+        <div class="box"><div class="scroll" id="dbTbl"></div></div>
+      </div>
+      <div class="box" style="margin-top:12px"><div class="eyebrow" style="margin-bottom:6px">Sample predictions (illustrative, matched to each model's loss)</div><div class="scroll" id="dbSamples"></div></div>
+      <div class="grid2" style="margin-top:12px"><div class="box note" style="border-left:0" id="dbVerdict"></div><div class="predict" id="dbPred"></div></div>
+    </div>
+
+    <div class="panel" id="p9-hall">
+      <div class="phead"><span class="tag">04</span><h3>Hallucinations & limitations</h3><span class="sim real">real generation, real source check</span>
+        <p class="plain">A language model produces <em>likely</em> words, not <em>verified facts</em>. Generate sentences and check each one against the training text. Some are recited, but many are <em>new combinations</em>: fluent, confident, and never checked against reality. That's how hallucinations happen.</p></div>
+      <div class="row" style="margin-bottom:10px"><label class="field" style="flex:1 1 260px">Prompt<input class="txt" id="hlIn" type="text" value="the bank" autocomplete="off"></label><div class="row" style="align-self:end"><button class="btn primary" id="hlGen" type="button">Generate 6 answers</button></div></div>
+      <div class="grid2">
+        <div class="box"><div id="hlOut" style="display:grid;gap:6px"></div></div>
+        <div style="display:grid;gap:12px;align-content:start"><div class="box"><div class="stats" id="hlStats"></div></div>
+          <div class="box"><div class="eyebrow" style="margin-bottom:6px">Known limitations of any SLM</div><ul style="margin:0;padding-left:18px;display:grid;gap:4px;font-size:.9rem"><li><b>No live knowledge:</b> it only knows its training text (a knowledge cutoff)</li><li><b>No sources:</b> it can't tell which sentence a “fact” came from</li><li><b>Context window:</b> it forgets anything outside its last C tokens</li><li><b>Bias:</b> it mirrors whatever its data over- or under-represents</li><li><b>Confident tone:</b> fluency is not evidence of truth</li></ul></div>
+          <div class="predict" id="hlPred"></div></div>
+      </div>
+    </div>
+
+    <div class="panel" id="p9-code">
+      <div class="phead"><span class="tag">05</span><h3>Code it on your CPU</h3><p>Evaluate any model on a held-out test set: loss, perplexity, top-1 and top-5 accuracy, and a calibration check (average confidence vs actual accuracy). It runs standalone, and works on TinyGPT unchanged.</p></div>
+      <div class="code" id="code9"><div class="tabs"></div><pre></pre></div>
+    </div>
+
+    <div class="panel" id="p9-ex">
+      <div class="phead"><span class="tag">06</span><h3>Hands-on exercise: four missions</h3><p>The checks read the panels' live state.</p></div>
+      <div class="box"><div class="checks" id="ex9Checks"></div><div class="row" style="margin-top:14px"><button class="btn primary" id="ex9Btn" type="button">Check missions</button></div><p class="note" id="ex9Msg" style="margin-top:10px" aria-live="polite">Not checked yet.</p></div>
+    </div>
+
+    <div class="panel" id="p9-quiz">
+      <div class="phead"><span class="tag">07</span><h3>Stage 9 assessment</h3><p>5 questions. Score 4/5 or better to unlock Stage 10, fine-tuning.</p></div>
+      <div id="quiz9"></div>
+    </div>
+  </section>
+
   <!-- ====================== OTHER STAGES ====================== -->
   <section id="stageOther" class="locked-view" hidden>
     <div class="stagehead"><div class="eyebrow" id="loEye"></div><h2 id="loTitle"></h2><p id="loSub"></p></div>
@@ -1918,7 +2002,7 @@ try{const s=localStorage.getItem("slmlab.v1");if(s)P=Object.assign(P,JSON.parse(
 const save=()=>{try{localStorage.setItem("slmlab.v1",JSON.stringify(P));}catch(e){}};
 const unlocked=i=>i===0||P.completed.includes(i-1);
 let current=0;
-const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8"};
+const BUILT={0:"#stage0",1:"#stage1",2:"#stage2",3:"#stage3",4:"#stage4",5:"#stage5",6:"#stage6",7:"#stage7",8:"#stage8",9:"#stage9"};
 function renderRail(){
   const rail=$("#rail");rail.innerHTML="";
   STAGES.forEach((s,i)=>{
@@ -5139,6 +5223,176 @@ function makeQuiz8(seed){
 mountQuiz(8,$("#quiz8"),makeQuiz8);
 renderRT();runEx8();
 
+/* =================== STAGE 9 =================== */
+/* ---- 1. perplexity lab ---- */
+const PP_A=train(CORPUS),PP_B=train(CORPUS.slice(0,Math.round(CORPUS.length*.3))),PP_V=FULLVOCAB.length+1;
+function ppProb(m,prev,w){const row=m.bi.get(prev);let tot=0,c=0;if(row){row.forEach(v=>tot+=v);c=row.get(w)||0;}return (c+.1)/(tot+.1*PP_V);}
+const PP_PRE=[...HELD,"the cat sat on the mat .","the bank approved the mortgage ."];
+let ppLast={a:0,b:0};
+$("#ppPre").innerHTML=PP_PRE.map((s,i)=>`<button type="button" class="btn" data-pp="${i}">${esc(s.replace(" .",""))}</button>`).join("");
+$$("#ppPre [data-pp]").forEach(b=>b.addEventListener("click",()=>{$("#ppIn").value=PP_PRE[+b.dataset.pp];renderPP();}));
+function renderPP(){
+  const t=["<s>",...tokenize($("#ppIn").value)];if(t.length<2){$("#ppTbl").innerHTML='<p class="muted">Type a sentence.</p>';return;}
+  let LA=0,LB=0;const rows=[];for(let i=1;i<t.length;i++){const a=ppProb(PP_A,t[i-1],t[i]),b=ppProb(PP_B,t[i-1],t[i]);LA+=-Math.log(a);LB+=-Math.log(b);rows.push({w:t[i],prev:t[i-1],a,b});}
+  const n=rows.length;LA/=n;LB/=n;ppLast={a:Math.exp(LA),b:Math.exp(LB)};
+  const bar=(p,col)=>`<span style="display:inline-block;width:70px;height:10px;background:var(--bg);border-radius:3px;vertical-align:middle;overflow:hidden"><span style="display:block;height:100%;width:${Math.max(2,p*100)}%;background:${col}"></span></span>`;
+  $("#ppTbl").innerHTML=`<table class="tbl" style="width:100%"><tr><th>after</th><th>next word</th><th class="c-out">model A (100% data): p</th><th>surprise −log p</th><th class="c-tok">model B (30% data): p</th><th>surprise −log p</th></tr>${rows.map(r=>`<tr><td class="dim">${esc(r.prev)}</td><td class="c-tok">${esc(r.w)}${FULLVOCAB.includes(r.w)?"":' <span class="c-err">(unseen word)</span>'}</td><td>${bar(r.a,"var(--out)")} ${(r.a*100).toFixed(1)}%</td><td class="${-Math.log(r.a)>3?"c-err":""}">${(-Math.log(r.a)).toFixed(2)}</td><td>${bar(r.b,"var(--tok)")} ${(r.b*100).toFixed(1)}%</td><td class="${-Math.log(r.b)>3?"c-err":""}">${(-Math.log(r.b)).toFixed(2)}</td></tr>`).join("")}</table>`;
+  $("#ppStats").innerHTML=`<div class="stat"><span class="v c-out">${LA.toFixed(2)}</span><span class="k">model A loss</span></div><div class="stat"><span class="v c-out">${Math.exp(LA).toFixed(1)}</span><span class="k">model A perplexity</span></div><div class="stat"><span class="v c-tok">${LB.toFixed(2)}</span><span class="k">model B loss</span></div><div class="stat"><span class="v c-tok">${Math.exp(LB).toFixed(1)}</span><span class="k">model B perplexity</span></div><div class="stat"><span class="v">${PP_V}</span><span class="k">perplexity of a random guess</span></div>`;
+}
+$("#ppIn").addEventListener("input",renderPP);renderPP();
+predictBox($("#ppPred"),{q:"Model A's perplexity is 8 and model B's is 40 on the same test text. Which is better, and roughly what does 8 mean?",opts:["B, because higher is better","A: on average it's about as unsure as choosing between ~8 equally likely words","They're equal, because perplexity can't be compared"],ok:1,
+  why:"Lower perplexity means less surprise. 8 means it behaves as if picking among about 8 equally likely words at each step, versus ~40 for B. That's a valid comparison as long as both use the same tokenizer and test text."});
+
+/* ---- 2. beyond accuracy ---- */
+const AC_TRUE=["loan","loan","application","loan","account","loan","mortgage","loan","application","loan"];
+const acDist=p=>({loan:p,application:(1-p)*.5,account:(1-p)*.25,mortgage:(1-p)*.25});
+const acLoss=p=>{const d=acDist(p);return AC_TRUE.reduce((s,w)=>s-Math.log(d[w]),0)/AC_TRUE.length;};
+function renderAC(){
+  const p=+$("#acP").value/100,d=acDist(p),L=acLoss(p);$("#acPV").textContent=(p*100).toFixed(0)+"%";
+  $("#acBars").innerHTML=Object.entries(d).map(([w,v])=>`<div class="bar"><span class="lbl">${w}</span><span class="trk"><span class="fill" style="display:block;width:${(v*100).toFixed(1)}%"></span></span><span class="val">${(v*100).toFixed(1)}%</span></div>`).join("");
+  $("#acCases").innerHTML='<span class="eyebrow">true next words:</span>'+AC_TRUE.map(w=>`<span class="tk ${w==="loan"?"tk3":"unk"}">${w} ${w==="loan"?"✓":"✗"}</span>`).join("");
+  const W=420,H=200,l=34,r=10,t=10,b=26,X=q=>l+(q-.25)/(.99-.25)*(W-l-r),mx=acLoss(.99)+.1,Y=v=>t+(mx-v)/(mx-.9)*(H-t-b);
+  const pts=[];for(let q=.25;q<=.99;q+=.01)pts.push(`${X(q).toFixed(1)},${Y(acLoss(q)).toFixed(1)}`);
+  let g="";[1,1.5,2,2.5].forEach(v=>{if(v<mx)g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l-4}" y="${Y(v)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text>`;});
+  [.3,.6,.9].forEach(q=>g+=`<text x="${X(q)}" y="${H-8}" text-anchor="middle" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${q*100}%</text>`);
+  g+=`<polyline points="${pts.join(" ")}" style="fill:none;stroke:var(--err)" stroke-width="2.5"/><line x1="${X(.6)}" x2="${X(.6)}" y1="${t}" y2="${H-b}" style="stroke:var(--out)" stroke-dasharray="4 3"/><text x="${X(.6)+4}" y="${t+12}" font-size="9.5" style="fill:var(--out)" font-family="IBM Plex Mono">calibrated: 60% = how often it's right</text><circle cx="${X(p)}" cy="${Y(L)}" r="6" style="fill:var(--err);stroke:var(--bg)" stroke-width="2"/><text x="${l}" y="${H-8}" font-size="9" style="fill:var(--muted)" font-family="IBM Plex Mono">loss</text>`;
+  $("#acSvg").innerHTML=g;
+  $("#acStats").innerHTML=`<div class="stat"><span class="v c-tok">60%</span><span class="k">top-1 accuracy (never changes)</span></div><div class="stat"><span class="v c-err">${L.toFixed(3)}</span><span class="k">loss</span></div><div class="stat"><span class="v">${Math.exp(L).toFixed(2)}</span><span class="k">perplexity</span></div>`;
+  window.__acP=p;
+}
+$("#acP").addEventListener("input",renderAC);renderAC();
+predictBox($("#acPred"),{q:"The model is right 60% of the time. Which confidence on its top guess gives the <b>lowest</b> loss?",opts:["99%: be as confident as possible","60%: match how often it's actually right","25%: stay cautious"],ok:1,
+  why:"Loss is minimised when stated confidence equals the true frequency. That's calibration. At 99% the four misses each cost −log(≈0.005), which is huge. Accuracy would score all three settings identically.",onReveal:()=>{$("#acP").value=60;renderAC();}});
+
+/* ---- 3. dashboard ---- */
+const DB_CFG=[{n:"Tiny · 0.2M params · 10 MB data",N:2e5,MB:10},{n:"Small · 2M params · 1 MB data",N:2e6,MB:1},{n:"Small · 2M params · 30 MB data",N:2e6,MB:30},{n:"Medium · 12M params · 30 MB data",N:1.2e7,MB:30},{n:"Medium · 12M params · 1 MB data",N:1.2e7,MB:1},{n:"Bigger · 50M params · 100 MB data",N:5e7,MB:100}];
+const DB_SAMPLES=[["the customer asked about the",["loan interest rate for a home loan .","loan the account the fee .","the the bank customer of ."]],["my debit card is",["lost , please block it and send a new one .","blocked the card is lost card .","card the is my of the ."]],["the bank approved the",["home loan after checking the documents .","loan application the loan .","approved the the bank ."]]];
+function dbSim(c){const E=10,D=c.MB*2.5e5,spe=D/(64*256),Lbest=1.35+2.4*Math.pow(c.N/1e5,-.3)+1.9*Math.pow(D/1e6,-.28),L0=Math.log(8000),rho=c.N/(D/20),pts=[];
+  for(let i=0;i<=60;i++){const e=i/60*E,steps=e*spe,conv=Lbest+(L0-Lbest)*Math.exp(-steps/900),over=rho>1?Math.min(Lbest-.4,.22*Math.max(0,e-1)*Math.sqrt(rho)):0;pts.push([e,conv-over,conv+(rho>1?.11*Math.max(0,e-1)*Math.sqrt(rho):0)]);}
+  const f=pts[pts.length-1],best=Math.min(...pts.map(p=>p[2]));return {pts,train:f[1],val:f[2],test:f[2]+.03,best,gap:f[2]-f[1]};}
+["#dbA","#dbB"].forEach((s,i)=>{$(s).innerHTML=DB_CFG.map((c,k)=>`<option value="${k}">${c.n}</option>`).join("");$(s).value=i?3:4;$(s).addEventListener("change",renderDB);});
+let dbSawTrap=false;
+function renderDB(){
+  const A=DB_CFG[+$("#dbA").value],B=DB_CFG[+$("#dbB").value],a=dbSim(A),b=dbSim(B);
+  const W=440,H=230,l=34,r=10,t=10,bm=26,top=9.5,X=e=>l+e/10*(W-l-r),Y=v=>t+(top-Math.min(v,top))/top*(H-t-bm),pl=(pts,k)=>pts.map(p=>`${X(p[0]).toFixed(1)},${Y(p[k]).toFixed(1)}`).join(" ");
+  let g="";[0,2,4,6,8].forEach(v=>g+=`<line x1="${l}" x2="${W-r}" y1="${Y(v)}" y2="${Y(v)}" style="stroke:var(--line)"/><text x="${l-4}" y="${Y(v)+3}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">${v}</text>`);
+  g+=`<polyline points="${pl(a.pts,2)}" style="fill:none;stroke:var(--tok)" stroke-width="2.5"/><polyline points="${pl(a.pts,1)}" style="fill:none;stroke:var(--tok)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".7"/><polyline points="${pl(b.pts,2)}" style="fill:none;stroke:var(--emb)" stroke-width="2.5"/><polyline points="${pl(b.pts,1)}" style="fill:none;stroke:var(--emb)" stroke-width="1.5" stroke-dasharray="5 4" opacity=".7"/><text x="${W-r}" y="${H-8}" text-anchor="end" font-size="9" style="fill:var(--dim)" font-family="IBM Plex Mono">epochs · solid = validation, dashed = training</text>`;
+  $("#dbSvg").innerHTML=g;
+  const bench=s=>Math.max(5,Math.min(92,Math.round(100*(1-(s.best-1.35)/3.6))));
+  const row=(k,fa,fb,lower=true)=>{const va=fa(a),vb=fb(b),better=lower?(va<vb?"a":"b"):(va>vb?"a":"b");return `<tr><td>${k}</td><td class="${better==="a"?"c-out":""}">${typeof va==="number"?va.toFixed(2):va}</td><td class="${better==="b"?"c-out":""}">${typeof vb==="number"?vb.toFixed(2):vb}</td></tr>`;};
+  $("#dbTbl").innerHTML=`<table class="tbl" style="width:100%"><tr><th>metric</th><th class="c-tok">model A</th><th class="c-emb">model B</th></tr>${row("training loss",s=>s.train,s=>s.train)}${row("validation loss",s=>s.val,s=>s.val)}${row("test loss",s=>s.test,s=>s.test)}${row("test perplexity",s=>Math.exp(s.test),s=>Math.exp(s.test))}${row("generalisation gap (val − train)",s=>s.gap,s=>s.gap)}${row("banking QA benchmark (%)",s=>bench(s),s=>bench(s),false)}</table><p class="note" style="margin-top:8px">Green = better. Judge on <b>validation/test</b>, never on training loss alone.</p>`;
+  const tier=s=>s.best<2.4?0:s.best<3.2?1:2;
+  $("#dbSamples").innerHTML=`<table class="tbl" style="width:100%"><tr><th>prompt</th><th class="c-tok">model A</th><th class="c-emb">model B</th></tr>${DB_SAMPLES.map(([pr,outs])=>`<tr><td class="dim">${pr} …</td><td>${outs[tier(a)]}</td><td>${outs[tier(b)]}</td></tr>`).join("")}</table>`;
+  const trap=(a.train<b.train&&a.test>b.test)||(b.train<a.train&&b.test>a.test);if(trap)dbSawTrap=true;
+  $("#dbVerdict").innerHTML=trap?`<b class="c-tok">Trap spotted:</b> the model with the <b>lower training loss</b> has the <b>higher test loss</b>. It memorised its data (big gap). Choose by test/validation loss, and you pick the model that actually generalises.`:`Model <b>${a.test<b.test?"A":"B"}</b> wins on test loss (${Math.min(a.test,b.test).toFixed(2)} vs ${Math.max(a.test,b.test).toFixed(2)}). Try a big model on 1 MB of data against a smaller one on 30 MB.`;
+}
+renderDB();
+predictBox($("#dbPred"),{q:"Model A: train loss 1.9, validation 2.6. Model B: train 2.3, validation 2.4. Which do you deploy?",opts:["A: it has the lowest training loss","B: it does better on unseen data, with a much smaller gap","Neither can be judged"],ok:1,
+  why:"Validation/test loss predicts real-world behaviour. A's 0.7 gap says it memorised. B generalises better and is the safer choice."});
+
+/* ---- 4. hallucinations ---- */
+const HL_M=train([...CORPUS,...EXTRA2]),HL_SET=new Set([...CORPUS,...EXTRA2].map(s=>tokenize(s).join(" ")));
+let hlStat={n:0,novel:0,recited:0};
+$("#hlGen").addEventListener("click",()=>{const out=[];for(let k=0;k<6;k++){const t=tokenize($("#hlIn").value);if(!t.length)t.push("the");for(let i=0;i<16;i++){const nc=nextCounts(HL_M,t),d=distFrom(nc.counts,1),a=sample(d);t.push(a.w);if(a.w===".")break;}out.push(t.join(" "));}
+  hlStat.n+=6;const rows=out.map(s=>{const rec=HL_SET.has(s);rec?hlStat.recited++:hlStat.novel++;return `<div class="row" style="gap:8px;align-items:flex-start;flex-wrap:nowrap"><span class="chip ${rec?"":"unk"}" style="flex:none">${rec?"recited":"new combination"}</span><span style="font-size:.92rem">${esc(s)}</span></div>`;});
+  $("#hlOut").innerHTML=rows.join("")+`<p class="note" style="margin-top:6px">“New combination” sentences sound just as confident, but no training sentence says them. If one states a fact (“the bank rejected the loan”), nothing guarantees it's true for <i>this</i> customer. Banks fix this with <b>retrieval (RAG)</b>: they fetch the real record or policy and make the model answer from it.</p>`;
+  $("#hlStats").innerHTML=`<div class="stat"><span class="v">${hlStat.n}</span><span class="k">answers generated</span></div><div class="stat"><span class="v c-out">${hlStat.recited}</span><span class="k">recited from training</span></div><div class="stat"><span class="v c-err">${hlStat.novel}</span><span class="k">made-up combinations</span></div>`;});
+$("#hlStats").innerHTML='<p class="muted">Press Generate to start.</p>';
+predictBox($("#hlPred"),{q:"Your banking SLM answers “Your loan was approved.” in a fluent, confident tone. What does that tell you?",opts:["It's true, because the model is confident","Nothing about truth: fluency comes from patterns, so check it against the real record","The model has access to the bank's database"],ok:1,
+  why:"A language model predicts likely words. It doesn't look facts up unless you connect it to a source. Production systems ground answers in retrieved documents or APIs, and refuse when no source supports the claim."});
+
+/* ---- code ---- */
+codeBox($("#code9"),{"eval.py":`import math, torch, torch.nn as nn, torch.nn.functional as F
+
+@torch.no_grad()
+def evaluate(model, data, block_size=32, batch_size=16):
+    """Loss, perplexity, top-1 / top-5 accuracy and calibration on held-out tokens."""
+    model.eval()
+    total_loss, n_tok, top1, top5, conf_sum = 0.0, 0, 0, 0, 0.0
+    starts = list(range(0, len(data) - block_size - 1, block_size))   # non-overlapping windows
+    for s in range(0, len(starts), batch_size):
+        ix = starts[s:s + batch_size]
+        x = torch.stack([data[i:i + block_size] for i in ix])
+        y = torch.stack([data[i + 1:i + block_size + 1] for i in ix])
+        out = model(x)
+        logits = out[0] if isinstance(out, tuple) else out             # works for TinyGPT too
+        logits, y = logits.reshape(-1, logits.size(-1)), y.reshape(-1)
+        total_loss += F.cross_entropy(logits, y, reduction="sum").item()
+        probs = logits.softmax(-1)
+        top = probs.topk(5, dim=-1).indices
+        top1 += (top[:, 0] == y).sum().item()
+        top5 += (top == y[:, None]).any(-1).sum().item()
+        conf_sum += probs.max(-1).values.sum().item()
+        n_tok += y.numel()
+    model.train()
+    loss = total_loss / n_tok
+    return {"loss": loss, "perplexity": math.exp(loss), "top1": top1 / n_tok,
+            "top5": top5 / n_tok, "avg_confidence": conf_sum / n_tok}
+
+if __name__ == "__main__":
+    torch.manual_seed(0)
+    text = ("the customer opened a savings account . the bank approved the loan . "
+            "the customer paid the fee . the agent explained the interest rate . ") * 40
+    words = text.split(); vocab = sorted(set(words)); stoi = {w: i for i, w in enumerate(vocab)}
+    data = torch.tensor([stoi[w] for w in words]); n = int(0.9 * len(data))
+    train_data, test_data = data[:n], data[n:]
+
+    model = nn.Embedding(len(vocab), len(vocab))           # untrained: random guesses
+    show = lambda r: {k: round(v, 3) for k, v in r.items()}
+    print("before training:", show(evaluate(model, test_data)))
+
+    opt = torch.optim.AdamW(model.parameters(), lr=0.1)
+    for step in range(300):
+        ix = torch.randint(len(train_data) - 9, (32,))
+        x = torch.stack([train_data[i:i + 8] for i in ix])
+        y = torch.stack([train_data[i + 1:i + 9] for i in ix])
+        loss = F.cross_entropy(model(x).reshape(-1, len(vocab)), y.reshape(-1))
+        opt.zero_grad(); loss.backward(); opt.step()
+    print("after training: ", show(evaluate(model, test_data)))
+    # calibration check: avg_confidence close to top1 means the confidence is honest`});
+
+/* ---- exercise ---- */
+let ex9Checked=false;
+const EX9=[
+ {t:"<b>Perplexity (panel 01):</b> find a sentence where the 30%-data model's perplexity is <b>at least 10 higher</b> than the full model's",f:()=>ppLast.b-ppLast.a>=10},
+ {t:"<b>Calibration (panel 02):</b> set the confidence that gives the <b>lowest possible loss</b> (within 2%)",f:()=>Math.abs((window.__acP||0)-.6)<=.02},
+ {t:"<b>Dashboard (panel 03):</b> find a pair where the model with <b>lower training loss</b> has <b>higher test loss</b>",f:()=>dbSawTrap},
+ {t:"<b>Hallucinations (panel 04):</b> generate answers until you have caught <b>at least 3 made-up combinations</b>",f:()=>hlStat.novel>=3}
+];
+function runEx9(){let ok=0;$("#ex9Checks").innerHTML=EX9.map(e=>{const r=e.f();if(r)ok++;return `<div class="ck ${ex9Checked?(r?"ok":"no"):""}"><span class="dot">${ex9Checked?(r?"✓":"✕"):""}</span><span>${e.t}</span></div>`;}).join("");
+  if(ex9Checked)$("#ex9Msg").innerHTML=ok===EX9.length?'<span class="c-out">All 4 missions complete.</span> You can now judge a model the way a reviewer would.':`${ok}/4 missions complete. Hint: sentences with banking words expose the 30% model, because it never read them.`;}
+$("#ex9Btn").addEventListener("click",()=>{ex9Checked=true;runEx9();});
+
+/* ---- quiz ---- */
+function makeQuiz9(seed){
+  const r=mulberry(seed),pick=a=>a[Math.floor(r()*a.length)];
+  const L=pick([1.5,2,2.5,3]),ppl=Math.exp(L);
+  const ps=pick([[.5,.25,.125],[.5,.5,.25],[.25,.25,.125]]),lo=ps.reduce((s,p)=>s-Math.log(p),0)/3;
+  return [
+   {type:"Numerical",kind:"num",q:`A model's test loss is <b>${L}</b> nats per token. What is its perplexity? (1 decimal)`,
+    check:v=>{if(Math.abs(v-ppl)<.06)return [true,`perplexity = e<sup>${L}</sup> = ${ppl.toFixed(2)}: as unsure as picking among ~${ppl.toFixed(0)} equally likely tokens.`];if(Math.abs(v-Math.pow(2,L))<.06)return [false,`2<sup>${L}</sup> uses base 2. With losses in nats (natural log), perplexity = e<sup>${L}</sup> = ${ppl.toFixed(2)}.`];return [false,`perplexity = e<sup>loss</sup> = e<sup>${L}</sup> = ${ppl.toFixed(2)}.`];}},
+   {type:"Numerical",kind:"num",q:`On a 3-token test text the model gives the correct tokens probabilities <b>${ps.join(", ")}</b>. What is the average loss (natural log, 3 decimals)?`,
+    check:v=>{if(Math.abs(v-lo)<.006)return [true,`(${ps.map(p=>`−ln ${p}`).join(" + ")}) / 3 = ${lo.toFixed(3)}, so perplexity e<sup>${lo.toFixed(3)}</sup> = ${Math.exp(lo).toFixed(2)}.`];if(Math.abs(v-(1-ps.reduce((a,b)=>a+b,0)/3))<.006)return [false,`That's 1 − mean probability. Loss uses −log: (${ps.map(p=>`−ln ${p}`).join(" + ")}) / 3 = ${lo.toFixed(3)}.`];return [false,`loss = mean of −ln p = (${ps.map(p=>(-Math.log(p)).toFixed(3)).join(" + ")}) / 3 = ${lo.toFixed(3)}.`];}},
+   {type:"Conceptual",kind:"mcq",q:"Why isn't top-1 accuracy enough to evaluate a language model?",opts:shuffle([
+     {t:"Many next words are valid, and accuracy ignores how much probability the model gave to them. Loss/perplexity reward the whole distribution and honest confidence.",ok:true,why:"Correct. Panel 02: accuracy stayed at 60% while loss changed dramatically with confidence."},
+     {t:"Accuracy is too hard to compute for text",why:"Misconception: <b>it's a compute problem</b>. Accuracy is trivial to compute. It just measures the wrong thing for open-ended prediction."},
+     {t:"Accuracy is always 100% for good models",why:"Misconception: <b>good models are always right</b>. Even excellent models have low top-1 accuracy on next tokens, because language is genuinely uncertain."},
+     {t:"Accuracy only works for images",why:"Misconception: <b>accuracy is for vision</b>. It's used for classification of any kind. Language modelling is different because many answers are acceptable."}],r)},
+   {type:"Conceptual",kind:"mcq",q:"What is a hallucination, and what is the most effective way to reduce it in a banking assistant?",opts:shuffle([
+     {t:"A fluent but false or unsupported answer. Ground answers in retrieved, trusted documents (RAG) and let the model refuse when no source supports a claim.",ok:true,why:"Correct. The model produces likely text, not verified facts, so connect it to the real records and policies."},
+     {t:"A software crash: fix it with error handling",why:"Misconception: <b>hallucination = a bug</b>. The output looks perfectly normal. That's what makes it dangerous."},
+     {t:"Random characters in the output: lower the temperature",why:"Misconception: <b>hallucinations look like gibberish</b>. They're usually fluent. Lower temperature reduces randomness, but not confident errors."},
+     {t:"It only happens in big models, so use an SLM",why:"Misconception: <b>small models don't hallucinate</b>. Any language model can. Panel 04's tiny model does it constantly."}],r)},
+   {type:"Practical",kind:"mcq",q:"Two runs: A has train loss 1.9 / val 2.6; B has train 2.3 / val 2.4. Both use the same data and tokenizer. Which goes to production?",opts:shuffle([
+     {t:"B: lower validation loss and a small gap, so it generalises better to real customers",ok:true,why:"Correct. Validation (and later test) loss predicts real-world behaviour; A's large gap signals memorisation."},
+     {t:"A: lowest training loss means it learned the most",why:"Misconception: <b>train loss is the target</b>. It measures memorisation of seen data. A is overfitting."},
+     {t:"Average them: deploy whichever is cheaper",why:"Misconception: <b>they're equivalent</b>. The validation difference is meaningful. Cost matters, but only between models of similar quality."},
+     {t:"Neither: the validation loss should be 0",why:"Misconception: <b>perfect loss is possible</b>. Language is inherently uncertain, so validation loss never reaches 0."}],r)}
+  ];
+}
+mountQuiz(9,$("#quiz9"),makeQuiz9);
+runEx9();
+
 /* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
 const NARR_GENERIC={
  code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
@@ -5670,6 +5924,41 @@ Object.assign(NARR,{
  {sel:"#hsVerdict",act:()=>{$("#hsS").value=4;$("#hsE").value=8;renderHS();},en:"Give it much more data and both curves fall together. That's a good fit. The green line marks where early stopping would keep the best checkpoint.",
   te:"చాలా ఎక్కువ డేటా ఇస్తే రెండు వక్రరేఖలు కలిసి తగ్గుతాయి. అది మంచి ఫిట్. ఆకుపచ్చ గీత, ఎర్లీ స్టాపింగ్ ఉత్తమ చెక్‌పాయింట్‌ను ఎక్కడ ఉంచుతుందో చూపిస్తుంది.",
   hn:"बहुत ज़्यादा डेटा दीजिए, तो दोनों कर्व साथ-साथ गिरते हैं। यही अच्छा फ़िट है। हरी रेखा बताती है कि अर्ली स्टॉपिंग सबसे अच्छा चेकपॉइंट कहाँ रखेगा।"}]
+});
+
+/* ---- narration for stage 9 ---- */
+NARR_INTRO[9]={en:"Welcome to Stage nine, evaluation. A model that looks great on its training data can still fail in the real world, so here we learn to measure models honestly.",
+ te:"స్టేజ్ తొమ్మిదికి స్వాగతం. ఇది మూల్యాంకనం. ట్రైనింగ్ డేటాపై బాగా కనిపించే మోడల్ కూడా నిజ ప్రపంచంలో విఫలం కావచ్చు, కాబట్టి ఇక్కడ మోడల్స్‌ను నిజాయితీగా కొలవడం నేర్చుకుంటాం.",
+ hn:"स्टेज नाइन में आपका स्वागत है, यानी मूल्यांकन। ट्रेनिंग डेटा पर बढ़िया दिखने वाला मॉडल भी असली दुनिया में फ़ेल हो सकता है, इसलिए यहाँ हम मॉडल को ईमानदारी से मापना सीखते हैं।"};
+Object.assign(NARR,{
+"p9-ppl":[
+ {sel:"#ppTbl",en:"Two real models read the same sentence. For each word, we look at the probability they gave to the word that actually came next. Low probability means high surprise.",
+  te:"రెండు నిజమైన మోడల్స్ ఒకే వాక్యాన్ని చదువుతాయి. ప్రతి పదానికి, నిజంగా తర్వాత వచ్చిన పదానికి అవి ఇచ్చిన సంభావ్యతను చూస్తాం. తక్కువ సంభావ్యత అంటే ఎక్కువ ఆశ్చర్యం.",
+  hn:"दो असली मॉडल एक ही वाक्य पढ़ते हैं। हर शब्द के लिए हम देखते हैं कि असल में आए अगले शब्द को उन्होंने कितनी संभावना दी। कम संभावना यानी ज़्यादा हैरानी।"},
+ {sel:"#ppStats",en:"The average surprise is the loss. Raise e to the loss and you get perplexity: roughly how many words the model was torn between. The model that read less data is far more perplexed.",
+  te:"సగటు ఆశ్చర్యమే లాస్. లాస్‌కు ఈ ఘాతం తీసుకుంటే పర్‌ప్లెక్సిటీ వస్తుంది: మోడల్ సుమారు ఎన్ని పదాల మధ్య తడబడిందో. తక్కువ డేటా చదివిన మోడల్ చాలా ఎక్కువ తడబడుతుంది.",
+  hn:"औसत हैरानी ही लॉस है। लॉस पर ई की घात लें तो पर्प्लेक्सिटी मिलती है: मॉडल लगभग कितने शब्दों के बीच उलझा था। कम डेटा पढ़ने वाला मॉडल कहीं ज़्यादा उलझा रहता है।"}],
+"p9-acc":[
+ {sel:"#acStats",act:()=>{$("#acP").value=95;renderAC();},en:"Here the model is right sixty percent of the time, whatever its confidence. Accuracy stays the same, but the loss changes a lot.",
+  te:"ఇక్కడ మోడల్ నమ్మకం ఎంతైనా, అరవై శాతం సార్లు సరిగ్గా ఉంటుంది. ఖచ్చితత్వం అలాగే ఉంటుంది, కానీ లాస్ చాలా మారుతుంది.",
+  hn:"यहाँ मॉडल कितना भी आश्वस्त हो, साठ प्रतिशत बार सही है। एक्यूरेसी वही रहती है, पर लॉस बहुत बदलता है।"},
+ {sel:"#acSvg",act:()=>{$("#acP").value=60;renderAC();},en:"The loss is lowest when confidence matches how often the model is right. That is called calibration, and it is why language models are judged by loss, not just accuracy.",
+  te:"నమ్మకం మోడల్ ఎంత తరచుగా సరిగ్గా ఉంటుందో దానికి సరిపోయినప్పుడు లాస్ అత్యల్పం. దాన్ని క్యాలిబ్రేషన్ అంటారు. అందుకే లాంగ్వేజ్ మోడల్స్‌ను కేవలం ఖచ్చితత్వంతో కాకుండా లాస్‌తో అంచనా వేస్తారు.",
+  hn:"लॉस तब सबसे कम होता है जब आत्मविश्वास इस बात से मेल खाता है कि मॉडल कितनी बार सही है। इसे कैलिब्रेशन कहते हैं, और इसीलिए लैंग्वेज मॉडल को सिर्फ़ एक्यूरेसी से नहीं, लॉस से परखा जाता है।"}],
+"p9-dash":[
+ {sel:"#dbTbl",en:"Compare two training runs. Green marks the better value. Always judge on validation and test loss, never on training loss alone.",
+  te:"రెండు ట్రైనింగ్ రన్‌లను పోల్చండి. ఆకుపచ్చ మెరుగైన విలువను సూచిస్తుంది. ఎల్లప్పుడూ వాలిడేషన్, టెస్ట్ లాస్‌తో అంచనా వేయండి, కేవలం ట్రైనింగ్ లాస్‌తో కాదు.",
+  hn:"दो ट्रेनिंग रन की तुलना कीजिए। हरा बेहतर मान दिखाता है। हमेशा वैलिडेशन और टेस्ट लॉस से परखिए, सिर्फ़ ट्रेनिंग लॉस से नहीं।"},
+ {sel:"#dbVerdict",en:"Here, the bigger model trained on little data has the lowest training loss but the worst test loss. It memorised its data, and a reviewer would reject it.",
+  te:"ఇక్కడ తక్కువ డేటాపై ట్రైన్ అయిన పెద్ద మోడల్‌కు అత్యల్ప ట్రైనింగ్ లాస్ ఉంది కానీ అత్యంత చెడ్డ టెస్ట్ లాస్. అది డేటాను బట్టీ పట్టింది, రివ్యూయర్ దాన్ని తిరస్కరిస్తాడు.",
+  hn:"यहाँ कम डेटा पर ट्रेन हुए बड़े मॉडल का ट्रेनिंग लॉस सबसे कम है पर टेस्ट लॉस सबसे खराब। उसने डेटा रट लिया, और कोई समीक्षक उसे अस्वीकार कर देगा।"}],
+"p9-hall":[
+ {sel:"#hlOut",act:"#hlGen",en:"Generate answers and check each one against the training text. Some are recited, but many are new combinations. They sound just as confident, yet nothing checked that they are true.",
+  te:"జవాబులు తయారు చేసి ప్రతిదాన్ని ట్రైనింగ్ టెక్స్ట్‌తో సరిచూడండి. కొన్ని పునరావృతమైనవి, కానీ చాలా కొత్త కలయికలు. అవి అంతే నమ్మకంగా వినిపిస్తాయి, అయినా అవి నిజమని ఎవరూ తనిఖీ చేయలేదు.",
+  hn:"जवाब बनाइए और हर एक को ट्रेनिंग टेक्स्ट से मिलाइए। कुछ दोहराए गए हैं, पर कई नए मेल हैं। वे उतने ही आत्मविश्वासी लगते हैं, फिर भी किसी ने नहीं जाँचा कि वे सच हैं।"},
+ {sel:"#hlStats",en:"That is a hallucination: fluent, confident, and unsupported. Banks reduce it by retrieving the real record and making the model answer from it.",
+  te:"అదే హాలూసినేషన్: సరళమైనది, నమ్మకమైనది, ఆధారం లేనిది. బ్యాంకులు నిజమైన రికార్డును తెచ్చి, దాని నుంచే జవాబు చెప్పేలా చేసి దీన్ని తగ్గిస్తాయి.",
+  hn:"यही हैलुसिनेशन है: धाराप्रवाह, आत्मविश्वासी, और बिना आधार। बैंक असली रिकॉर्ड लाकर मॉडल से उसी के आधार पर जवाब दिलवाकर इसे कम करते हैं।"}]
 });
 
 /* ---- engine ---- */
