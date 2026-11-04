@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Telugu:wght@400;600&family=Noto+Sans+Devanagari:wght@400;600&display=swap">
 <style>
 /* Layout: a lab bench. Header with progress, roadmap rail, then one stage at a time as a stack of instrument panels. */
 :root{
@@ -16,7 +16,7 @@
   --out:#62e3a2;   /* probabilities / outputs */
   --err:#ff7d93;   /* error / loss / gradient */
   --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
-  --f-body:"IBM Plex Sans",system-ui,-apple-system,sans-serif;
+  --f-body:"IBM Plex Sans","Noto Sans Telugu","Noto Sans Devanagari",system-ui,-apple-system,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
   --r:10px;
 }
@@ -341,6 +341,25 @@ i.lg{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:
 .encstep{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px;align-items:center;font-size:.8rem;animation:pop .3s ease both}
 .encstep .why{font-family:var(--f-mono);font-size:.7rem;color:var(--muted)}
 @media (max-width:560px){.encstep{grid-template-columns:minmax(0,1fr)}}
+/* ---- narrator ---- */
+.lbtn{display:inline-flex;align-items:center;gap:6px;background:rgba(243,185,85,.1);border:1px solid rgba(243,185,85,.45);color:var(--tok);border-radius:999px;padding:4px 11px;font-size:.78rem;font-weight:600}
+.lbtn:hover{background:rgba(243,185,85,.2)}
+.lbtn.tour{justify-self:start;padding:7px 14px;font-size:.85rem}
+.narr-hi{outline:2px solid var(--tok)!important;outline-offset:4px;border-radius:8px;box-shadow:0 0 0 6px rgba(243,185,85,.12);transition:outline-color .3s}
+body.narrating main{padding-bottom:190px}
+.narrbar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:rgba(14,23,29,.97);backdrop-filter:blur(8px);border-top:1px solid rgba(243,185,85,.45);padding:10px max(16px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));box-shadow:0 -10px 30px rgba(0,0,0,.45)}
+.narrbar .in{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 18px;align-items:center}
+@media (max-width:760px){.narrbar .in{grid-template-columns:minmax(0,1fr)}}
+.nb-t{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;color:var(--tok)}
+.nb-x{font-size:1.02rem;line-height:1.5;margin-top:2px;font-family:var(--f-body)}
+.nb-w{font-size:.76rem;color:var(--err);margin-top:4px}
+.nb-w:empty{display:none}
+.nb-c{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.nb-c button,.nb-c select{background:var(--panel2);border:1px solid var(--line2);border-radius:7px;padding:5px 9px;font-size:.8rem;color:var(--fg);max-width:190px}
+.nb-c button.pri{background:var(--tok);color:#1a1206;border-color:var(--tok);font-weight:600;min-width:74px}
+.nb-c label{font-size:.78rem;color:var(--muted);display:inline-flex;gap:4px;align-items:center}
+.nb-p{grid-column:1/-1;height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.nb-p i{display:block;height:100%;background:var(--tok);width:0;transition:width .4s}
 </style>
 
 <header class="top">
@@ -1258,6 +1277,23 @@ the customer asked about the account balance and the interest rate on her saving
     </div>
   </section>
 </main>
+<div class="narrbar" id="narrBar" hidden role="region" aria-label="Narrator">
+  <div class="in">
+    <div style="min-width:0"><div class="nb-t" id="nbTitle"></div><div class="nb-x" id="nbText" aria-live="polite"></div><div class="nb-w" id="nbWarn"></div></div>
+    <div class="nb-c">
+      <button type="button" id="nbPrev" aria-label="Previous sentence">◀◀</button>
+      <button type="button" id="nbPlay" class="pri">Pause</button>
+      <button type="button" id="nbNext" aria-label="Next sentence">▶▶</button>
+      <select id="nbLang" aria-label="Narration language"><option value="en">English</option><option value="te">తెలుగు</option><option value="hn">हिन्दी</option></select>
+      <select id="nbRate" aria-label="Speed"><option value="0.75">0.75×</option><option value="0.9">0.9×</option><option value="1">1×</option><option value="1.25">1.25×</option><option value="1.5">1.5×</option></select>
+      <select id="nbVoice" aria-label="Voice"></select>
+      <label><input type="checkbox" id="nbCap" checked> captions</label>
+      <button type="button" id="nbStop">Close</button>
+    </div>
+    <div class="nb-p"><i id="nbProg"></i></div>
+  </div>
+</div>
+
 
 <script>
 (function(){
@@ -3081,6 +3117,336 @@ function makeQuiz3(seed){
   ];
 }
 mountQuiz(3,$("#quiz3"),makeQuiz3);
+
+/* =================== NARRATOR (English · తెలుగు · हिन्दी) =================== */
+const NARR_GENERIC={
+ code:[{en:"This panel has short Python files that rebuild what you just saw. Copy one with the copy button and run it on your own computer. No GPU is needed.",
+   te:"ఈ ప్యానెల్‌లో మీరు ఇప్పుడే చూసినదాన్ని మళ్లీ నిర్మించే చిన్న పైథాన్ ఫైళ్లు ఉన్నాయి. కాపీ బటన్‌తో కాపీ చేసి మీ కంప్యూటర్‌లో రన్ చేయండి. జీపీయూ అవసరం లేదు.",
+   hn:"इस पैनल में छोटी पाइथन फ़ाइलें हैं जो वही बनाती हैं जो आपने अभी देखा। कॉपी बटन से कॉपी करें और अपने कंप्यूटर पर चलाएँ। जीपीयू की ज़रूरत नहीं है।"}],
+ ex:[{en:"Now it's your turn. Each mission asks you to use one of the instruments above. Set it up, then press the check button to see which missions pass.",
+   te:"ఇప్పుడు మీ వంతు. ప్రతి మిషన్ పైన ఉన్న ఒక సాధనాన్ని ఉపయోగించమని అడుగుతుంది. దాన్ని సెట్ చేసి, ఏ మిషన్లు పూర్తయ్యాయో చూడటానికి చెక్ బటన్ నొక్కండి.",
+   hn:"अब आपकी बारी। हर मिशन ऊपर के किसी एक टूल का इस्तेमाल करने को कहता है। उसे सेट करें, फिर चेक बटन दबाकर देखें कि कौन से मिशन पूरे हुए।"}],
+ quiz:[{en:"Finally, the assessment. Answer all five questions and press submit. Every wrong answer comes with an explanation of the misconception behind it. Score four or more to unlock the next stage. Each retry uses new numbers.",
+   te:"చివరగా, అసెస్‌మెంట్. ఐదు ప్రశ్నలకూ జవాబు ఇచ్చి సబ్మిట్ నొక్కండి. ప్రతి తప్పు జవాబుకు, ఆ పొరపాటు వెనుక ఉన్న అపోహ ఏమిటో వివరణ వస్తుంది. తదుపరి స్టేజ్ తెరవాలంటే ఐదులో కనీసం నాలుగు రావాలి. ప్రతి ప్రయత్నంలో కొత్త సంఖ్యలు వస్తాయి.",
+   hn:"आखिर में, असेसमेंट। पाँचों सवालों के जवाब देकर सबमिट दबाएँ। हर गलत जवाब के साथ उसके पीछे की गलतफहमी समझाई जाएगी। अगला स्टेज खोलने के लिए पाँच में से कम से कम चार सही चाहिए। हर बार नए नंबर आते हैं।"}]
+};
+const NARR_INTRO={
+ 0:{en:"Welcome to Stage zero. Here you will find out where small language models fit inside artificial intelligence, watch a tiny model learn, follow one sentence through a model, and discover what size of model your laptop can handle.",
+    te:"స్టేజ్ సున్నాకు స్వాగతం. ఇక్కడ మీరు ఆర్టిఫిషియల్ ఇంటెలిజెన్స్‌లో చిన్న లాంగ్వేజ్ మోడల్స్ ఎక్కడ ఉంటాయో తెలుసుకుంటారు, ఒక చిన్న మోడల్ నేర్చుకోవడం చూస్తారు, ఒక వాక్యం మోడల్ లోపల ఎలా ప్రయాణిస్తుందో గమనిస్తారు, మీ ల్యాప్‌టాప్ ఎంత పెద్ద మోడల్‌ను నడపగలదో కనుగొంటారు.",
+    hn:"स्टेज ज़ीरो में आपका स्वागत है। यहाँ आप जानेंगे कि आर्टिफ़िशियल इंटेलिजेंस में छोटे लैंग्वेज मॉडल कहाँ आते हैं, एक छोटे मॉडल को सीखते हुए देखेंगे, एक वाक्य को मॉडल के अंदर चलते हुए देखेंगे, और पता करेंगे कि आपका लैपटॉप कितना बड़ा मॉडल चला सकता है।"},
+ 1:{en:"Welcome to Stage one, the math inside every model. You need no math background. Each tool starts with a picture you can move, then shows the numbers, and only then the formula.",
+    te:"స్టేజ్ ఒకటికి స్వాగతం. ఇది ప్రతి మోడల్ లోపల ఉండే గణితం. మీకు గణితం తెలియకపోయినా పర్వాలేదు. ప్రతి సాధనం ముందు మీరు కదిలించగల ఒక చిత్రంతో మొదలవుతుంది, తర్వాత సంఖ్యలు, చివరగా ఫార్ములా.",
+    hn:"स्टेज वन में आपका स्वागत है, यानी हर मॉडल के अंदर का गणित। आपको गणित पहले से जानने की ज़रूरत नहीं है। हर टूल पहले एक तस्वीर से शुरू होता है जिसे आप हिला सकते हैं, फिर नंबर दिखाता है, और आखिर में फ़ॉर्मूला।"},
+ 2:{en:"Welcome to Stage two, tokenization. A model only understands numbers, so every sentence must be cut into pieces and turned into integers. Let's see exactly how.",
+    te:"స్టేజ్ రెండుకు స్వాగతం. ఇది టోకనైజేషన్. మోడల్‌కు సంఖ్యలు మాత్రమే అర్థమవుతాయి, కాబట్టి ప్రతి వాక్యాన్ని ముక్కలుగా కోసి పూర్ణ సంఖ్యలుగా మార్చాలి. అది ఎలా జరుగుతుందో చూద్దాం.",
+    hn:"स्टेज टू में आपका स्वागत है, यानी टोकनाइज़ेशन। मॉडल सिर्फ़ नंबर समझता है, इसलिए हर वाक्य को टुकड़ों में काटकर पूर्णांकों में बदलना पड़ता है। चलिए देखते हैं कैसे।"},
+ 3:{en:"Welcome to Stage three, embeddings. Here, plain ID numbers become vectors whose positions capture meaning.",
+    te:"స్టేజ్ మూడుకు స్వాగతం. ఇది ఎంబెడింగ్స్. ఇక్కడ సాధారణ ఐడీ సంఖ్యలు అర్థాన్ని పట్టుకునే వెక్టర్లుగా మారతాయి.",
+    hn:"स्टेज थ्री में आपका स्वागत है, यानी एम्बेडिंग्स। यहाँ साधारण आईडी नंबर ऐसे वेक्टर बन जाते हैं जिनकी जगह शब्द का अर्थ बताती है।"}
+};
+const NARR={
+/* ---------- Stage 0 ---------- */
+"p-map":[
+ {sel:".hier",en:"This map shows artificial intelligence as boxes inside boxes, like folders inside folders.",
+  te:"ఈ మ్యాప్ ఆర్టిఫిషియల్ ఇంటెలిజెన్స్‌ను పెట్టెల్లో పెట్టెలుగా చూపిస్తుంది, ఫోల్డర్ల లోపల ఫోల్డర్ల లాగా.",
+  hn:"यह मैप आर्टिफ़िशियल इंटेलिजेंस को डिब्बों के अंदर डिब्बों की तरह दिखाता है, जैसे फ़ोल्डर के अंदर फ़ोल्डर।"},
+ {sel:".hier",act:"#walkBtn",en:"Let's walk from the outside in. AI is the big goal. Machine learning means learning from examples instead of writing rules. Deep learning stacks many layers of neural networks.",
+  te:"బయటి నుంచి లోపలికి వెళ్దాం. ఏఐ అనేది పెద్ద లక్ష్యం. మెషిన్ లెర్నింగ్ అంటే నియమాలు రాయకుండా ఉదాహరణల నుంచి నేర్చుకోవడం. డీప్ లెర్నింగ్ న్యూరల్ నెట్‌వర్క్‌ల ఎన్నో పొరలను ఒకదానిపై ఒకటి పేర్చుతుంది.",
+  hn:"चलिए बाहर से अंदर चलते हैं। एआई बड़ा लक्ष्य है। मशीन लर्निंग का मतलब है नियम लिखने के बजाय उदाहरणों से सीखना। डीप लर्निंग न्यूरल नेटवर्क की कई परतों को एक के ऊपर एक रखता है।"},
+ {sel:"#detail",en:"Inside deep learning is language processing, and inside that are language models: programs that predict the next word. Small and large language models are the same idea at different sizes.",
+  te:"డీప్ లెర్నింగ్ లోపల భాషా ప్రాసెసింగ్ ఉంది, దాని లోపల లాంగ్వేజ్ మోడల్స్ ఉన్నాయి. ఇవి తర్వాతి పదాన్ని ఊహించే ప్రోగ్రామ్‌లు. చిన్న, పెద్ద లాంగ్వేజ్ మోడల్స్ ఒకే ఆలోచన, వేర్వేరు పరిమాణాల్లో.",
+  hn:"डीप लर्निंग के अंदर भाषा प्रोसेसिंग है, और उसके अंदर लैंग्वेज मॉडल हैं, यानी ऐसे प्रोग्राम जो अगला शब्द अनुमान लगाते हैं। छोटे और बड़े लैंग्वेज मॉडल एक ही विचार हैं, बस अलग आकार में।"},
+ {sel:".nnchip",en:"Click the neural networks chip to play with a single neuron. Move its sliders and watch inputs, weights and a bias produce an output.",
+  te:"ఒక్క న్యూరాన్‌తో ఆడుకోవడానికి న్యూరల్ నెట్‌వర్క్స్ చిప్‌ను నొక్కండి. స్లైడర్లను కదిలించి, ఇన్‌పుట్లు, వెయిట్లు, బయాస్ కలిసి అవుట్‌పుట్‌ను ఎలా ఇస్తాయో చూడండి.",
+  hn:"एक न्यूरॉन के साथ खेलने के लिए न्यूरल नेटवर्क वाली चिप पर क्लिक करें। स्लाइडर हिलाइए और देखिए कि इनपुट, वेट और बायस मिलकर आउटपुट कैसे बनाते हैं।"}],
+"p-learn":[
+ {sel:"#gBars",en:"This is a real, tiny language model. It learned by counting which word follows which in about forty sentences. The green bars are its guesses for the next word.",
+  te:"ఇది నిజమైన, చిన్న లాంగ్వేజ్ మోడల్. సుమారు నలభై వాక్యాల్లో ఏ పదం తర్వాత ఏ పదం వస్తుందో లెక్కించి ఇది నేర్చుకుంది. ఆకుపచ్చ బార్లు తర్వాతి పదం కోసం దాని అంచనాలు.",
+  hn:"यह एक असली, छोटा लैंग्वेज मॉडल है। इसने लगभग चालीस वाक्यों में गिनकर सीखा कि कौन सा शब्द किसके बाद आता है। हरी पट्टियाँ अगले शब्द के लिए इसके अनुमान हैं।"},
+ {sel:"#gOut",act:"#gRun",en:"Watch it write. It picks a word, adds it to the sentence, and repeats. The green chips are the words it chose.",
+  te:"ఇది రాయడం చూడండి. ఒక పదాన్ని ఎంచుకుని, వాక్యానికి జోడించి, మళ్లీ అదే చేస్తుంది. ఆకుపచ్చ చిప్స్ అది ఎంచుకున్న పదాలు.",
+  hn:"इसे लिखते हुए देखिए। यह एक शब्द चुनता है, उसे वाक्य में जोड़ता है, और यही दोहराता है। हरी चिप्स वे शब्द हैं जो इसने चुने।"},
+ {sel:"#gFrac",en:"Now drag the training data slider down. With less text the model has seen fewer words, so its guesses get worse.",
+  te:"ఇప్పుడు ట్రైనింగ్ డేటా స్లైడర్‌ను కిందికి లాగండి. తక్కువ టెక్స్ట్ ఉంటే మోడల్ తక్కువ పదాలు చూసింది, కాబట్టి దాని అంచనాలు బలహీనమవుతాయి.",
+  hn:"अब ट्रेनिंग डेटा स्लाइडर को नीचे खींचिए। कम टेक्स्ट होने पर मॉडल ने कम शब्द देखे हैं, इसलिए उसके अनुमान खराब हो जाते हैं।"},
+ {sel:"#lossSvg",en:"This red curve is the loss on sentences the model never saw. More data means lower loss. That is what learning means: the model is less surprised by real text.",
+  te:"ఈ ఎరుపు వక్రరేఖ మోడల్ ఎప్పుడూ చూడని వాక్యాలపై లాస్. ఎక్కువ డేటా అంటే తక్కువ లాస్. నేర్చుకోవడం అంటే ఇదే: నిజమైన టెక్స్ట్ చూసి మోడల్ తక్కువ ఆశ్చర్యపోతుంది.",
+  hn:"यह लाल रेखा उन वाक्यों पर लॉस है जो मॉडल ने कभी नहीं देखे। ज़्यादा डेटा यानी कम लॉस। सीखने का यही मतलब है: असली टेक्स्ट देखकर मॉडल कम हैरान होता है।"}],
+"p-journey":[
+ {sel:"#jIn",en:"Now let's follow one sentence through a model, step by step.",
+  te:"ఇప్పుడు ఒక వాక్యాన్ని మోడల్ లోపల అడుగడుగునా అనుసరిద్దాం.",
+  hn:"अब एक वाक्य को मॉडल के अंदर कदम दर कदम चलते हुए देखते हैं।"},
+ {sel:"#pipe",act:"#jPlay",en:"First the text is cut into tokens. Each token becomes an ID number, and each ID picks a row of numbers called an embedding.",
+  te:"ముందుగా టెక్స్ట్‌ను టోకెన్లుగా కోస్తారు. ప్రతి టోకెన్ ఒక ఐడీ సంఖ్య అవుతుంది, ప్రతి ఐడీ ఎంబెడింగ్ అనే సంఖ్యల వరుసను ఎంచుకుంటుంది.",
+  hn:"पहले टेक्स्ट को टोकन में काटा जाता है। हर टोकन एक आईडी नंबर बनता है, और हर आईडी एम्बेडिंग नाम की नंबरों की एक पंक्ति चुनता है।"},
+ {sel:"#jOut",en:"Position information is added, the transformer layers mix the words together, and the last layer gives every word in the vocabulary a score.",
+  te:"స్థానం సమాచారం జోడిస్తారు, ట్రాన్స్‌ఫార్మర్ పొరలు పదాలను కలుపుతాయి, చివరి పొర పదకోశంలోని ప్రతి పదానికి ఒక స్కోర్ ఇస్తుంది.",
+  hn:"स्थिति की जानकारी जोड़ी जाती है, ट्रांसफ़ॉर्मर परतें शब्दों को आपस में मिलाती हैं, और आखिरी परत शब्दकोश के हर शब्द को एक स्कोर देती है।"},
+ {sel:"#jOut",en:"Softmax turns the scores into probabilities and one word is chosen. Add it to the sentence and run again. That loop is how every chat model writes.",
+  te:"సాఫ్ట్‌మాక్స్ స్కోర్లను సంభావ్యతలుగా మారుస్తుంది, ఒక పదం ఎంపికవుతుంది. దాన్ని వాక్యానికి జోడించి మళ్లీ నడపండి. ప్రతి చాట్ మోడల్ ఇలాగే రాస్తుంది.",
+  hn:"सॉफ़्टमैक्स स्कोर को संभावनाओं में बदलता है और एक शब्द चुना जाता है। उसे वाक्य में जोड़कर फिर से चलाइए। हर चैट मॉडल इसी चक्र से लिखता है।"}],
+"p-size":[
+ {sel:"#p-size .ctrls",en:"Small and large models use the same design. What changes is width, depth and vocabulary. Move these sliders and every number updates.",
+  te:"చిన్న, పెద్ద మోడల్స్ ఒకే డిజైన్ వాడతాయి. మారేది వెడల్పు, లోతు, పదకోశం మాత్రమే. ఈ స్లైడర్లను కదిలిస్తే ప్రతి సంఖ్య మారుతుంది.",
+  hn:"छोटे और बड़े मॉडल एक ही डिज़ाइन इस्तेमाल करते हैं। बदलता है सिर्फ़ चौड़ाई, गहराई और शब्दकोश। ये स्लाइडर हिलाइए, हर नंबर बदल जाएगा।"},
+ {sel:"#oN",act:'#presets [data-p="0"]',en:"This is our CPU lab model, under one million parameters. You could train it on your laptop in minutes.",
+  te:"ఇది మన సీపీయూ ల్యాబ్ మోడల్, పది లక్షల కంటే తక్కువ పారామీటర్లు. దీన్ని మీ ల్యాప్‌టాప్‌లో నిమిషాల్లో ట్రైన్ చేయవచ్చు.",
+  hn:"यह हमारा सीपीयू लैब मॉडल है, दस लाख से कम पैरामीटर। इसे आप अपने लैपटॉप पर कुछ ही मिनटों में ट्रेन कर सकते हैं।"},
+ {sel:"#oKv",act:'#presets [data-p="4"]',en:"Now a seven billion parameter model. Its weights alone need about fourteen gigabytes, and training it on a CPU would take thousands of years.",
+  te:"ఇప్పుడు ఏడు వందల కోట్ల పారామీటర్ల మోడల్. దాని వెయిట్లకే సుమారు పద్నాలుగు జీబీ కావాలి, సీపీయూపై ట్రైన్ చేయాలంటే వేల సంవత్సరాలు పడుతుంది.",
+  hn:"अब सात अरब पैरामीटर वाला मॉडल। सिर्फ़ इसके वेट के लिए लगभग चौदह जीबी चाहिए, और सीपीयू पर इसे ट्रेन करने में हज़ारों साल लगेंगे।"},
+ {sel:"#logc",act:'#presets [data-p="0"]',en:"This chart places your model among real model sizes. Small language models live on the left, and that is where we will build ours.",
+  te:"ఈ చార్ట్ మీ మోడల్‌ను నిజమైన మోడల్ పరిమాణాల మధ్య చూపిస్తుంది. చిన్న లాంగ్వేజ్ మోడల్స్ ఎడమవైపు ఉంటాయి, మనం మనది అక్కడే నిర్మిస్తాం.",
+  hn:"यह चार्ट आपके मॉडल को असली मॉडलों के आकार के बीच दिखाता है। छोटे लैंग्वेज मॉडल बाईं ओर हैं, और हम अपना मॉडल वहीं बनाएँगे।"}],
+/* ---------- Stage 1 ---------- */
+"p1-ten":[
+ {sel:"#tView",act:()=>{tR=0;renderTen();},en:"A scalar is a single number, like the temperature setting.",
+  te:"స్కేలార్ అంటే ఒకే ఒక సంఖ్య, టెంపరేచర్ సెట్టింగ్ లాగా.",hn:"स्केलर का मतलब है सिर्फ़ एक नंबर, जैसे टेम्परेचर की सेटिंग।"},
+ {sel:"#tView",act:()=>{tR=1;renderTen();},en:"A vector is a row of numbers. Here, four numbers describe the word bank.",
+  te:"వెక్టర్ అంటే సంఖ్యల వరుస. ఇక్కడ నాలుగు సంఖ్యలు బ్యాంక్ అనే పదాన్ని వివరిస్తాయి.",hn:"वेक्टर नंबरों की एक पंक्ति है। यहाँ चार नंबर बैंक शब्द का वर्णन करते हैं।"},
+ {sel:"#tView",act:()=>{tR=2;renderTen();},en:"A matrix is a grid: five words, four numbers each.",
+  te:"మ్యాట్రిక్స్ అంటే గ్రిడ్: ఐదు పదాలు, ఒక్కోదానికి నాలుగు సంఖ్యలు.",hn:"मैट्रिक्स एक ग्रिड है: पाँच शब्द, हर एक के चार नंबर।"},
+ {sel:"#tShape",act:()=>{tR=3;renderTen();},en:"A tensor stacks grids: three sentences, five words, four numbers. The shape lists the size in each direction. Hover any cell to see its address.",
+  te:"టెన్సర్ గ్రిడ్లను పేర్చుతుంది: మూడు వాక్యాలు, ఐదు పదాలు, నాలుగు సంఖ్యలు. షేప్ ప్రతి దిశలోని పరిమాణాన్ని చెబుతుంది. ఏ గడిపైనైనా కర్సర్ ఉంచి దాని చిరునామా చూడండి.",
+  hn:"टेंसर ग्रिड को एक के ऊपर एक रखता है: तीन वाक्य, पाँच शब्द, चार नंबर। शेप हर दिशा का आकार बताता है। किसी भी खाने पर माउस रखकर उसका पता देखिए।"}],
+"p1-dot":[
+ {sel:"#dotSvg",en:"A vector is an arrow. You can drag the tips of arrows a and b.",
+  te:"వెక్టర్ ఒక బాణం. ఏ, బీ బాణాల చివరలను మీరు లాగవచ్చు.",hn:"वेक्टर एक तीर है। आप तीर ए और बी के सिरों को खींच सकते हैं।"},
+ {sel:"#dotRead",act:'#dotPresets [data-pb="2.6,1.7"]',en:"The dot product multiplies matching numbers and adds them up. When arrows point the same way, like cat and dog, it is large and the gauge moves right.",
+  te:"డాట్ ప్రోడక్ట్ సరిపోయే సంఖ్యలను గుణించి కలుపుతుంది. పిల్లి, కుక్క లాగా బాణాలు ఒకే దిశలో ఉంటే అది పెద్దదిగా ఉంటుంది, గేజ్ కుడివైపు కదులుతుంది.",
+  hn:"डॉट प्रोडक्ट मिलते-जुलते नंबरों को गुणा करके जोड़ता है। जब तीर एक ही दिशा में हों, जैसे बिल्ली और कुत्ता, तो यह बड़ा होता है और गेज दाईं ओर जाता है।"},
+ {sel:"#dotRead",act:'#dotPresets [data-pb="-2.8,-0.8"]',en:"Hot and cold point in opposite directions, so the result is negative.",
+  te:"వేడి, చల్ల వ్యతిరేక దిశల్లో ఉంటాయి, కాబట్టి ఫలితం రుణాత్మకం.",hn:"गर्म और ठंडा उल्टी दिशाओं में हैं, इसलिए नतीजा ऋणात्मक है।"},
+ {sel:"#dotRead",en:"Inside a model, attention uses dot products to decide which words are relevant to each other.",
+  te:"మోడల్ లోపల, ఏ పదాలు ఒకదానికొకటి సంబంధించినవో నిర్ణయించడానికి అటెన్షన్ డాట్ ప్రోడక్ట్‌లను వాడుతుంది.",hn:"मॉडल के अंदर, अटेंशन डॉट प्रोडक्ट से तय करता है कि कौन से शब्द एक-दूसरे के लिए ज़रूरी हैं।"}],
+"p1-mm":[
+ {sel:"#mmA",en:"Matrix multiplication is many dot products at once. Every row of A meets every column of B.",
+  te:"మ్యాట్రిక్స్ గుణకారం అంటే ఒకేసారి ఎన్నో డాట్ ప్రోడక్ట్‌లు. ఏ లోని ప్రతి వరుస బీ లోని ప్రతి నిలువు వరుసను కలుస్తుంది.",
+  hn:"मैट्रिक्स गुणा एक साथ कई डॉट प्रोडक्ट है। ए की हर पंक्ति बी के हर कॉलम से मिलती है।"},
+ {sel:"#mmCalc",act:"#mmPlay",en:"Watch. The highlighted row and column pair up, multiply number by number, and the sum becomes one cell of C.",
+  te:"చూడండి. హైలైట్ అయిన వరుస, నిలువు వరుస జత కట్టి, సంఖ్య సంఖ్యగా గుణిస్తాయి, మొత్తం సీ లో ఒక గడి అవుతుంది.",
+  hn:"देखिए। हाइलाइट की गई पंक्ति और कॉलम जोड़ी बनाते हैं, नंबर-दर-नंबर गुणा करते हैं, और जोड़ सी का एक खाना बन जाता है।"},
+ {sel:"#mmShape",en:"The rule is that the inner sizes must match. Three columns in A need three rows in B.",
+  te:"నియమం ఏమిటంటే లోపలి పరిమాణాలు సరిపోవాలి. ఏ లో మూడు నిలువు వరుసలు ఉంటే బీ లో మూడు వరుసలు ఉండాలి.",
+  hn:"नियम यह है कि अंदर के आकार मेल खाने चाहिए। ए में तीन कॉलम हैं तो बी में तीन पंक्तियाँ चाहिए।"},
+ {sel:"#mmCg",en:"Every layer of a language model is built from matrix multiplications. They are over ninety percent of the work.",
+  te:"లాంగ్వేజ్ మోడల్‌లోని ప్రతి పొర మ్యాట్రిక్స్ గుణకారాలతోనే నిర్మితమవుతుంది. పనిలో తొంభై శాతానికి పైగా అవే.",
+  hn:"लैंग्वेज मॉडल की हर परत मैट्रिक्स गुणा से बनी है। काम का नब्बे प्रतिशत से ज़्यादा यही है।"}],
+"p1-soft":[
+ {sel:"#smCtl",en:"A model gives each possible next word a raw score called a logit. Scores can be any number, even negative.",
+  te:"మోడల్ ప్రతి సాధ్యమైన తర్వాతి పదానికి లాజిట్ అనే ముడి స్కోర్ ఇస్తుంది. స్కోర్లు ఏ సంఖ్యైనా కావచ్చు, రుణాత్మకమైనా సరే.",
+  hn:"मॉडल हर संभावित अगले शब्द को लॉजिट नाम का कच्चा स्कोर देता है। स्कोर कोई भी नंबर हो सकता है, ऋणात्मक भी।"},
+ {sel:"#p1-soft .scols",en:"Softmax raises e to the power of each score, so everything becomes positive, then divides by the total. The results add up to one hundred percent.",
+  te:"సాఫ్ట్‌మాక్స్ ప్రతి స్కోర్‌కు ఈ ఘాతం తీసుకుంటుంది, దాంతో అన్నీ ధనాత్మకమవుతాయి, తర్వాత మొత్తంతో భాగిస్తుంది. ఫలితాలు కలిపితే వంద శాతం.",
+  hn:"सॉफ़्टमैक्स हर स्कोर पर ई की घात लेता है, जिससे सब धनात्मक हो जाते हैं, फिर कुल से भाग देता है। नतीजों का जोड़ सौ प्रतिशत होता है।"},
+ {sel:"#smStack",act:"#smEq",en:"Equal scores give equal probabilities.",
+  te:"సమాన స్కోర్లు సమాన సంభావ్యతలను ఇస్తాయి.",hn:"बराबर स्कोर बराबर संभावनाएँ देते हैं।"},
+ {sel:"#smNote",act:"#smShift",en:"Adding the same amount to every score changes nothing, because only differences matter. The temperature slider spreads or sharpens the probabilities.",
+  te:"ప్రతి స్కోర్‌కు ఒకే మొత్తం కలిపితే ఏమీ మారదు, ఎందుకంటే తేడాలే ముఖ్యం. టెంపరేచర్ స్లైడర్ సంభావ్యతలను విస్తరిస్తుంది లేదా పదును పెడుతుంది.",
+  hn:"हर स्कोर में एक ही मात्रा जोड़ने से कुछ नहीं बदलता, क्योंकि सिर्फ़ अंतर मायने रखते हैं। टेम्परेचर स्लाइडर संभावनाओं को फैलाता या तेज़ करता है।"}],
+"p1-ce":[
+ {sel:"#ceSvg",en:"How do we score a guess? We look only at the probability given to the correct word.",
+  te:"ఒక అంచనాకు స్కోర్ ఎలా ఇస్తాం? సరైన పదానికి ఇచ్చిన సంభావ్యతను మాత్రమే చూస్తాం.",hn:"किसी अनुमान को अंक कैसे दें? हम सिर्फ़ सही शब्द को दी गई संभावना देखते हैं।"},
+ {sel:"#ceL",act:()=>{ceP=.9;renderCE();},en:"Ninety percent on the right word gives a tiny penalty.",
+  te:"సరైన పదానికి తొంభై శాతం ఇస్తే చాలా చిన్న శిక్ష.",hn:"सही शब्द पर नब्बे प्रतिशत देने पर बहुत छोटी सज़ा मिलती है।"},
+ {sel:"#ceL",act:()=>{ceP=.05;renderCE();},en:"Five percent gives a huge penalty. The curve shoots up as the probability drops.",
+  te:"ఐదు శాతం ఇస్తే చాలా పెద్ద శిక్ష. సంభావ్యత తగ్గే కొద్దీ వక్రరేఖ పైకి దూసుకుపోతుంది.",hn:"पाँच प्रतिशत देने पर बहुत बड़ी सज़ा। संभावना घटते ही रेखा तेज़ी से ऊपर जाती है।"},
+ {sel:"#ceMood",act:()=>{ceP=.3;renderCE();},en:"This penalty, averaged over every word, is the training loss. Training means pushing it down.",
+  te:"ప్రతి పదంపై ఈ శిక్ష సగటే ట్రైనింగ్ లాస్. ట్రైనింగ్ అంటే దాన్ని తగ్గించడం.",hn:"हर शब्द पर इस सज़ा का औसत ही ट्रेनिंग लॉस है। ट्रेनिंग का मतलब है इसे नीचे लाना।"}],
+"p1-der":[
+ {sel:"#derSvg",en:"A derivative measures steepness. If I nudge x a little, how much does the curve move?",
+  te:"డెరివేటివ్ ఏటవాలును కొలుస్తుంది. ఎక్స్‌ను కొంచెం కదిలిస్తే వక్రరేఖ ఎంత కదులుతుంది?",hn:"डेरिवेटिव ढलान मापता है। अगर एक्स को थोड़ा खिसकाएँ तो रेखा कितनी हिलती है?"},
+ {sel:"#derH",act:()=>{fhv=85;renderDer();},en:"The orange line passes through two points a distance h apart. Its slope is rise over run.",
+  te:"నారింజ రంగు గీత హెచ్ దూరంలో ఉన్న రెండు బిందువుల గుండా వెళ్తుంది. దాని వాలు అంటే ఎత్తు భాగించు దూరం.",hn:"नारंगी रेखा एच की दूरी पर दो बिंदुओं से गुज़रती है। उसकी ढलान है ऊँचाई बटा दूरी।"},
+ {sel:"#derRead",act:"#derShrink",en:"Watch h shrink towards zero. The orange line turns into the green tangent. That limit is the derivative.",
+  te:"హెచ్ సున్నా వైపు తగ్గడం చూడండి. నారింజ గీత ఆకుపచ్చ టాంజెంట్‌గా మారుతుంది. ఆ పరిమితే డెరివేటివ్.",hn:"एच को शून्य की ओर घटते देखिए। नारंगी रेखा हरी टैंजेंट बन जाती है। यही सीमा डेरिवेटिव है।"},
+ {sel:"#derRead",en:"The red arrow points downhill. Training follows the downhill direction for every weight.",
+  te:"ఎరుపు బాణం కిందికి వాలు వైపు చూపిస్తుంది. ట్రైనింగ్ ప్రతి వెయిట్‌కు ఈ దిశనే అనుసరిస్తుంది.",hn:"लाल तीर ढलान की ओर इशारा करता है। ट्रेनिंग हर वेट के लिए इसी दिशा में चलती है।"}],
+"p1-gd":[
+ {sel:"#gdCv",en:"This map is a loss landscape. Dark means low loss and bright means high loss. The white ball is the model's two weights.",
+  te:"ఈ మ్యాప్ ఒక లాస్ ల్యాండ్‌స్కేప్. చీకటి అంటే తక్కువ లాస్, వెలుతురు అంటే ఎక్కువ లాస్. తెల్లటి బంతి మోడల్ యొక్క రెండు వెయిట్లు.",hn:"यह मैप लॉस का भू-दृश्य है। गहरा रंग यानी कम लॉस, चमकीला यानी ज़्यादा लॉस। सफ़ेद गेंद मॉडल के दो वेट हैं।"},
+ {sel:"#gdCv",act:()=>{gd.land="bowl";$("#gdLr").value=4;$("#gdMom").checked=false;gd.start=[2.4,2];gdReset();gdRoll();},en:"Gradient descent feels the slope and steps downhill, again and again, until it reaches the bottom.",
+  te:"గ్రేడియెంట్ డిసెంట్ వాలును గమనించి కిందికి అడుగు వేస్తుంది, మళ్లీ మళ్లీ, అడుగుకు చేరేవరకు.",hn:"ग्रेडिएंट डिसेंट ढलान महसूस करके नीचे कदम रखता है, बार-बार, जब तक तल तक न पहुँच जाए।"},
+ {sel:"#gdRead",act:()=>{gd.land="valley";$("#gdLr").value=10;gd.start=[2.5,1.5];gdReset();gdRoll();},en:"But if the learning rate is too large, every step overshoots further and the ball bounces out of control. This is how training explodes.",
+  te:"కానీ లెర్నింగ్ రేట్ చాలా పెద్దదైతే, ప్రతి అడుగు మరింత దూరం దాటిపోతుంది, బంతి అదుపు తప్పుతుంది. ట్రైనింగ్ ఇలాగే విఫలమవుతుంది.",hn:"लेकिन अगर लर्निंग रेट बहुत बड़ा हो, तो हर कदम और आगे निकल जाता है और गेंद बेकाबू हो जाती है। ट्रेनिंग ऐसे ही बिगड़ती है।"},
+ {sel:"#gdLands",act:()=>{gd.land="twin";$("#gdLr").value=4;gd.start=[2.2,1.8];gdReset();gdRoll();},en:"On the two valleys map, where you start matters. Here the ball gets stuck in the shallow valley.",
+  te:"రెండు లోయల మ్యాప్‌లో ఎక్కడ మొదలుపెడతారన్నది ముఖ్యం. ఇక్కడ బంతి లోతు తక్కువ లోయలో చిక్కుకుపోతుంది.",hn:"दो घाटियों वाले मैप पर शुरुआत की जगह मायने रखती है। यहाँ गेंद उथली घाटी में फँस जाती है।"}],
+"p1-bp":[
+ {sel:"#bpSvg",act:"#bpR",en:"This is one neuron drawn as a graph. Input x is multiplied by weight w, bias b is added, and sigmoid squashes the result into a prediction.",
+  te:"ఇది ఒక న్యూరాన్‌ను గ్రాఫ్‌గా చూపిస్తుంది. ఇన్‌పుట్ ఎక్స్‌ను వెయిట్ డబ్ల్యూతో గుణిస్తారు, బయాస్ బీ కలుపుతారు, సిగ్మాయిడ్ దాన్ని ఒక అంచనాగా కుదిస్తుంది.",
+  hn:"यह एक न्यूरॉन को ग्राफ़ के रूप में दिखाता है। इनपुट एक्स को वेट डब्ल्यू से गुणा किया जाता है, बायस बी जोड़ा जाता है, और सिग्मॉइड नतीजे को एक अनुमान में बदल देता है।"},
+ {sel:"#bpNarr",act:"#bpF",en:"The forward pass. Values flow from left to right and end in the error, L.",
+  te:"ఫార్వర్డ్ పాస్. విలువలు ఎడమ నుంచి కుడికి ప్రవహించి ఎర్రర్ ఎల్ దగ్గర ముగుస్తాయి.",hn:"फ़ॉरवर्ड पास। मान बाएँ से दाएँ बहते हैं और त्रुटि एल पर खत्म होते हैं।"},
+ {sel:"#bpNarr",act:"#bpB",en:"The backward pass. Gradients flow from right to left, and each step multiplies by a local slope. That is the chain rule. Now every weight knows its share of the blame.",
+  te:"బ్యాక్‌వర్డ్ పాస్. గ్రేడియెంట్లు కుడి నుంచి ఎడమకు ప్రవహిస్తాయి, ప్రతి అడుగులో ఒక స్థానిక వాలుతో గుణిస్తాయి. ఇదే చైన్ రూల్. ఇప్పుడు ప్రతి వెయిట్‌కు తప్పులో తన వాటా తెలుసు.",
+  hn:"बैकवर्ड पास। ग्रेडिएंट दाएँ से बाएँ बहते हैं, और हर कदम पर एक स्थानीय ढलान से गुणा होता है। यही चेन रूल है। अब हर वेट को गलती में अपना हिस्सा पता है।"},
+ {sel:"#bpLoss",act:"#bpU",en:"Update. Each weight takes a small step against its gradient, and the loss goes down. Repeat this millions of times and you have trained a language model.",
+  te:"అప్‌డేట్. ప్రతి వెయిట్ తన గ్రేడియెంట్‌కు వ్యతిరేకంగా చిన్న అడుగు వేస్తుంది, లాస్ తగ్గుతుంది. దీన్ని లక్షల సార్లు చేస్తే లాంగ్వేజ్ మోడల్ ట్రైన్ అయినట్లే.",
+  hn:"अपडेट। हर वेट अपने ग्रेडिएंट के उल्टा एक छोटा कदम लेता है, और लॉस घटता है। इसे लाखों बार दोहराइए और लैंग्वेज मॉडल ट्रेन हो जाता है।"}],
+/* ---------- Stage 2 ---------- */
+"p2-pipe":[
+ {sel:"#p2In",en:"Here is the whole tokenizer pipeline. Type any sentence you like.",
+  te:"ఇది మొత్తం టోకనైజర్ పైప్‌లైన్. మీకు నచ్చిన ఏ వాక్యమైనా టైప్ చేయండి.",hn:"यह पूरी टोकनाइज़र पाइपलाइन है। अपनी पसंद का कोई भी वाक्य लिखिए।"},
+ {sel:"#pipe2",act:"#p2Play",en:"The text is cleaned, split into words, cut into subword pieces, wrapped with start and end markers, turned into IDs, and padded.",
+  te:"టెక్స్ట్ శుభ్రపరచబడి, పదాలుగా విడదీయబడి, సబ్‌వర్డ్ ముక్కలుగా కోయబడి, ప్రారంభ, ముగింపు గుర్తులతో చుట్టబడి, ఐడీలుగా మారి, ప్యాడ్ చేయబడుతుంది.",
+  hn:"टेक्स्ट को साफ़ किया जाता है, शब्दों में बाँटा जाता है, सबवर्ड टुकड़ों में काटा जाता है, शुरू और अंत के निशान लगाए जाते हैं, आईडी में बदला जाता है, और पैड किया जाता है।"},
+ {sel:"#p2Out",en:"At the end, your sentence is just a row of integers. That tensor is all the model ever sees.",
+  te:"చివరికి మీ వాక్యం కేవలం పూర్ణ సంఖ్యల వరుస. మోడల్ చూసేది ఆ టెన్సర్ మాత్రమే.",hn:"आखिर में आपका वाक्य बस पूर्णांकों की एक पंक्ति है। मॉडल सिर्फ़ यही टेंसर देखता है।"}],
+"p2-bytes":[
+ {sel:"#byCards",en:"Computers already store text as bytes, which are numbers from zero to two hundred and fifty five.",
+  te:"కంప్యూటర్లు ఇప్పటికే టెక్స్ట్‌ను బైట్లుగా నిల్వ చేస్తాయి, అంటే సున్నా నుంచి రెండు వందల యాభై ఐదు వరకు సంఖ్యలు.",hn:"कंप्यूटर पहले से ही टेक्स्ट को बाइट्स में रखते हैं, यानी शून्य से दो सौ पचपन तक के नंबर।"},
+ {sel:"#byLeg",en:"English letters need one byte, accented letters two, the rupee sign and Indian scripts three, and emoji four.",
+  te:"ఇంగ్లీష్ అక్షరాలకు ఒక బైట్, యాస గుర్తులున్న అక్షరాలకు రెండు, రూపాయి గుర్తు, భారతీయ లిపులకు మూడు, ఎమోజీకి నాలుగు.",hn:"अंग्रेज़ी अक्षरों को एक बाइट, मात्रा वाले अक्षरों को दो, रुपये के चिह्न और भारतीय लिपियों को तीन, और इमोजी को चार बाइट चाहिए।"},
+ {sel:"#byStats",act:()=>{$("#byIn").value="Hello నమస్తే नमस्ते 👍";renderBytes();},en:"With Telugu or Hindi text, notice that each letter takes three bytes. Byte-level tokenizers handle any language, but rarer scripts cost more tokens.",
+  te:"తెలుగు లేదా హిందీ టెక్స్ట్‌లో ప్రతి అక్షరానికి మూడు బైట్లు పడతాయి గమనించండి. బైట్ స్థాయి టోకనైజర్లు ఏ భాషనైనా నిర్వహిస్తాయి, కానీ అరుదైన లిపులకు ఎక్కువ టోకెన్లు ఖర్చవుతాయి.",
+  hn:"तेलुगु या हिंदी टेक्स्ट में देखिए, हर अक्षर तीन बाइट लेता है। बाइट स्तर के टोकनाइज़र कोई भी भाषा संभाल लेते हैं, लेकिन कम इस्तेमाल होने वाली लिपियों में ज़्यादा टोकन लगते हैं।"}],
+"p2-norm":[
+ {sel:"#nIn",en:"Real text is messy: capital letters, extra spaces and fancy characters.",
+  te:"నిజమైన టెక్స్ట్ గజిబిజిగా ఉంటుంది: పెద్ద అక్షరాలు, అదనపు ఖాళీలు, వింత అక్షరాలు.",hn:"असली टेक्स्ट गंदा होता है: बड़े अक्षर, फ़ालतू खाली जगहें और अजीब अक्षर।"},
+ {sel:"#nSteps",act:()=>{["nfkc","lower","accent","space"].forEach(k=>{normState[k]=true;$("#no-"+k).checked=true;});renderNorm();},en:"Each normalization rule cleans one thing. Read the steps from top to bottom and watch the text change.",
+  te:"ప్రతి నార్మలైజేషన్ నియమం ఒక విషయాన్ని శుభ్రం చేస్తుంది. పై నుంచి కిందికి దశలను చదివి టెక్స్ట్ ఎలా మారుతుందో చూడండి.",hn:"हर नॉर्मलाइज़ेशन नियम एक चीज़ साफ़ करता है। ऊपर से नीचे कदम पढ़िए और टेक्स्ट को बदलते देखिए।"},
+ {sel:"#nVar",en:"Seven different spellings collapse into just two words. But be careful: lowercasing and removing accents also throw information away.",
+  te:"ఏడు వేర్వేరు స్పెల్లింగ్‌లు కేవలం రెండు పదాలుగా కలిసిపోతాయి. కానీ జాగ్రత్త: చిన్న అక్షరాలకు మార్చడం, యాస గుర్తులు తీసేయడం సమాచారాన్ని కూడా పోగొడతాయి.",hn:"सात अलग वर्तनियाँ सिर्फ़ दो शब्दों में सिमट जाती हैं। लेकिन ध्यान रहे: छोटे अक्षर करना और मात्राएँ हटाना जानकारी भी मिटा देता है।"}],
+"p2-cmp":[
+ {sel:"#cRows",en:"Here are three ways to cut text. Each coloured box is one token.",
+  te:"టెక్స్ట్‌ను కోయడానికి ఇవి మూడు మార్గాలు. ప్రతి రంగు పెట్టె ఒక టోకెన్.",hn:"टेक्स्ट काटने के ये तीन तरीके हैं। हर रंगीन डिब्बा एक टोकन है।"},
+ {sel:"#cRows",en:"Characters give a tiny vocabulary but very long sequences. Whole words give short sequences, but any new word becomes unknown, shown in red.",
+  te:"అక్షరాలు చిన్న పదకోశాన్ని, కానీ చాలా పొడవైన వరుసలను ఇస్తాయి. పూర్తి పదాలు చిన్న వరుసలను ఇస్తాయి, కానీ ఏ కొత్త పదమైనా తెలియనిదిగా ఎరుపులో కనిపిస్తుంది.",hn:"अक्षर छोटा शब्दकोश देते हैं लेकिन बहुत लंबे क्रम। पूरे शब्द छोटे क्रम देते हैं, लेकिन हर नया शब्द अनजान बन जाता है, जो लाल रंग में दिखता है।"},
+ {sel:"#bpeN",act:()=>setBpeN(0),en:"Subword BPE sits in between. With zero merges, it is just characters.",
+  te:"సబ్‌వర్డ్ బీపీఈ మధ్యలో ఉంటుంది. సున్నా మెర్జ్‌లతో అది కేవలం అక్షరాలే.",hn:"सबवर्ड बीपीई बीच में है। शून्य मर्ज पर यह बस अक्षर हैं।"},
+ {sel:"#cRows",act:()=>setBpeN(Math.min(120,MAXM)),en:"With more merges, common words become single tokens while rare words split into known pieces. Nothing is ever unknown.",
+  te:"ఎక్కువ మెర్జ్‌లతో సాధారణ పదాలు ఒకే టోకెన్ అవుతాయి, అరుదైన పదాలు తెలిసిన ముక్కలుగా విడిపోతాయి. ఏదీ తెలియనిది కాదు.",hn:"ज़्यादा मर्ज के साथ आम शब्द एक टोकन बन जाते हैं, और कम आने वाले शब्द जाने-पहचाने टुकड़ों में बँट जाते हैं। कुछ भी अनजान नहीं रहता।"}],
+"p2-bpe":[
+ {sel:"#bWords",act:()=>{$("#bCorpus").value=BCLASSIC;$("#bEnc").value="lowest";bReset();},en:"Byte pair encoding builds its vocabulary from the bottom up. Every word starts as single letters.",
+  te:"బైట్ పెయిర్ ఎన్‌కోడింగ్ తన పదకోశాన్ని కింది నుంచి పైకి నిర్మిస్తుంది. ప్రతి పదం ఒక్కో అక్షరంగా మొదలవుతుంది.",hn:"बाइट पेयर एनकोडिंग अपना शब्दकोश नीचे से ऊपर बनाता है। हर शब्द अकेले अक्षरों से शुरू होता है।"},
+ {sel:"#bPairs",act:"#bNext",en:"It counts every pair of neighbouring symbols. The most frequent pair, e plus s, is glued into a new token.",
+  te:"ఇది పక్కపక్కనే ఉన్న ప్రతి జతను లెక్కిస్తుంది. ఎక్కువసార్లు వచ్చిన జత, ఈ ప్లస్ ఎస్, కొత్త టోకెన్‌గా అతుక్కుంటుంది.",hn:"यह पास-पास के हर जोड़े को गिनता है। सबसे ज़्यादा आने वाला जोड़ा, ई प्लस एस, जुड़कर नया टोकन बन जाता है।"},
+ {sel:"#bRules",act:"#bNext",en:"Repeat. Each merge becomes a rule, in order. The list of rules is the trained tokenizer.",
+  te:"మళ్లీ చేయండి. ప్రతి మెర్జ్ క్రమంలో ఒక నియమం అవుతుంది. ఈ నియమాల జాబితానే ట్రైన్ అయిన టోకనైజర్.",hn:"दोहराइए। हर मर्ज क्रम से एक नियम बनता है। नियमों की यही सूची ट्रेन किया हुआ टोकनाइज़र है।"},
+ {sel:"#bEncOut",act:()=>{bStep().then(()=>bStep());},en:"A new word like lowest is encoded by replaying the rules, so it becomes low plus est, even though it never appeared in training.",
+  te:"లోయెస్ట్ లాంటి కొత్త పదాన్ని నియమాలను మళ్లీ వర్తింపజేసి ఎన్‌కోడ్ చేస్తారు, కాబట్టి అది ట్రైనింగ్‌లో ఎప్పుడూ లేకపోయినా లో ప్లస్ ఎస్ట్ అవుతుంది.",hn:"लोएस्ट जैसे नए शब्द को नियम दोहराकर एनकोड किया जाता है, इसलिए ट्रेनिंग में कभी न आने पर भी यह लो प्लस एस्ट बन जाता है।"}],
+"p2-vocab":[
+ {sel:"#vSvg",en:"Here is the central trade-off. The orange line shows how many tokens the text needs. The violet line shows embedding parameters.",
+  te:"ఇదే కీలకమైన సమతుల్యత. నారింజ గీత టెక్స్ట్‌కు ఎన్ని టోకెన్లు కావాలో చూపిస్తుంది. ఊదా గీత ఎంబెడింగ్ పారామీటర్లను చూపిస్తుంది.",hn:"यही मुख्य संतुलन है। नारंगी रेखा बताती है कि टेक्स्ट को कितने टोकन चाहिए। बैंगनी रेखा एम्बेडिंग पैरामीटर दिखाती है।"},
+ {sel:"#vStats",act:()=>setBpeN(MAXM),en:"A bigger vocabulary means shorter sequences, so attention is cheaper. But the embedding table grows, and rare tokens are poorly trained.",
+  te:"పెద్ద పదకోశం అంటే చిన్న వరుసలు, కాబట్టి అటెన్షన్ చౌక. కానీ ఎంబెడింగ్ పట్టిక పెరుగుతుంది, అరుదైన టోకెన్లు సరిగా ట్రైన్ కావు.",hn:"बड़ा शब्दकोश यानी छोटे क्रम, इसलिए अटेंशन सस्ता। लेकिन एम्बेडिंग टेबल बढ़ती है, और कम आने वाले टोकन ठीक से ट्रेन नहीं होते।"},
+ {sel:"#vStats",act:()=>setBpeN(Math.min(120,MAXM)),en:"Small models that run on a CPU usually choose a vocabulary of a few thousand tokens.",
+  te:"సీపీయూపై నడిచే చిన్న మోడల్స్ సాధారణంగా కొన్ని వేల టోకెన్ల పదకోశాన్ని ఎంచుకుంటాయి.",hn:"सीपीयू पर चलने वाले छोटे मॉडल आमतौर पर कुछ हज़ार टोकन का शब्दकोश चुनते हैं।"}],
+"p2-pad":[
+ {sel:"#pGrid",en:"Models process sentences in batches, and a batch must be a rectangle.",
+  te:"మోడల్స్ వాక్యాలను బ్యాచ్‌లుగా ప్రాసెస్ చేస్తాయి, బ్యాచ్ ఒక దీర్ఘచతురస్రంగా ఉండాలి.",hn:"मॉडल वाक्यों को बैच में प्रोसेस करते हैं, और बैच एक आयत होना चाहिए।"},
+ {sel:"#pGrid",act:()=>{$("#pTo").value="longest";$("#pMax").value=12;$("#pTrunc").checked=true;renderPad();},en:"Short sentences get padding tokens, shown with dashed borders. Long sentences get cut, shown in red.",
+  te:"చిన్న వాక్యాలకు ప్యాడింగ్ టోకెన్లు జోడిస్తారు, అవి చుక్కల అంచులతో కనిపిస్తాయి. పొడవైన వాక్యాలు కత్తిరించబడతాయి, ఎరుపులో కనిపిస్తాయి.",hn:"छोटे वाक्यों में पैडिंग टोकन जुड़ते हैं, जो डैश वाली किनारी से दिखते हैं। लंबे वाक्य कट जाते हैं, जो लाल रंग में दिखते हैं।"},
+ {sel:"#pMask",en:"The attention mask marks real tokens with one and padding with zero, so the model ignores the padding.",
+  te:"అటెన్షన్ మాస్క్ నిజమైన టోకెన్లను ఒకటితో, ప్యాడింగ్‌ను సున్నాతో గుర్తిస్తుంది, కాబట్టి మోడల్ ప్యాడింగ్‌ను పట్టించుకోదు.",hn:"अटेंशन मास्क असली टोकन को एक और पैडिंग को शून्य से चिह्नित करता है, ताकि मॉडल पैडिंग को नज़रअंदाज़ करे।"},
+ {sel:"#pStats",en:"Padding wastes compute. Grouping sentences of similar length keeps the waste low.",
+  te:"ప్యాడింగ్ కంప్యూట్‌ను వృథా చేస్తుంది. ఒకే పొడవున్న వాక్యాలను కలిపి ఉంచితే వృథా తగ్గుతుంది.",hn:"पैडिंग कंप्यूट बर्बाद करती है। एक जैसी लंबाई के वाक्यों को साथ रखने से बर्बादी कम होती है।"}],
+/* ---------- Stage 3 ---------- */
+"p3-why":[
+ {sel:"#whySim",act:"#whyOne",en:"With one-hot vectors, every word is equally different from every other. Every pair scores zero.",
+  te:"వన్-హాట్ వెక్టర్లతో ప్రతి పదం మిగతా అన్నింటికీ సమానంగా భిన్నంగా ఉంటుంది. ప్రతి జతకు స్కోర్ సున్నా.",hn:"वन-हॉट वेक्टर में हर शब्द बाकी सबसे बराबर अलग होता है। हर जोड़े का स्कोर शून्य है।"},
+ {sel:"#whySim",act:"#whyDense",en:"With dense embeddings, related words such as cat and dog, or king and queen, become similar. Learning about one word now helps its neighbours.",
+  te:"డెన్స్ ఎంబెడింగ్స్‌తో, పిల్లి, కుక్క లేదా రాజు, రాణి లాంటి సంబంధిత పదాలు దగ్గరవుతాయి. ఒక పదం గురించి నేర్చుకున్నది దాని పొరుగు పదాలకూ ఉపయోగపడుతుంది.",hn:"डेंस एम्बेडिंग में बिल्ली और कुत्ता, या राजा और रानी जैसे जुड़े शब्द मिलते-जुलते हो जाते हैं। एक शब्द के बारे में सीखी बात उसके पड़ोसियों के भी काम आती है।"}],
+"p3-look":[
+ {sel:"#lkE",en:"The embedding matrix is a table with one row for each word in the vocabulary.",
+  te:"ఎంబెడింగ్ మ్యాట్రిక్స్ అనేది పదకోశంలోని ప్రతి పదానికి ఒక వరుస ఉన్న పట్టిక.",hn:"एम्बेडिंग मैट्रिक्स एक टेबल है जिसमें शब्दकोश के हर शब्द की एक पंक्ति है।"},
+ {sel:"#lkOut",act:"#lkPlay",en:"To embed a sentence, each token simply copies its row. Watch each word fetch its numbers.",
+  te:"వాక్యాన్ని ఎంబెడ్ చేయడానికి ప్రతి టోకెన్ తన వరుసను కాపీ చేసుకుంటుంది. ప్రతి పదం తన సంఖ్యలను తెచ్చుకోవడం చూడండి.",hn:"वाक्य को एम्बेड करने के लिए हर टोकन बस अपनी पंक्ति कॉपी करता है। हर शब्द को अपने नंबर लाते हुए देखिए।"},
+ {sel:"#lkOH",en:"This copy is the same as multiplying a one-hot vector by the matrix. The table's numbers start random and are learned during training.",
+  te:"ఈ కాపీ, ఒక వన్-హాట్ వెక్టర్‌ను మ్యాట్రిక్స్‌తో గుణించడంతో సమానం. పట్టికలోని సంఖ్యలు యాదృచ్ఛికంగా మొదలై ట్రైనింగ్‌లో నేర్చుకోబడతాయి.",hn:"यह कॉपी करना वन-हॉट वेक्टर को मैट्रिक्स से गुणा करने जैसा ही है। टेबल के नंबर बेतरतीब शुरू होते हैं और ट्रेनिंग में सीखे जाते हैं।"}],
+"p3-map":[
+ {sel:"#mapSvg",act:()=>{embDi=3;renderMap();},en:"This map shows word embeddings flattened to two dimensions. Each colour is a group of related words.",
+  te:"ఈ మ్యాప్ పద ఎంబెడింగ్స్‌ను రెండు కొలతలకు కుదించి చూపిస్తుంది. ప్రతి రంగు సంబంధిత పదాల సమూహం.",hn:"यह मैप शब्द एम्बेडिंग को दो आयामों में दबाकर दिखाता है। हर रंग जुड़े हुए शब्दों का एक समूह है।"},
+ {sel:"#mapNN",act:()=>{mapSel="king";renderMap();},en:"Click a word to see its nearest neighbours. King is close to prince, queen and princess.",
+  te:"దగ్గరి పొరుగు పదాలను చూడటానికి ఒక పదాన్ని నొక్కండి. రాజుకు యువరాజు, రాణి, యువరాణి దగ్గరగా ఉన్నారు.",hn:"सबसे नज़दीकी शब्द देखने के लिए किसी शब्द पर क्लिक करें। राजा के पास राजकुमार, रानी और राजकुमारी हैं।"},
+ {sel:"#mapStats",act:()=>{embDi=0;renderMap();},en:"Shrink the embedding size to two, and the meanings crowd together. Accuracy falls.",
+  te:"ఎంబెడింగ్ పరిమాణాన్ని రెండుకు తగ్గిస్తే అర్థాలు ఒకదానిపై ఒకటి కిక్కిరిసిపోతాయి. ఖచ్చితత్వం పడిపోతుంది.",hn:"एम्बेडिंग का आकार दो कर दीजिए, तो अर्थ एक-दूसरे पर भीड़ लगा देते हैं। सटीकता गिर जाती है।"},
+ {sel:"#anOut",act:()=>{embDi=4;renderMap();},en:"With more dimensions there is room for every meaning. Even arithmetic works: king minus man plus woman lands on queen.",
+  te:"ఎక్కువ కొలతలుంటే ప్రతి అర్థానికీ చోటు ఉంటుంది. లెక్కలు కూడా పనిచేస్తాయి: రాజు మైనస్ పురుషుడు ప్లస్ స్త్రీ, రాణి దగ్గరికి చేరుతుంది.",hn:"ज़्यादा आयाम होने पर हर अर्थ के लिए जगह होती है। गणित भी काम करता है: राजा माइनस आदमी प्लस औरत, रानी पर पहुँचता है।"}],
+"p3-cos":[
+ {sel:"#csVecs",act:()=>{csK=1;renderCos();},en:"Cosine similarity compares directions. Multiply matching numbers, add them up, then divide by both lengths.",
+  te:"కొసైన్ సిమిలారిటీ దిశలను పోలుస్తుంది. సరిపోయే సంఖ్యలను గుణించి, కలిపి, రెండు పొడవులతో భాగించండి.",hn:"कोसाइन सिमिलैरिटी दिशाओं की तुलना करती है। मिलते नंबरों को गुणा करके जोड़िए, फिर दोनों लंबाइयों से भाग दीजिए।"},
+ {sel:"#csStats",act:"#csScale",en:"Stretch vector A to double its length. The dot product doubles, but cosine stays the same. That is why cosine is used to compare meanings.",
+  te:"వెక్టర్ ఏ ను రెట్టింపు పొడవుకు సాగదీయండి. డాట్ ప్రోడక్ట్ రెట్టింపవుతుంది, కానీ కొసైన్ మారదు. అందుకే అర్థాలను పోల్చడానికి కొసైన్ వాడతారు.",hn:"वेक्टर ए को दोगुना लंबा कीजिए। डॉट प्रोडक्ट दोगुना हो जाता है, लेकिन कोसाइन वही रहता है। इसीलिए अर्थों की तुलना के लिए कोसाइन इस्तेमाल होता है।"}],
+"p3-pe":[
+ {sel:"#peCv",act:"#peSin",en:"Attention sees all the words at once, so it has to be told their order. Each position gets its own pattern of waves.",
+  te:"అటెన్షన్ అన్ని పదాలను ఒకేసారి చూస్తుంది, కాబట్టి వాటి క్రమం చెప్పాలి. ప్రతి స్థానానికి దాని సొంత తరంగాల నమూనా ఉంటుంది.",hn:"अटेंशन सारे शब्द एक साथ देखता है, इसलिए उसे उनका क्रम बताना पड़ता है। हर स्थिति को लहरों का अपना पैटर्न मिलता है।"},
+ {sel:"#peWave",en:"Low dimensions wiggle fast and high dimensions slowly, like the hands of a clock. Together they give every position a unique fingerprint.",
+  te:"తక్కువ కొలతలు వేగంగా, ఎక్కువ కొలతలు నెమ్మదిగా ఊగుతాయి, గడియారపు ముళ్ల లాగా. కలిసి ప్రతి స్థానానికి ఒక ప్రత్యేక వేలిముద్రను ఇస్తాయి.",hn:"छोटे आयाम तेज़ी से और बड़े आयाम धीरे हिलते हैं, घड़ी की सुइयों की तरह। मिलकर ये हर स्थिति को एक अनोखी पहचान देते हैं।"},
+ {sel:"#peSim",en:"Nearby positions look alike and distant ones look different. That is the bright band along the diagonal.",
+  te:"దగ్గరి స్థానాలు ఒకేలా, దూరపు స్థానాలు భిన్నంగా కనిపిస్తాయి. కర్ణం వెంబడి ఉన్న ప్రకాశవంతమైన పట్టీ అదే.",hn:"पास की स्थितियाँ एक जैसी और दूर की अलग दिखती हैं। विकर्ण के साथ चमकीली पट्टी यही है।"}],
+"p3-mix":[
+ {sel:"#mxRows",en:"The model's input is the word's embedding plus its position's encoding.",
+  te:"మోడల్ ఇన్‌పుట్ అంటే పదం యొక్క ఎంబెడింగ్ ప్లస్ దాని స్థానం యొక్క ఎన్‌కోడింగ్.",hn:"मॉडल का इनपुट है शब्द की एम्बेडिंग प्लस उसकी स्थिति की एनकोडिंग।"},
+ {sel:"#ordOut",en:"So dog at the start and dog at the end now get different vectors, and the model can tell who chased whom.",
+  te:"కాబట్టి మొదట్లో ఉన్న కుక్క, చివర్లో ఉన్న కుక్కకు ఇప్పుడు వేర్వేరు వెక్టర్లు వస్తాయి, ఎవరు ఎవరిని వెంబడించారో మోడల్ గుర్తించగలదు.",hn:"इसलिए शुरुआत वाले कुत्ते और आखिर वाले कुत्ते को अब अलग वेक्टर मिलते हैं, और मॉडल बता सकता है कि किसने किसका पीछा किया।"}],
+"p3-train":[
+ {sel:"#trSvg",act:"#trReset",en:"Now real learning. Every word starts at a random point.",
+  te:"ఇప్పుడు నిజమైన నేర్చుకోవడం. ప్రతి పదం ఒక యాదృచ్ఛిక బిందువు వద్ద మొదలవుతుంది.",hn:"अब असली सीखना। हर शब्द एक बेतरतीब बिंदु से शुरू होता है।"},
+ {sel:"#trSvg",act:()=>{if(!tr.timer)$("#trPlay").click();},en:"Words used in the same sentence pull together, and random pairs push apart. Watch the groups form, with nobody telling the model what the words mean.",
+  te:"ఒకే వాక్యంలో వాడిన పదాలు దగ్గరికి లాగబడతాయి, యాదృచ్ఛిక జతలు దూరంగా నెట్టబడతాయి. పదాల అర్థం ఎవరూ చెప్పకుండానే సమూహాలు ఏర్పడటం చూడండి.",hn:"एक ही वाक्य में आए शब्द पास खिंचते हैं, और बेतरतीब जोड़े दूर धकेले जाते हैं। देखिए, बिना किसी के अर्थ बताए समूह बन रहे हैं।"},
+ {sel:"#trStats",en:"The loss falls and more words find a neighbour of the same colour. A real language model learns its embeddings the same way, from context alone.",
+  te:"లాస్ తగ్గుతుంది, ఎక్కువ పదాలకు అదే రంగు పొరుగు పదం దొరుకుతుంది. నిజమైన లాంగ్వేజ్ మోడల్ కూడా తన ఎంబెడింగ్స్‌ను కేవలం సందర్భం నుంచే ఇలాగే నేర్చుకుంటుంది.",hn:"लॉस घटता है और ज़्यादा शब्दों को उसी रंग का पड़ोसी मिलता है। असली लैंग्वेज मॉडल भी अपनी एम्बेडिंग सिर्फ़ संदर्भ से ऐसे ही सीखता है।"}]
+};
+
+/* ---- engine ---- */
+const NV={lang:"en",rate:1,cap:true,voice:"",queue:[],i:0,tok:0,playing:false,safety:null};
+try{const s=JSON.parse(localStorage.getItem("slmlab.narr")||"{}");Object.assign(NV,{lang:s.lang||"en",rate:s.rate||1,cap:s.cap!==false,voice:s.voice||""});}catch(e){}
+const saveNV=()=>{try{localStorage.setItem("slmlab.narr",JSON.stringify({lang:NV.lang,rate:NV.rate,cap:NV.cap,voice:NV.voice}));}catch(e){}};
+const synth=("speechSynthesis" in window)?window.speechSynthesis:null;
+const LCODE={en:"en",te:"te",hn:"hi"},LNAME={en:"English",te:"Telugu",hn:"Hindi"};
+let voices=[];
+function loadVoices(){try{voices=synth?synth.getVoices():[];}catch(e){voices=[];}fillVoices();}
+const voicesFor=l=>voices.filter(v=>(v.lang||"").toLowerCase().replace("_","-").startsWith(LCODE[l]));
+function pickVoice(l){const vs=voicesFor(l);if(!vs.length)return null;return vs.find(v=>v.voiceURI===NV.voice)||vs.find(v=>/google|natural|neural|online|enhanced|premium/i.test(v.name))||vs[0];}
+function fillVoices(){const sel=$("#nbVoice");if(!sel)return;const vs=voicesFor(NV.lang),cur=pickVoice(NV.lang);
+  sel.innerHTML=vs.length?vs.map(v=>`<option value="${esc(v.voiceURI)}"${cur&&v.voiceURI===cur.voiceURI?" selected":""}>${esc(v.name)}</option>`).join(""):`<option value="">no ${LNAME[NV.lang]} voice on this device</option>`;
+  const w=$("#nbWarn");if(w)w.innerHTML=(!synth?"Your browser has no speech engine, so captions are shown instead.":!voices.length?"No speech voices were found on this device, so captions are shown and advance automatically. Voices can take a moment to load; if none appear, see your device&rsquo;s text-to-speech settings.":!vs.length?`No ${LNAME[NV.lang]} voice is installed on this device, so captions are shown instead. To add one: Android → Settings → Google Text-to-speech → Install voice data; Windows → Settings → Time & language → Speech → Add voices; Mac/iPhone → Accessibility → Spoken Content → Voices.`:"");}
+if(synth){loadVoices();try{synth.onvoiceschanged=loadVoices;}catch(e){}}
+function narrItems(id){const m=id.match(/-(code|ex|quiz)$/);return NARR[id]||(m?NARR_GENERIC[m[1]]:null);}
+const panelTitle=id=>{const h=document.querySelector(`#${id} .phead h3`);return h?h.textContent:"";};
+function clearHi(){$$(".narr-hi").forEach(e=>e.classList.remove("narr-hi"));}
+function narrStart(queue){narrHalt();NV.queue=queue;NV.i=0;NV.playing=true;$("#narrBar").hidden=false;document.body.classList.add("narrating");runSeg(true);}
+function narrHalt(){NV.tok++;clearTimeout(NV.safety);try{synth&&synth.cancel();}catch(e){}}
+function narrStop(){narrHalt();NV.playing=false;clearHi();$("#narrBar").hidden=true;document.body.classList.remove("narrating");}
+function runSeg(scroll){
+  const tok=++NV.tok;clearTimeout(NV.safety);const it=NV.queue[NV.i];
+  if(!it){NV.playing=false;clearHi();$("#nbPlay").textContent="Replay";$("#nbText").textContent=({en:"Finished. Press Replay to listen again.",te:"పూర్తయింది. మళ్లీ వినడానికి రీప్లే నొక్కండి.",hn:"पूरा हुआ। फिर से सुनने के लिए रीप्ले दबाएँ।"})[NV.lang];return;}
+  $("#nbPlay").textContent="Pause";
+  const prev=NV.queue[NV.i-1];
+  if(it.panel&&(scroll||!prev||prev.panel!==it.panel)){const p=document.getElementById(it.panel);if(p)p.scrollIntoView({behavior:"smooth",block:"start"});}
+  clearHi();if(it.seg.sel){const el=document.querySelector(it.seg.sel);if(el){el.classList.add("narr-hi");if(prev&&prev.panel===it.panel)el.scrollIntoView({behavior:"smooth",block:"nearest"});}}
+  if(it.seg.act&&!it.done){it.done=true;try{typeof it.seg.act==="function"?it.seg.act():document.querySelector(it.seg.act)?.click();}catch(e){}}
+  const text=it.seg[NV.lang]||it.seg.en;
+  $("#nbTitle").textContent=`${it.title} · ${NV.i+1}/${NV.queue.length}`;
+  const tx=$("#nbText");tx.textContent=text;tx.lang=LCODE[NV.lang];tx.hidden=!NV.cap;
+  $("#nbProg").style.width=((NV.i+1)/NV.queue.length*100).toFixed(1)+"%";
+  const next=()=>{if(tok!==NV.tok||!NV.playing)return;NV.i++;runSeg(false);};
+  const est=Math.max(2500,text.length/(NV.lang==="en"?14:11)/NV.rate*1000);
+  const v=synth?pickVoice(NV.lang):null;
+  if(v){setTimeout(()=>{if(tok!==NV.tok)return;try{const u=new SpeechSynthesisUtterance(text);u.voice=v;u.lang=v.lang;u.rate=NV.rate;
+      u.onend=()=>{clearTimeout(NV.safety);setTimeout(next,350);};
+      u.onerror=e=>{if(e.error==="interrupted"||e.error==="canceled")return;clearTimeout(NV.safety);NV.safety=setTimeout(next,est);};
+      synth.speak(u);NV.safety=setTimeout(next,est*2.2+4000);}catch(e){NV.safety=setTimeout(next,est);}},80);}
+  else NV.safety=setTimeout(next,est);
+}
+function tourFor(stage){const sec=document.querySelector(BUILT[stage]);const q=[];
+  const intro=NARR_INTRO[stage];if(intro)q.push({panel:null,title:`Stage ${stage} tour`,seg:intro});
+  sec.querySelectorAll(".panel[id]").forEach(p=>{const items=narrItems(p.id);if(items)items.forEach(seg=>q.push({panel:p.id,title:panelTitle(p.id),seg}));});return q;}
+function panelQueue(id){return (narrItems(id)||[]).map(seg=>({panel:id,title:panelTitle(id),seg}));}
+const SPK='<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+$$(".panel[id]").forEach(p=>{if(!narrItems(p.id))return;const h=p.querySelector(".phead");if(!h)return;const b=document.createElement("button");b.type="button";b.className="lbtn";b.innerHTML=SPK+"<span>Listen</span>";b.setAttribute("aria-label","Listen to an explanation of this panel");b.addEventListener("click",()=>narrStart(panelQueue(p.id)));const p0=h.querySelector("p");h.insertBefore(b,p0||null);});
+Object.entries(BUILT).forEach(([s,sel])=>{const head=document.querySelector(sel+" .stagehead");if(!head)return;const b=document.createElement("button");b.type="button";b.className="lbtn tour";b.innerHTML=SPK+"<span>Narrated tour of this stage</span>";b.addEventListener("click",()=>narrStart(tourFor(+s)));head.appendChild(b);});
+$("#nbLang").value=NV.lang;$("#nbRate").value=String(NV.rate);$("#nbCap").checked=NV.cap;
+$("#nbLang").addEventListener("change",e=>{NV.lang=e.target.value;NV.voice="";saveNV();fillVoices();if(NV.playing){narrHalt();runSeg(false);}});
+$("#nbRate").addEventListener("change",e=>{NV.rate=+e.target.value;saveNV();if(NV.playing){narrHalt();runSeg(false);}});
+$("#nbVoice").addEventListener("change",e=>{NV.voice=e.target.value;saveNV();if(NV.playing){narrHalt();runSeg(false);}});
+$("#nbCap").addEventListener("change",e=>{NV.cap=e.target.checked;saveNV();$("#nbText").hidden=!NV.cap;});
+$("#nbPlay").addEventListener("click",()=>{if(NV.playing){narrHalt();NV.playing=false;$("#nbPlay").textContent="Resume";}else{if(NV.i>=NV.queue.length){NV.i=0;NV.queue.forEach(q=>q.done=false);}NV.playing=true;runSeg(false);}});
+$("#nbPrev").addEventListener("click",()=>{narrHalt();NV.i=Math.max(0,NV.i-1);if(NV.queue[NV.i])NV.queue[NV.i].done=false;NV.playing=true;runSeg(false);});
+$("#nbNext").addEventListener("click",()=>{narrHalt();NV.i=Math.min(NV.queue.length,NV.i+1);NV.playing=true;runSeg(false);});
+$("#nbStop").addEventListener("click",narrStop);
+fillVoices();
 
 showStage(0);window.scrollTo(0,0);
 })();
