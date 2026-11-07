@@ -16,8 +16,8 @@ class GameFilterTest {
     }
 
     @Test fun queryMatchesTitleCaseInsensitivelyAndShortTitleExactly() {
-        assertEquals(listOf("gta-vice-city"), GameFilter.apply(games, "vice", null).map { it.id })
-        assertEquals(listOf("gta-san-andreas"), GameFilter.apply(games, "sa", GameCategory.GTA).map { it.id })
+        assertEquals(listOf("gta-vice-city", "gta-vice-city-android"), GameFilter.apply(games, "vice", null).map { it.id })
+        assertEquals(listOf("gta-san-andreas", "gta-san-andreas-android"), GameFilter.apply(games, "sa", GameCategory.GTA).map { it.id })
         assertEquals(emptyList<String>(), GameFilter.apply(games, "vice", GameCategory.CRICKET).map { it.id })
     }
 

@@ -20,14 +20,14 @@ class LibraryViewModelTest {
         val vm = LibraryViewModel(FakeGameRepository())
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect() }
 
-        assertEquals(6, vm.uiState.value.games.size)
+        assertEquals(9, vm.uiState.value.games.size)
         vm.onCategorySelected(GameCategory.GTA)
-        assertEquals(5, vm.uiState.value.games.size)
+        assertEquals(8, vm.uiState.value.games.size)
         vm.onQueryChange("andreas")
-        assertEquals(listOf("gta-san-andreas"), vm.uiState.value.games.map { it.id })
-        assertEquals(6, vm.uiState.value.totalCount)
+        assertEquals(listOf("gta-san-andreas", "gta-san-andreas-android"), vm.uiState.value.games.map { it.id })
+        assertEquals(9, vm.uiState.value.totalCount)
         vm.onCategorySelected(null)
         vm.onQueryChange("")
-        assertEquals(6, vm.uiState.value.games.size)
+        assertEquals(9, vm.uiState.value.games.size)
     }
 }

@@ -6,6 +6,8 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.retroplay.app.data.local.RetroPlayDatabase
 import com.retroplay.app.domain.game.GameCatalogue
+import com.retroplay.app.domain.launch.LaunchMethod
+import com.retroplay.app.domain.model.InstallationStatus
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -57,6 +59,26 @@ class OfflineGameRepositoryTest {
         // A fresh repository instance re-runs seeding; existing rows must not be overwritten.
         val reopened = OfflineGameRepository(db.gameDao())
         assertEquals("Use VirGL first", reopened.observeGame("gta-iii").first()!!.userNotes)
+    }
+
+    @Test fun androidLaunchUpdatesLastPlayedButOpeningAnExternalAppDoesNot() = runTest {
+        repository.observeGames().first()
+        repository.recordLaunch("gta-iii", LaunchMethod.EXTERNAL_APP_OPENED, 1_000)
+        assertNull(repository.observeGame("gta-iii").first()!!.lastPlayedAtEpochMillis)
+
+        repository.recordLaunch("gta-iii-android", LaunchMethod.ANDROID_APP, 2_000)
+        assertEquals(2_000L, repository.observeGame("gta-iii-android").first()!!.lastPlayedAtEpochMillis)
+        assertEquals(1, db.gameDao().playHistory("gta-iii").size)
+        assertEquals(1, db.gameDao().playHistory("gta-iii-android").size)
+    }
+
+    @Test fun linksAndroidPackageAndInstallationStatus() = runTest {
+        repository.observeGames().first()
+        repository.setAndroidPackage("gta-iii-android", " com.example.edition ")
+        repository.updateInstallationStatus("gta-iii-android", InstallationStatus.INSTALLED)
+        val game = repository.observeGame("gta-iii-android").first()!!
+        assertEquals("com.example.edition", game.androidPackageName)
+        assertEquals(InstallationStatus.INSTALLED, game.installationStatus)
     }
 
     @Test fun unknownGameIsNull() = runTest {

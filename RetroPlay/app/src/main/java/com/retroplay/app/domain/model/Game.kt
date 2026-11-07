@@ -22,6 +22,8 @@ enum class ExecutionType(val label: String) {
 enum class InstallationStatus(val label: String) {
     /** No files or app have been registered with RetroPlay yet. */
     NOT_IMPORTED("Not imported"),
+    /** An Android game whose app is not installed on this phone. */
+    NOT_INSTALLED("Not installed"),
     IMPORTED("Files imported"),
     INSTALLED("Installed"),
     /** Previously registered, but the app or files are no longer present. */
@@ -56,4 +58,6 @@ data class Game(
     val userNotes: String,
     val isFavorite: Boolean,
     val sortOrder: Int,
+    /** Android package of the official app for ANDROID_NATIVE games (catalogue default or user-linked). */
+    val androidPackageName: String? = null,
 )

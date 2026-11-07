@@ -23,7 +23,6 @@ import androidx.compose.material.icons.automirrored.filled.Notes
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -35,7 +34,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.retroplay.app.domain.launch.LaunchPlan
+import com.retroplay.app.presentation.common.AppPickerDialog
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -60,7 +66,40 @@ import java.util.Date
 @Composable
 fun GameDetailScreen(onBack: () -> Unit, viewModel: GameDetailViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    GameDetailContent(state, onBack, viewModel::setFavorite, viewModel::saveNotes)
+    val message by viewModel.message.collectAsStateWithLifecycle()
+    val picker by viewModel.picker.collectAsStateWithLifecycle()
+    val snackbar = remember { SnackbarHostState() }
+
+    // Re-check installed apps whenever the user returns (e.g. from the Play Store).
+    LifecycleResumeEffect(Unit) {
+        viewModel.refresh()
+        onPauseOrDispose {}
+    }
+    LaunchedEffect(message) {
+        message?.let {
+            snackbar.showSnackbar(it)
+            viewModel.consumeMessage()
+        }
+    }
+
+    Box {
+        GameDetailContent(
+            state = state,
+            onBack = onBack,
+            onFavoriteChange = viewModel::setFavorite,
+            onSaveNotes = viewModel::saveNotes,
+            launchActions = LaunchActions(
+                onLaunch = viewModel::launch,
+                onOpenStore = viewModel::openStoreListing,
+                onLinkApp = { viewModel.showPicker(PickerPurpose.LINK_ANDROID_APP) },
+                onChooseExternalApp = { viewModel.showPicker(PickerPurpose.CHOOSE_EXTERNAL_APP) },
+            ),
+        )
+        SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).navigationBarsPadding())
+    }
+    picker?.let { (_, pickerState) ->
+        AppPickerDialog(pickerState, onPick = viewModel::onAppPicked, onDismiss = viewModel::dismissPicker)
+    }
 }
 
 @Composable
@@ -69,6 +108,7 @@ fun GameDetailContent(
     onBack: () -> Unit,
     onFavoriteChange: (Boolean) -> Unit,
     onSaveNotes: (String) -> Unit,
+    launchActions: LaunchActions = LaunchActions(),
 ) {
     // Surface (not a bare Box) so text inherits onBackground instead of the default black.
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { Box(Modifier.fillMaxSize()) {
@@ -79,7 +119,7 @@ fun GameDetailContent(
                 "This entry is no longer in your library.",
                 Modifier.align(Alignment.Center).padding(16.dp),
             )
-            is GameDetailUiState.Ready -> GameDetailBody(state.game, onFavoriteChange, onSaveNotes)
+            is GameDetailUiState.Ready -> GameDetailBody(state.game, state.launchPlan, launchActions, onFavoriteChange, onSaveNotes)
         }
         FilledIconButton(
             onClick = onBack,
@@ -92,7 +132,11 @@ fun GameDetailContent(
 }
 
 @Composable
-private fun GameDetailBody(game: Game, onFavoriteChange: (Boolean) -> Unit, onSaveNotes: (String) -> Unit) {
+private fun GameDetailBody(
+    game: Game,
+    launchPlan: LaunchPlan?,
+    launchActions: LaunchActions,
+    onFavoriteChange: (Boolean) -> Unit, onSaveNotes: (String) -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
@@ -128,19 +172,7 @@ private fun GameDetailBody(game: Game, onFavoriteChange: (Boolean) -> Unit, onSa
             }
             Text(game.description, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
 
-            RetroCard {
-                CardHeader("How it runs", Icons.Filled.PlayCircle)
-                InfoRow("Execution", game.executionType.label)
-                InfoRow("Installation", game.installationStatus.label)
-                Spacer(Modifier.height(4.dp))
-                Text(game.executionType.explanation, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    "Launching from RetroPlay is not available in this build.",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary,
-                )
-            }
+            LaunchCard(game, launchPlan, launchActions)
 
             RetroCard {
                 CardHeader("Compatibility on this device", Icons.Filled.Verified)

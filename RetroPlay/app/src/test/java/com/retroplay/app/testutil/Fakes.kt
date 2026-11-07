@@ -38,6 +38,10 @@ class FakeUserPreferencesRepository(initial: UserPreferences = UserPreferences()
     override suspend fun setShowReferenceComparison(enabled: Boolean) {
         state.update { it.copy(showReferenceComparison = enabled) }
     }
+
+    override suspend fun setExternalApp(packageName: String?, label: String?) {
+        state.update { it.copy(externalAppPackage = packageName, externalAppLabel = if (packageName == null) null else label) }
+    }
 }
 
 class FakeGameRepository(
@@ -57,4 +61,60 @@ class FakeGameRepository(
     override suspend fun updateNotes(id: String, notes: String) {
         games.update { list -> list.map { if (it.id == id) it.copy(userNotes = notes.trim()) else it } }
     }
+
+    val launches = mutableListOf<Triple<String, com.retroplay.app.domain.launch.LaunchMethod, Long>>()
+
+    override suspend fun setAndroidPackage(id: String, packageName: String?) {
+        games.update { list -> list.map { if (it.id == id) it.copy(androidPackageName = packageName) else it } }
+    }
+
+    override suspend fun updateInstallationStatus(id: String, status: com.retroplay.app.domain.model.InstallationStatus) {
+        games.update { list -> list.map { if (it.id == id) it.copy(installationStatus = status) else it } }
+    }
+
+    override suspend fun recordLaunch(id: String, method: com.retroplay.app.domain.launch.LaunchMethod, atEpochMillis: Long) {
+        launches += Triple(id, method, atEpochMillis)
+        if (method == com.retroplay.app.domain.launch.LaunchMethod.ANDROID_APP) {
+            games.update { list -> list.map { if (it.id == id) it.copy(lastPlayedAtEpochMillis = atEpochMillis) else it } }
+        }
+    }
+}
+
+/** Simulates the set of apps visible to RetroPlay. */
+class FakePackageInspector(vararg apps: com.retroplay.app.domain.launch.InstalledApp) : com.retroplay.app.launcher.PackageInspector {
+    val installed = apps.toMutableList()
+    override fun launchableApp(packageName: String) = installed.firstOrNull { it.packageName == packageName }
+    override fun launchableApps() = installed.sortedBy { it.label }
+}
+
+class FakeAppStarter(var failWith: Exception? = null, var storeAvailable: Boolean = true) : com.retroplay.app.launcher.AppStarter {
+    val started = mutableListOf<String>()
+    val storeOpened = mutableListOf<String>()
+    override fun startApp(packageName: String): Result<Unit> {
+        failWith?.let { return Result.failure(it) }
+        started += packageName
+        return Result.success(Unit)
+    }
+    override fun openStoreListing(packageName: String): Boolean {
+        if (storeAvailable) storeOpened += packageName
+        return storeAvailable
+    }
+}
+
+class FakeGameLaunchManager(
+    var apps: List<com.retroplay.app.domain.launch.InstalledApp> = listOf(
+        com.retroplay.app.domain.launch.InstalledApp("com.example.windowsrunner", "Windows Runner"),
+    ),
+    var nextPlan: com.retroplay.app.domain.launch.LaunchPlan =
+        com.retroplay.app.domain.launch.LaunchPlan.ExternalNotConfigured(emptyList(), ""),
+    var nextResult: com.retroplay.app.domain.launch.LaunchResult =
+        com.retroplay.app.domain.launch.LaunchResult.NotStarted(nextPlan),
+    var storeAvailable: Boolean = true,
+) : com.retroplay.app.domain.launch.GameLaunchManager {
+    var planCalls = 0
+    val launched = mutableListOf<String>()
+    override suspend fun plan(game: com.retroplay.app.domain.model.Game) = nextPlan.also { planCalls++ }
+    override suspend fun launch(game: com.retroplay.app.domain.model.Game) = nextResult.also { launched += game.id }
+    override suspend fun launchableApps() = apps
+    override fun openStoreListing(packageName: String) = storeAvailable
 }

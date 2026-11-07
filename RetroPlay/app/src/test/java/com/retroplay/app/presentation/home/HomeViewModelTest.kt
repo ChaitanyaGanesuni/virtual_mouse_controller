@@ -23,9 +23,9 @@ class HomeViewModelTest {
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect() }
 
         val state = vm.uiState.value
-        assertEquals(6, state.library.size)
+        assertEquals(9, state.library.size)
         assertTrue(state.recentlyPlayed.isEmpty())
-        assertEquals(mapOf(GameCategory.CRICKET to 1, GameCategory.GTA to 5), state.categoryCounts)
+        assertEquals(mapOf(GameCategory.CRICKET to 1, GameCategory.GTA to 8), state.categoryCounts)
 
         repo.setFavorite("gta-iv", true)
         assertEquals(listOf("gta-iv"), vm.uiState.value.favorites.map { it.id })

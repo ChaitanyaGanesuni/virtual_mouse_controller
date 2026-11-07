@@ -9,7 +9,7 @@ import com.retroplay.app.domain.model.InstallationStatus
 
 /**
  * The initial catalogue: metadata only. RetroPlay ships no game files, assets or executables.
- * Release years are those of the Windows PC editions. Every PC game starts as NOT_TESTED, because
+ * Release years are those of the catalogued edition (Windows PC or Android). Every game starts as NOT_TESTED, because
  * compatibility is only recorded after a real test on the device (Phase 7).
  */
 object GameCatalogue {
@@ -75,6 +75,59 @@ object GameCatalogue {
                 "This entry is the Windows PC edition.",
             sortOrder = 14,
         ),
+        // Official Rockstar Games mobile editions. Package names are checked on the device at runtime;
+        // a different edition (for example a subscription-service release) can be linked by the user.
+        androidGame(
+            id = "gta-iii-android",
+            title = "Grand Theft Auto III (Android)",
+            shortTitle = "III",
+            releaseYear = 2011,
+            packageName = "com.rockstargames.gta3",
+            sortOrder = 20,
+        ),
+        androidGame(
+            id = "gta-vice-city-android",
+            title = "Grand Theft Auto: Vice City (Android)",
+            shortTitle = "VC",
+            releaseYear = 2012,
+            packageName = "com.rockstargames.gtavc",
+            sortOrder = 21,
+        ),
+        androidGame(
+            id = "gta-san-andreas-android",
+            title = "Grand Theft Auto: San Andreas (Android)",
+            shortTitle = "SA",
+            releaseYear = 2013,
+            packageName = "com.rockstargames.gtasa",
+            sortOrder = 22,
+        ),
+    )
+
+    private fun androidGame(
+        id: String,
+        title: String,
+        shortTitle: String,
+        releaseYear: Int,
+        packageName: String,
+        sortOrder: Int,
+    ) = Game(
+        id = id,
+        title = title,
+        shortTitle = shortTitle,
+        category = GameCategory.GTA,
+        originalPlatform = GamePlatform.ANDROID,
+        releaseYear = releaseYear,
+        description = "Rockstar Games' official mobile edition. Install it from its app store; " +
+            "RetroPlay launches the installed app and never installs anything itself.",
+        artworkRef = "placeholder:$id",
+        executionType = ExecutionType.ANDROID_NATIVE,
+        installationStatus = InstallationStatus.NOT_INSTALLED,
+        compatibilityStatus = CompatibilityStatus.NOT_TESTED,
+        lastPlayedAtEpochMillis = null,
+        userNotes = "",
+        isFavorite = false,
+        sortOrder = sortOrder,
+        androidPackageName = packageName,
     )
 
     private fun pcGame(

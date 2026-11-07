@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Computer
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +22,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -39,12 +41,17 @@ import com.retroplay.app.core.designsystem.component.InfoRow
 import com.retroplay.app.core.designsystem.component.RetroCard
 import com.retroplay.app.core.designsystem.component.SectionLabel
 import com.retroplay.app.domain.repository.UserPreferences
+import com.retroplay.app.presentation.common.AppPickerDialog
 
 @Composable
 fun SettingsScreen(onOpenDeviceInfo: () -> Unit, onOpenCompatibilityReport: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
+    val picker by viewModel.picker.collectAsStateWithLifecycle()
+    picker?.let { AppPickerDialog(it, onPick = viewModel::onExternalAppPicked, onDismiss = viewModel::dismissPicker) }
     SettingsContent(
         preferences = prefs,
+        onChooseExternalApp = viewModel::showExternalAppPicker,
+        onClearExternalApp = viewModel::clearExternalApp,
         onOpenDeviceInfo = onOpenDeviceInfo,
         onOpenCompatibilityReport = onOpenCompatibilityReport,
         onShowComparisonChange = viewModel::setShowReferenceComparison,
@@ -58,6 +65,8 @@ fun SettingsContent(
     onOpenDeviceInfo: () -> Unit,
     onOpenCompatibilityReport: () -> Unit,
     onShowComparisonChange: (Boolean) -> Unit,
+    onChooseExternalApp: () -> Unit = {},
+    onClearExternalApp: () -> Unit = {},
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -89,6 +98,26 @@ fun SettingsContent(
                 description = "Recorded compatibility status of every game on this device.",
                 onClick = onOpenCompatibilityReport,
             )
+
+            SectionLabel("Windows games")
+            RetroCard {
+                CardHeader("Compatibility app", Icons.Filled.Computer)
+                InfoRow("Selected", preferences.externalAppLabel ?: "None")
+                Text(
+                    "RetroPlay opens this app for Windows games; you start the game inside it. " +
+                        "Its settings are never changed by RetroPlay.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Row {
+                    TextButton(onClick = onChooseExternalApp) {
+                        Text(if (preferences.externalAppPackage == null) "Choose app" else "Change")
+                    }
+                    if (preferences.externalAppPackage != null) {
+                        TextButton(onClick = onClearExternalApp) { Text("Clear") }
+                    }
+                }
+            }
 
             SectionLabel("Preferences")
             RetroCard {

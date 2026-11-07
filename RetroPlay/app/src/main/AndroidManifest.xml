@@ -2,9 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
-        Phase 1-2 requires no runtime permissions: device profiling uses public,
-        permission-free APIs. Package-visibility <queries> are added in Phase 5.
+        No runtime permissions are needed. Package visibility (Android 11+) is limited to:
+          * apps with a launcher entry, so the user can link an installed game or choose their
+            own Windows compatibility app (QUERY_ALL_PACKAGES is deliberately NOT requested);
+          * the official Android GTA packages in the catalogue (targeted queries);
+          * app-store handlers, to open a store listing when the user asks.
     -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="market" />
+        </intent>
+        <package android:name="com.rockstargames.gta3" />
+        <package android:name="com.rockstargames.gtavc" />
+        <package android:name="com.rockstargames.gtasa" />
+    </queries>
 
     <application
         android:name=".RetroPlayApp"

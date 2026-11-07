@@ -3,6 +3,8 @@ package com.retroplay.app.presentation.discover
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.retroplay.app.domain.model.CompatibilityStatus
+import com.retroplay.app.domain.model.ExecutionType
+import com.retroplay.app.domain.model.GamePlatform
 import com.retroplay.app.domain.model.Game
 import com.retroplay.app.domain.model.GameCategory
 import com.retroplay.app.domain.repository.GameRepository
@@ -31,8 +33,8 @@ class DiscoverViewModel @Inject constructor(gameRepository: GameRepository) : Vi
         fun collectionsFor(games: List<Game>): List<DiscoverCollection> = listOf(
             DiscoverCollection(
                 "Grand Theft Auto",
-                "The open-world series, PC editions",
-                games.filter { it.category == GameCategory.GTA }.sortedBy { it.releaseYear ?: Int.MAX_VALUE },
+                "The open-world series on PC and Android",
+                games.filter { it.category == GameCategory.GTA },
             ),
             DiscoverCollection(
                 "Cricket",
@@ -40,9 +42,14 @@ class DiscoverViewModel @Inject constructor(gameRepository: GameRepository) : Vi
                 games.filter { it.category == GameCategory.CRICKET },
             ),
             DiscoverCollection(
+                "Play on Android",
+                "Official mobile editions, launched directly",
+                games.filter { it.executionType == ExecutionType.ANDROID_NATIVE },
+            ),
+            DiscoverCollection(
                 "2000s PC classics",
                 "PC editions released 2000–2009",
-                games.filter { (it.releaseYear ?: 0) in 2000..2009 },
+                games.filter { it.originalPlatform == GamePlatform.WINDOWS_PC && (it.releaseYear ?: 0) in 2000..2009 },
             ),
             DiscoverCollection(
                 "Awaiting a compatibility test",

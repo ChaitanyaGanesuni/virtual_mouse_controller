@@ -51,6 +51,11 @@ android {
         }
     }
 
+    sourceSets {
+        // Exported Room schemas are packaged into debug builds so Robolectric migration tests can read them.
+        getByName("debug").assets.srcDir("$projectDir/schemas")
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -100,6 +105,7 @@ dependencies {
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.room.testing)
     testImplementation(platform(libs.androidx.compose.bom))
     testImplementation(libs.androidx.compose.ui.test.junit4)
 }

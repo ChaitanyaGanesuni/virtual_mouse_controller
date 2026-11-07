@@ -20,7 +20,9 @@ object DatabaseModule {
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): RetroPlayDatabase =
-        Room.databaseBuilder(context, RetroPlayDatabase::class.java, RetroPlayDatabase.NAME).build()
+        Room.databaseBuilder(context, RetroPlayDatabase::class.java, RetroPlayDatabase.NAME)
+            .addMigrations(*RetroPlayDatabase.ALL_MIGRATIONS)
+            .build()
 
     @Provides
     fun provideGameDao(database: RetroPlayDatabase): GameDao = database.gameDao()

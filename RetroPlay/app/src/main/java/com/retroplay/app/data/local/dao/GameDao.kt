@@ -7,6 +7,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.retroplay.app.data.local.entity.FavoriteEntity
 import com.retroplay.app.data.local.entity.GameEntity
+import com.retroplay.app.data.local.entity.PlayHistoryEntity
+import com.retroplay.app.domain.model.InstallationStatus
 import kotlinx.coroutines.flow.Flow
 
 data class GameWithFavorite(
@@ -41,6 +43,21 @@ interface GameDao {
 
     @Query("UPDATE games SET userNotes = :notes WHERE id = :id")
     suspend fun updateNotes(id: String, notes: String): Int
+
+    @Query("UPDATE games SET androidPackageName = :packageName WHERE id = :id")
+    suspend fun updateAndroidPackage(id: String, packageName: String?): Int
+
+    @Query("UPDATE games SET installationStatus = :status WHERE id = :id")
+    suspend fun updateInstallationStatus(id: String, status: InstallationStatus): Int
+
+    @Query("UPDATE games SET lastPlayedAt = :at WHERE id = :id")
+    suspend fun updateLastPlayed(id: String, at: Long): Int
+
+    @Insert
+    suspend fun insertPlayHistory(entry: PlayHistoryEntity): Long
+
+    @Query("SELECT * FROM play_history WHERE gameId = :gameId ORDER BY launchedAt DESC")
+    suspend fun playHistory(gameId: String): List<PlayHistoryEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addFavorite(favorite: FavoriteEntity)

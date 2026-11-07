@@ -12,7 +12,7 @@ import org.junit.Test
 class GameCatalogueTest {
     private val games = GameCatalogue.initialGames
 
-    @Test fun containsTheRequestedSixGames() {
+    @Test fun containsRequestedGamesPlusOfficialAndroidEditions() {
         assertEquals(
             listOf(
                 "EA Sports Cricket 07",
@@ -21,11 +21,14 @@ class GameCatalogueTest {
                 "Grand Theft Auto: San Andreas",
                 "Grand Theft Auto IV",
                 "Grand Theft Auto V",
+                "Grand Theft Auto III (Android)",
+                "Grand Theft Auto: Vice City (Android)",
+                "Grand Theft Auto: San Andreas (Android)",
             ),
             games.map { it.title },
         )
         assertEquals(1, games.count { it.category == GameCategory.CRICKET })
-        assertEquals(5, games.count { it.category == GameCategory.GTA })
+        assertEquals(8, games.count { it.category == GameCategory.GTA })
     }
 
     @Test fun idsAreUnique() {
@@ -38,6 +41,19 @@ class GameCatalogueTest {
             assertEquals(it.title, InstallationStatus.NOT_IMPORTED, it.installationStatus)
             assertEquals(it.title, ExecutionType.EXTERNAL_EMULATOR, it.executionType)
         }
+    }
+
+    @Test fun androidEditionsAreNativeUntestedAndLinkedToAPackage() {
+        val android = games.filter { it.originalPlatform == GamePlatform.ANDROID }
+        assertEquals(3, android.size)
+        android.forEach {
+            assertEquals(ExecutionType.ANDROID_NATIVE, it.executionType)
+            assertEquals(CompatibilityStatus.NOT_TESTED, it.compatibilityStatus)
+            assertEquals(InstallationStatus.NOT_INSTALLED, it.installationStatus)
+            assertTrue(it.androidPackageName!!.startsWith("com.rockstargames."))
+        }
+        // There is no official Android release of GTA IV or GTA V.
+        assertTrue(games.none { it.originalPlatform == GamePlatform.ANDROID && it.title.contains(Regex("IV|V\\b")) && !it.title.contains("Vice") })
     }
 
     @Test fun usesGeneratedPlaceholderArtworkAndNoUserData() {

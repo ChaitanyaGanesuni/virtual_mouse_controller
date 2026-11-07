@@ -25,6 +25,7 @@ data class GameEntity(
     val lastPlayedAt: Long?,
     val userNotes: String,
     val sortOrder: Int,
+    val androidPackageName: String?,
 ) {
     fun toDomain(isFavorite: Boolean) = Game(
         id = id,
@@ -42,6 +43,7 @@ data class GameEntity(
         userNotes = userNotes,
         isFavorite = isFavorite,
         sortOrder = sortOrder,
+        androidPackageName = androidPackageName,
     )
 
     companion object {
@@ -60,6 +62,7 @@ data class GameEntity(
             lastPlayedAt = game.lastPlayedAtEpochMillis,
             userNotes = game.userNotes,
             sortOrder = game.sortOrder,
+            androidPackageName = game.androidPackageName,
         )
     }
 }
