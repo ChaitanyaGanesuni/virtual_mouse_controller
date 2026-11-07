@@ -73,12 +73,13 @@ class AndroidDeviceInfoSource @Inject constructor(
 
     override fun graphicsApis(): GraphicsApiSupport {
         val pm = context.packageManager
-        val features = pm.systemAvailableFeatures
+        // Platform type: may be null on some builds, so treat it as nullable.
+        val features: Array<android.content.pm.FeatureInfo>? = pm.systemAvailableFeatures
         return GraphicsApiSupport(
             openGlEsVersion = activityManager.deviceConfigurationInfo?.glEsVersion,
             hasAndroidExtensionPack = pm.hasSystemFeature(PackageManager.FEATURE_OPENGLES_EXTENSION_PACK),
             vulkanApiVersion = detectVulkanVersion(pm),
-            vulkanHardwareLevel = features.firstOrNull { it.name == PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL }?.version,
+            vulkanHardwareLevel = features?.firstOrNull { it.name == PackageManager.FEATURE_VULKAN_HARDWARE_LEVEL }?.version,
         )
     }
 
