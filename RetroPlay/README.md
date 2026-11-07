@@ -1,0 +1,122 @@
+# RetroPlay – Classic Gaming Hub
+
+A personal Android game library and launcher, built for a Google Pixel 9 (Tensor G4, Mali-G715 MC7)
+running Android 15 or later.
+
+RetroPlay **does not bundle, download or distribute any game**, game asset, executable or emulator.
+It only organises and launches software the user already owns and has installed.
+
+## Status
+
+| Phase | Scope | State |
+|---|---|---|
+| 1 | Project foundation (Kotlin, Compose, MVVM, Hilt, Room, DataStore, Navigation, Coil) | ✅ Done |
+| 2 | `DeviceProfileManager` + Settings › Device information + Pixel 9 reference comparison | ✅ Done |
+| 3 | Full launcher UI (library, discover, favourites, game detail, compatibility report) | Not started |
+| 4 | Initial game catalogue | Not started |
+| 5 | `GameLaunchManager` (Android games, external emulator, unsupported handler) | Not started |
+| 6 | Storage Access Framework import | Not started |
+| 7 | Mali / Tensor G4 compatibility profile + `CompatibilityManager` | Not started |
+| 8 | Room entities, DAOs, repositories | Not started (Room is wired, no database yet) |
+| 9 | Full test suite | Partial (tests for Phases 1–2) |
+
+## What works in this build
+
+- **Home**: branded landing screen with a shortcut to the device profile.
+- **Settings**: device information entry, the *Pixel 9 reference comparison* toggle (saved in DataStore), and app version.
+- **Settings › Device information**: a hardware profile measured **at runtime** on the phone:
+  - Android version, API level, security patch and build
+  - CPU ABIs, 64-bit support, core count, and per-cluster max clocks (when sysfs is readable)
+  - Total (OS-visible), available and low-memory threshold RAM, plus app heap classes
+  - GPU renderer, vendor, GL ES driver, GLSL and EGL versions (from a temporary 1×1 off-screen EGL context)
+  - Graphics APIs: OpenGL ES version, Android Extension Pack, highest Vulkan version, Vulkan hardware level
+  - Physical resolution, density, current/max/supported refresh rates, HDR
+  - Internal storage available/total, and current thermal status
+  - A comparison against the **Pixel 9 reference profile** (spec-sheet values, clearly labelled as
+    reference rather than measurement) with a *Matches / Differs / Unavailable* verdict per field.
+
+No Pixel 9 value is hard-coded as a measurement. If the platform does not expose a value, the UI says
+“Not reported” or “Not obtainable” rather than guessing.
+
+## Architecture
+
+Single Gradle module (`app`) with layered packages under `com.retroplay.app`:
+
+```
+core/           theme (dark, purple/electric-blue), shared Compose components, formatters, dispatcher qualifiers
+domain/         pure Kotlin: models, Pixel 9 reference profile, DeviceProfileComparator, repository interfaces
+compatibility/  DeviceProfileManager + DeviceInfoSource / GpuInfoProvider contracts
+data/           Android implementations (AndroidDeviceInfoSource, EglGpuInfoProvider)
+settings/       DataStore-backed UserPreferencesRepository
+presentation/   Compose screens + Hilt ViewModels (home, settings, deviceinfo)
+navigation/     type-safe Navigation Compose routes, NavHost, bottom-bar shell
+launcher/       (Phase 5)    storage/  (Phase 6)
+di/             Hilt modules
+```
+
+Data flows one way: platform APIs → `DeviceInfoSource` → `DeviceProfileManager` → `DeviceInfoViewModel`
+(a `StateFlow` combined with DataStore preferences) → Compose UI.
+
+### Tech stack
+
+AGP 8.7.3 · Gradle 8.14.3 · Kotlin 2.0.21 · KSP · Compose BOM 2024.12.01 · Material 3 · Hilt 2.52 ·
+Navigation Compose 2.8.5 · Room 2.6.1 · DataStore 1.1.1 · Coil 2.7 · Coroutines 1.9 ·
+JUnit 4 · Robolectric 4.14 · Compose UI Test.
+
+`compileSdk`, `targetSdk` and `minSdk` are all **35** (Android 15). The app also runs on later versions.
+
+## Building
+
+Requirements: JDK 17 or newer (Android Studio’s bundled JBR works), and Android SDK Platform 35 with
+Build-Tools 35. Android Studio Ladybug or newer opens the `RetroPlay/` folder directly.
+
+From the command line, point Gradle at your SDK by creating `RetroPlay/local.properties`:
+
+```
+sdk.dir=C\:\\Users\\<you>\\AppData\\Local\\Android\\Sdk
+```
+
+or by setting the `ANDROID_HOME` environment variable. Then:
+
+**Windows**
+```
+cd RetroPlay
+.\gradlew.bat assembleDebug
+.\gradlew.bat testDebugUnitTest
+```
+
+**macOS / Linux**
+```
+cd RetroPlay
+./gradlew assembleDebug
+./gradlew testDebugUnitTest
+```
+
+The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`. To install it on a connected Pixel
+with USB debugging enabled:
+
+```
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+## Tests (Phases 1–2)
+
+All tests run on the JVM (`testDebugUnitTest`); no emulator is needed:
+
+- `DeviceProfileComparatorTest`: verdict rules, RAM tolerance limits, landscape resolution, API level.
+- `DefaultDeviceProfileManagerTest`: profile assembly, GPU caching, GPU failure handling.
+- `AndroidDeviceInfoSourceTest` (Robolectric, API 35): the real platform-reading code against simulated framework services.
+- `DeviceInfoViewModelTest` / `SettingsViewModelTest`: UI state, error/retry, and preference toggling.
+- `DataStoreUserPreferencesRepositoryTest`: defaults and persistence.
+- `DeviceInfoSectionsTest`: display mapping and the “not reported” labels.
+- `DeviceInfoContentTest` (Compose UI on Robolectric): rendering, comparison toggle, retry/back actions.
+
+Test fixtures are synthetic and are not measurements of any real device.
+
+## Known limitations
+
+- GL_RENDERER reports the GPU family (e.g. `Mali-G715`) but not the shader-core count (`MC7`).
+- Per-core max CPU frequencies come from `/sys/devices/system/cpu/*/cpufreq`. Some Android builds block this
+  for apps through SELinux; the UI then shows “Not readable on this device”.
+- The Vulkan version comes from `FEATURE_VULKAN_HARDWARE_VERSION`. Querying the Vulkan driver itself would need the NDK.
+- Robolectric tests check logic and wiring, not real Pixel 9 values. Check those on the device.
