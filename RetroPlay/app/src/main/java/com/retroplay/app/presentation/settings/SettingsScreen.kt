@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.automirrored.filled.CompareArrows
+import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -39,11 +41,12 @@ import com.retroplay.app.core.designsystem.component.SectionLabel
 import com.retroplay.app.domain.repository.UserPreferences
 
 @Composable
-fun SettingsScreen(onOpenDeviceInfo: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
+fun SettingsScreen(onOpenDeviceInfo: () -> Unit, onOpenCompatibilityReport: () -> Unit, viewModel: SettingsViewModel = hiltViewModel()) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
     SettingsContent(
         preferences = prefs,
         onOpenDeviceInfo = onOpenDeviceInfo,
+        onOpenCompatibilityReport = onOpenCompatibilityReport,
         onShowComparisonChange = viewModel::setShowReferenceComparison,
     )
 }
@@ -53,6 +56,7 @@ fun SettingsScreen(onOpenDeviceInfo: () -> Unit, viewModel: SettingsViewModel = 
 fun SettingsContent(
     preferences: UserPreferences,
     onOpenDeviceInfo: () -> Unit,
+    onOpenCompatibilityReport: () -> Unit,
     onShowComparisonChange: (Boolean) -> Unit,
 ) {
     Scaffold(
@@ -73,20 +77,18 @@ fun SettingsContent(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             SectionLabel("Device")
-            RetroCard(onClick = onOpenDeviceInfo) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Column(Modifier.weight(1f)) {
-                        CardHeader(stringResource(R.string.title_device_info), Icons.Filled.PhoneAndroid)
-                        Text(
-                            "Runtime hardware profile: CPU, memory, GPU, graphics APIs, display and storage.",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                    Spacer(Modifier.width(8.dp))
-                    Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
-                }
-            }
+            NavigationCard(
+                title = stringResource(R.string.title_device_info),
+                icon = Icons.Filled.PhoneAndroid,
+                description = "Runtime hardware profile: CPU, memory, GPU, graphics APIs, display and storage.",
+                onClick = onOpenDeviceInfo,
+            )
+            NavigationCard(
+                title = "Compatibility report",
+                icon = Icons.Filled.Assessment,
+                description = "Recorded compatibility status of every game on this device.",
+                onClick = onOpenCompatibilityReport,
+            )
 
             SectionLabel("Preferences")
             RetroCard {
@@ -115,6 +117,20 @@ fun SettingsContent(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
+        }
+    }
+}
+
+@Composable
+private fun NavigationCard(title: String, icon: ImageVector, description: String, onClick: () -> Unit) {
+    RetroCard(onClick = onClick) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                CardHeader(title, icon)
+                Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Spacer(Modifier.width(8.dp))
+            Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
         }
     }
 }

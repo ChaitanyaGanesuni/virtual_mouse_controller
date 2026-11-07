@@ -39,3 +39,22 @@ class FakeUserPreferencesRepository(initial: UserPreferences = UserPreferences()
         state.update { it.copy(showReferenceComparison = enabled) }
     }
 }
+
+class FakeGameRepository(
+    initial: List<com.retroplay.app.domain.model.Game> = com.retroplay.app.domain.game.GameCatalogue.initialGames,
+) : com.retroplay.app.domain.repository.GameRepository {
+    val games = MutableStateFlow(initial)
+
+    override fun observeGames(): Flow<List<com.retroplay.app.domain.model.Game>> = games
+
+    override fun observeGame(id: String): Flow<com.retroplay.app.domain.model.Game?> =
+        kotlinx.coroutines.flow.flow { games.collect { list -> emit(list.firstOrNull { it.id == id }) } }
+
+    override suspend fun setFavorite(id: String, favorite: Boolean) {
+        games.update { list -> list.map { if (it.id == id) it.copy(isFavorite = favorite) else it } }
+    }
+
+    override suspend fun updateNotes(id: String, notes: String) {
+        games.update { list -> list.map { if (it.id == id) it.copy(userNotes = notes.trim()) else it } }
+    }
+}

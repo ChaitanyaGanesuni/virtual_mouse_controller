@@ -12,18 +12,41 @@ It only organises and launches software the user already owns and has installed.
 |---|---|---|
 | 1 | Project foundation (Kotlin, Compose, MVVM, Hilt, Room, DataStore, Navigation, Coil) | ✅ Done |
 | 2 | `DeviceProfileManager` + Settings › Device information + Pixel 9 reference comparison | ✅ Done |
-| 3 | Full launcher UI (library, discover, favourites, game detail, compatibility report) | Not started |
-| 4 | Initial game catalogue | Not started |
+| 3 | Full launcher UI (home, library, discover, favourites, game detail, compatibility report) | ✅ Done |
+| 4 | Initial game catalogue (6 games, metadata only) | ✅ Done |
 | 5 | `GameLaunchManager` (Android games, external emulator, unsupported handler) | Not started |
 | 6 | Storage Access Framework import | Not started |
 | 7 | Mali / Tensor G4 compatibility profile + `CompatibilityManager` | Not started |
-| 8 | Room entities, DAOs, repositories | Not started (Room is wired, no database yet) |
-| 9 | Full test suite | Partial (tests for Phases 1–2) |
+| 8 | Room entities, DAOs, repositories | Partial: `GameEntity`, `FavoriteEntity`, `GameDao` |
+| 9 | Full test suite | Partial (tests for Phases 1–4) |
 
 ## What works in this build
 
-- **Home**: branded landing screen with a shortcut to the device profile.
-- **Settings**: device information entry, the *Pixel 9 reference comparison* toggle (saved in DataStore), and app version.
+- **Home**: hero banner, *Continue playing*, favourites, a library carousel and a device shortcut.
+- **Library**: search plus category filters over an adaptive grid of game cards.
+- **Discover**: browsable collections (GTA, Cricket, 2000s PC classics, games awaiting a test).
+- **Favourites**: games you've marked with the heart, saved in Room.
+- **Game detail**: artwork, metadata, execution type, installation and compatibility status, last played,
+  and personal notes you can edit (saved in Room). There is **no launch button**, because launching arrives in Phase 5.
+- **Compatibility report** (Settings): the test device summary, status counts, each game's status, and a status legend.
+- **Settings**: device information, compatibility report, the *Pixel 9 reference comparison* toggle (saved in DataStore), and app version.
+
+### Game catalogue
+
+Metadata only. No game files, assets or executables are included. Artwork is generated in-app
+(a gradient, the category icon and a monogram) until you supply licensed images.
+
+| Game | Category | Edition | Year | Compatibility |
+|---|---|---|---|---|
+| EA Sports Cricket 07 | Cricket | Windows PC | 2006 | Not tested |
+| Grand Theft Auto III | GTA | Windows PC | 2002 | Not tested |
+| Grand Theft Auto: Vice City | GTA | Windows PC | 2003 | Not tested |
+| Grand Theft Auto: San Andreas | GTA | Windows PC | 2005 | Not tested |
+| Grand Theft Auto IV | GTA | Windows PC | 2008 | Not tested |
+| Grand Theft Auto V | GTA | Windows PC | 2015 | Not tested |
+
+The catalogue is seeded with insert-if-absent, so your notes and favourites are never overwritten.
+
 - **Settings › Device information**: a hardware profile measured **at runtime** on the phone:
   - Android version, API level, security patch and build
   - CPU ABIs, 64-bit support, core count, and per-cluster max clocks (when sysfs is readable)
@@ -51,6 +74,7 @@ settings/       DataStore-backed UserPreferencesRepository
 presentation/   Compose screens + Hilt ViewModels (home, settings, deviceinfo)
 navigation/     type-safe Navigation Compose routes, NavHost, bottom-bar shell
 launcher/       (Phase 5)    storage/  (Phase 6)
+data/local/     Room database, entities and DAOs (schema exported to app/schemas/)
 di/             Hilt modules
 ```
 
@@ -99,7 +123,7 @@ with USB debugging enabled:
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## Tests (Phases 1–2)
+## Tests (Phases 1–4)
 
 All tests run on the JVM (`testDebugUnitTest`); no emulator is needed:
 
@@ -110,6 +134,11 @@ All tests run on the JVM (`testDebugUnitTest`); no emulator is needed:
 - `DataStoreUserPreferencesRepositoryTest`: defaults and persistence.
 - `DeviceInfoSectionsTest`: display mapping and the “not reported” labels.
 - `DeviceInfoContentTest` (Compose UI on Robolectric): rendering, comparison toggle, retry/back actions.
+- `GameCatalogueTest` / `GameFilterTest`: catalogue contents, unique IDs, NOT_TESTED defaults, search and filtering.
+- `OfflineGameRepositoryTest` (in-memory Room on Robolectric): seeding, favourites, notes surviving a re-seed.
+- `HomeViewModelTest`, `LibraryViewModelTest`, `DiscoverViewModelTest`, `FavoritesViewModelTest`,
+  `GameDetailViewModelTest`, `CompatibilityReportViewModelTest`: screen state and actions.
+- `GameDetailContentTest` (Compose UI): metadata, no fake launch button, favourite/back/notes callbacks.
 
 Test fixtures are synthetic and are not measurements of any real device.
 
