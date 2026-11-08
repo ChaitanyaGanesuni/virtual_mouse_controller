@@ -4,7 +4,7 @@ import type { Transaction } from './types';
 const DAY = 86_400_000;
 
 /** Monthly bills land on the same date each month (clamped to the month's last day), not every 30 days. */
-function nextMonthly(last: number): number {
+export function nextMonthly(last: number): number {
   const d = new Date(last);
   const target = new Date(d.getFullYear(), d.getMonth() + 1, 1, d.getHours(), d.getMinutes());
   const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();

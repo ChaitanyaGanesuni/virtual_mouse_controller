@@ -93,7 +93,7 @@ test('demo data end-to-end', () => {
   for (const id of ['fees', 'subscriptions', 'food-delivery', 'betting']) assert.ok(ids.includes(id), `insights: ${ids}`);
 
   const holdings = buildHoldings(ledger.mfOrders);
-  assert.equal(holdings.length, 2);
+  assert.equal(holdings.length, 3);
   assert.ok(holdings.some((h) => h.plan === 'regular'));
   const inv = investmentInsights(holdings, ledger.accounts, ledger.transactions, undefined, now).map((i) => i.id);
   assert.ok(inv.includes('regular-plans'), `inv: ${inv}`);
@@ -278,4 +278,180 @@ test('net worth history: one point per month end plus today', () => {
   for (let i = 1; i < h.length; i++) assert.ok(h[i].date > h[i - 1].date);
   assert.ok(h.every((p) => Number.isFinite(p.net)));
   assert.ok(h[h.length - 1].investments > h[0].investments);
+});
+
+import { findSignals, trackFailedPayments } from '../src/lib/guard';
+import { helplineFrom } from '../src/lib/smsParser';
+
+const DAYMS = 86_400_000;
+
+test('failed payment: detected, reversal paired, status and RBI compensation', () => {
+  const t0 = new Date(2026, 9, 1, 10).getTime();
+  const msgs = [
+    at('1', 'AX-HDFCBK', 'Rs.1,500.00 debited from A/c XX4821 for UPI txn to merchant@ybl. Txn failed. Amount will be reversed within 1 working day. Call 18002586161', t0),
+    at('2', 'AX-HDFCBK', 'Rs.1,500.00 credited to A/c XX4821 as reversal of your failed UPI txn on 01-10-26.', t0 + 1 * DAYMS),
+    at('3', 'AX-HDFCBK', 'Rs.800.00 debited from A/c XX4821 at ATM. Cash not dispensed. Amount will be reversed. Call 18002586161', t0 + 2 * DAYMS),
+  ];
+  const l = buildLedger(msgs);
+  assert.equal(l.failedDebits.length, 2);
+  const reversal = l.transactions.find((t) => t.id === '2')!;
+  assert.ok(reversal, 'reversal credit must not be dropped as a "failed" alert');
+  const now = t0 + 20 * DAYMS;
+  const f = trackFailedPayments(l.failedDebits, l.transactions, now);
+  const upi = f.find((x) => x.amount === 1500)!;
+  const atm = f.find((x) => x.amount === 800)!;
+  assert.equal(upi.status, 'refunded');
+  assert.equal(atm.status, 'overdue');
+  assert.equal(atm.helpline, '18002586161');
+  assert.ok(atm.compensation >= 1000, String(atm.compensation));
+  assert.equal(helplineFrom('If not you, call 18001080.'), '18001080');
+  assert.equal(helplineFrom('Not you? Call 1800-202-6161 now'), '18002026161');
+  assert.equal(helplineFrom('Ref 123456789012 done'), null);
+});
+
+test('debit followed by its reversal is not counted as spending', () => {
+  const t0 = new Date(2026, 9, 1, 10).getTime();
+  const l = buildLedger([
+    at('1', 'AX-HDFCBK', 'Sent Rs.2,000.00 From HDFC Bank A/C *4821 To shop@ybl On 01-10-26 Ref 111111111111. Avl Bal Rs.5,000', t0),
+    at('2', 'AX-HDFCBK', 'Rs.2,000.00 credited to A/c XX4821 as reversal of failed UPI txn Ref 111111111111.', t0 + DAYMS),
+  ]);
+  assert.deepEqual(l.transactions.map((t) => t.category), ['Reversed', 'Reversed']);
+});
+
+test('a genuine double charge is kept; an identical repeated SMS is dropped', () => {
+  const t0 = new Date(2026, 9, 1, 10).getTime();
+  const body = (ref: string) => `INR 999.00 spent using ICICI Bank Card XX9034 on 01-10-26 on BOOKMYSHOW. Ref ${ref}. Avl Limit: INR 50,000.00`;
+  const l = buildLedger([
+    at('1', 'JD-ICICIT', body('111'), t0),
+    at('2', 'JD-ICICIT', body('111'), t0 + 60_000), // same SMS twice
+    at('3', 'JD-ICICIT', body('222'), t0 + 120_000), // second real charge
+  ]);
+  assert.equal(l.transactions.length, 2);
+  const s = findSignals(l.transactions, t0 + DAYMS);
+  assert.ok(s.some((x) => x.kind === 'duplicate'), JSON.stringify(s.map((x) => x.kind)));
+});
+
+test('fraud signals: international and first large payment to a new merchant', () => {
+  const t0 = new Date(2026, 9, 10, 14).getTime();
+  const small = Array.from({ length: 10 }, (_, i) =>
+    at(`s${i}`, 'AX-HDFCBK', `Sent Rs.300.00 From HDFC Bank A/C *4821 To swiggy@icici On 01-10-26 Ref ${i}. Avl Bal Rs.50,000`, t0 - (i + 1) * DAYMS),
+  );
+  const l = buildLedger([
+    ...small,
+    at('f', 'JD-ICICIT', 'INR 4,200.00 spent using ICICI Bank Card XX9034 on 10-10-26 on STEAM USD 50.00 international txn. Avl Limit: INR 40,000', t0),
+    at('n', 'AX-HDFCBK', 'Sent Rs.25,000.00 From HDFC Bank A/C *4821 To quickcash@okaxis On 10-10-26 Ref 9. Avl Bal Rs.20,000', t0 + 60_000),
+  ]);
+  const kinds = findSignals(l.transactions, t0 + DAYMS).map((x) => x.kind);
+  assert.ok(kinds.includes('foreign') && kinds.includes('new-merchant'), JSON.stringify(kinds));
+});
+
+import { capitalGains, deductions, financialYear } from '../src/lib/tax';
+import { rentPayments, rentReceiptsHtml } from '../src/lib/rent';
+
+test('financial year boundaries', () => {
+  assert.equal(financialYear(new Date(2026, 2, 31).getTime()).label, 'FY 2025-26');
+  assert.equal(financialYear(new Date(2026, 3, 1).getTime()).label, 'FY 2026-27');
+});
+
+test('deductions: ELSS, life, health, savings interest, capped at limits', () => {
+  const now = new Date(2026, 10, 8).getTime();
+  const mk = (id: string, body: string, d: number) => at(id, 'AX-HDFCBK', body, d);
+  const l = buildLedger([
+    mk('1', 'Rs.30,000.00 debited from A/c XX4821 on 05-06-26 towards LIC life insurance premium. Avl Bal Rs.1,00,000', new Date(2026, 5, 5).getTime()),
+    mk('2', 'Rs.18,000.00 debited from A/c XX4821 on 05-07-26 towards Star Health insurance premium. Avl Bal Rs.80,000', new Date(2026, 6, 5).getTime()),
+    mk('3', 'Your A/c XX4821 is credited with Rs.2,400.00 on 30-09-26 towards savings interest. Avl Bal Rs.82,400', new Date(2026, 8, 30).getTime()),
+    mk('4', 'Rs.99,000.00 debited from A/c XX4821 on 05-02-26 towards LIC life insurance premium. Avl Bal Rs.1,000', new Date(2026, 1, 5).getTime()), // previous FY
+  ]);
+  const orders = [{ id: 'o', date: new Date(2026, 4, 1).getTime(), scheme: 'Mirae Asset ELSS Tax Saver Fund - Direct Growth', folio: '1', amount: 140000, units: 1000, nav: 140 }];
+  const g = Object.fromEntries(deductions(l.transactions, orders, now).map((x) => [x.section, x]));
+  assert.equal(g['80C'].total, 170000);
+  assert.equal(g['80C'].claimed, 150000);
+  assert.equal(g['80D'].total, 18000);
+  assert.equal(g['80TTA'].total, 2400);
+});
+
+test('capital gains: FIFO lots, realised LTCG reduces harvestable exemption', () => {
+  const now = new Date(2026, 10, 8).getTime();
+  const y = (yy: number, m: number) => new Date(yy, m, 1).getTime();
+  const orders = [
+    { id: 'a', date: y(2023, 0), scheme: 'Nifty 50 Index Fund - Direct Growth', folio: '1', amount: 100000, units: 1000, nav: 100 },
+    { id: 'b', date: y(2026, 6), scheme: 'Nifty 50 Index Fund - Direct Growth', folio: '1', amount: 30000, units: 200, nav: 150 },
+    { id: 'c', date: y(2026, 5), scheme: 'Nifty 50 Index Fund - Direct Growth', folio: '1', amount: -45000, units: -300, nav: 150 }, // sells oldest lot
+  ];
+  const h = buildHoldings(orders, {})[0];
+  h.lastNav = 200;
+  h.currentValue = h.units * 200;
+  const cg = capitalGains([h], now);
+  assert.equal(Math.round(cg.realisedLongTerm), 15000); // 300 × (150 − 100)
+  assert.equal(Math.round(cg.unrealisedLongTerm), 70000); // 700 × (200 − 100)
+  assert.equal(Math.round(cg.unrealisedShortTerm), 10000); // 200 × (200 − 150)
+  assert.equal(Math.round(cg.harvestable), 70000); // min(1.25L − 15k, 70k)
+});
+
+test('rent receipts: monthly rows in the FY and escaped HTML', () => {
+  const now = Date.now();
+  const l = buildLedger(demoMessages(now));
+  const months = rentPayments(l.transactions, now);
+  assert.ok(months.length >= 1 && months.every((m) => m.amount === 32000));
+  const html = rentReceiptsHtml({ tenant: 'A <b>', landlord: 'Rajesh', landlordPan: '', address: 'Flat 1' }, months, now);
+  assert.ok(html.includes('A &lt;b&gt;') && html.includes('RENT RECEIPT'));
+  assert.ok((html.match(/class="r"/g) ?? []).length === months.length);
+});
+
+import { goalProgress, monthlyPace } from '../src/lib/goals';
+import { nextSundayEvening, weeklyDigest } from '../src/lib/digest';
+import { serviceFor, subscriptionViews, subId } from '../src/lib/subscriptions';
+
+test('subscriptions: cancel guide, yearly cost, charged after cancelling', () => {
+  const now = Date.now();
+  const l = buildLedger(demoMessages(now));
+  const rec = findRecurring(l.transactions, now);
+  const netflix = rec.find((r) => /netflix/i.test(r.merchant))!;
+  assert.equal(serviceFor(netflix.merchant)?.name, 'Netflix');
+  const id = subId(netflix.merchant);
+  const views = subscriptionViews(rec, { [id]: { status: 'cancelled', at: netflix.lastCharged - 20 * DAYMS } }, () => netflix.lastCharged);
+  const v = views.find((x) => x.id === id)!;
+  assert.ok(v.chargedAfterCancel);
+  assert.equal(views[0].id, id, 'charged-after-cancel goes first');
+  assert.equal(v.yearlyCost, netflix.amount * 12);
+  assert.equal(new Date(v.nextDue).getDate(), new Date(netflix.lastCharged).getDate());
+  assert.ok(!views.some((x) => /landlord/.test(x.id)), 'rent is not a subscription');
+});
+
+test('goals: growth shared in order, pace decides on-track', () => {
+  const now = new Date(2026, 10, 8).getTime();
+  const mk = (id: string, target: number, monthsAhead: number, createdAt: number) => ({
+    id, name: id, target, by: now + monthsAhead * 30.44 * DAYMS, createdAt, startNet: 100000, icon: 'plane' as const,
+  });
+  const p = goalProgress([mk('trip', 60000, 4, 1), mk('car', 300000, 12, 2)], 180000, 25000, now);
+  assert.equal(p[0].saved, 60000);
+  assert.ok(p[0].done && p[0].onTrack);
+  assert.equal(p[1].saved, 20000);
+  assert.ok(Math.abs(p[1].needPerMonth - 280000 / 12) < 50);
+  assert.ok(p[1].onTrack); // 25k pace >= ~23.3k need
+  assert.ok(!goalProgress([mk('car', 300000, 12, 2)], 120000, 5000, now)[0].onTrack);
+  assert.equal(Math.round(monthlyPace([{ date: 0, cash: 0, investments: 0, dues: 0, net: 0 }, { date: 30.44 * DAYMS * 2, cash: 0, investments: 0, dues: 0, net: 20000 }])), 10000);
+});
+
+test('weekly digest and Sunday scheduling', () => {
+  const now = new Date(2026, 10, 12, 10).getTime(); // Thursday
+  const l = buildLedger(demoMessages(now));
+  const dg = weeklyDigest(l.transactions, l.accounts, monthForecast(l.transactions, now), wasteInsights(l.transactions, now), now);
+  assert.ok(dg.spent > 0 && dg.topCategory);
+  assert.match(dg.notification.title, /^Your week: ₹/);
+  const sun = new Date(nextSundayEvening(now));
+  assert.equal(sun.getDay(), 0);
+  assert.equal(sun.getHours(), 19);
+  assert.equal(new Date(nextSundayEvening(new Date(2026, 10, 15, 20).getTime())).getDate(), 22);
+});
+
+import { makeBackup, readBackup } from '../src/lib/backupFormat';
+
+test('backup: round trip keeps known keys, rejects other files', () => {
+  const b = makeBackup([['budgets.v1', '{"total":5}'], ['unknown.v1', '"x"'], ['goals.v1', null]], 1);
+  assert.deepEqual(Object.keys(b.data), ['budgets.v1']);
+  assert.deepEqual(readBackup(JSON.stringify(b)), [['budgets.v1', '{"total":5}']]);
+  assert.throws(() => readBackup('{"hello":1}'), /isn't a Paisa Watch backup/);
+  assert.throws(() => readBackup('not json'), /isn't a Paisa Watch backup/);
+  assert.deepEqual(readBackup(JSON.stringify({ ...b, data: { 'budgets.v1': 'not json', 'rules.v1': '[]' } })), [['rules.v1', '[]']]);
 });

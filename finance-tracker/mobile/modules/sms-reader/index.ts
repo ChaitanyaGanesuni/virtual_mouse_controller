@@ -16,6 +16,7 @@ interface SmsReaderNative {
   canNotify(): boolean;
   setBudgetState(monthKey: string, spent: number, limit: number): void;
   notify(id: number, title: string, text: string): void;
+  setSecure(on: boolean): void;
 }
 
 const native = requireOptionalNativeModule<SmsReaderNative>('SmsReader');
@@ -47,4 +48,9 @@ export function setBudgetState(monthKey: string, spent: number, limit: number): 
 
 export function notifyNow(id: number, title: string, text: string): void {
   native?.notify(id, title, text);
+}
+
+/** Hide app content in recent apps and block screenshots. */
+export function setSecure(on: boolean): void {
+  native?.setSecure(on);
 }

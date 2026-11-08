@@ -14,7 +14,22 @@ export interface Ledger {
   balancePoints: { key: string; date: number; balance: number }[];
   /** Card statements and payments, oldest first. */
   cardEvents: { key: string; date: number; kind: 'statement' | 'payment'; amount: number }[];
+  /** "Debited but payment failed" alerts, oldest first. */
+  failedDebits: FailedDebit[];
 }
+
+export interface FailedDebit {
+  id: string;
+  date: number;
+  amount: number;
+  institution: string;
+  last4: string;
+  mode: string;
+  body: string;
+}
+
+/** Same message on any phone (SMS ids differ), so category fixes survive a backup/restore. */
+export const stableKey = (sms: RawSms) => `${sms.date}|${sms.address.toUpperCase()}`;
 
 const DAY = 86_400_000;
 const MIN = 60_000;
@@ -33,7 +48,8 @@ export function buildLedger(
   const failures: Ledger['failures'] = [];
   const balancePoints: Ledger['balancePoints'] = [];
   const cardEvents: Ledger['cardEvents'] = [];
-  const seen = new Set<string>();
+  const failedDebits: FailedDebit[] = [];
+  const lastSeen = new Map<string, number>();
 
   const account = (institution: string, kind: Account['kind'], last4: string): Account => {
     const key = `${institution}|${kind}|${last4 || '????'}`;
@@ -71,6 +87,10 @@ export function buildLedger(
       continue;
     }
 
+    if (p.type === 'failed') {
+      failedDebits.push({ id: sms.id, date: sms.date, amount: p.amount, institution: p.institution, last4: p.last4, mode: p.mode, body: sms.body });
+      continue;
+    }
     if (p.type === 'mf') {
       mfOrders.push({ id: sms.id, date: sms.date, ...p.order });
       continue;
@@ -94,10 +114,12 @@ export function buildLedger(
       continue;
     }
 
-    // Banks sometimes send the same alert twice; drop exact duplicates within 10 minutes.
-    const dupKey = `${p.institution}|${p.last4}|${p.direction}|${p.amount}|${Math.floor(sms.date / 600_000)}`;
-    if (seen.has(dupKey)) continue;
-    seen.add(dupKey);
+    // Banks sometimes send the same alert twice: drop an identical message within 10 minutes.
+    // Two genuine charges of the same amount differ (reference number), so a real double charge is kept.
+    const dupKey = `${p.institution}|${sms.body.replace(/\s+/g, '')}`;
+    const prevAt = lastSeen.get(dupKey);
+    lastSeen.set(dupKey, sms.date);
+    if (prevAt != null && sms.date - prevAt < 600_000) continue;
 
     const a = account(p.institution, p.accountKind, p.last4);
     if (p.balance != null) {
@@ -117,6 +139,7 @@ export function buildLedger(
 
     txns.push({
       id: sms.id,
+      key: stableKey(sms),
       date: sms.date,
       amount: p.amount,
       direction: p.direction,
@@ -138,8 +161,13 @@ export function buildLedger(
   }
 
   pairInternalMoves(txns, [...accounts.values()]);
+  pairReversals(txns);
 
-  for (const t of txns) if (overrides[t.id]) t.category = overrides[t.id];
+  // Overrides saved before 4.0 were keyed by SMS id; newer ones by the stable key.
+  for (const t of txns) {
+    const o = overrides[t.key] ?? overrides[t.id];
+    if (o) t.category = o;
+  }
 
   return {
     transactions: txns.sort((x, y) => y.date - x.date),
@@ -149,6 +177,7 @@ export function buildLedger(
     failures,
     balancePoints,
     cardEvents,
+    failedDebits,
   };
 }
 
@@ -210,5 +239,29 @@ function pairInternalMoves(txns: Transaction[], accounts: Account[]): void {
     used.add(match.id);
     d.category = cat;
     match.category = cat;
+  }
+}
+
+const REVERSAL_RE = /revers|refund|failed|declined|unsuccessful|not dispensed/i;
+
+/** A debit followed within 7 days by an equal reversal credit on the same account never really left. */
+function pairReversals(txns: Transaction[]): void {
+  const used = new Set<string>();
+  const sorted = [...txns].sort((a, b) => a.date - b.date);
+  for (const c of sorted) {
+    if (c.direction !== 'credit' || !REVERSAL_RE.test(c.body)) continue;
+    const d = sorted.find(
+      (t) =>
+        t.direction === 'debit' &&
+        !used.has(t.id) &&
+        t.accountKey === c.accountKey &&
+        Math.abs(t.amount - c.amount) < 0.01 &&
+        t.date <= c.date &&
+        c.date - t.date <= 7 * 86_400_000,
+    );
+    if (!d) continue;
+    used.add(d.id);
+    d.category = 'Reversed';
+    c.category = 'Reversed';
   }
 }

@@ -9,8 +9,8 @@ import { Card, GradientCard, InsightCard, Label, Pill, Row, Section, Stat, T } f
 import { inr, isSpend, monthlySummary, totalMonthlySaving } from '../lib/analysis';
 import { monthForecast } from '../lib/forecast';
 import { moneyHealth } from '../lib/health';
-import { netWorthHistory } from '../lib/history';
 import { BudgetsCard, ForecastCard, NetWorthTrend } from '../components/planning';
+import { DigestCard, GoalsCard, GuardBanner } from '../components/weekly';
 import type { Account } from '../lib/types';
 import { useData } from '../store';
 import { C, F, GRADIENTS } from '../theme';
@@ -85,7 +85,7 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
   const saving = totalMonthlySaving(d.waste);
   const health = moneyHealth(transactions, accounts, d.holdings);
   const forecast = monthForecast(transactions);
-  const history = netWorthHistory(d.ledger, d.holdings);
+  const history = d.history;
   const healthColor = !health ? C.sub : health.score >= 80 ? C.green : health.score >= 60 ? C.teal : health.score >= 40 ? C.amber : C.red;
   // Compare with last month up to the same day, so early-month rent doesn't look like a spike.
   const today = new Date();
@@ -120,6 +120,8 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
           </Row>
         </FadeIn>
       ) : null}
+
+      <GuardBanner go={go} />
 
       <FadeIn index={0}>
         <GradientCard colors={GRADIENTS.hero}>
@@ -220,6 +222,8 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
 
       <ForecastCard f={forecast} index={3} />
       <BudgetsCard txns={transactions} budgets={d.budgets} onSave={d.setBudgets} index={3} />
+      <GoalsCard index={3} />
+      <DigestCard dg={d.digest} index={3} />
 
       {saving > 0 ? (
         <FadeIn index={3}>

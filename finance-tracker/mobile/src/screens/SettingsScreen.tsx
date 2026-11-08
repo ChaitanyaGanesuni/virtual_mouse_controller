@@ -1,9 +1,11 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Animated, Linking, ScrollView, Share, Switch, View, type LayoutChangeEvent } from 'react-native';
+import { useEffect, useState, type ReactNode } from 'react';
+import { Linking, ScrollView, Share, Switch, View } from 'react-native';
 
 import { FadeIn, PressScale, tap } from '../components/anim';
 import { canUseDeviceLock, verifyOwner } from '../components/guards';
-import { clearErrors, formatErrors, getErrors, type LoggedError } from '../errorLog';
+import Segmented from '../components/Segmented';
+import { exportBackup, importBackup } from '../backup';
+import { clearErrors, formatErrors, getErrors, logError, type LoggedError } from '../errorLog';
 import Icon, { type IconName } from '../components/Icon';
 import { ShieldArt } from '../components/Illustrations';
 import { Button, Card, IconBubble, Label, Pill, Row, Section, Sheet, T } from '../components/ui';
@@ -69,45 +71,6 @@ function Stepper({ value, step, min, max, fmt, onChange }: {
   );
 }
 
-/** Three-way segmented control with a sliding thumb. */
-function Segmented<V extends string>({ options, value, onChange }: { options: { value: V; label: string }[]; value: V; onChange: (v: V) => void }) {
-  const [w, setW] = useState(0);
-  const idx = Math.max(0, options.findIndex((o) => o.value === value));
-  const x = useRef(new Animated.Value(idx)).current;
-  useEffect(() => {
-    Animated.spring(x, { toValue: idx, useNativeDriver: true, speed: 18, bounciness: 6 }).start();
-  }, [idx, x]);
-  const seg = w / options.length;
-  return (
-    <View
-      onLayout={(e: LayoutChangeEvent) => setW(e.nativeEvent.layout.width)}
-      style={{ flexDirection: 'row', backgroundColor: C.bg2, borderRadius: 14, padding: 4, marginTop: 10 }}
-    >
-      {w > 0 ? (
-        <Animated.View
-          style={{
-            position: 'absolute',
-            top: 4,
-            bottom: 4,
-            left: 4,
-            width: seg - 8 / options.length,
-            borderRadius: 11,
-            backgroundColor: C.green,
-            transform: [{ translateX: x.interpolate({ inputRange: [0, options.length - 1], outputRange: [0, seg * (options.length - 1) - 8 / options.length * (options.length - 1)] }) }],
-          }}
-        />
-      ) : null}
-      {options.map((o) => (
-        <PressScale key={o.value} haptic onPress={() => onChange(o.value)} style={{ flex: 1, paddingVertical: 9, alignItems: 'center' }}>
-          <T size={13} weight="bold" color={o.value === value ? '#04261B' : C.sub}>
-            {o.label}
-          </T>
-        </PressScale>
-      ))}
-    </View>
-  );
-}
-
 const sw = { trackColor: { false: C.cardHi, true: C.greenDeep }, thumbColor: '#fff' } as const;
 
 export default function SettingsScreen() {
@@ -117,6 +80,7 @@ export default function SettingsScreen() {
   const [showMissed, setShowMissed] = useState(false);
   const [errors, setErrors] = useState<LoggedError[]>([]);
   const [lockMsg, setLockMsg] = useState<string | null>(null);
+  const [backupMsg, setBackupMsg] = useState<string | null>(null);
   useEffect(() => {
     getErrors().then(setErrors);
   }, [d.lastSync]);
@@ -237,8 +201,15 @@ export default function SettingsScreen() {
             color={C.blue}
             title="Card bill reminders"
             sub="3 days before, day before, due day"
-            last
             right={<Switch value={al.billReminders} onValueChange={(v) => { tap(); setAl({ billReminders: v }); }} {...sw} />}
+          />
+          <SettingRow
+            icon="message"
+            color={C.violet}
+            title="Weekly check-in"
+            sub="Sunday 7 pm: your week, bills ahead, one tip"
+            last
+            right={<Switch value={d.extras.digest} onValueChange={(v) => { tap(); d.setExtra('digest', v); }} {...sw} />}
           />
         </Card>
       </FadeIn>
@@ -288,12 +259,67 @@ export default function SettingsScreen() {
             color={C.violet}
             title="App lock"
             sub="Fingerprint, face or PIN when opening, and after 30 s away"
-            last
             right={<Switch value={d.appLock} onValueChange={toggleLock} {...sw} />}
+          />
+          <SettingRow
+            icon="eye"
+            color={C.teal}
+            title="Hide in recent apps"
+            sub={d.appLock ? 'Blank preview in the app switcher; also blocks screenshots' : 'Works together with app lock'}
+            last
+            right={<Switch disabled={!d.appLock} value={d.appLock && d.extras.secure} onValueChange={(v) => { tap(); d.setExtra('secure', v); }} {...sw} />}
           />
           {lockMsg ? (
             <T size={12.5} color={C.amber} style={{ marginTop: 6 }}>
               {lockMsg}
+            </T>
+          ) : null}
+        </Card>
+      </FadeIn>
+
+      <Section title="Backup & restore" />
+      <FadeIn index={4}>
+        <Card>
+          <T size={13} color={C.sub}>
+            Saves your category fixes, budgets, goals, subscriptions and settings to a file you keep (Google Drive, email…).
+            Transactions aren't in it: they're rebuilt from SMS on the new phone.
+          </T>
+          <Row style={{ gap: 10 }}>
+            <Button
+              label="Back up"
+              icon="share"
+              style={{ flex: 1 }}
+              onPress={async () => {
+                setBackupMsg(null);
+                try {
+                  await exportBackup();
+                } catch (e) {
+                  logError('backup', e);
+                  setBackupMsg("Couldn't create the backup on this device.");
+                }
+              }}
+            />
+            <Button
+              label="Restore"
+              icon="undo"
+              kind="ghost"
+              style={{ flex: 1 }}
+              onPress={async () => {
+                setBackupMsg(null);
+                try {
+                  const n = await importBackup();
+                  if (n == null) return;
+                  await d.reloadAll();
+                  setBackupMsg(`Restored ${n} settings.`);
+                } catch (e) {
+                  setBackupMsg(e instanceof Error ? e.message : String(e));
+                }
+              }}
+            />
+          </Row>
+          {backupMsg ? (
+            <T size={12.5} color={backupMsg.startsWith('Restored') ? C.green : C.amber} style={{ marginTop: 8 }}>
+              {backupMsg}
             </T>
           ) : null}
         </Card>
@@ -358,7 +384,7 @@ export default function SettingsScreen() {
       </FadeIn>
 
       <T size={11} color={C.faint} style={{ textAlign: 'center', marginTop: 8, fontFamily: F.medium }}>
-        Paisa Watch 3.0
+        Paisa Watch 4.0
       </T>
 
       <Sheet visible={showMissed} onClose={() => setShowMissed(false)} title={`Unread alerts (${missed.length})`}>

@@ -19,8 +19,8 @@ import { installGlobalErrorHandler } from './src/errorLog';
 import Icon, { type IconName } from './src/components/Icon';
 import { T } from './src/components/ui';
 import HomeScreen from './src/screens/HomeScreen';
-import InsightsScreen from './src/screens/InsightsScreen';
-import InvestScreen from './src/screens/InvestScreen';
+import InsightsScreen, { type LeaksView } from './src/screens/InsightsScreen';
+import InvestScreen, { type InvestView } from './src/screens/InvestScreen';
 import OnboardingScreen from './src/screens/OnboardingScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import SpendingScreen from './src/screens/SpendingScreen';
@@ -139,6 +139,12 @@ function TabBar({ tab, onChange, badge }: { tab: Tab; onChange: (t: Tab) => void
 function Shell() {
   const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<Tab>('home');
+  const [subView, setSubView] = useState<string | undefined>(undefined);
+  const go = (target: string) => {
+    const [t, v] = target.split(':');
+    setSubView(v);
+    setTab(t as Tab);
+  };
   const d = useData();
   const meta = TABS.find((t) => t.key === tab)!;
   const highLeaks = d.waste.filter((i) => i.severity === 'high').length;
@@ -183,13 +189,20 @@ function Shell() {
         <SyncSpinner active={d.loading} />
       </View>
       <FadeIn key={tab} from={14} style={{ flex: 1 }}>
-        {tab === 'home' && <HomeScreen go={(t) => setTab(t as Tab)} />}
+        {tab === 'home' && <HomeScreen go={go} />}
         {tab === 'spending' && <SpendingScreen />}
-        {tab === 'insights' && <InsightsScreen />}
-        {tab === 'invest' && <InvestScreen />}
+        {tab === 'insights' && <InsightsScreen initial={(subView as LeaksView) ?? 'leaks'} />}
+        {tab === 'invest' && <InvestScreen initial={(subView as InvestView) ?? 'portfolio'} />}
         {tab === 'settings' && <SettingsScreen />}
       </FadeIn>
-      <TabBar tab={tab} onChange={setTab} badge={highLeaks} />
+      <TabBar
+        tab={tab}
+        onChange={(t) => {
+          setSubView(undefined);
+          setTab(t);
+        }}
+        badge={highLeaks + d.signals.length + d.failedPayments.filter((f) => f.status === 'overdue').length}
+      />
       {showLock ? <LockScreen onUnlock={() => setLocked(false)} /> : null}
     </View>
   );

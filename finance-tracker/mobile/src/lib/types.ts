@@ -9,7 +9,9 @@ export interface RawSms {
 }
 
 export interface Transaction {
-  id: string; // sms id
+  id: string; // sms id (differs between phones)
+  /** Stable across phones and SMS-backup restores: used for saved category fixes. */
+  key: string;
   date: number; // epoch ms
   amount: number;
   direction: Direction;

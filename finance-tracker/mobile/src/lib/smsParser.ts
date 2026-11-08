@@ -20,7 +20,21 @@ export type ParsedSms =
     }
   | { type: 'card_due'; institution: string; last4: string; amountDue: number; minDue: number | null; dueDate: number | null }
   | { type: 'balance'; institution: string; last4: string; balance: number }
-  | { type: 'mf'; order: Omit<MfOrder, 'id' | 'date'> };
+  | { type: 'mf'; order: Omit<MfOrder, 'id' | 'date'> }
+  /** Money was taken but the payment failed; a reversal is owed. */
+  | { type: 'failed'; institution: string; last4: string; amount: number; mode: string };
+
+const FAILED_RE = /\b(failed|declined|unsuccessful|not dispensed|could not be (?:processed|completed)|timed? ?out)\b/i;
+const MONEY_TAKEN_RE = /debited|deducted|will be (?:reversed|refunded|credited back)|auto[- ]?revers|reversal (?:is |will be )?(?:initiated|processed within)|refund will/i;
+/** "Rs 500 credited/refunded as reversal of your failed txn": the money came back. */
+const REVERSAL_CREDIT_RE = /\b(credited|refunded|reversed)\b(?!.{0,20}\bwithin\b)/i;
+const FUTURE_RE = /will be (?:credited|refunded|reversed)/i;
+
+/** Pulls the bank's own helpline out of an alert ("…call 18002586161"), so we never hard-code one. */
+export function helplineFrom(body: string): string | null {
+  const m = /(?:call|contact|dial|reach us|helpline|customer care)\D{0,18}(1800(?:[\s-]?\d){4,7}(?!\d)|1860[\s-]?\d{3}[\s-]?\d{4}|\+?91[\s-]?\d{10}|\b[6-9]\d{9}\b|\b0\d{2,4}[\s-]?\d{6,8}\b)/i.exec(body);
+  return m ? m[1].replace(/[\s-]/g, '') : null;
+}
 
 // Commercial sender IDs look like "AX-HDFCBK", "VM-SBIINB-S", "JD-ICICIT-T".
 const SENDER_RE = /^[A-Z0-9]{2}-([A-Z0-9]{3,9})(?:-[A-Z])?$/i;
@@ -94,7 +108,11 @@ export function isBusinessSender(address: string): boolean {
 function cleanMerchant(m: string): string {
   let s = m.trim().replace(/\s+/g, ' ');
   if (s.includes('@')) s = s.split('@')[0]; // UPI VPA -> handle
-  s = s.replace(/^(?:vpa|upi)[\s:-]*/i, '').replace(/[.\-*]+$/, '');
+  s = s
+    .replace(/^(?:vpa|upi)[\s:-]*/i, '')
+    .replace(/\s+(?:USD|EUR|GBP|AED|SGD|AUD|CAD|JPY|CHF)\b.*$/i, '') // "STEAM USD 40.00 international"
+    .replace(/\s+(?:international|intl)\b.*$/i, '')
+    .replace(/[.\-*]+$/, '');
   if (/^\d+$/.test(s) || /^(a\/c|ac|acct|account|your|you|card|xx|the|self)\b/i.test(s)) return '';
   return s.slice(0, 40);
 }
@@ -202,12 +220,22 @@ export function parseSms(sms: RawSms): ParsedSms | null {
     };
   }
 
-  if (IGNORE_RE.test(body)) return null;
+  const failed = FAILED_RE.test(body);
+  const reversalCredit = failed && REVERSAL_CREDIT_RE.test(body) && !FUTURE_RE.test(body);
+  if (failed && !reversalCredit && MONEY_TAKEN_RE.test(body)) {
+    const a = AMOUNT_RE.exec(body) ?? AMOUNT_FALLBACK_RE.exec(body);
+    if (a && parseAmount(a[1]) > 0) {
+      return { type: 'failed', institution, last4, amount: parseAmount(a[1]), mode: detectMode(body) };
+    }
+  }
+  // A reversal credit mentions the failed payment, so it must not be thrown away with the other "failed" alerts.
+  if (IGNORE_RE.test(reversalCredit ? body.replace(FAILED_RE, '') : body)) return null;
 
   const d = DEBIT_RE.exec(body);
   const c = CREDIT_RE.exec(body);
   let direction: Direction | null = null;
   if (/payment (?:of .{1,30} )?(?:has been |is )?received|received .{0,30}payment|thank you for (?:your |the )?payment/i.test(body)) direction = 'credit';
+  else if (reversalCredit) direction = 'credit';
   else if (d && c) direction = d.index <= c.index ? 'debit' : 'credit';
   else if (d) direction = 'debit';
   else if (c) direction = 'credit';

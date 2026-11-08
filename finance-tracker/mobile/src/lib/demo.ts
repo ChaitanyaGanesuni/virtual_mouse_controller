@@ -91,6 +91,21 @@ export function demoMessages(now = Date.now()): RawSms[] {
       card(at(20), 1_180, 'FINANCE CHARGES INTEREST');
       card(at(20), 700, 'LATE PAYMENT FEE');
     }
+    // Tax-saver SIP (ELSS) and insurance premiums
+    if (upto(7)) {
+      push(at(7, 15), 'VM-KFINTK', `Dear Investor, your purchase of Rs.2,000.00 in Folio 55512345 under Mirae Asset ELSS Tax Saver Fund - Direct Growth is processed at NAV of ${(45 + (5 - m) * 0.5).toFixed(4)} for ${(2000 / (45 + (5 - m) * 0.5)).toFixed(3)} units.`);
+    }
+    if (m === 4 && upto(20)) push(at(20), 'AX-HDFCBK', `Rs.25,000.00 debited from A/c XX4821 on ${d(at(20))} towards LIC life insurance premium.`);
+    if (m === 3 && upto(18)) push(at(18), 'AX-HDFCBK', `Rs.15,000.00 debited from A/c XX4821 on ${d(at(18))} towards Star Health insurance premium.`);
+    if (m === 2 && upto(28)) push(at(28), 'VM-HDFCBK', `Your A/c XX4821 is credited with Rs.1,850.00 on ${d(at(28))} towards savings interest.`);
+    // Failed payments: one reversed on time, one never reversed (overdue)
+    if (m === 2 && upto(12)) {
+      push(at(12, 13), 'AX-HDFCBK', `Rs.1,200.00 debited from A/c XX4821 for UPI txn to irctc@ybl. Txn failed. Amount will be reversed within 1 working day. Call 18002586161`);
+      push(at(13, 11), 'AX-HDFCBK', `Rs.1,200.00 credited to A/c XX4821 as reversal of your failed UPI txn on ${d(at(12))}.`);
+    }
+    if (m === 1 && upto(10)) {
+      push(at(10, 19), 'AX-HDFCBK', `Rs.2,000.00 debited from A/c XX4821 at HDFC ATM. Cash not dispensed. Amount will be reversed. Call 18002586161`);
+    }
     // Weekend betting habit
     if (m <= 2 && upto(16)) upi(at(16), 500, 'dream11@icici');
     // ATM
@@ -98,6 +113,13 @@ export function demoMessages(now = Date.now()): RawSms[] {
       bal -= 3000;
       push(at(15), 'AX-HDFCBK', `Rs.3,000.00 withdrawn at HDFC ATM from A/c XX4821 on ${d(at(15))}. Avl Bal Rs.${fmt(bal)}`);
     }
+  }
+  // Recent: a failed UPI payment awaiting reversal, and a late-night international card charge
+  push(now - DAY, 'AX-HDFCBK', 'Rs.750.00 debited from A/c XX4821 for UPI txn to bookmyshow@hdfcbank. Txn failed. Amount will be reversed within 1 working day. Call 18002586161');
+  {
+    const night = new Date(now - 2 * DAY);
+    night.setHours(1, 40, 0, 0);
+    push(night.getTime(), 'JD-ICICIT-S', `INR 3,450.00 spent using ICICI Bank Card XX9034 on ${d(night.getTime())} on STEAMGAMES USD 40.00 international txn. Avl Limit: INR 1,20,000.00. If not you, call 18001080.`);
   }
   // Noise that must be ignored
   push(now - DAY, 'AX-HDFCBK', 'OTP for txn of Rs.4,999.00 at AMAZON is 482913. Do not share.');

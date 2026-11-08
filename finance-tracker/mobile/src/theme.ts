@@ -69,6 +69,7 @@ const CAT: Record<string, CategoryMeta> = {
   Income: { color: '#34D399', icon: 'arrowDown' },
   'Interest & Dividends': { color: '#2DD4BF', icon: 'percent' },
   Refund: { color: '#5EEAD4', icon: 'undo' },
+  Reversed: { color: '#94A3B8', icon: 'undo' },
   'UPI Payments (Other)': { color: '#7DD3FC', icon: 'send' },
   Other: { color: '#94A3B8', icon: 'dots' },
 };

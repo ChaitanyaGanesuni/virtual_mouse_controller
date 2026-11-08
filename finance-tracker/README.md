@@ -23,6 +23,18 @@ credit-card issuers, UPI apps and mutual-fund registrars (CAMS / KFintech) alrea
 - **Net-worth trend**: month-end net worth rebuilt from SMS balances, card statements and fund purchases.
 - **Money Health score** (0–100): savings rate, fees, emergency cushion, investing habit and fund costs.
   Parts that can't be measured yet (e.g. no salary SMS) are left out instead of counted as zero.
+- **Protection**: failed payments ("debited but failed") tracked against RBI refund deadlines (T+1 for UPI/IMPS,
+  T+5 for cards/ATM) with the ₹100/day compensation owed if late; possible double charges, large first payments to new
+  merchants, foreign-currency and late-night card use. Buttons call your bank's helpline (taken from its own SMS) or
+  the national cybercrime helpline 1930.
+- **Subscriptions**: every recurring charge with its yearly cost, a monthly "still using it?" review, step-by-step
+  cancel guides (plus how to revoke UPI Autopay / card mandates), and a warning if it's charged after you cancelled.
+- **Tax**: 80C / 80CCD(1B) / 80D / 80TTA found in your SMS for the financial year, with an honest note about the new
+  regime; long-term equity gains you can still book tax-free (₹1.25L allowance, FIFO lots); rent receipts PDF for HRA.
+- **Goals & weekly check-in**: savings goals that fill up as your net worth grows (on track / behind), and a Sunday
+  evening summary of your week and the bills ahead.
+- **Backup & restore**: your fixes, budgets, goals and settings to a file you keep; the app can also hide its
+  content in recent apps (and block screenshots) while app lock is on.
 - **App lock**: fingerprint, face or screen-lock PIN on open and after 30 seconds away.
 - **Problem log**: errors are recorded on the phone only and can be shared (numbers masked).
 - **Investments**: mutual-fund holdings built from allotment SMS, valued at live NAVs (mfapi.in / AMFI), with gain,
@@ -91,6 +103,10 @@ Project layout:
 | `mobile/src/lib/forecast.ts` | Month-end spending and cash-left projection. |
 | `mobile/src/lib/history.ts` | Month-end net-worth history rebuilt from SMS. |
 | `mobile/src/lib/health.ts` | Money Health score. |
+| `mobile/src/lib/guard.ts` | Failed-payment tracking (RBI TAT) and fraud signals. |
+| `mobile/src/lib/subscriptions.ts` | Cancel guides and subscription review. |
+| `mobile/src/lib/tax.ts`, `rent.ts` | Deductions, capital gains harvesting, rent receipts. |
+| `mobile/src/lib/goals.ts`, `digest.ts` | Savings goals and the weekly check-in. |
 | `mobile/src/lib/analysis.ts` | Monthly summaries, recurring-payment detection, waste insights. |
 | `mobile/src/lib/investments.ts` | Holdings, live NAVs, XIRR, investment insights. |
 | `mobile/src/screens/*` | Home, Spending, Leaks, Invest, Settings. |

@@ -1,4 +1,8 @@
+import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
+
+import Segmented from '../components/Segmented';
+import TaxSection from './sections/TaxSection';
 
 import { AnimatedNumber, FadeIn } from '../components/anim';
 import { Donut } from '../components/charts';
@@ -18,7 +22,7 @@ const ASSET = {
   gold: { label: 'Gold', color: C.amber },
 };
 
-export default function InvestScreen() {
+function PortfolioContent() {
   const d = useData();
   const h = d.holdings;
   const value = h.reduce((s, x) => s + x.currentValue, 0);
@@ -33,7 +37,7 @@ export default function InvestScreen() {
   );
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+    <View>
       <FadeIn>
         <GradientCard colors={GRADIENTS.invest}>
           <Row style={{ justifyContent: 'space-between' }}>
@@ -175,6 +179,29 @@ export default function InvestScreen() {
         Live NAVs from mfapi.in (AMFI). Suggestions are general, rule-based education, not personalised advice from a SEBI-registered adviser. Check exit
         loads and taxes before switching or selling.
       </T>
+    </View>
+  );
+}
+
+export type InvestView = 'portfolio' | 'tax';
+
+export default function InvestScreen({ initial = 'portfolio' }: { initial?: InvestView }) {
+  const [view, setView] = useState<InvestView>(initial);
+  return (
+    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+      <View style={{ marginTop: -10, marginBottom: 12 }}>
+        <Segmented
+          value={view}
+          onChange={setView}
+          options={[
+            { value: 'portfolio', label: 'Portfolio' },
+            { value: 'tax', label: 'Tax' },
+          ]}
+        />
+      </View>
+      <FadeIn key={view} from={10}>
+        {view === 'portfolio' ? <PortfolioContent /> : <TaxSection />}
+      </FadeIn>
     </ScrollView>
   );
 }

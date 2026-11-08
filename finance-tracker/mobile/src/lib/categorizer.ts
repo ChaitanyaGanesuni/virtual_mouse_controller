@@ -1,7 +1,7 @@
 import type { Direction } from './types';
 
 /** Categories that are not real spending (money just moved between your own pots). */
-export const NON_SPEND = new Set(['Self Transfer', 'Card Bill Payment', 'Investments', 'Refund']);
+export const NON_SPEND = new Set(['Self Transfer', 'Card Bill Payment', 'Investments', 'Refund', 'Reversed']);
 /** Discretionary categories: where "waste" usually hides. */
 export const DISCRETIONARY = new Set([
   'Food Delivery',
@@ -42,7 +42,7 @@ const DEBIT_RULES: Rule[] = [
 const CREDIT_RULES: Rule[] = [
   [/refund|reversal|reversed|cashback|chargeback/i, 'Refund'],
   [/salary|\bsal\b|payroll|stipend/i, 'Salary'],
-  [/interest (?:credited|paid)|int\.? ?pd|\bint\b.*credit|dividend|\bdiv\b/i, 'Interest & Dividends'],
+  [/\binterest\b|int\.? ?(?:pd|cr)\b|\bint\b.*credit|dividend|\bdiv\b/i, 'Interest & Dividends'],
   [/redemption|redeem|zerodha|groww|upstox|nse ?clearing|iccl|mutual fund/i, 'Investments'],
   [/payment received|thank you for (?:the )?payment|payment of .* (?:has been )?received/i, 'Card Bill Payment'],
   [/self|own account/i, 'Self Transfer'],

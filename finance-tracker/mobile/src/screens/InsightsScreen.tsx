@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import Segmented from '../components/Segmented';
+import GuardSection from './sections/GuardSection';
+import SubscriptionsSection from './sections/SubscriptionsSection';
 import { LayoutAnimation, ScrollView, View } from 'react-native';
 
 import { AnimatedNumber, FadeIn } from '../components/anim';
@@ -9,7 +12,7 @@ import type { Severity } from '../lib/types';
 import { useData } from '../store';
 import { C, F, GRADIENTS, SEVERITY } from '../theme';
 
-export default function InsightsScreen() {
+function LeaksContent() {
   const d = useData();
   const [filter, setFilter] = useState<Severity | 'all'>('all');
   const saving = totalMonthlySaving(d.waste);
@@ -21,7 +24,7 @@ export default function InsightsScreen() {
   for (const i of d.waste) counts[i.severity]++;
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+    <View>
       <FadeIn>
         <GradientCard colors={d.waste.length ? GRADIENTS.warn : GRADIENTS.save}>
           <Row>
@@ -114,6 +117,32 @@ export default function InsightsScreen() {
             </>
           )}
         </Card>
+      </FadeIn>
+    </View>
+  );
+}
+
+export type LeaksView = 'leaks' | 'subs' | 'guard';
+
+export default function InsightsScreen({ initial = 'leaks' }: { initial?: LeaksView }) {
+  const d = useData();
+  const [view, setView] = useState<LeaksView>(initial);
+  const alerts = d.signals.length + d.failedPayments.filter((f) => f.status !== 'refunded').length;
+  return (
+    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+      <View style={{ marginTop: -10, marginBottom: 12 }}>
+        <Segmented
+          value={view}
+          onChange={setView}
+          options={[
+            { value: 'leaks', label: 'Leaks' },
+            { value: 'subs', label: 'Subscriptions' },
+            { value: 'guard', label: alerts ? `Protection · ${alerts}` : 'Protection' },
+          ]}
+        />
+      </View>
+      <FadeIn key={view} from={10}>
+        {view === 'leaks' ? <LeaksContent /> : view === 'subs' ? <SubscriptionsSection /> : <GuardSection />}
       </FadeIn>
     </ScrollView>
   );
