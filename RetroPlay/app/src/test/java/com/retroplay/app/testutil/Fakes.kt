@@ -72,6 +72,25 @@ class FakeGameRepository(
         games.update { list -> list.map { if (it.id == id) it.copy(installationStatus = status) else it } }
     }
 
+    override suspend fun registerCustomGame(title: String, category: com.retroplay.app.domain.model.GameCategory): com.retroplay.app.domain.model.Game {
+        val game = com.retroplay.app.domain.game.GameCatalogue.initialGames.first().copy(
+            id = com.retroplay.app.domain.model.Game.CUSTOM_ID_PREFIX + (games.value.size + 1),
+            title = title.trim(),
+            category = category,
+            releaseYear = null,
+            sortOrder = 1_000,
+        )
+        games.update { it + game }
+        return game
+    }
+
+    override suspend fun removeCustomGame(id: String): Boolean {
+        if (!id.startsWith(com.retroplay.app.domain.model.Game.CUSTOM_ID_PREFIX)) return false
+        val before = games.value.size
+        games.update { list -> list.filterNot { it.id == id } }
+        return games.value.size < before
+    }
+
     override suspend fun recordLaunch(id: String, method: com.retroplay.app.domain.launch.LaunchMethod, atEpochMillis: Long) {
         launches += Triple(id, method, atEpochMillis)
         if (method == com.retroplay.app.domain.launch.LaunchMethod.ANDROID_APP) {
@@ -117,4 +136,18 @@ class FakeGameLaunchManager(
     override suspend fun launch(game: com.retroplay.app.domain.model.Game) = nextResult.also { launched += game.id }
     override suspend fun launchableApps() = apps
     override fun openStoreListing(packageName: String) = storeAvailable
+}
+
+class FakeInstallationRepository : com.retroplay.app.domain.repository.InstallationRepository {
+    val items = MutableStateFlow<Map<String, com.retroplay.app.domain.model.GameInstallation>>(emptyMap())
+    override fun observe(gameId: String): Flow<com.retroplay.app.domain.model.GameInstallation?> =
+        kotlinx.coroutines.flow.flow { items.collect { emit(it[gameId]) } }
+    override suspend fun get(gameId: String) = items.value[gameId]
+    override suspend fun upsert(installation: com.retroplay.app.domain.model.GameInstallation) {
+        items.update { it + (installation.gameId to installation) }
+    }
+    override suspend fun delete(gameId: String) {
+        items.update { it - gameId }
+    }
+    override suspend fun countUsingFolder(folderUri: String) = items.value.values.count { it.folderUri == folderUri }
 }

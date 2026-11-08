@@ -59,6 +59,13 @@ interface GameDao {
     @Query("SELECT * FROM play_history WHERE gameId = :gameId ORDER BY launchedAt DESC")
     suspend fun playHistory(gameId: String): List<PlayHistoryEntity>
 
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun insertGame(game: GameEntity)
+
+    /** Deletes the library row; favourites, history and file references cascade. Files are untouched. */
+    @Query("DELETE FROM games WHERE id = :id")
+    suspend fun deleteGame(id: String): Int
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addFavorite(favorite: FavoriteEntity)
 

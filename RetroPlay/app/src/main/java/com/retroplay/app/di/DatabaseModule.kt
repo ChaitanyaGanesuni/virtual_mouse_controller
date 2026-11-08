@@ -5,6 +5,9 @@ import androidx.room.Room
 import com.retroplay.app.data.game.OfflineGameRepository
 import com.retroplay.app.data.local.RetroPlayDatabase
 import com.retroplay.app.data.local.dao.GameDao
+import com.retroplay.app.data.local.dao.InstallationDao
+import com.retroplay.app.data.game.OfflineInstallationRepository
+import com.retroplay.app.domain.repository.InstallationRepository
 import com.retroplay.app.domain.repository.GameRepository
 import dagger.Binds
 import dagger.Module
@@ -26,6 +29,9 @@ object DatabaseModule {
 
     @Provides
     fun provideGameDao(database: RetroPlayDatabase): GameDao = database.gameDao()
+
+    @Provides
+    fun provideInstallationDao(database: RetroPlayDatabase): InstallationDao = database.installationDao()
 }
 
 @Module
@@ -33,4 +39,7 @@ object DatabaseModule {
 abstract class RepositoryModule {
     @Binds
     abstract fun bindGameRepository(impl: OfflineGameRepository): GameRepository
+
+    @Binds
+    abstract fun bindInstallationRepository(impl: OfflineInstallationRepository): InstallationRepository
 }

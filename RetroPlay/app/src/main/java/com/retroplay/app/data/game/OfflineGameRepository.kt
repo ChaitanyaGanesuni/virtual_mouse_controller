@@ -14,6 +14,11 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import com.retroplay.app.domain.model.CompatibilityStatus
+import com.retroplay.app.domain.model.ExecutionType
+import com.retroplay.app.domain.model.GameCategory
+import com.retroplay.app.domain.model.GamePlatform
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -57,10 +62,51 @@ class OfflineGameRepository @Inject constructor(
         if (method == LaunchMethod.ANDROID_APP) gameDao.updateLastPlayed(id, atEpochMillis)
     }
 
+    override suspend fun registerCustomGame(title: String, category: GameCategory): Game {
+        val clean = title.trim()
+        require(clean.isNotEmpty()) { "Title must not be empty" }
+        val id = Game.CUSTOM_ID_PREFIX + UUID.randomUUID().toString()
+        val game = Game(
+            id = id,
+            title = clean,
+            shortTitle = monogram(clean),
+            category = category,
+            originalPlatform = GamePlatform.WINDOWS_PC,
+            releaseYear = null,
+            description = "Added by you. Import your legally obtained game files to register them with RetroPlay.",
+            artworkRef = "placeholder:$id",
+            executionType = ExecutionType.EXTERNAL_EMULATOR,
+            installationStatus = InstallationStatus.NOT_IMPORTED,
+            compatibilityStatus = CompatibilityStatus.NOT_TESTED,
+            lastPlayedAtEpochMillis = null,
+            userNotes = "",
+            isFavorite = false,
+            sortOrder = CUSTOM_SORT_ORDER,
+        )
+        gameDao.insertGame(GameEntity.fromDomain(game))
+        return game
+    }
+
+    override suspend fun removeCustomGame(id: String): Boolean {
+        if (!id.startsWith(Game.CUSTOM_ID_PREFIX)) return false
+        return gameDao.deleteGame(id) > 0
+    }
+
     private suspend fun ensureCatalogueSeeded() = seedLock.withLock {
         if (!seeded) {
             gameDao.insertIfAbsent(GameCatalogue.initialGames.map(GameEntity::fromDomain))
             seeded = true
+        }
+    }
+
+    private companion object {
+        const val CUSTOM_SORT_ORDER = 1_000
+
+        /** "Need for Speed Underground" -> "NSU"; single words use their first two letters. */
+        fun monogram(title: String): String {
+            val words = title.split(Regex("[^\\p{L}\\p{N}]+")).filter { it.isNotEmpty() }
+            val letters = if (words.size >= 2) words.take(3).joinToString("") { it.first().toString() } else title.take(2)
+            return letters.uppercase()
         }
     }
 }

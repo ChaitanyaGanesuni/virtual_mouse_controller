@@ -79,6 +79,60 @@ class GameDetailContentTest {
         composeRule.onNodeWithText("Not tested on this device.").performScrollTo().assertIsDisplayed()
     }
 
+    @Test fun pcGameShowsImportButAndroidGameDoesNot() {
+        var picks = 0
+        composeRule.setContent {
+            RetroPlayTheme {
+                GameDetailContent(
+                    GameDetailUiState.Ready(pcGame, null), {}, {}, {},
+                    filesActions = com.retroplay.app.presentation.gamefiles.GameFilesActions(onPickFolder = { picks++ }),
+                )
+            }
+        }
+        composeRule.onNodeWithText("Import game files").performScrollTo().performClick()
+        assertEquals(1, picks)
+        composeRule.onNodeWithText("Remove from library").assertDoesNotExist() // catalogue game
+    }
+
+    @Test fun androidGameHasNoFileImport() {
+        composeRule.setContent { RetroPlayTheme { GameDetailContent(GameDetailUiState.Ready(androidGame, null), {}, {}, {}) } }
+        composeRule.onNodeWithText("Import game files").assertDoesNotExist()
+    }
+
+    @Test fun importedFilesShowLocationAndRemovalIsConfirmedAsNonDestructive() {
+        var removed = 0
+        val installation = com.retroplay.app.domain.model.GameInstallation(
+            pcGame.id, "content://t", "Internal storage/Games/VC", "gta-vc.exe", 3_000_000, 0, 0,
+            com.retroplay.app.domain.model.ImportValidity.VALID, null,
+        )
+        composeRule.setContent {
+            RetroPlayTheme {
+                GameDetailContent(
+                    GameDetailUiState.Ready(pcGame, null), {}, {}, {},
+                    installation = installation,
+                    filesActions = com.retroplay.app.presentation.gamefiles.GameFilesActions(onRemoveImport = { removed++ }),
+                )
+            }
+        }
+        composeRule.onNodeWithText("Internal storage/Games/VC").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("gta-vc.exe").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Remove import").performScrollTo().performClick()
+        composeRule.onNodeWithText("RetroPlay will forget where these files are. Your game files are not deleted or changed.").assertIsDisplayed()
+        composeRule.onNodeWithText("Remove").performClick()
+        assertEquals(1, removed)
+    }
+
+    @Test fun customGameCanBeRemovedAfterConfirmation() {
+        var removed = 0
+        val custom = pcGame.copy(id = "custom-1", title = "My Game")
+        composeRule.setContent {
+            RetroPlayTheme { GameDetailContent(GameDetailUiState.Ready(custom, null), {}, {}, {}, onRemoveGame = { removed++ }) }
+        }
+        composeRule.onNodeWithText("Remove from library").performScrollTo().performClick()
+        composeRule.onNodeWithText("Remove").performClick()
+        assertEquals(1, removed)
+    }
+
     @Test fun favouriteBackAndNotesCallbacks() {
         var favourite: Boolean? = null
         var savedNotes: String? = null

@@ -36,7 +36,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.LaunchedEffect
+import com.retroplay.app.domain.model.GameInstallation
+import com.retroplay.app.domain.model.GamePlatform
+import com.retroplay.app.presentation.gamefiles.GameFilesActions
+import com.retroplay.app.presentation.gamefiles.GameFilesCard
+import com.retroplay.app.presentation.gamefiles.GameFilesViewModel
+import com.retroplay.app.presentation.gamefiles.ImportFlowDialogs
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -64,8 +72,20 @@ import java.text.DateFormat
 import java.util.Date
 
 @Composable
-fun GameDetailScreen(onBack: () -> Unit, viewModel: GameDetailViewModel = hiltViewModel()) {
+fun GameDetailScreen(
+    onBack: () -> Unit,
+    viewModel: GameDetailViewModel = hiltViewModel(),
+    filesViewModel: GameFilesViewModel = hiltViewModel(),
+) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val installation by filesViewModel.installation.collectAsStateWithLifecycle()
+    val importFlow by filesViewModel.flow.collectAsStateWithLifecycle()
+    val removed by filesViewModel.removed.collectAsStateWithLifecycle()
+    // Storage Access Framework folder picker: no storage permission is requested.
+    val pickFolder = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        filesViewModel.onFolderPicked(uri?.toString())
+    }
+    LaunchedEffect(removed) { if (removed) onBack() }
     val message by viewModel.message.collectAsStateWithLifecycle()
     val picker by viewModel.picker.collectAsStateWithLifecycle()
     val snackbar = remember { SnackbarHostState() }
@@ -94,9 +114,22 @@ fun GameDetailScreen(onBack: () -> Unit, viewModel: GameDetailViewModel = hiltVi
                 onLinkApp = { viewModel.showPicker(PickerPurpose.LINK_ANDROID_APP) },
                 onChooseExternalApp = { viewModel.showPicker(PickerPurpose.CHOOSE_EXTERNAL_APP) },
             ),
+            installation = installation,
+            filesActions = GameFilesActions(
+                onPickFolder = { pickFolder.launch(null) },
+                onRevalidate = filesViewModel::revalidate,
+                onRemoveImport = filesViewModel::removeImport,
+            ),
+            onRemoveGame = filesViewModel::removeCustomGame,
         )
         SnackbarHost(snackbar, Modifier.align(Alignment.BottomCenter).navigationBarsPadding())
     }
+    ImportFlowDialogs(
+        importFlow,
+        onChoose = filesViewModel::onExecutableChosen,
+        onCancel = filesViewModel::cancelFlow,
+        onDismissResult = filesViewModel::dismissResult,
+    )
     picker?.let { (_, pickerState) ->
         AppPickerDialog(pickerState, onPick = viewModel::onAppPicked, onDismiss = viewModel::dismissPicker)
     }
@@ -109,6 +142,9 @@ fun GameDetailContent(
     onFavoriteChange: (Boolean) -> Unit,
     onSaveNotes: (String) -> Unit,
     launchActions: LaunchActions = LaunchActions(),
+    installation: GameInstallation? = null,
+    filesActions: GameFilesActions = GameFilesActions(),
+    onRemoveGame: () -> Unit = {},
 ) {
     // Surface (not a bare Box) so text inherits onBackground instead of the default black.
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) { Box(Modifier.fillMaxSize()) {
@@ -119,7 +155,9 @@ fun GameDetailContent(
                 "This entry is no longer in your library.",
                 Modifier.align(Alignment.Center).padding(16.dp),
             )
-            is GameDetailUiState.Ready -> GameDetailBody(state.game, state.launchPlan, launchActions, onFavoriteChange, onSaveNotes)
+            is GameDetailUiState.Ready -> GameDetailBody(
+                state.game, state.launchPlan, launchActions, installation, filesActions, onRemoveGame, onFavoriteChange, onSaveNotes,
+            )
         }
         FilledIconButton(
             onClick = onBack,
@@ -136,6 +174,9 @@ private fun GameDetailBody(
     game: Game,
     launchPlan: LaunchPlan?,
     launchActions: LaunchActions,
+    installation: GameInstallation?,
+    filesActions: GameFilesActions,
+    onRemoveGame: () -> Unit,
     onFavoriteChange: (Boolean) -> Unit, onSaveNotes: (String) -> Unit) {
     Column(
         Modifier
@@ -174,6 +215,10 @@ private fun GameDetailBody(
 
             LaunchCard(game, launchPlan, launchActions)
 
+            if (game.originalPlatform == GamePlatform.WINDOWS_PC) {
+                GameFilesCard(installation, filesActions)
+            }
+
             RetroCard {
                 CardHeader("Compatibility on this device", Icons.Filled.Verified)
                 CompatibilityChip(game.compatibilityStatus)
@@ -191,6 +236,7 @@ private fun GameDetailBody(
             }
 
             NotesCard(game, onSaveNotes)
+            if (game.isCustom) RemoveGameButton(game.title, onRemoveGame)
             Spacer(Modifier.height(24.dp))
         }
     }
@@ -226,4 +272,26 @@ private fun MetaPill(text: String) {
             .border(1.dp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(50))
             .padding(horizontal = 12.dp, vertical = 6.dp),
     )
+}
+
+@Composable
+private fun RemoveGameButton(title: String, onRemove: () -> Unit) {
+    var confirm by remember { mutableStateOf(false) }
+    androidx.compose.material3.OutlinedButton(onClick = { confirm = true }, modifier = Modifier.fillMaxWidth()) {
+        Text("Remove from library")
+    }
+    if (confirm) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { confirm = false },
+            title = { Text("Remove $title?") },
+            text = {
+                Text(
+                    "This removes the entry, your notes, favourite and play history from RetroPlay. " +
+                        "Your game files are not deleted or changed.",
+                )
+            },
+            confirmButton = { androidx.compose.material3.TextButton(onClick = { confirm = false; onRemove() }) { Text("Remove") } },
+            dismissButton = { androidx.compose.material3.TextButton(onClick = { confirm = false }) { Text("Cancel") } },
+        )
+    }
 }

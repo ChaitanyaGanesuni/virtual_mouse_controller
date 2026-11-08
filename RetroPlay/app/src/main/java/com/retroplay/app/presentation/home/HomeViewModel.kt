@@ -30,7 +30,8 @@ class HomeViewModel @Inject constructor(gameRepository: GameRepository) : ViewMo
                 recentlyPlayed = GameFilter.recentlyPlayed(games),
                 favorites = games.filter { it.isFavorite },
                 library = games,
-                categoryCounts = GameCategory.entries.associateWith { c -> games.count { it.category == c } },
+                categoryCounts = GameCategory.entries.associateWith { c -> games.count { it.category == c } }
+                    .filterValues { it > 0 },
             )
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState())

@@ -41,6 +41,17 @@ class MigrationTest {
         db.query("SELECT COUNT(*) FROM play_history").use { it.moveToFirst(); assertEquals(0, it.getInt(0)) }
     }
 
+    @Test fun migrate2To3AddsInstallationsTable() {
+        helper.createDatabase(DB, 2).close()
+        val db = helper.runMigrationsAndValidate(DB, 3, true, *RetroPlayDatabase.ALL_MIGRATIONS)
+        db.query("SELECT COUNT(*) FROM game_installations").use { it.moveToFirst(); assertEquals(0, it.getInt(0)) }
+    }
+
+    @Test fun migrate1To3InOneGo() {
+        helper.createDatabase(DB, 1).close()
+        helper.runMigrationsAndValidate(DB, 3, true, *RetroPlayDatabase.ALL_MIGRATIONS)
+    }
+
     private companion object {
         const val DB = "migration-test"
     }

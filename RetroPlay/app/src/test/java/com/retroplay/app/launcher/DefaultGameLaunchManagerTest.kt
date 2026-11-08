@@ -12,6 +12,7 @@ import com.retroplay.app.launcher.LauncherTestFixtures.compatApp
 import com.retroplay.app.launcher.LauncherTestFixtures.pcGame
 import com.retroplay.app.testutil.FakeAppStarter
 import com.retroplay.app.testutil.FakeGameRepository
+import com.retroplay.app.testutil.FakeInstallationRepository
 import com.retroplay.app.testutil.FakePackageInspector
 import com.retroplay.app.testutil.FakeUserPreferencesRepository
 import kotlinx.coroutines.flow.first
@@ -32,7 +33,7 @@ class DefaultGameLaunchManagerTest {
         val prefsRepo = FakeUserPreferencesRepository(prefs)
         val manager = DefaultGameLaunchManager(
             AndroidGameLauncher(inspector, starter),
-            ExternalEmulatorLauncher(inspector, starter, prefsRepo),
+            ExternalEmulatorLauncher(inspector, starter, prefsRepo, FakeInstallationRepository()),
             UnsupportedGameHandler(),
             inspector,
             starter,

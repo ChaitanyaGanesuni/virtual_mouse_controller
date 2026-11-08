@@ -3,6 +3,7 @@ package com.retroplay.app.domain.model
 enum class GameCategory(val label: String) {
     CRICKET("Cricket"),
     GTA("Grand Theft Auto"),
+    OTHER("Other PC games"),
 }
 
 enum class GamePlatform(val label: String) {
@@ -60,4 +61,11 @@ data class Game(
     val sortOrder: Int,
     /** Android package of the official app for ANDROID_NATIVE games (catalogue default or user-linked). */
     val androidPackageName: String? = null,
-)
+) {
+    /** Games the user registered themselves (as opposed to catalogue entries) can be removed from the library. */
+    val isCustom: Boolean get() = id.startsWith(CUSTOM_ID_PREFIX)
+
+    companion object {
+        const val CUSTOM_ID_PREFIX = "custom-"
+    }
+}

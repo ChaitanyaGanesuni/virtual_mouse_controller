@@ -3,6 +3,7 @@ package com.retroplay.app.presentation.common
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.SportsCricket
+import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.retroplay.app.core.designsystem.theme.ElectricBlue
@@ -18,6 +19,7 @@ val GameCategory.icon: ImageVector
     get() = when (this) {
         GameCategory.CRICKET -> Icons.Filled.SportsCricket
         GameCategory.GTA -> Icons.Filled.DirectionsCar
+        GameCategory.OTHER -> Icons.Filled.SportsEsports
     }
 
 val CompatibilityStatus.color: Color

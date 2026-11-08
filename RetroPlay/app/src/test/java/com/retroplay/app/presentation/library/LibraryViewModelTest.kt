@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -29,5 +30,20 @@ class LibraryViewModelTest {
         vm.onCategorySelected(null)
         vm.onQueryChange("")
         assertEquals(9, vm.uiState.value.games.size)
+    }
+
+    @Test fun registeringAGameAddsItAndOpensIt() = runTest {
+        val vm = LibraryViewModel(FakeGameRepository())
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { vm.uiState.collect() }
+
+        vm.registerGame("   ", GameCategory.OTHER)
+        assertEquals(null, vm.createdGameId.value)
+
+        vm.registerGame("Midtown Classic", GameCategory.OTHER)
+        val id = vm.createdGameId.value!!
+        assertTrue(id.startsWith("custom-"))
+        assertEquals(10, vm.uiState.value.totalCount)
+        vm.onCreatedGameHandled()
+        assertEquals(null, vm.createdGameId.value)
     }
 }

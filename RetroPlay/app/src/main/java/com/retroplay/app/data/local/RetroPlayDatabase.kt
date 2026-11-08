@@ -5,17 +5,20 @@ import androidx.room.RoomDatabase
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.retroplay.app.data.local.dao.GameDao
+import com.retroplay.app.data.local.dao.InstallationDao
 import com.retroplay.app.data.local.entity.FavoriteEntity
 import com.retroplay.app.data.local.entity.GameEntity
+import com.retroplay.app.data.local.entity.GameInstallationEntity
 import com.retroplay.app.data.local.entity.PlayHistoryEntity
 
 @Database(
-    entities = [GameEntity::class, FavoriteEntity::class, PlayHistoryEntity::class],
-    version = 2,
+    entities = [GameEntity::class, FavoriteEntity::class, PlayHistoryEntity::class, GameInstallationEntity::class],
+    version = 3,
     exportSchema = true,
 )
 abstract class RetroPlayDatabase : RoomDatabase() {
     abstract fun gameDao(): GameDao
+    abstract fun installationDao(): InstallationDao
 
     companion object {
         const val NAME = "retroplay.db"
@@ -34,6 +37,20 @@ abstract class RetroPlayDatabase : RoomDatabase() {
             }
         }
 
-        val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2)
+        /** v3: references to user-imported game files (SAF folder + executable path). */
+        val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `game_installations` (" +
+                        "`gameId` TEXT NOT NULL, `folderUri` TEXT NOT NULL, `folderDisplayPath` TEXT NOT NULL, " +
+                        "`executableRelativePath` TEXT NOT NULL, `executableSizeBytes` INTEGER NOT NULL, " +
+                        "`importedAt` INTEGER NOT NULL, `lastValidatedAt` INTEGER NOT NULL, `validity` TEXT NOT NULL, " +
+                        "`message` TEXT, PRIMARY KEY(`gameId`), " +
+                        "FOREIGN KEY(`gameId`) REFERENCES `games`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+                )
+            }
+        }
+
+        val ALL_MIGRATIONS = arrayOf(MIGRATION_1_2, MIGRATION_2_3)
     }
 }

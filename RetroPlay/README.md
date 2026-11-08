@@ -15,10 +15,10 @@ It only organises and launches software the user already owns and has installed.
 | 3 | Full launcher UI (home, library, discover, favourites, game detail, compatibility report) | ✅ Done |
 | 4 | Initial game catalogue (9 entries, metadata only) | ✅ Done |
 | 5 | `GameLaunchManager` (Android games, external emulator, unsupported handler) | ✅ Done |
-| 6 | Storage Access Framework import | Not started |
+| 6 | Storage Access Framework import | ✅ Done |
 | 7 | Mali / Tensor G4 compatibility profile + `CompatibilityManager` | Not started |
-| 8 | Room entities, DAOs, repositories | Partial: `GameEntity`, `FavoriteEntity`, `PlayHistoryEntity` (schema v2 with migration) |
-| 9 | Full test suite | Partial (tests for Phases 1–5) |
+| 8 | Room entities, DAOs, repositories | Partial: `GameEntity`, `FavoriteEntity`, `PlayHistoryEntity`, `GameInstallationEntity` (schema v3, migrations tested) |
+| 9 | Full test suite | Partial (tests for Phases 1–6) |
 
 ## What works in this build
 
@@ -30,6 +30,25 @@ It only organises and launches software the user already owns and has installed.
   and personal notes you can edit (saved in Room), plus a **Launch** card that shows only actions RetroPlay can really perform (see below).
 - **Compatibility report** (Settings): the test device summary, status counts, each game's status, and a status legend.
 - **Settings**: device information, compatibility report, your **Windows compatibility app**, the *Pixel 9 reference comparison* toggle (saved in DataStore), and app version.
+
+### Importing game files (Phase 6)
+
+On a Windows game's page, **Import game files** opens Android's system folder picker (Storage Access Framework):
+
+1. You pick the folder holding your legally obtained copy. RetroPlay takes **persisted read-only access to that folder only**.
+   No storage permission is requested.
+2. RetroPlay lists the `.exe` files it finds, searching breadth-first up to 4 levels deep and 5,000 items, and you choose the game's executable.
+3. The file is validated: it must be reachable, end in `.exe`, be non-empty, and start with the Windows `MZ` header.
+   Only those two bytes are read.
+4. RetroPlay stores a reference (folder URI, readable path, executable path, size, dates, validity), and the game becomes *Files imported*.
+
+**Re-check** detects files that were moved or deleted, folders that have disappeared, revoked access, and invalid executables. You can select the folder again to recover.
+**Remove import** forgets the reference and releases folder access once no other game uses that folder.
+Files are **never copied, executed, modified or deleted**. RetroPlay's folder access is not shared with other apps, so the
+launch steps tell you to make sure your compatibility app can reach the folder, or to copy it somewhere it can.
+
+**Add game** (Library) registers your own Windows titles as *Not tested* and *Not imported*. Only these custom entries can be
+removed from the library, and removing one never deletes files.
 
 ### Launching (Phase 5)
 
@@ -146,7 +165,7 @@ with USB debugging enabled:
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
 
-## Tests (Phases 1–5)
+## Tests (Phases 1–6)
 
 All tests run on the JVM (`testDebugUnitTest`); no emulator is needed:
 
@@ -165,7 +184,12 @@ All tests run on the JVM (`testDebugUnitTest`); no emulator is needed:
 - `AndroidGameLauncherTest`, `ExternalEmulatorLauncherTest`, `UnsupportedGameHandlerTest`, `DefaultGameLaunchManagerTest`:
   launch/missing/failure paths, the compatibility app missing or unconfigured, history recorded only on a real start.
 - `AndroidPlatformAppsTest` (Robolectric PackageManager): installed/missing detection, app listing, standard launcher intent.
-- `MigrationTest`: Room v1 → v2 against exported schemas, keeping notes and favourites.
+- `MigrationTest`: Room v1 → v2 → v3 against exported schemas, keeping notes and favourites.
+- `ExecutableScannerTest`, `ExecutableValidatorTest`, `TreeUriPathsTest`: scanning limits, MZ validation, missing, revoked or deleted cases.
+- `GameImportManagerTest`: import, refused permission, empty folder, invalid file, cancel, re-check, shared folders,
+  re-import from another folder, removal never touching files. Uses a read-only in-memory document tree.
+- `SafPersistedAccessTest` (Robolectric): persisted SAF read permission taken, detected and released.
+- `GameFilesViewModelTest`, `LibraryViewModelTest`: the import flow states and registering custom games.
 
 Test fixtures are synthetic and are not measurements of any real device.
 
@@ -177,3 +201,6 @@ Test fixtures are synthetic and are not measurements of any real device.
 - The Vulkan version comes from `FEATURE_VULKAN_HARDWARE_VERSION`. Querying the Vulkan driver itself would need the NDK.
 - Robolectric tests check logic and wiring, not real Pixel 9 values. Check those on the device.
 - RetroPlay cannot tell whether a Windows game actually ran inside the compatibility app; the user records that (Phase 7).
+- Android limits how many folders an app can keep persisted access to. If that limit is reached, the import reports
+  the refusal instead of failing silently.
+- Folders on cloud or third-party document providers can be slow to scan. Pick the game's own folder, not a whole drive.

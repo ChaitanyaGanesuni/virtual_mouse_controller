@@ -28,7 +28,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
@@ -43,7 +51,14 @@ const val LIBRARY_GRID_TAG = "library_grid"
 @Composable
 fun LibraryScreen(onOpenGame: (String) -> Unit, viewModel: LibraryViewModel = hiltViewModel()) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
-    LibraryContent(state, onOpenGame, viewModel::onQueryChange, viewModel::onCategorySelected)
+    val created by viewModel.createdGameId.collectAsStateWithLifecycle()
+    LaunchedEffect(created) {
+        created?.let {
+            viewModel.onCreatedGameHandled()
+            onOpenGame(it)
+        }
+    }
+    LibraryContent(state, onOpenGame, viewModel::onQueryChange, viewModel::onCategorySelected, viewModel::registerGame)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,8 +68,20 @@ fun LibraryContent(
     onOpenGame: (String) -> Unit,
     onQueryChange: (String) -> Unit,
     onCategorySelected: (GameCategory?) -> Unit,
+    onRegisterGame: (String, GameCategory) -> Unit = { _, _ -> },
 ) {
+    var showAdd by rememberSaveable { mutableStateOf(false) }
+    if (showAdd) {
+        AddGameDialog(onAdd = { title, cat -> showAdd = false; onRegisterGame(title, cat) }, onDismiss = { showAdd = false })
+    }
     Scaffold(
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { showAdd = true },
+                icon = { Icon(Icons.Filled.Add, contentDescription = null) },
+                text = { Text("Add game") },
+            )
+        },
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
@@ -133,5 +160,37 @@ private fun CategoryChip(label: String, selected: Boolean, onClick: () -> Unit) 
             selectedContainerColor = MaterialTheme.colorScheme.primary,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimary,
         ),
+    )
+}
+
+/** Registers a title the user owns. Only metadata is created; files are imported from the game's page. */
+@Composable
+fun AddGameDialog(onAdd: (String, GameCategory) -> Unit, onDismiss: () -> Unit) {
+    var title by rememberSaveable { mutableStateOf("") }
+    var category by rememberSaveable { mutableStateOf(GameCategory.OTHER) }
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add a Windows PC game") },
+        text = {
+            androidx.compose.foundation.layout.Column {
+                Text(
+                    "Register a game you legally own. You can import its files on the next screen.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it.take(80) },
+                    label = { Text("Title") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                )
+                Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    GameCategory.entries.forEach { c -> CategoryChip(c.label, category == c) { category = c } }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { onAdd(title, category) }, enabled = title.isNotBlank()) { Text("Add") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } },
     )
 }
