@@ -33,6 +33,12 @@ export interface Account {
   /** Credit cards only: available limit. */
   availableLimit: number | null;
   asOf: number | null;
+  /** Credit cards only: last statement, and what is still unpaid from it. */
+  statementDue: number | null;
+  statementDate: number | null;
+  minDue: number | null;
+  dueDate: number | null;
+  paidSinceStatement: number;
 }
 
 export interface MfOrder {

@@ -107,3 +107,81 @@ test('KFin allotment scheme name', () => {
   assert.ok(p && p.type === 'mf');
   assert.equal(p.order.scheme, 'Parag Parikh Flexi Cap Fund - Direct Growth');
 });
+
+import { parseDateText } from '../src/lib/dates';
+import { maskSms } from '../src/lib/smsParser';
+
+const at = (id: string, address: string, body: string, date: number) => ({ id, address, body, date });
+
+test('date formats', () => {
+  const ref = new Date(2026, 10, 8).getTime();
+  const ymd = (t: number | null) => (t == null ? null : new Date(t).toISOString().slice(0, 10));
+  assert.equal(ymd(parseDateText('28-11-26', ref)), '2026-11-28');
+  assert.equal(ymd(parseDateText('28/11/2026', ref)), '2026-11-28');
+  assert.equal(ymd(parseDateText('28-Nov-26', ref)), '2026-11-28');
+  assert.equal(ymd(parseDateText('28 November 2026', ref)), '2026-11-28');
+  assert.equal(ymd(parseDateText('05Dec26', ref)), '2026-12-05');
+  assert.equal(ymd(parseDateText('Dec 5, 2026', ref)), '2026-12-05');
+  assert.equal(ymd(parseDateText('05 Jan', ref)), '2027-01-05');
+});
+
+test('card statement: due date, min due, and dues drop after payment', () => {
+  const t0 = new Date(2026, 10, 1).getTime();
+  const msgs = [
+    at('1', 'JD-ICICIT', 'ICICI Bank Credit Card XX9034 statement: Total Amt Due Rs 20,000.00. Min Amt Due Rs 1,000.00. Pay by 21-11-26.', t0),
+    at('2', 'JD-ICICIT', 'Dear Customer, Payment of INR 15,000.00 has been received on your ICICI Bank Credit Card Account XX9034. Thank you.', t0 + 5 * 86_400_000),
+  ];
+  const card = buildLedger(msgs).accounts.find((a) => a.kind === 'credit_card')!;
+  assert.equal(card.statementDue, 20000);
+  assert.equal(card.minDue, 1000);
+  assert.equal(new Date(card.dueDate!).getDate(), 21);
+  assert.equal(card.balance, 5000);
+});
+
+test('friend payment is not mistaken for a self transfer', () => {
+  const t0 = new Date(2026, 10, 1, 10).getTime();
+  const msgs = [
+    at('1', 'AX-HDFCBK', 'Sent Rs.500.00 From HDFC Bank A/C *4821 To rahul@okaxis On 01-11-26 Ref 123456789012. Avl Bal Rs.9,500.00', t0),
+    at('2', 'VM-SBIINB', 'Your A/c X5678 is credited by Rs.500.00 on 01Nov26 by UPI from PRIYA S Ref 987654321098', t0 + 8 * 3_600_000),
+  ];
+  const l = buildLedger(msgs);
+  assert.ok(l.transactions.every((t) => t.category !== 'Self Transfer'), l.transactions.map((t) => t.category).join());
+});
+
+test('self transfer between own accounts is paired', () => {
+  const t0 = new Date(2026, 10, 1, 10).getTime();
+  const msgs = [
+    at('1', 'AX-HDFCBK', 'Rs.20,000.00 debited from A/c XX4821 on 01-11-26 by IMPS to A/c XX5678 Ref 123456789012. Avl Bal Rs.9,500.00', t0),
+    at('2', 'VM-SBIINB', 'Your A/c X5678 is credited by Rs.20,000.00 on 01Nov26 by IMPS Ref 123456789012', t0 + 3 * 3_600_000),
+  ];
+  const l = buildLedger(msgs);
+  assert.deepEqual(l.transactions.map((t) => t.category), ['Self Transfer', 'Self Transfer']);
+});
+
+test('unreadable bank alerts are listed as missed, promos are not', () => {
+  const t0 = Date.now();
+  const msgs = [
+    at('1', 'VM-XYZBNK', 'Txn of INR 1,234 done via Kotak Card ending 1122 at IKEA', t0),
+    at('2', 'VM-HDFCBK', 'Get flat 10% off up to Rs 1,500 on your HDFC Bank Credit Card at Myntra!', t0),
+  ];
+  const l = buildLedger(msgs);
+  // first is either parsed or reported as missed, never silently dropped
+  assert.ok(l.transactions.length === 1 || l.missed.some((m) => m.id === '1'));
+  assert.ok(!l.missed.some((m) => m.id === '2'));
+  assert.equal(maskSms('Ref 123456789012 A/c 4821'), 'Ref XXXXXXXXXX12 A/c 4821');
+});
+
+import { planReminders } from '../src/lib/reminders';
+
+test('bill reminders: 3 days before, day before, due day; none once paid', () => {
+  const now = new Date(2026, 10, 10, 8).getTime();
+  const card = {
+    key: 'k', institution: 'ICICI Bank', kind: 'credit_card' as const, last4: '9034', balance: 5000,
+    availableLimit: null, asOf: null, statementDue: 20000, statementDate: now, minDue: 1000,
+    dueDate: new Date(2026, 10, 21, 12).getTime(), paidSinceStatement: 15000,
+  };
+  const r = planReminders([card], now);
+  assert.deepEqual(r.map((x) => new Date(x.at).getDate()), [18, 20, 21]);
+  assert.match(r[0].title, /₹5,000 due on 21 Nov/);
+  assert.equal(planReminders([{ ...card, balance: 0 }], now).length, 0);
+});

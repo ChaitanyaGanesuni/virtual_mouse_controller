@@ -30,9 +30,9 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
             {'\n\n'}
             {d.permission === 'denied'
               ? 'SMS access was declined. Allow it to get started, or explore with sample data.'
-              : 'Allow SMS access to get started.'}
+              : 'Allow SMS access to get started. Also allow notifications to get alerts for bank charges, big payments and card bills as they happen.'}
           </Text>
-          <Button label="Allow SMS access & scan" onPress={d.refresh} />
+          <Button label="Allow SMS access & scan" onPress={() => d.refresh(true)} />
           {d.permission === 'denied' ? (
             <Button label="Open app settings" kind="ghost" onPress={() => Linking.openSettings()} />
           ) : null}
@@ -45,7 +45,7 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
   return (
     <ScrollView
       contentContainerStyle={{ padding: 16 }}
-      refreshControl={<RefreshControl refreshing={d.loading} onRefresh={d.refresh} tintColor={C.accent} />}
+      refreshControl={<RefreshControl refreshing={d.loading} onRefresh={() => d.refresh()} tintColor={C.accent} />}
     >
       {d.demoMode ? (
         <Text style={{ color: C.amber, marginBottom: 10 }}>Showing sample data. Turn off in Settings.</Text>
@@ -91,10 +91,14 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
               </Text>
               <Text style={{ color: C.sub, fontSize: 12 }}>
                 {a.asOf ? `updated ${new Date(a.asOf).toLocaleDateString('en-IN')}` : 'balance not reported in SMS'}
+                {a.kind === 'credit_card' && a.dueDate != null && (a.balance ?? 0) > 0
+                  ? ` · pay by ${new Date(a.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}`
+                  : ''}
+                {a.kind === 'credit_card' && a.statementDue != null && (a.balance ?? 0) === 0 ? ' · last bill paid ✓' : ''}
                 {a.kind === 'credit_card' && a.availableLimit != null ? ` · limit left ${inr(a.availableLimit)}` : ''}
               </Text>
             </View>
-            <Text style={{ color: a.kind === 'credit_card' ? C.red : C.text, fontWeight: '700' }}>
+            <Text style={{ color: a.kind === 'credit_card' && (a.balance ?? 0) > 0 ? C.red : C.text, fontWeight: '700' }}>
               {a.balance == null ? '—' : (a.kind === 'credit_card' ? 'Due ' : '') + inr(a.balance)}
             </Text>
           </Row>

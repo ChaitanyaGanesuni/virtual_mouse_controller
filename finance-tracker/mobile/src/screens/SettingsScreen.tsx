@@ -1,6 +1,9 @@
-import { Linking, Pressable, ScrollView, Switch, Text, View } from 'react-native';
+import { useState } from 'react';
+import { Linking, Modal, Pressable, ScrollView, Share, Switch, Text, View } from 'react-native';
 
-import { Button, C, Card, H, Label, Row } from '../components/ui';
+import { Button, C, Card, Chip, H, Label, Row } from '../components/ui';
+import { inr } from '../lib/analysis';
+import { maskSms } from '../lib/smsParser';
 import type { Assumptions } from '../lib/investments';
 import { useData } from '../store';
 
@@ -34,6 +37,19 @@ function Stepper({ label, value, step, min, max, fmt, onChange }: {
 export default function SettingsScreen() {
   const d = useData();
   const a = d.assumptions;
+  const al = d.alertPrefs;
+  const [showMissed, setShowMissed] = useState(false);
+  const missed = d.ledger.missed;
+  const shareMissed = () =>
+    Share.share({
+      title: 'Paisa Watch: unread bank alerts',
+      message:
+        'Bank alerts Paisa Watch could not read (numbers masked):\n\n' +
+        missed
+          .slice(0, 30)
+          .map((m) => `[${m.address}] ${maskSms(m.body)}`)
+          .join('\n\n'),
+    });
   const set = (patch: Partial<Assumptions>) => d.setAssumptions({ ...a, ...patch });
   const setEquity = (eq: number) => {
     const rest = 100 - eq;
@@ -60,7 +76,7 @@ export default function SettingsScreen() {
           <Text style={{ color: C.text }}>{d.lastSync ? new Date(d.lastSync).toLocaleString('en-IN') : '—'}</Text>
         </Row>
         {d.error ? <Text style={{ color: C.red, marginTop: 8 }}>{d.error}</Text> : null}
-        <Button label={d.loading ? 'Scanning…' : 'Re-scan now'} onPress={d.refresh} />
+        <Button label={d.loading ? 'Scanning…' : 'Re-scan everything'} onPress={() => d.refresh(true)} />
         {d.permission === 'denied' ? (
           <Button label="Open app settings to allow SMS" kind="ghost" onPress={() => Linking.openSettings()} />
         ) : null}
@@ -69,6 +85,70 @@ export default function SettingsScreen() {
           <Switch value={d.demoMode} onValueChange={d.setDemoMode} thumbColor={d.demoMode ? C.accent : undefined} />
         </Row>
       </Card>
+
+      <H>Alerts & reminders</H>
+      <Card>
+        {!d.notifications && d.source === 'sms' ? (
+          <>
+            <Text style={{ color: C.amber, marginBottom: 6 }}>Notifications are off for Paisa Watch, so alerts can't be shown.</Text>
+            <Button label="Turn on notifications" kind="ghost" onPress={() => Linking.openSettings()} />
+          </>
+        ) : null}
+        <Label>Notify me when a bank SMS arrives</Label>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 }}>
+          <Chip label="Important only" active={al.mode === 'smart'} onPress={() => d.setAlertPrefs({ ...al, mode: 'smart' })} />
+          <Chip label="Every transaction" active={al.mode === 'all'} onPress={() => d.setAlertPrefs({ ...al, mode: 'all' })} />
+          <Chip label="Off" active={al.mode === 'off'} onPress={() => d.setAlertPrefs({ ...al, mode: 'off' })} />
+        </View>
+        <Text style={{ color: C.sub, fontSize: 12, lineHeight: 18 }}>
+          Important = bank charges & penalties, card bills, recurring subscription charges, and anything over the amount below.
+        </Text>
+        <Stepper
+          label="Alert for payments over"
+          value={al.largeAmount}
+          step={al.largeAmount >= 10000 ? 5000 : 1000}
+          min={1000}
+          max={100000}
+          fmt={(v) => inr(v)}
+          onChange={(v) => d.setAlertPrefs({ ...al, largeAmount: v })}
+        />
+        <Row style={{ justifyContent: 'space-between', marginTop: 6 }}>
+          <Text style={{ color: C.text, flex: 1 }}>Card bill reminders (3 days before, day before, due day)</Text>
+          <Switch value={al.billReminders} onValueChange={(v) => d.setAlertPrefs({ ...al, billReminders: v })} />
+        </Row>
+      </Card>
+
+      <H>Alerts the app couldn't read</H>
+      <Card>
+        <Text style={{ color: C.sub, lineHeight: 20 }}>
+          {missed.length
+            ? `${missed.length} bank message(s) look like transactions but weren't understood, so they're missing from your totals.`
+            : 'None. Every bank alert in your inbox was understood.'}
+        </Text>
+        {missed.length ? (
+          <>
+            <Button label="Review them" kind="ghost" onPress={() => setShowMissed(true)} />
+            <Button label="Share (numbers masked) to get them supported" onPress={shareMissed} />
+          </>
+        ) : null}
+      </Card>
+
+      <Modal visible={showMissed} animationType="slide" onRequestClose={() => setShowMissed(false)}>
+        <View style={{ flex: 1, backgroundColor: C.bg, padding: 16, paddingTop: 40 }}>
+          <H>Unread alerts ({missed.length})</H>
+          <ScrollView style={{ flex: 1 }}>
+            {missed.slice(0, 100).map((m) => (
+              <Card key={m.id}>
+                <Text style={{ color: C.sub, fontSize: 12 }}>
+                  {m.address} · {new Date(m.date).toLocaleDateString('en-IN')}
+                </Text>
+                <Text style={{ color: C.text, marginTop: 4 }}>{maskSms(m.body)}</Text>
+              </Card>
+            ))}
+          </ScrollView>
+          <Button label="Close" kind="ghost" onPress={() => setShowMissed(false)} />
+        </View>
+      </Modal>
 
       <H>Investment goals</H>
       <Card>
@@ -95,7 +175,8 @@ export default function SettingsScreen() {
             • Only SMS from business sender IDs (like AX-HDFCBK) are read. Messages from people are skipped inside the native
             code and never reach the app.{'\n'}• Everything is processed and stored on this phone. There is no account, server or
             analytics.{'\n'}• The only network call is fetching public mutual-fund NAVs from mfapi.in (scheme names only).{'\n'}•
-            New alerts are picked up automatically every time you open the app.
+            New alerts are picked up every time you open the app, and important ones arrive as notifications even when it's
+            closed.{'\n'}• "Share" sends only the unread alerts you choose, with long numbers masked.
           </Text>
         </View>
       </Card>

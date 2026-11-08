@@ -8,8 +8,14 @@ credit-card issuers, UPI apps and mutual-fund registrars (CAMS / KFintech) alrea
 - **Money leaks**: bank and card fees and penalties, credit-card interest, recurring subscriptions, food-delivery
   habits, small impulse buys, real-money gaming, category spikes, and untracked cash. Each comes with an estimated
   monthly saving.
-- **Balances & net worth**: latest balance for each bank account (from "Avl Bal" in alerts), card dues and
-  remaining limit, and investments.
+- **Balances & net worth**: latest balance for each bank account (from "Avl Bal" in alerts), card dues (statement
+  amount minus payments since), due dates, remaining limit, and investments.
+- **Real-time alerts**: a notification the moment a bank charge or penalty, card bill, recurring subscription charge
+  or large payment hits, even when the app is closed. Choose "Important only", "Every transaction" or "Off".
+- **Bill reminders**: 3 days before, the day before and on the due date of every unpaid card bill. Reminders are
+  re-armed after a phone restart and stop once the bill is paid.
+- **Unread alerts**: bank messages that look like transactions but couldn't be read are listed in Settings, and can
+  be shared with long numbers masked so support can be added.
 - **Investments**: mutual-fund holdings built from allotment SMS, valued at live NAVs (mfapi.in / AMFI), with gain,
   XIRR and asset allocation.
 - **How to invest better**: Regular-to-Direct plan switches (with the 10-year cost), idle cash beyond your
@@ -22,7 +28,7 @@ Everything runs on the phone. There is no server and no account. The only networ
 
 1. Copy `paisa-watch.apk` to your Android phone and open it. Allow "Install unknown apps" for your file manager
    or browser if Android asks.
-2. Open **Paisa Watch** and tap **Allow SMS access & scan**.
+2. Open **Paisa Watch**, tap **Allow SMS access & scan**, and allow SMS and notifications.
 3. That's it. New alerts are picked up every time you open the app, and you can pull down to refresh.
 
 Want to look around first? Tap **Explore with sample data**. You can switch it off in Settings.
@@ -54,17 +60,24 @@ cd mobile
 npm install
 npm test            # parser and analysis tests (Node)
 npm run typecheck
-npm run build:apk   # needs JDK 17+ and the Android SDK (ANDROID_HOME)
+PAISA_KEYSTORE=/path/paisa-watch-upload.jks PAISA_KEYSTORE_PASSWORD=... PAISA_KEY_ALIAS=paisa-upload \
+  npm run build:apk # needs JDK 17 and the Android SDK (ANDROID_HOME)
 ```
+
+Release builds are signed with your own upload key (`plugins/withReleaseSigning.js`) and refuse to build without it.
+**Never commit the keystore, and never lose it:** Android only installs an update signed with the same key, so a lost
+key means uninstalling the app (and its saved category fixes) to install a new version.
 
 Project layout:
 
 | Path | What |
 |---|---|
-| `mobile/modules/sms-reader` | Small Kotlin Expo module that reads the inbox. It only returns business senders like `AX-HDFCBK`. |
+| `mobile/modules/sms-reader` | Kotlin Expo module: reads the inbox (business senders like `AX-HDFCBK` only), the background SMS receiver for real-time alerts, and bill reminders (AlarmManager, re-armed on boot). |
 | `mobile/src/lib/smsParser.ts` | Parses bank, card, UPI, statement and MF allotment SMS from all major Indian banks. |
 | `mobile/src/lib/categorizer.ts` | Merchant and keyword categorisation rules. |
 | `mobile/src/lib/ledger.ts` | Builds transactions, accounts and balances. Pairs self-transfers and card bill payments. |
+| `mobile/src/lib/reminders.ts` | Plans card-bill reminders from statement due dates. |
+| `mobile/src/lib/dates.ts` | Parses the date formats Indian banks use. |
 | `mobile/src/lib/analysis.ts` | Monthly summaries, recurring-payment detection, waste insights. |
 | `mobile/src/lib/investments.ts` | Holdings, live NAVs, XIRR, investment insights. |
 | `mobile/src/screens/*` | Home, Spending, Leaks, Invest, Settings. |

@@ -3,3 +3,7 @@ android/
 ios/
 .expo/
 *.apk
+*.jks
+*.keystore
+!debug.keystore
+keystore-password.txt

@@ -2,6 +2,7 @@
  * Parses Indian bank / credit-card / UPI / mutual-fund alert SMS into structured data.
  * Pure functions: no React Native imports, so it is unit-testable in Node.
  */
+import { parseDateText } from './dates';
 import type { AccountKind, Direction, MfOrder, RawSms } from './types';
 
 export type ParsedSms =
@@ -17,7 +18,7 @@ export type ParsedSms =
       balance: number | null;
       availableLimit: number | null;
     }
-  | { type: 'card_due'; institution: string; last4: string; amountDue: number }
+  | { type: 'card_due'; institution: string; last4: string; amountDue: number; minDue: number | null; dueDate: number | null }
   | { type: 'balance'; institution: string; last4: string; balance: number }
   | { type: 'mf'; order: Omit<MfOrder, 'id' | 'date'> };
 
@@ -64,6 +65,8 @@ const LIMIT_RE = new RegExp(
   'i',
 );
 const DUE_RE = new RegExp(String.raw`(?:total|tot\.?)\s*(?:amount|amt\.?)?\s*due\s*(?:is|:|-|of)?\s*(?:rs\.?|inr|₹)?\s*` + NUM, 'i');
+const MIN_DUE_RE = new RegExp(String.raw`min(?:imum)?\.?\s*(?:amount|amt\.?)?\s*due\s*(?:is|:|-|of)?\s*(?:rs\.?|inr|₹)?\s*` + NUM, 'i');
+const DUE_DATE_RE = /(?:pay(?:ment)?\s*(?:by|before|on or before)|due\s*(?:date|by|on)|payable by)\s*:?\s*(?:is\s*)?([0-9A-Za-z][0-9A-Za-z ,./-]{3,20})/i;
 const LAST4_RE = /(?:a\/c|acct|account|card|ac)\s*(?:no\.?|number)?\s*(?:ending\s*(?:with|in)?\s*)?[:\s]*[x*.\s]*(\d{3,6})\b/i;
 
 const IGNORE_RE =
@@ -187,7 +190,16 @@ export function parseSms(sms: RawSms): ParsedSms | null {
   // Card statement: "Total Amt Due Rs 12,345 ... due by"
   const due = DUE_RE.exec(body);
   if (due && /card/i.test(body) && !DEBIT_RE.test(body.replace(/payment/gi, ''))) {
-    return { type: 'card_due', institution, last4, amountDue: parseAmount(due[1]) };
+    const min = MIN_DUE_RE.exec(body);
+    const dd = DUE_DATE_RE.exec(body);
+    return {
+      type: 'card_due',
+      institution,
+      last4,
+      amountDue: parseAmount(due[1]),
+      minDue: min ? parseAmount(min[1]) : null,
+      dueDate: dd ? parseDateText(dd[1], sms.date) : null,
+    };
   }
 
   if (IGNORE_RE.test(body)) return null;
@@ -228,4 +240,26 @@ export function parseSms(sms: RawSms): ParsedSms | null {
     balance: bal && kind === 'bank' ? parseAmount(bal[1]) : null,
     availableLimit: lim ? parseAmount(lim[1]) : null,
   };
+}
+
+const PROMO_RE =
+  /\b(offer|win|won|discount|% ?off|upto|up to|apply|eligible|pre-?approved|congratulations|voucher|coupon|limit (?:increase|enhance)|reward points?|instant loan|emi option|convert to emi|insurance cover|kyc)\b/i;
+const FIN_WORD_RE = /\b(debit(?:ed)?|credit(?:ed)?|spent|withdrawn|sent|paid|received|txn|transaction|transferred|deposited|purchase|a\/c|acct|account|card)\b/i;
+
+/**
+ * True for a business SMS that looks like a real transaction alert (amount + account/transaction words,
+ * not an OTP or promotion). Used to list alerts the parser could not read, so they can be supported.
+ */
+export function looksLikeTransactionAlert(sms: RawSms): boolean {
+  if (!isBusinessSender(sms.address)) return false;
+  const body = sms.body.replace(/\s+/g, ' ');
+  if (!AMOUNT_RE.test(body) && !AMOUNT_FALLBACK_RE.test(body)) return false;
+  if (!FIN_WORD_RE.test(body)) return false;
+  return !IGNORE_RE.test(body) && !PROMO_RE.test(body);
+}
+
+/** Hides account, reference and phone numbers before an alert is shared. */
+export function maskSms(body: string): string {
+  return body
+    .replace(/\d{6,}/g, (m) => 'X'.repeat(m.length - 2) + m.slice(-2));
 }

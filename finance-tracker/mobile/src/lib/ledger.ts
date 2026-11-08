@@ -1,14 +1,17 @@
 import { categorize, type UserRule } from './categorizer';
-import { parseSms } from './smsParser';
+import { looksLikeTransactionAlert, parseSms } from './smsParser';
 import type { Account, MfOrder, RawSms, Transaction } from './types';
 
 export interface Ledger {
   transactions: Transaction[]; // newest first
   accounts: Account[];
   mfOrders: MfOrder[]; // oldest first
+  /** Bank/card alerts that look like transactions but could not be parsed. Newest first. */
+  missed: RawSms[];
 }
 
 const DAY = 86_400_000;
+const MIN = 60_000;
 
 /** Turns raw SMS into transactions, accounts (with latest balances) and MF orders. */
 export function buildLedger(
@@ -20,13 +23,27 @@ export function buildLedger(
   const accounts = new Map<string, Account>();
   const txns: Transaction[] = [];
   const mfOrders: MfOrder[] = [];
+  const missed: RawSms[] = [];
   const seen = new Set<string>();
 
   const account = (institution: string, kind: Account['kind'], last4: string): Account => {
     const key = `${institution}|${kind}|${last4 || '????'}`;
     let a = accounts.get(key);
     if (!a) {
-      a = { key, institution, kind, last4, balance: null, availableLimit: null, asOf: null };
+      a = {
+        key,
+        institution,
+        kind,
+        last4,
+        balance: null,
+        availableLimit: null,
+        asOf: null,
+        statementDue: null,
+        statementDate: null,
+        minDue: null,
+        dueDate: null,
+        paidSinceStatement: 0,
+      };
       accounts.set(key, a);
     }
     return a;
@@ -34,7 +51,10 @@ export function buildLedger(
 
   for (const sms of sorted) {
     const p = parseSms(sms);
-    if (!p) continue;
+    if (!p) {
+      if (looksLikeTransactionAlert(sms)) missed.push(sms);
+      continue;
+    }
 
     if (p.type === 'mf') {
       mfOrders.push({ id: sms.id, date: sms.date, ...p.order });
@@ -42,7 +62,11 @@ export function buildLedger(
     }
     if (p.type === 'card_due') {
       const a = account(p.institution, 'credit_card', p.last4);
-      a.balance = p.amountDue;
+      a.statementDue = p.amountDue;
+      a.statementDate = sms.date;
+      a.minDue = p.minDue;
+      a.dueDate = p.dueDate;
+      a.paidSinceStatement = 0;
       a.asOf = sms.date;
       continue;
     }
@@ -67,6 +91,10 @@ export function buildLedger(
       a.availableLimit = p.availableLimit;
       a.asOf = sms.date;
     }
+    // Payments and refunds credited to a card after its statement reduce what is still due.
+    if (a.kind === 'credit_card' && p.direction === 'credit' && a.statementDate != null) {
+      a.paidSinceStatement += p.amount;
+    }
 
     txns.push({
       id: sms.id,
@@ -84,7 +112,13 @@ export function buildLedger(
     });
   }
 
-  pairInternalMoves(txns);
+  for (const a of accounts.values()) {
+    if (a.kind === 'credit_card' && a.statementDue != null) {
+      a.balance = Math.max(0, Math.round((a.statementDue - a.paidSinceStatement) * 100) / 100);
+    }
+  }
+
+  pairInternalMoves(txns, [...accounts.values()]);
 
   for (const t of txns) if (overrides[t.id]) t.category = overrides[t.id];
 
@@ -92,25 +126,66 @@ export function buildLedger(
     transactions: txns.sort((x, y) => y.date - x.date),
     accounts: [...accounts.values()].sort((x, y) => x.kind.localeCompare(y.kind) || x.institution.localeCompare(y.institution)),
     mfOrders,
+    missed: missed.reverse(),
   };
 }
 
+const CARD_PAY_RE = /credit card|\bcc\b|card ?(?:bill|payment|dues?)|\bcred\b|billdesk|bbps|towards your card/i;
+const SELF_RE = /\bself\b|own account|to your (?:other )?a\/c|between your accounts/i;
+
 /**
- * A debit in one of your accounts matched by an equal credit in another within 2 days is
- * money moving between your own pots (self transfer, or paying your credit-card bill),
- * not spending or income.
+ * Finds money that only moved between your own accounts, so it is not counted as spending or income:
+ *  - card bill payments: a bank debit and an equal credit on one of your cards within 3 days, where
+ *    the debit mentions a card / bill payment or the card alert says a payment was received;
+ *  - self transfers: an equal debit and credit in two of your bank accounts that either name each
+ *    other (account last digits, "self") or arrive within 30 minutes of each other.
+ * A payment to a friend followed later by an unrelated credit of the same amount is not paired.
  */
-function pairInternalMoves(txns: Transaction[]): void {
+function pairInternalMoves(txns: Transaction[], accounts: Account[]): void {
   const used = new Set<string>();
-  const credits = txns.filter((t) => t.direction === 'credit' && !['Salary', 'Refund', 'Interest & Dividends'].includes(t.category));
+  const myLast4 = new Set(accounts.map((a) => a.last4).filter((x) => x.length >= 3));
+  const skipDebit = new Set(['Fees & Charges', 'Cash Withdrawal', 'Investments']);
+  const skipCredit = new Set(['Salary', 'Refund', 'Interest & Dividends', 'Investments']);
+
+  const mentionsOther = (body: string, ownLast4: string) =>
+    [...myLast4].some((l4) => l4 !== ownLast4 && new RegExp(`(?:x|\\*|\\.|\\s)${l4}\\b`, 'i').test(body));
+
   for (const d of txns) {
-    if (d.direction !== 'debit' || ['Fees & Charges', 'Cash Withdrawal'].includes(d.category)) continue;
-    const match = credits.find(
-      (c) => !used.has(c.id) && c.accountKey !== d.accountKey && c.amount === d.amount && Math.abs(c.date - d.date) <= 2 * DAY,
+    if (d.direction !== 'debit' || d.accountKind !== 'bank' || skipDebit.has(d.category)) continue;
+    const candidates = txns.filter(
+      (c) =>
+        c.direction === 'credit' &&
+        !used.has(c.id) &&
+        c.accountKey !== d.accountKey &&
+        !skipCredit.has(c.category) &&
+        Math.abs(c.amount - d.amount) < 0.01,
     );
+    let match: Transaction | undefined;
+    let cat = '';
+
+    match = candidates.find(
+      (c) =>
+        c.accountKind === 'credit_card' &&
+        Math.abs(c.date - d.date) <= 3 * DAY &&
+        (CARD_PAY_RE.test(d.body) || c.category === 'Card Bill Payment'),
+    );
+    if (match) cat = 'Card Bill Payment';
+
+    if (!match) {
+      match = candidates.find(
+        (c) =>
+          c.accountKind === 'bank' &&
+          Math.abs(c.date - d.date) <= DAY &&
+          (SELF_RE.test(d.body) ||
+            SELF_RE.test(c.body) ||
+            mentionsOther(d.body, d.last4) ||
+            mentionsOther(c.body, c.last4) ||
+            Math.abs(c.date - d.date) <= 30 * MIN),
+      );
+      if (match) cat = 'Self Transfer';
+    }
     if (!match) continue;
     used.add(match.id);
-    const cat = match.accountKind === 'credit_card' ? 'Card Bill Payment' : 'Self Transfer';
     d.category = cat;
     match.category = cat;
   }
