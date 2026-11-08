@@ -2,13 +2,13 @@
   "expo": {
     "name": "Paisa Watch",
     "slug": "paisa-watch",
-    "version": "1.1.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#0E1116",
+    "backgroundColor": "#090D14",
     "android": {
       "package": "com.paisawatch.app",
-      "versionCode": 2,
+      "versionCode": 3,
       "permissions": [
         "android.permission.READ_SMS",
         "android.permission.RECEIVE_SMS",
@@ -22,7 +22,9 @@
         "android.permission.WRITE_EXTERNAL_STORAGE"
       ],
       "adaptiveIcon": {
-        "backgroundColor": "#0E1116"
+        "foregroundImage": "./assets/adaptive-foreground.png",
+        "backgroundImage": "./assets/adaptive-background.png",
+        "backgroundColor": "#0E7490"
       }
     },
     "plugins": [
@@ -37,7 +39,18 @@
           }
         }
       ],
-      "./plugins/withReleaseSigning"
-    ]
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 150,
+          "resizeMode": "contain",
+          "backgroundColor": "#090D14"
+        }
+      ],
+      "./plugins/withReleaseSigning",
+      "expo-font"
+    ],
+    "icon": "./assets/icon.png"
   }
 }

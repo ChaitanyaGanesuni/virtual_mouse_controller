@@ -1,175 +1,350 @@
-import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, View, type ViewStyle } from 'react-native';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import {
+  Animated,
+  Easing,
+  LayoutAnimation,
+  Modal,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
-import type { Insight } from '../lib/types';
 import { inr } from '../lib/analysis';
+import type { Insight } from '../lib/types';
+import { C, F, R, SEVERITY, catMeta } from '../theme';
+import { PressScale } from './anim';
+import Icon, { type IconName } from './Icon';
 
-export const C = {
-  bg: '#0E1116',
-  card: '#171B22',
-  cardAlt: '#1F242D',
-  border: '#272D38',
-  text: '#E8ECF2',
-  sub: '#8B95A5',
-  accent: '#3DDC97',
-  red: '#FF6B6B',
-  amber: '#F5B841',
-  blue: '#5AA9FF',
-  violet: '#A78BFA',
+export { C };
+
+// ---------------------------------------------------------------- typography
+
+export function T({
+  children,
+  size = 14,
+  weight = 'regular',
+  color = C.text,
+  style,
+  lines,
+}: {
+  children: ReactNode;
+  size?: number;
+  weight?: keyof typeof F;
+  color?: string;
+  style?: StyleProp<TextStyle>;
+  lines?: number;
+}) {
+  return (
+    <Text numberOfLines={lines} style={[{ fontFamily: F[weight], fontSize: size, color, lineHeight: Math.round(size * 1.4) }, style]}>
+      {children}
+    </Text>
+  );
+}
+
+export const Label = ({ children, color = C.sub }: { children: ReactNode; color?: string }) => (
+  <Text style={{ fontFamily: F.semibold, fontSize: 11, letterSpacing: 1.1, textTransform: 'uppercase', color }}>{children}</Text>
+);
+
+// ---------------------------------------------------------------- surfaces
+
+export function Card({ children, style, pad = 18 }: { children: ReactNode; style?: StyleProp<ViewStyle>; pad?: number }) {
+  return <View style={[s.card, { padding: pad }, style]}>{children}</View>;
+}
+
+/** Card with a diagonal gradient background and a soft glow orb. */
+export function GradientCard({
+  colors,
+  children,
+  style,
+}: {
+  colors: readonly string[];
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+}) {
+  const id = useRef(`g${Math.random().toString(36).slice(2, 8)}`).current;
+  return (
+    <View style={[{ borderRadius: R.xl, overflow: 'hidden', marginBottom: 14 }, style]}>
+      <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none">
+        <Defs>
+          <LinearGradient id={id} x1="0" y1="0" x2="1" y2="1">
+            {colors.map((c, i) => (
+              <Stop key={c + i} offset={String(i / Math.max(1, colors.length - 1))} stopColor={c} />
+            ))}
+          </LinearGradient>
+        </Defs>
+        <Rect width="100%" height="100%" fill={`url(#${id})`} />
+      </Svg>
+      <View style={s.orb} />
+      <View style={[s.orb, { right: undefined, left: -60, top: undefined, bottom: -90, opacity: 0.06 }]} />
+      <View style={{ padding: 20 }}>{children}</View>
+    </View>
+  );
+}
+
+export function Section({ title, action, onAction }: { title: string; action?: string; onAction?: () => void }) {
+  return (
+    <View style={s.section}>
+      <T size={17} weight="bold">
+        {title}
+      </T>
+      {action ? (
+        <PressScale onPress={onAction} style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <T size={13} weight="semibold" color={C.green}>
+            {action}
+          </T>
+          <Icon name="chevronRight" size={16} color={C.green} />
+        </PressScale>
+      ) : null}
+    </View>
+  );
+}
+
+export const Row = ({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) => (
+  <View style={[{ flexDirection: 'row', alignItems: 'center' }, style]}>{children}</View>
+);
+
+export const Divider = () => <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: C.border, marginVertical: 4 }} />;
+
+// ---------------------------------------------------------------- small parts
+
+export function IconBubble({ icon, color, size = 40 }: { icon: IconName; color: string; size?: number }) {
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2.6,
+        backgroundColor: color + '22',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Icon name={icon} size={size * 0.5} color={color} />
+    </View>
+  );
+}
+
+export const CategoryBubble = ({ category, size = 40 }: { category: string; size?: number }) => {
+  const m = catMeta(category);
+  return <IconBubble icon={m.icon} color={m.color} size={size} />;
 };
 
-export const PALETTE = ['#5AA9FF', '#3DDC97', '#F5B841', '#FF6B6B', '#A78BFA', '#4FD1C5', '#F687B3', '#9AE6B4', '#FBD38D', '#90CDF4'];
-
-export function Card({ children, style }: { children: ReactNode; style?: ViewStyle }) {
-  return <View style={[s.card, style]}>{children}</View>;
-}
-
-export function H({ children }: { children: ReactNode }) {
-  return <Text style={s.h}>{children}</Text>;
-}
-
-export function Label({ children }: { children: ReactNode }) {
-  return <Text style={s.label}>{children}</Text>;
-}
-
-export function Big({ children, color }: { children: ReactNode; color?: string }) {
-  return <Text style={[s.big, color ? { color } : null]}>{children}</Text>;
-}
-
-export function Row({ children, style }: { children: ReactNode; style?: ViewStyle }) {
-  return <View style={[s.row, style]}>{children}</View>;
-}
-
-export function Stat({ label, value, color }: { label: string; value: string; color?: string }) {
+export function Pill({ text, color, icon }: { text: string; color: string; icon?: IconName }) {
   return (
-    <View style={{ flex: 1 }}>
-      <Label>{label}</Label>
-      <Text style={[s.stat, color ? { color } : null]}>{value}</Text>
+    <View style={[s.pill, { backgroundColor: color + '1F' }]}>
+      {icon ? <Icon name={icon} size={12} color={color} stroke={2.4} /> : null}
+      <Text style={{ color, fontFamily: F.semibold, fontSize: 11, marginLeft: icon ? 4 : 0 }}>{text}</Text>
     </View>
   );
 }
 
-/** Horizontal bar with label and value. */
-export function BarRow({
+export function Chip({ label, active, onPress, icon }: { label: string; active?: boolean; onPress: () => void; icon?: IconName }) {
+  return (
+    <PressScale onPress={onPress} style={[s.chip, active ? s.chipOn : null]}>
+      {icon ? <Icon name={icon} size={14} color={active ? C.bg : C.sub} /> : null}
+      <Text style={{ color: active ? C.bg : C.text, fontFamily: F.semibold, fontSize: 13, marginLeft: icon ? 6 : 0 }}>{label}</Text>
+    </PressScale>
+  );
+}
+
+export function Button({
   label,
-  value,
-  max,
-  color = C.blue,
-  right,
   onPress,
-  active,
+  kind = 'primary',
+  icon,
+  iconRight,
+  style,
 }: {
   label: string;
-  value: number;
-  max: number;
-  color?: string;
-  right?: string;
-  onPress?: () => void;
-  active?: boolean;
+  onPress: () => void;
+  kind?: 'primary' | 'ghost' | 'danger';
+  icon?: IconName;
+  iconRight?: IconName;
+  style?: StyleProp<ViewStyle>;
 }) {
-  const pct = max > 0 ? Math.max(2, (value / max) * 100) : 0;
+  const primary = kind === 'primary';
+  const fg = primary ? '#04261B' : kind === 'danger' ? C.red : C.text;
   return (
-    <Pressable onPress={onPress} style={[s.barRow, active ? { backgroundColor: C.cardAlt } : null]}>
-      <Row style={{ justifyContent: 'space-between', marginBottom: 4 }}>
-        <Text style={s.barLabel} numberOfLines={1}>
-          {label}
-        </Text>
-        <Text style={s.barValue}>{right ?? inr(value)}</Text>
-      </Row>
-      <View style={s.track}>
-        <View style={[s.fill, { width: `${pct}%`, backgroundColor: color }]} />
-      </View>
-    </Pressable>
+    <PressScale onPress={onPress} style={[s.btn, primary ? s.btnPrimary : s.btnGhost, style]}>
+      {icon ? <Icon name={icon} size={18} color={fg} /> : null}
+      <Text style={{ color: fg, fontFamily: F.bold, fontSize: 15, marginLeft: icon ? 8 : 0, marginRight: iconRight ? 6 : 0 }}>{label}</Text>
+      {iconRight ? <Icon name={iconRight} size={18} color={fg} /> : null}
+    </PressScale>
   );
 }
 
-/** One stacked bar showing shares, plus legend. */
-export function StackBar({ parts }: { parts: { label: string; value: number; color: string }[] }) {
-  const total = parts.reduce((x, p) => x + p.value, 0) || 1;
+export function Stat({ label, value, color, icon }: { label: string; value: ReactNode; color?: string; icon?: IconName }) {
   return (
-    <View>
-      <View style={[s.track, { height: 14, flexDirection: 'row', overflow: 'hidden' }]}>
-        {parts.map((p) => (
-          <View key={p.label} style={{ width: `${(p.value / total) * 100}%`, backgroundColor: p.color }} />
-        ))}
-      </View>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', marginTop: 8 }}>
-        {parts.map((p) => (
-          <Row key={p.label} style={{ marginRight: 14, marginBottom: 4 }}>
-            <View style={{ width: 10, height: 10, borderRadius: 2, backgroundColor: p.color, marginRight: 6 }} />
-            <Text style={{ color: C.sub, fontSize: 12 }}>
-              {p.label} {Math.round((p.value / total) * 100)}%
-            </Text>
-          </Row>
-        ))}
-      </View>
+    <View style={{ flex: 1 }}>
+      <Row style={{ marginBottom: 4 }}>
+        {icon ? <Icon name={icon} size={12} color={color ?? C.sub} stroke={2.4} /> : null}
+        <Text style={{ fontFamily: F.medium, fontSize: 12, color: 'rgba(238,242,248,0.7)', marginLeft: icon ? 4 : 0 }}>{label}</Text>
+      </Row>
+      {typeof value === 'string' ? (
+        <T size={16} weight="bold" color={color ?? C.text}>
+          {value}
+        </T>
+      ) : (
+        value
+      )}
     </View>
   );
 }
 
-const sevColor = { high: C.red, medium: C.amber, low: C.blue };
-
-export function InsightCard({ i, onPress }: { i: Insight; onPress?: () => void }) {
+export function Empty({ title, text, art }: { title: string; text: string; art?: ReactNode }) {
   return (
-    <Pressable onPress={onPress}>
-      <Card style={{ borderLeftWidth: 4, borderLeftColor: sevColor[i.severity] }}>
-        <Text style={s.insTitle}>{i.title}</Text>
-        <Text style={s.insDetail}>{i.detail}</Text>
-        {i.monthlySaving ? (
-          <Text style={s.save}>Potential saving ≈ {inr(i.monthlySaving)}/month</Text>
+    <View style={{ alignItems: 'center', paddingVertical: 26, paddingHorizontal: 12 }}>
+      {art}
+      <T size={16} weight="bold" style={{ marginTop: art ? 14 : 0, textAlign: 'center' }}>
+        {title}
+      </T>
+      <T size={13} color={C.sub} style={{ textAlign: 'center', marginTop: 6 }}>
+        {text}
+      </T>
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------- insight card
+
+export function InsightCard({ i, startOpen = false }: { i: Insight; startOpen?: boolean }) {
+  const [open, setOpen] = useState(startOpen);
+  const sev = SEVERITY[i.severity];
+  const rot = useRef(new Animated.Value(startOpen ? 1 : 0)).current;
+  const toggle = () => {
+    LayoutAnimation.configureNext(LayoutAnimation.create(260, 'easeInEaseOut', 'opacity'));
+    Animated.timing(rot, { toValue: open ? 0 : 1, duration: 220, useNativeDriver: true }).start();
+    setOpen(!open);
+  };
+  return (
+    <PressScale onPress={toggle} scaleTo={0.985} style={[s.card, { padding: 16 }]}>
+      <Row style={{ alignItems: 'flex-start' }}>
+        <IconBubble icon={sev.icon} color={sev.color} size={42} />
+        <View style={{ flex: 1, marginLeft: 12 }}>
+          <Row style={{ justifyContent: 'space-between', marginBottom: 4 }}>
+            <Pill text={sev.label} color={sev.color} />
+            <Animated.View style={{ transform: [{ rotate: rot.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '180deg'] }) }] }}>
+              <Icon name="chevronDown" size={18} color={C.sub} />
+            </Animated.View>
+          </Row>
+          <T size={15} weight="bold">
+            {i.title}
+          </T>
+          {i.monthlySaving ? (
+            <Row style={{ marginTop: 8 }}>
+              <Icon name="sparkle" size={14} color={C.green} fill={C.green} />
+              <T size={13} weight="semibold" color={C.green} style={{ marginLeft: 6 }}>
+                Save ≈ {inr(i.monthlySaving)}/month
+              </T>
+            </Row>
+          ) : null}
+          {open ? (
+            <T size={13.5} color={C.sub} style={{ marginTop: 10, lineHeight: 21 }}>
+              {i.detail}
+            </T>
+          ) : null}
+        </View>
+      </Row>
+    </PressScale>
+  );
+}
+
+// ---------------------------------------------------------------- bottom sheet
+
+export function Sheet({ visible, onClose, children, title }: { visible: boolean; onClose: () => void; children: ReactNode; title?: string }) {
+  const insets = useSafeAreaInsets();
+  const v = useRef(new Animated.Value(0)).current;
+  const [mounted, setMounted] = useState(visible);
+  useEffect(() => {
+    if (visible) {
+      setMounted(true);
+      Animated.spring(v, { toValue: 1, useNativeDriver: true, damping: 18, stiffness: 160, mass: 0.8 }).start();
+    } else {
+      Animated.timing(v, { toValue: 0, duration: 200, easing: Easing.in(Easing.cubic), useNativeDriver: true }).start(() => setMounted(false));
+    }
+  }, [visible, v]);
+  if (!mounted) return null;
+  return (
+    <Modal transparent visible statusBarTranslucent onRequestClose={onClose} animationType="none">
+      <Animated.View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.6)', opacity: v }]}>
+        <Pressable style={{ flex: 1 }} onPress={onClose} />
+      </Animated.View>
+      <Animated.View
+        style={[
+          s.sheet,
+          { paddingBottom: insets.bottom + 16 },
+          { transform: [{ translateY: v.interpolate({ inputRange: [0, 1], outputRange: [600, 0] }) }] },
+        ]}
+      >
+        <View style={s.grabber} />
+        {title ? (
+          <T size={18} weight="bold" style={{ marginBottom: 12 }}>
+            {title}
+          </T>
         ) : null}
-      </Card>
-    </Pressable>
+        {children}
+      </Animated.View>
+    </Modal>
   );
 }
 
-export function Chip({ label, active, onPress }: { label: string; active?: boolean; onPress: () => void }) {
-  return (
-    <Pressable onPress={onPress} style={[s.chip, active ? { backgroundColor: C.accent, borderColor: C.accent } : null]}>
-      <Text style={{ color: active ? C.bg : C.text, fontSize: 13, fontWeight: '600' }}>{label}</Text>
-    </Pressable>
-  );
-}
-
-export function Button({ label, onPress, kind = 'primary' }: { label: string; onPress: () => void; kind?: 'primary' | 'ghost' }) {
-  return (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed }) => [s.btn, kind === 'ghost' ? s.btnGhost : null, pressed ? { opacity: 0.7 } : null]}
-    >
-      <Text style={{ color: kind === 'ghost' ? C.text : C.bg, fontWeight: '700' }}>{label}</Text>
-    </Pressable>
-  );
-}
-
-export function Empty({ text }: { text: string }) {
-  return <Text style={{ color: C.sub, textAlign: 'center', marginVertical: 24, lineHeight: 20 }}>{text}</Text>;
-}
+// ---------------------------------------------------------------- styles
 
 export const s = StyleSheet.create({
-  card: { backgroundColor: C.card, borderRadius: 14, padding: 16, marginBottom: 12, borderWidth: 1, borderColor: C.border },
-  h: { color: C.text, fontSize: 18, fontWeight: '700', marginTop: 8, marginBottom: 10 },
-  label: { color: C.sub, fontSize: 12, textTransform: 'uppercase', letterSpacing: 0.6 },
-  big: { color: C.text, fontSize: 30, fontWeight: '800', marginTop: 4 },
-  stat: { color: C.text, fontSize: 17, fontWeight: '700', marginTop: 2 },
-  row: { flexDirection: 'row', alignItems: 'center' },
-  barRow: { paddingVertical: 6, paddingHorizontal: 4, borderRadius: 8 },
-  barLabel: { color: C.text, fontSize: 14, flex: 1, marginRight: 8 },
-  barValue: { color: C.text, fontSize: 14, fontWeight: '600' },
-  track: { height: 8, backgroundColor: C.cardAlt, borderRadius: 6 },
-  fill: { height: '100%', borderRadius: 6 },
-  insTitle: { color: C.text, fontSize: 16, fontWeight: '700', marginBottom: 6 },
-  insDetail: { color: C.sub, fontSize: 14, lineHeight: 20 },
-  save: { color: C.accent, fontSize: 14, fontWeight: '700', marginTop: 10 },
-  chip: {
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 18,
-    borderWidth: 1,
+  card: {
+    backgroundColor: C.card,
+    borderRadius: R.lg,
+    marginBottom: 12,
+    borderWidth: StyleSheet.hairlineWidth,
     borderColor: C.border,
+  },
+  orb: {
+    position: 'absolute',
+    right: -50,
+    top: -70,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: '#FFFFFF',
+    opacity: 0.08,
+  },
+  section: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 14, marginBottom: 10 },
+  pill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, paddingVertical: 3, borderRadius: R.pill, alignSelf: 'flex-start' },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: R.pill,
+    backgroundColor: C.card,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: C.borderHi,
     marginRight: 8,
     marginBottom: 8,
   },
-  btn: { backgroundColor: C.accent, borderRadius: 10, paddingVertical: 12, alignItems: 'center', marginTop: 8 },
-  btnGhost: { backgroundColor: 'transparent', borderWidth: 1, borderColor: C.border },
+  chipOn: { backgroundColor: C.green, borderColor: C.green },
+  btn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: R.md, paddingVertical: 15, marginTop: 10 },
+  btnPrimary: { backgroundColor: C.green },
+  btnGhost: { backgroundColor: C.cardHi, borderWidth: StyleSheet.hairlineWidth, borderColor: C.borderHi },
+  sheet: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    maxHeight: '85%',
+    backgroundColor: C.bg2,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: C.borderHi,
+  },
+  grabber: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: C.borderHi, marginBottom: 14 },
 });

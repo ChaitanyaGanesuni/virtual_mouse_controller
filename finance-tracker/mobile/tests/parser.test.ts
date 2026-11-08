@@ -185,3 +185,16 @@ test('bill reminders: 3 days before, day before, due day; none once paid', () =>
   assert.match(r[0].title, /₹5,000 due on 21 Nov/);
   assert.equal(planReminders([{ ...card, balance: 0 }], now).length, 0);
 });
+
+import { moneyHealth } from '../src/lib/health';
+
+test('money health score is 0-100 and penalises fees and regular plans', () => {
+  const now = Date.now();
+  const l = buildLedger(demoMessages(now));
+  const h = moneyHealth(l.transactions, l.accounts, buildHoldings(l.mfOrders), now)!;
+  assert.ok(h.score >= 0 && h.score <= 100, String(h.score));
+  assert.equal(h.parts.reduce((s, p) => s + p.max, 0), 100);
+  assert.ok(h.parts.find((p) => p.key === 'fees')!.score < 20);
+  assert.ok(h.parts.find((p) => p.key === 'costs')!.score < 10);
+  assert.equal(moneyHealth([], [], [], now), null);
+});

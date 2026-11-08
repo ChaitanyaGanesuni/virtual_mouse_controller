@@ -11,16 +11,25 @@
     "build:apk": "expo prebuild --platform android --clean && cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
+    "@expo-google-fonts/inter": "^0.4.2",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.23",
     "expo-build-properties": "~58.0.12",
+    "expo-font": "~58.0.11",
+    "expo-haptics": "~58.0.7",
+    "expo-splash-screen": "~58.0.13",
     "expo-status-bar": "~58.0.4",
+    "expo-system-ui": "~58.0.7",
     "react": "19.3.0",
     "react-native": "0.88.1",
-    "react-native-safe-area-context": "~5.11.1"
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-svg": "^15.16.0"
   },
   "devDependencies": {
+    "@expo/metro-runtime": "~58.0.17",
     "@types/react": "~19.3.0",
+    "react-dom": "^19.3.0",
+    "react-native-web": "^0.21.4",
     "tsx": "^4.20.6",
     "typescript": "~5.9.3"
   }
