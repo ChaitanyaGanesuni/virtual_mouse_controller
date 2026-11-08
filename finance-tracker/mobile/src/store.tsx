@@ -28,6 +28,11 @@ import { netWorthHistory, type WorthPoint } from './lib/history';
 import { rentPayments, type RentMonth, type RentProfile } from './lib/rent';
 import { subId, subscriptionViews, type SubState, type SubscriptionView } from './lib/subscriptions';
 import { capitalGains, deductions, type DeductionGroup, type GainsSummary, type Regime } from './lib/tax';
+import { priceChanges, type PriceChange } from './lib/anomalies';
+import { billViews, expiryViews, lowFastags, planBillReminders, type BillView, type ExpiryView } from './lib/bills';
+import { detectLoans, type Loan, type LoanSettings } from './lib/loans';
+import { yearReview, type YearReview } from './lib/review';
+import type { Account } from './lib/types';
 import { logError } from './errorLog';
 import type { Holding, Insight, RawSms } from './lib/types';
 
@@ -57,6 +62,10 @@ export interface Extras {
   guardDismissed: string[];
   /** Hide app content in recent apps & block screenshots while app lock is on. */
   secure: boolean;
+  /** Your corrections per loan (interest rate, outstanding). */
+  loans: Record<string, LoanSettings>;
+  /** Price changes you've acknowledged. */
+  changesSeen: string[];
 }
 const EXTRA_KEYS: Record<keyof Extras, string> = {
   goals: 'goals.v1',
@@ -67,6 +76,8 @@ const EXTRA_KEYS: Record<keyof Extras, string> = {
   rentProfile: 'rentProfile.v1',
   guardDismissed: 'guardDismissed.v1',
   secure: 'secure.v1',
+  loans: 'loans.v1',
+  changesSeen: 'changesSeen.v1',
 };
 const DEFAULT_EXTRAS: Extras = {
   goals: [],
@@ -77,6 +88,8 @@ const DEFAULT_EXTRAS: Extras = {
   rentProfile: { tenant: '', landlord: '', landlordPan: '', address: '' },
   guardDismissed: [],
   secure: true,
+  loans: {},
+  changesSeen: [],
 };
 
 async function loadExtras(): Promise<Extras> {
@@ -143,6 +156,12 @@ interface State {
   gains: GainsSummary;
   rentMonths: RentMonth[];
   digest: Digest;
+  bills: BillView[];
+  expiries: ExpiryView[];
+  fastagLow: Account[];
+  changes: PriceChange[];
+  loans: Loan[];
+  review: YearReview;
   refresh: (full?: boolean) => Promise<void>;
   setDemoMode: (on: boolean) => Promise<void>;
   setCategory: (txnId: string, category: string, applyToMerchant: boolean) => Promise<void>;
@@ -195,7 +214,7 @@ async function ensurePermissions(): Promise<{ sms: boolean; notify: boolean }> {
   return { sms, notify: canNotify() };
 }
 
-const EMPTY: Ledger = { transactions: [], accounts: [], mfOrders: [], missed: [], failures: [], balancePoints: [], cardEvents: [], failedDebits: [] };
+const EMPTY: Ledger = { transactions: [], accounts: [], mfOrders: [], missed: [], failures: [], balancePoints: [], cardEvents: [], failedDebits: [], bills: [], expiries: [], loanPoints: [] };
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
@@ -227,7 +246,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const ex = extrasRef.current;
     const recurring = findRecurring(l.transactions).map((r) => r.merchant.toLowerCase());
     pushAlertPrefs(prefs.mode, prefs.largeAmount, recurring);
-    const reminders = prefs.billReminders ? planReminders(l.accounts) : [];
+    const reminders = prefs.billReminders
+      ? [...planReminders(l.accounts), ...planBillReminders(billViews(l.bills, l.transactions), expiryViews(l.expiries))]
+      : [];
     if (ex.digest) {
       const dg = weeklyDigest(l.transactions, l.accounts, monthForecast(l.transactions), wasteInsights(l.transactions));
       reminders.push({ at: nextSundayEvening(), title: dg.notification.title, text: dg.notification.text });
@@ -246,6 +267,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
       const id = `failed|${f.id}|overdue`;
       if (f.status === 'overdue' && !notified.has(id) && f.date >= Date.now() - 60 * DAY) {
         guardNew.push({ id, title: `Refund overdue: ₹${f.amount.toLocaleString('en-IN')}`, text: `Your ${f.institution} payment failed and hasn't been reversed. Raise a complaint; the bank owes ₹100/day.` });
+      }
+    }
+    for (const c of priceChanges(l.transactions, l.bills)) {
+      if (c.date >= Date.now() - 7 * DAY && !notified.has(c.id) && !ex.changesSeen.includes(c.id)) {
+        guardNew.push({
+          id: c.id,
+          title: c.kind === 'price-rise' ? `${c.name} price went up ${Math.round(c.pct * 100)}%` : `${c.name} bill ${Math.round(c.pct * 100)}% above usual`,
+          text:
+            c.kind === 'price-rise'
+              ? `₹${Math.round(c.from)} → ₹${Math.round(c.to)}: about ₹${Math.round(c.impact).toLocaleString('en-IN')} more a year. Still worth it?`
+              : `₹${Math.round(c.to).toLocaleString('en-IN')} vs about ₹${Math.round(c.from).toLocaleString('en-IN')} normally. Worth a check.`,
+        });
       }
     }
     guardNew.slice(0, 5).forEach((n, i) => notifyNow(7300 + i, n.title, n.text));
@@ -448,6 +481,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
       gains: capitalGains(holdings),
       rentMonths: rentPayments(ledger.transactions),
       digest: weeklyDigest(ledger.transactions, ledger.accounts, monthForecast(ledger.transactions), waste),
+      bills: billViews(ledger.bills, ledger.transactions),
+      expiries: expiryViews(ledger.expiries),
+      fastagLow: lowFastags(ledger.accounts),
+      changes: priceChanges(ledger.transactions, ledger.bills).filter((c) => !extras.changesSeen.includes(c.id)),
+      loans: detectLoans(ledger.transactions, ledger.loanPoints, extras.loans),
+      review: yearReview(ledger.transactions, history),
     };
   }, [ledger, holdings, history, extras, waste]);
 

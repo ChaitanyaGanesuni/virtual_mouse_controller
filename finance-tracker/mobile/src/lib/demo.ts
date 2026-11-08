@@ -45,12 +45,28 @@ export function demoMessages(now = Date.now()): RawSms[] {
       push(at(7), 'VM-KFINTK', `Dear Investor, your purchase of Rs.5,000.00 in Folio 91234567 under Parag Parikh Flexi Cap Fund - Direct Growth is processed at NAV of ${(78 + (5 - m) * 1.1).toFixed(4)} for ${(5000 / (78 + (5 - m) * 1.1)).toFixed(3)} units.`);
     }
     // Subscriptions on card
-    if (upto(6)) card(at(6), 649, 'NETFLIX.COM');
+    if (upto(6)) card(at(6), m === 0 ? 799 : 649, 'NETFLIX.COM'); // price rise this month
     if (upto(8)) card(at(8), 299, 'HOTSTAR');
     if (upto(9)) card(at(9), 119, 'SPOTIFY INDIA');
     if (upto(11)) card(at(11), 1_999, 'CULT.FIT');
     // Bills
-    if (upto(12)) upi(at(12), 1_840 + Math.round(rnd() * 600), 'bescom@billdesk');
+    // Electricity: bill SMS on the 5th, paid on the 12th; this month's bill is unusually high.
+    {
+      const amt = m === 0 ? 3_140 : 1_900 + Math.round(rnd() * 250);
+      if (upto(5)) push(at(5, 11), 'VM-BESCOM', `Dear Consumer, BESCOM bill amount Rs.${fmt(amt)} for RR No 77123 is due on ${d(at(15))}. Pay online to avoid disconnection.`);
+      if (upto(12)) upi(at(12), amt, 'bescom@billdesk');
+    }
+    // Home loan EMI on the 5th
+    if (upto(5)) {
+      bal -= 25_000;
+      push(at(5, 8), 'AX-HDFCBK', `EMI of Rs.25,000.00 for Home Loan A/c XX5566 debited from A/c XX4821 on ${d(at(5))}. Avl Bal Rs.${fmt(bal)}`);
+    }
+    if (m === 3 && upto(2)) push(at(2), 'AX-HDFCBK', `Principal outstanding on your Home Loan A/c XX5566 is Rs.24,50,000 as on ${d(at(1))}.`);
+    // FASTag tolls on weekend trips
+    if (upto(20)) {
+      const tag = m === 0 ? 120 : 600;
+      push(at(20, 17), 'VM-IDFCFB', `Rs.85.00 debited from your FASTag for toll at Electronic City Plaza. Avl Bal Rs.${fmt(tag)}`);
+    }
     if (upto(14)) upi(at(14), 999, 'airtel@airtelpaymentsbank');
     // Food delivery and dining
     for (let i = 0; i < 9 + m; i++) {
@@ -114,6 +130,10 @@ export function demoMessages(now = Date.now()): RawSms[] {
       push(at(15), 'AX-HDFCBK', `Rs.3,000.00 withdrawn at HDFC ATM from A/c XX4821 on ${d(at(15))}. Avl Bal Rs.${fmt(bal)}`);
     }
   }
+  // Upcoming: insurance renewal, prepaid plan expiry, and a low FASTag
+  push(now - 2 * DAY, 'AX-LICIND', `Premium of Rs.25,000 for policy 123456789 is due on ${d(now + 12 * DAY)}. Pay before the due date to keep your policy active.`);
+  push(now - DAY, 'JM-JIOINF', `Your Jio plan of Rs 299 expires on ${d(now + 2 * DAY)}. Recharge now to continue enjoying services.`);
+  push(now - 3 * 3_600_000, 'VM-IDFCFB', 'Rs.85.00 debited from your FASTag for toll at Hosur Road Plaza. Avl Bal Rs.120.00');
   // Recent: a failed UPI payment awaiting reversal, and a late-night international card charge
   push(now - DAY, 'AX-HDFCBK', 'Rs.750.00 debited from A/c XX4821 for UPI txn to bookmyshow@hdfcbank. Txn failed. Amount will be reversed within 1 working day. Call 18002586161');
   {

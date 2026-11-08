@@ -384,7 +384,7 @@ export default function SettingsScreen() {
       </FadeIn>
 
       <T size={11} color={C.faint} style={{ textAlign: 'center', marginTop: 8, fontFamily: F.medium }}>
-        Paisa Watch 4.0
+        Paisa Watch 5.0
       </T>
 
       <Sheet visible={showMissed} onClose={() => setShowMissed(false)} title={`Unread alerts (${missed.length})`}>

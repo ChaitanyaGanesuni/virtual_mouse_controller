@@ -17,6 +17,8 @@ export const BACKUP_KEYS = [
   'tax.v1',
   'rentProfile.v1',
   'guardDismissed.v1',
+  'loans.v1',
+  'changesSeen.v1',
 ];
 
 interface BackupFile {

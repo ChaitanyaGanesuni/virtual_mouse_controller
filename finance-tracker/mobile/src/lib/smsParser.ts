@@ -5,6 +5,8 @@
 import { parseDateText } from './dates';
 import type { AccountKind, Direction, MfOrder, RawSms } from './types';
 
+const NUM = String.raw`([\d,]+(?:\.\d{1,2})?)`;
+
 export type ParsedSms =
   | {
       type: 'txn';
@@ -22,7 +24,79 @@ export type ParsedSms =
   | { type: 'balance'; institution: string; last4: string; balance: number }
   | { type: 'mf'; order: Omit<MfOrder, 'id' | 'date'> }
   /** Money was taken but the payment failed; a reversal is owed. */
-  | { type: 'failed'; institution: string; last4: string; amount: number; mode: string };
+  | { type: 'failed'; institution: string; last4: string; amount: number; mode: string }
+  /** A bill or premium that is due (utilities, phone/broadband, insurance renewals…). */
+  | { type: 'bill'; biller: string; kind: BillKind; amount: number; dueDate: number | null }
+  /** A prepaid plan / pack that expires on a date. */
+  | { type: 'expiry'; service: string; expiresOn: number }
+  /** FASTag balance update without a toll debit. */
+  | { type: 'fastag'; issuer: string; balance: number }
+  /** Outstanding balance on a loan account. */
+  | { type: 'loan'; lender: string; last4: string; outstanding: number };
+
+export type BillKind = 'electricity' | 'gas' | 'water' | 'phone & internet' | 'tv' | 'insurance' | 'other';
+
+const BILLERS: [RegExp, string, BillKind][] = [
+  [/BESCOM/i, 'BESCOM', 'electricity'],
+  [/TATAPW|TATA ?POWER/i, 'Tata Power', 'electricity'],
+  [/ADANI ?E|AEML/i, 'Adani Electricity', 'electricity'],
+  [/MSEDCL|MAHADISCOM|MAHAVITARAN/i, 'MSEDCL', 'electricity'],
+  [/BSES/i, 'BSES', 'electricity'],
+  [/TORRENT/i, 'Torrent Power', 'electricity'],
+  [/TNEB|TANGEDCO/i, 'TNEB', 'electricity'],
+  [/KSEB/i, 'KSEB', 'electricity'],
+  [/CESC/i, 'CESC', 'electricity'],
+  [/IGL|MGL|INDANE|HPGAS|BHARATGAS|GAIL ?GAS/i, 'Gas', 'gas'],
+  [/AIRTEL/i, 'Airtel', 'phone & internet'],
+  [/JIO/i, 'Jio', 'phone & internet'],
+  [/VODAFONE|VIINDIA|\bVI\b|VILTD/i, 'Vi', 'phone & internet'],
+  [/BSNL/i, 'BSNL', 'phone & internet'],
+  [/ACTFIB|ACT ?FIBERNET/i, 'ACT Fibernet', 'phone & internet'],
+  [/HATHWAY/i, 'Hathway', 'phone & internet'],
+  [/TATAPLAY|TATASKY|TATA ?PLAY|DISHTV|D2H|SUNDIRECT/i, 'DTH', 'tv'],
+  [/LICIND|\bLIC\b/i, 'LIC', 'insurance'],
+  [/STARHEALTH|STAR ?HEALTH/i, 'Star Health', 'insurance'],
+  [/HDFCERGO|HDFC ?ERGO/i, 'HDFC ERGO', 'insurance'],
+  [/HDFCLIFE|HDFC ?LIFE/i, 'HDFC Life', 'insurance'],
+  [/ICICIPRU|ICICI ?PRU/i, 'ICICI Prudential', 'insurance'],
+  [/SBILIFE|SBI ?LIFE/i, 'SBI Life', 'insurance'],
+  [/MAXLIFE|MAX ?LIFE|AXISMAX/i, 'Max Life', 'insurance'],
+  [/TATAAIA|TATA ?AIA/i, 'Tata AIA', 'insurance'],
+  [/NIVABUPA|NIVA ?BUPA|CAREHEALTH|CARE ?HEALTH|ACKO|DIGIT/i, 'Health insurer', 'insurance'],
+];
+
+const BILL_WORD_RE = /\b(bill|premium|renewal|invoice|policy)\b/i;
+const BILL_DUE_RE = /\bdue\b|payable by|renew (?:by|before|on)|(?:lapse|expire)s? on/i;
+const BILL_PAID_RE = /\b(debited|received|successful(?:ly)?|paid|thank you|has been credited)\b/i;
+const BILL_AMT_RE = new RegExp(
+  String.raw`(?:bill (?:amount|amt)|amount (?:due|payable)|amt due|premium(?: amount| of| due)?|bill of|total due|due amount|renewal premium)\s*(?:of|is|:|-|for)?\s*(?:rs\.?|inr|₹)\s*` + NUM,
+  'i',
+);
+const BILL_DATE_RE = /(?:due\s*(?:date|by|on)?|payable by|pay(?:ment)?\s*(?:by|before)|renew (?:by|before|on)|(?:lapse|expire)s? on)\s*(?:is|:|-)?\s*([0-9A-Za-z][0-9A-Za-z ,./-]{3,20})/i;
+const EXPIRY_RE = /(?:plan|pack|validity|recharge|service|subscription|benefits?)[^.]{0,40}?(?:expir\w*|ends?|end on|valid till|valid upto|valid until|will end)\s*(?:on|by|:|-)?\s*([0-9A-Za-z][0-9A-Za-z ,./-]{3,20})/i;
+const EXPIRY_PROMO_RE = /\b(offer|discount|cashback|% ?off|win|coupon|voucher|free trial|code)\b/i;
+const FASTAG_BAL_RE = new RegExp(String.raw`(?:balance|bal)\.?\s*(?:is|:|-|of)?\s*(?:rs\.?|inr|₹)?\s*` + NUM, 'i');
+const LOAN_OS_RE = new RegExp(String.raw`(?:principal outstanding|outstanding (?:principal|amount|balance)|loan balance|balance outstanding)[^.]{0,60}?(?:is|:|-|of|as)\s*(?:rs\.?|inr|₹)\s*` + NUM, 'i');
+
+function billerFor(sender: string, body: string): { name: string; kind: BillKind } {
+  const code = SENDER_RE.exec(sender.trim())?.[1] ?? sender;
+  for (const [re, name, kind] of BILLERS) if (re.test(code)) return { name, kind };
+  for (const [re, name, kind] of BILLERS) if (re.test(body)) return { name, kind };
+  const kind: BillKind = /electric|power|discom/i.test(body)
+    ? 'electricity'
+    : /\bgas\b|lpg|png/i.test(body)
+      ? 'gas'
+      : /water|jal/i.test(body)
+        ? 'water'
+        : /insurance|policy|premium/i.test(body)
+          ? 'insurance'
+          : /broadband|fib(?:er|re)|internet|postpaid|mobile/i.test(body)
+            ? 'phone & internet'
+            : /dth|set ?top/i.test(body)
+              ? 'tv'
+              : 'other';
+  return { name: code.toUpperCase(), kind };
+}
 
 const FAILED_RE = /\b(failed|declined|unsuccessful|not dispensed|could not be (?:processed|completed)|timed? ?out)\b/i;
 const MONEY_TAKEN_RE = /debited|deducted|will be (?:reversed|refunded|credited back)|auto[- ]?revers|reversal (?:is |will be )?(?:initiated|processed within)|refund will/i;
@@ -66,7 +140,6 @@ const BANKS: [RegExp, string][] = [
 
 const MF_SENDERS = /CAMS|KFIN|KARVY|MFCENTRAL|MFUTIL|BSESTAR|NSEMF/i;
 
-const NUM = String.raw`([\d,]+(?:\.\d{1,2})?)`;
 const CUR = String.raw`(?:rs\.?|inr|₹)\s*`;
 const AMOUNT_RE = new RegExp(CUR + NUM, 'i');
 const AMOUNT_FALLBACK_RE = new RegExp(String.raw`(?:debited|credited|withdrawn)\s*(?:by|with|for|of)\s*` + NUM, 'i');
@@ -81,6 +154,7 @@ const LIMIT_RE = new RegExp(
 const DUE_RE = new RegExp(String.raw`(?:total|tot\.?)\s*(?:amount|amt\.?)?\s*due\s*(?:is|:|-|of)?\s*(?:rs\.?|inr|₹)?\s*` + NUM, 'i');
 const MIN_DUE_RE = new RegExp(String.raw`min(?:imum)?\.?\s*(?:amount|amt\.?)?\s*due\s*(?:is|:|-|of)?\s*(?:rs\.?|inr|₹)?\s*` + NUM, 'i');
 const DUE_DATE_RE = /(?:pay(?:ment)?\s*(?:by|before|on or before)|due\s*(?:date|by|on)|payable by)\s*:?\s*(?:is\s*)?([0-9A-Za-z][0-9A-Za-z ,./-]{3,20})/i;
+const FROM_ACCT_RE = /(?:debited from|deducted from|from your|from)\s+(?:your\s+)?(?:\w+\s+bank\s+)?(?:a\/c|acct|account)\s*(?:no\.?)?\s*[:\s]*[x*.\s]*(\d{3,6})\b/i;
 const LAST4_RE = /(?:a\/c|acct|account|card|ac)\s*(?:no\.?|number)?\s*(?:ending\s*(?:with|in)?\s*)?[:\s]*[x*.\s]*(\d{3,6})\b/i;
 
 const IGNORE_RE =
@@ -155,6 +229,7 @@ function detectMode(b: string): string {
 }
 
 function detectKind(b: string): AccountKind {
+  if (/fastag/i.test(b)) return 'wallet';
   // Whichever is mentioned first, a bank account or a card, is the account the alert is about.
   const acc = b.search(/\b(?:a\/c|acct|account)\b/i);
   const crd = b.search(/\bcard\b/i);
@@ -202,8 +277,43 @@ export function parseSms(sms: RawSms): ParsedSms | null {
   }
 
   const institution = institutionFor(sms.address, body);
-  const last4Match = LAST4_RE.exec(body);
+  // "EMI for Loan A/c XX5566 debited from A/c XX4821": the money left 4821, not the loan account.
+  const fromMatch = FROM_ACCT_RE.exec(body);
+  const last4Match = fromMatch ?? LAST4_RE.exec(body);
   const last4 = last4Match ? last4Match[1].slice(-4) : '';
+
+  // Loan statements: "Principal outstanding on your Home Loan a/c XX1234 is Rs 24,50,000"
+  const os = LOAN_OS_RE.exec(body);
+  if (os && /\bloan\b/i.test(body) && !/\bcard\b/i.test(body)) {
+    const loanNo = /loan\s*(?:a\/c|acct|account|no\.?)\s*(?:no\.?)?\s*[:\s]*[x*.\s]*(\d{3,})/i.exec(body);
+    return { type: 'loan', lender: institution, last4: loanNo ? loanNo[1].slice(-4) : last4, outstanding: parseAmount(os[1]) };
+  }
+
+  // FASTag balance updates (toll debits are handled below as wallet transactions).
+  const isFastag = /fastag/i.test(body);
+  if (isFastag && !DEBIT_RE.test(body) && !CREDIT_RE.test(body)) {
+    const b = FASTAG_BAL_RE.exec(body);
+    if (b) return { type: 'fastag', issuer: institution, balance: parseAmount(b[1]) };
+  }
+
+  // Prepaid validity: "Your Jio plan expires on 12-Nov-26"
+  if (!/\bcard\b/i.test(body) && !EXPIRY_PROMO_RE.test(body) && !/\botp\b/i.test(body)) {
+    const ex = EXPIRY_RE.exec(body);
+    if (ex) {
+      const when = parseDateText(ex[1], sms.date);
+      if (when) return { type: 'expiry', service: billerFor(sms.address, body).name, expiresOn: when };
+    }
+  }
+
+  // Bills and insurance renewals that are due (not payment confirmations, not card statements).
+  if (BILL_WORD_RE.test(body) && BILL_DUE_RE.test(body) && !BILL_PAID_RE.test(body) && !/credit card|\bcard\b/i.test(body)) {
+    const amt = BILL_AMT_RE.exec(body) ?? AMOUNT_RE.exec(body);
+    if (amt) {
+      const dd = BILL_DATE_RE.exec(body);
+      const b = billerFor(sms.address, body);
+      return { type: 'bill', biller: b.name, kind: b.kind, amount: parseAmount(amt[1]), dueDate: dd ? parseDateText(dd[1], sms.date) : null };
+    }
+  }
 
   // Card statement: "Total Amt Due Rs 12,345 ... due by"
   const due = DUE_RE.exec(body);
@@ -265,7 +375,7 @@ export function parseSms(sms: RawSms): ParsedSms | null {
     last4,
     merchant: extractMerchant(body, direction),
     mode: detectMode(body),
-    balance: bal && kind === 'bank' ? parseAmount(bal[1]) : null,
+    balance: bal && kind !== 'credit_card' ? parseAmount(bal[1]) : null,
     availableLimit: lim ? parseAmount(lim[1]) : null,
   };
 }

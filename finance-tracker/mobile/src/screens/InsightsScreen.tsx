@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Segmented from '../components/Segmented';
+import { PriceChangesSection } from '../components/bills';
 import GuardSection from './sections/GuardSection';
 import SubscriptionsSection from './sections/SubscriptionsSection';
 import { LayoutAnimation, ScrollView, View } from 'react-native';
@@ -46,6 +47,8 @@ function LeaksContent() {
           </Row>
         </GradientCard>
       </FadeIn>
+
+      <PriceChangesSection />
 
       {d.waste.length ? (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16, marginBottom: 6 }} contentContainerStyle={{ paddingHorizontal: 16 }}>

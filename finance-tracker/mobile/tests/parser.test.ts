@@ -455,3 +455,111 @@ test('backup: round trip keeps known keys, rejects other files', () => {
   assert.throws(() => readBackup('not json'), /isn't a Paisa Watch backup/);
   assert.deepEqual(readBackup(JSON.stringify({ ...b, data: { 'budgets.v1': 'not json', 'rules.v1': '[]' } })), [['rules.v1', '[]']]);
 });
+
+test('bills, renewals, prepaid expiry, FASTag and loan statements are parsed', () => {
+  const ref = new Date(2026, 10, 8).getTime();
+  const p = (address: string, body: string) => parseSms({ id: '1', address, body, date: ref });
+  const elec = p('VM-BESCOM', 'Dear Consumer, BESCOM bill amount Rs.2,340.00 for RR No 12345 is due on 18-11-2026. Pay online to avoid disconnection.');
+  assert.ok(elec && elec.type === 'bill');
+  assert.equal(elec.biller, 'BESCOM');
+  assert.equal(elec.kind, 'electricity');
+  assert.equal(elec.amount, 2340);
+  assert.equal(new Date(elec.dueDate!).getDate(), 18);
+  const ins = p('AX-LICIND', 'Premium of Rs.25,000 for policy 123456789 is due on 20-Nov-2026. Pay before the due date to keep your policy active.');
+  assert.ok(ins && ins.type === 'bill' && ins.kind === 'insurance' && ins.amount === 25000);
+  // a payment confirmation is not a due bill
+  const paid = p('AD-AIRTEL', 'Payment of Rs 999 towards your Airtel bill due on 14-11-2026 has been received. Thank you!');
+  assert.ok(!paid || paid.type !== 'bill');
+  const exp = p('JM-JIOINF', 'Your Jio plan of Rs 299 expires on 12-Nov-26. Recharge now to continue enjoying services.');
+  assert.ok(exp && exp.type === 'expiry' && exp.service === 'Jio' && new Date(exp.expiresOn).getDate() === 12);
+  assert.equal(p('JM-JIOINF', 'Offer valid till 30-11-26! Get 20% cashback on recharge.')?.type ?? null, null);
+  const tag = p('VM-IDFCFB', 'Your FASTag balance is Rs.142.50. Please recharge to avoid double toll.');
+  assert.ok(tag && tag.type === 'fastag' && tag.balance === 142.5);
+  const toll = p('VM-IDFCFB', 'Rs.85.00 debited from your FASTag for toll at Electronic City Plaza. Avl Bal Rs.57.50');
+  assert.ok(toll && toll.type === 'txn' && toll.accountKind === 'wallet' && toll.balance === 57.5);
+  const loan = p('AX-HDFCBK', 'Principal outstanding on your Home Loan A/c XX5566 is Rs.24,50,000 as on 01-11-2026.');
+  assert.ok(loan && loan.type === 'loan' && loan.outstanding === 2450000 && loan.last4 === '5566');
+});
+
+import { billViews, expiryViews, lowFastags, planBillReminders } from '../src/lib/bills';
+import { priceChanges } from '../src/lib/anomalies';
+import { detectLoans, monthsToRepay, prepayImpact } from '../src/lib/loans';
+import { yearReview } from '../src/lib/review';
+
+test('bills: paid when a matching payment follows; reminders for unpaid and expiring plans', () => {
+  const now = new Date(2026, 10, 10, 8).getTime();
+  const l = buildLedger([
+    at('1', 'VM-BESCOM', 'BESCOM bill amount Rs.2,340.00 for RR No 1 is due on 18-11-2026.', new Date(2026, 10, 3).getTime()),
+    at('2', 'AX-LICIND', 'Premium of Rs.25,000 for policy 1 is due on 20-11-2026.', new Date(2026, 10, 4).getTime()),
+    at('3', 'AX-HDFCBK', 'Sent Rs.2,340.00 From HDFC Bank A/C *4821 To bescom@billdesk On 06-11-26 Ref 9. Avl Bal Rs.1,000', new Date(2026, 10, 6).getTime()),
+    at('4', 'JM-JIOINF', 'Your Jio plan expires on 13-11-2026. Recharge now.', new Date(2026, 10, 9).getTime()),
+    at('5', 'VM-IDFCFB', 'Your FASTag balance is Rs.142.50. Please recharge.', new Date(2026, 10, 9).getTime()),
+  ]);
+  const bv = billViews(l.bills, l.transactions, now);
+  assert.equal(bv.find((b) => b.biller === 'BESCOM')!.state, 'paid');
+  assert.equal(bv.find((b) => b.biller === 'LIC')!.state, 'due');
+  const ev = expiryViews(l.expiries, now);
+  assert.equal(ev[0].service, 'Jio');
+  assert.equal(lowFastags(l.accounts).length, 1);
+  assert.ok(!l.accounts.some((a) => a.kind === 'bank' && a.balance === 142.5), 'FASTag is not a bank account');
+  const r = planBillReminders(bv, ev, now);
+  assert.equal(r.filter((x) => /LIC/.test(x.title)).length, 2);
+  assert.ok(!r.some((x) => /BESCOM/.test(x.title)));
+  assert.ok(r.some((x) => /Jio plan expires today/.test(x.title)));
+});
+
+test('price rises on subscriptions and unusually high bills', () => {
+  const now = new Date(2026, 10, 10).getTime();
+  const msgs = [];
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(2026, 10 - i, 6).getTime();
+    msgs.push(at(`n${i}`, 'JD-ICICIT', `INR ${i === 0 ? '799.00' : '649.00'} spent using ICICI Bank Card XX9034 on 06-1${i}-26 on NETFLIX.COM. Avl Limit: INR 50,000`, d));
+    msgs.push(at(`b${i}`, 'VM-BESCOM', `BESCOM bill amount Rs.${i === 0 ? '3,400.00' : '2,000.00'} for RR No 1 is due on 25-1${i}-26.`, new Date(2026, 10 - i, 3).getTime()));
+  }
+  const l = buildLedger(msgs);
+  const ch = priceChanges(l.transactions, l.bills, now);
+  const rise = ch.find((c) => c.kind === 'price-rise')!;
+  assert.ok(rise && /netflix/i.test(rise.name) && rise.from === 649 && rise.to === 799);
+  assert.equal(Math.round(rise.impact), 1800);
+  const sp = ch.find((c) => c.kind === 'bill-spike')!;
+  assert.ok(sp && sp.name === 'BESCOM' && Math.round(sp.pct * 100) === 70);
+});
+
+test('loans: amortisation maths and EMI detection with lender outstanding', () => {
+  // ₹10L at 12% with ₹22,244 EMI is ~60 months
+  assert.ok(Math.abs(monthsToRepay(1_000_000, 0.01, 22_244) - 60) < 0.5);
+  assert.equal(monthsToRepay(100_000, 0.01, 500), Infinity);
+  const pp = prepayImpact(1_000_000, 0.12, 22_244, 200_000);
+  assert.ok(pp.monthsSaved > 12 && pp.interestSaved > 50_000, JSON.stringify(pp));
+  const now = new Date(2026, 10, 10).getTime();
+  const msgs = [at('os', 'AX-HDFCBK', 'Principal outstanding on your Home Loan A/c XX5566 is Rs.24,50,000 as on 01-08-2026.', new Date(2026, 7, 1).getTime())];
+  for (let i = 0; i < 6; i++) {
+    msgs.push(at(`e${i}`, 'AX-HDFCBK', `EMI of Rs.25,000.00 for Home Loan A/c XX5566 debited from A/c XX4821 on 05-0${i + 6}-26. Avl Bal Rs.1,00,000`, new Date(2026, 5 + i, 5).getTime()));
+  }
+  const loans = detectLoans(buildLedger(msgs).transactions, buildLedger(msgs).loanPoints, {}, now);
+  assert.equal(loans.length, 1);
+  const L = loans[0];
+  assert.equal(L.type, 'home');
+  assert.equal(L.emi, 25000);
+  assert.equal(L.outstandingSource, 'sms');
+  assert.ok(L.outstanding! < 2_450_000 && L.outstanding! > 2_400_000, String(L.outstanding));
+  assert.ok(L.monthsLeft! > 100 && L.interestLeft! > 0);
+});
+
+test('year in review', () => {
+  const now = Date.now();
+  const l = buildLedger(demoMessages(now));
+  const r = yearReview(l.transactions, netWorthHistory(l, buildHoldings(l.mfOrders), 12, now), now);
+  assert.ok(r.spent > 0 && r.income > 0 && r.topMerchants.length > 0);
+  assert.ok(r.foodOrders > 10 && r.rides > 10);
+  assert.ok(r.personality.name.startsWith('The '));
+  assert.equal(r.topMerchants[0].merchant, 'rajeshlandlord');
+  assert.ok(r.mostVisited && r.mostVisited.merchant !== 'rajeshlandlord');
+});
+
+test('EMI debit is booked to the paying account, not the loan account', () => {
+  const p = parseSms(sms('AX-HDFCBK', 'EMI of Rs.25,000.00 for Home Loan A/c XX5566 debited from A/c XX4821 on 05-11-26. Avl Bal Rs.1,00,000'));
+  assert.ok(p && p.type === 'txn' && p.last4 === '4821' && p.balance === 100000);
+  const q = parseSms(sms('AX-HDFCBK', 'Sent Rs.250.00 From HDFC Bank A/C *1234 To swiggy@icici On 05-11-26'));
+  assert.ok(q && q.type === 'txn' && q.last4 === '1234');
+});

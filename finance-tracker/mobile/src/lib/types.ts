@@ -1,5 +1,5 @@
 export type Direction = 'debit' | 'credit';
-export type AccountKind = 'bank' | 'credit_card';
+export type AccountKind = 'bank' | 'credit_card' | 'wallet'; // wallet = FASTag
 
 export interface RawSms {
   id: string;

@@ -1,5 +1,5 @@
 import { categorize, type UserRule } from './categorizer';
-import { looksLikeTransactionAlert, parseSms } from './smsParser';
+import { looksLikeTransactionAlert, parseSms, type BillKind } from './smsParser';
 import type { Account, MfOrder, RawSms, Transaction } from './types';
 
 export interface Ledger {
@@ -16,6 +16,21 @@ export interface Ledger {
   cardEvents: { key: string; date: number; kind: 'statement' | 'payment'; amount: number }[];
   /** "Debited but payment failed" alerts, oldest first. */
   failedDebits: FailedDebit[];
+  /** Bills / premiums announced as due, oldest first. */
+  bills: BillNotice[];
+  /** Prepaid plan expiry notices, oldest first. */
+  expiries: { id: string; date: number; service: string; expiresOn: number }[];
+  /** Loan outstanding balances reported by lenders, oldest first. */
+  loanPoints: { lender: string; last4: string; date: number; outstanding: number }[];
+}
+
+export interface BillNotice {
+  id: string;
+  date: number;
+  biller: string;
+  kind: BillKind;
+  amount: number;
+  dueDate: number | null;
 }
 
 export interface FailedDebit {
@@ -49,6 +64,9 @@ export function buildLedger(
   const balancePoints: Ledger['balancePoints'] = [];
   const cardEvents: Ledger['cardEvents'] = [];
   const failedDebits: FailedDebit[] = [];
+  const bills: BillNotice[] = [];
+  const expiries: Ledger['expiries'] = [];
+  const loanPoints: Ledger['loanPoints'] = [];
   const lastSeen = new Map<string, number>();
 
   const account = (institution: string, kind: Account['kind'], last4: string): Account => {
@@ -87,6 +105,24 @@ export function buildLedger(
       continue;
     }
 
+    if (p.type === 'bill') {
+      bills.push({ id: sms.id, date: sms.date, biller: p.biller, kind: p.kind, amount: p.amount, dueDate: p.dueDate });
+      continue;
+    }
+    if (p.type === 'expiry') {
+      expiries.push({ id: sms.id, date: sms.date, service: p.service, expiresOn: p.expiresOn });
+      continue;
+    }
+    if (p.type === 'loan') {
+      loanPoints.push({ lender: p.lender, last4: p.last4, date: sms.date, outstanding: p.outstanding });
+      continue;
+    }
+    if (p.type === 'fastag') {
+      const a = account(p.issuer, 'wallet', '');
+      a.balance = p.balance;
+      a.asOf = sms.date;
+      continue;
+    }
     if (p.type === 'failed') {
       failedDebits.push({ id: sms.id, date: sms.date, amount: p.amount, institution: p.institution, last4: p.last4, mode: p.mode, body: sms.body });
       continue;
@@ -121,7 +157,7 @@ export function buildLedger(
     lastSeen.set(dupKey, sms.date);
     if (prevAt != null && sms.date - prevAt < 600_000) continue;
 
-    const a = account(p.institution, p.accountKind, p.last4);
+    const a = account(p.institution, p.accountKind, p.accountKind === 'wallet' ? '' : p.last4);
     if (p.balance != null) {
       a.balance = p.balance;
       a.asOf = sms.date;
@@ -178,6 +214,9 @@ export function buildLedger(
     balancePoints,
     cardEvents,
     failedDebits,
+    bills,
+    expiries,
+    loanPoints,
   };
 }
 

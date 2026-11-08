@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import Segmented from '../components/Segmented';
+import LoansSection from './sections/LoansSection';
 import TaxSection from './sections/TaxSection';
 
 import { AnimatedNumber, FadeIn } from '../components/anim';
@@ -183,7 +184,7 @@ function PortfolioContent() {
   );
 }
 
-export type InvestView = 'portfolio' | 'tax';
+export type InvestView = 'portfolio' | 'loans' | 'tax';
 
 export default function InvestScreen({ initial = 'portfolio' }: { initial?: InvestView }) {
   const [view, setView] = useState<InvestView>(initial);
@@ -195,12 +196,13 @@ export default function InvestScreen({ initial = 'portfolio' }: { initial?: Inve
           onChange={setView}
           options={[
             { value: 'portfolio', label: 'Portfolio' },
+            { value: 'loans', label: 'Loans' },
             { value: 'tax', label: 'Tax' },
           ]}
         />
       </View>
       <FadeIn key={view} from={10}>
-        {view === 'portfolio' ? <PortfolioContent /> : <TaxSection />}
+        {view === 'portfolio' ? <PortfolioContent /> : view === 'loans' ? <LoansSection /> : <TaxSection />}
       </FadeIn>
     </ScrollView>
   );

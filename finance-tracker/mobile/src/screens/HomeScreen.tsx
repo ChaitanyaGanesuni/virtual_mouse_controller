@@ -11,6 +11,8 @@ import { monthForecast } from '../lib/forecast';
 import { moneyHealth } from '../lib/health';
 import { BudgetsCard, ForecastCard, NetWorthTrend } from '../components/planning';
 import { DigestCard, GoalsCard, GuardBanner } from '../components/weekly';
+import { BillsCard } from '../components/bills';
+import { YearReviewCard } from '../components/YearReview';
 import type { Account } from '../lib/types';
 import { useData } from '../store';
 import { C, F, GRADIENTS } from '../theme';
@@ -19,7 +21,8 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 const short = (n: number) =>
   n >= 1e7 ? `₹${(n / 1e7).toFixed(1)}Cr` : n >= 1e5 ? `₹${(n / 1e5).toFixed(1)}L` : n >= 1e3 ? `₹${(n / 1e3).toFixed(0)}k` : inr(n);
 
-const CARD_GRADIENTS: Record<string, readonly string[]> = {
+const CARD_GRADIENTS: Record<Account['kind'], readonly string[]> = {
+  wallet: ['#78350F', '#422006'],
   bank: ['#1E3A5F', '#0F2742'],
   credit_card: ['#3B1D5E', '#1E1B4B'],
 };
@@ -46,11 +49,11 @@ function AccountCard({ a, index }: { a: Account; index: number }) {
             <T size={13} weight="semibold" lines={1} style={{ flex: 1 }}>
               {a.institution}
             </T>
-            <Icon name={card ? 'card' : 'bank'} size={18} color="rgba(255,255,255,0.7)" />
+            <Icon name={card ? 'card' : a.kind === 'wallet' ? 'car' : 'bank'} size={18} color="rgba(255,255,255,0.7)" />
           </Row>
           <View>
             <T size={11} color="rgba(255,255,255,0.6)">
-              {card ? (owed ? 'Bill due' : 'Card') : 'Available'} ••{a.last4 || '??'}
+              {a.kind === 'wallet' ? 'FASTag balance' : `${card ? (owed ? 'Bill due' : 'Card') : 'Available'} ••${a.last4 || '??'}`}
             </T>
             <T size={20} weight="black" color={owed ? '#FCA5A5' : C.text}>
               {a.balance == null ? '—' : inr(a.balance)}
@@ -221,6 +224,7 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
       </FadeIn>
 
       <ForecastCard f={forecast} index={3} />
+      <BillsCard index={3} />
       <BudgetsCard txns={transactions} budgets={d.budgets} onSave={d.setBudgets} index={3} />
       <GoalsCard index={3} />
       <DigestCard dg={d.digest} index={3} />
@@ -278,6 +282,8 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
           />
         </Card>
       </FadeIn>
+
+      <YearReviewCard r={d.review} index={5} />
 
       {d.waste.length ? (
         <>

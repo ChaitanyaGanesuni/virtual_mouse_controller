@@ -33,6 +33,15 @@ credit-card issuers, UPI apps and mutual-fund registrars (CAMS / KFintech) alrea
   regime; long-term equity gains you can still book tax-free (₹1.25L allowance, FIFO lots); rent receipts PDF for HRA.
 - **Goals & weekly check-in**: savings goals that fill up as your net worth grows (on track / behind), and a Sunday
   evening summary of your week and the bills ahead.
+- **Bills & renewals**: electricity, gas, broadband/phone, DTH and insurance renewals from the biller's own "due on"
+  SMS, marked paid when the payment shows up; prepaid plan expiry (Jio, Airtel, Vi…) and low FASTag balance. Reminders
+  2 days before and on the day, plus instant alerts when the SMS arrives.
+- **Price changes**: subscriptions that got more expensive (e.g. ₹649 → ₹799, with the yearly impact) and bills well
+  above your usual.
+- **Loans**: EMIs grouped into loans (home, car, personal…), outstanding from your lender's SMS (or entered once),
+  interest still ahead, debt-free date, and a prepayment calculator (interest and time saved).
+- **Year in Review**: a story-style recap of your last 12 months (top categories and merchants, fun facts, what you
+  kept, your money personality) that can be shared as an image without any amounts.
 - **Backup & restore**: your fixes, budgets, goals and settings to a file you keep; the app can also hide its
   content in recent apps (and block screenshots) while app lock is on.
 - **App lock**: fingerprint, face or screen-lock PIN on open and after 30 seconds away.
@@ -107,6 +116,8 @@ Project layout:
 | `mobile/src/lib/subscriptions.ts` | Cancel guides and subscription review. |
 | `mobile/src/lib/tax.ts`, `rent.ts` | Deductions, capital gains harvesting, rent receipts. |
 | `mobile/src/lib/goals.ts`, `digest.ts` | Savings goals and the weekly check-in. |
+| `mobile/src/lib/bills.ts`, `anomalies.ts` | Bills/renewals/expiry tracking and price-change detection. |
+| `mobile/src/lib/loans.ts`, `review.ts` | Loan amortisation & prepayment; Year in Review. |
 | `mobile/src/lib/analysis.ts` | Monthly summaries, recurring-payment detection, waste insights. |
 | `mobile/src/lib/investments.ts` | Holdings, live NAVs, XIRR, investment insights. |
 | `mobile/src/screens/*` | Home, Spending, Leaks, Invest, Settings. |
