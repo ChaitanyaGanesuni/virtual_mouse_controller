@@ -4,7 +4,7 @@ import { LayoutAnimation, ScrollView, View } from 'react-native';
 import { AnimatedNumber, FadeIn } from '../components/anim';
 import { CheckArt, LeakArt } from '../components/Illustrations';
 import { Card, CategoryBubble, Chip, Empty, GradientCard, InsightCard, Label, Row, Section, T } from '../components/ui';
-import { findRecurring, inr } from '../lib/analysis';
+import { findRecurring, inr, totalMonthlySaving } from '../lib/analysis';
 import type { Severity } from '../lib/types';
 import { useData } from '../store';
 import { C, F, GRADIENTS, SEVERITY } from '../theme';
@@ -12,7 +12,7 @@ import { C, F, GRADIENTS, SEVERITY } from '../theme';
 export default function InsightsScreen() {
   const d = useData();
   const [filter, setFilter] = useState<Severity | 'all'>('all');
-  const saving = d.waste.reduce((s, i) => s + (i.monthlySaving ?? 0), 0);
+  const saving = totalMonthlySaving(d.waste);
   const lost = d.waste.filter((i) => i.severity === 'high').reduce((s, i) => s + (i.amount ?? 0), 0);
   const recurring = findRecurring(d.ledger.transactions);
   const recurringTotal = recurring.reduce((s, r) => s + r.monthlyCost, 0);

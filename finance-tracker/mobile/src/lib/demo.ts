@@ -14,7 +14,9 @@ export function demoMessages(now = Date.now()): RawSms[] {
     const x = new Date(ms);
     return `${String(x.getDate()).padStart(2, '0')}-${String(x.getMonth() + 1).padStart(2, '0')}-${String(x.getFullYear()).slice(2)}`;
   };
-  const push = (date: number, address: string, body: string) => out.push({ id: String(id++), address, body, date });
+  const push = (date: number, address: string, body: string) => {
+    if (date <= now) out.push({ id: String(id++), address, body, date }); // real SMS are never in the future
+  };
 
   const upi = (date: number, amt: number, vpa: string) => {
     bal -= amt;

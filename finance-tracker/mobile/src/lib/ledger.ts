@@ -8,6 +8,12 @@ export interface Ledger {
   mfOrders: MfOrder[]; // oldest first
   /** Bank/card alerts that look like transactions but could not be parsed. Newest first. */
   missed: RawSms[];
+  /** Messages that made the parser throw; they are skipped so one bad SMS can't break the scan. */
+  failures: { sms: RawSms; error: string }[];
+  /** Every bank balance reported in an SMS, oldest first (for history charts). */
+  balancePoints: { key: string; date: number; balance: number }[];
+  /** Card statements and payments, oldest first. */
+  cardEvents: { key: string; date: number; kind: 'statement' | 'payment'; amount: number }[];
 }
 
 const DAY = 86_400_000;
@@ -24,6 +30,9 @@ export function buildLedger(
   const txns: Transaction[] = [];
   const mfOrders: MfOrder[] = [];
   const missed: RawSms[] = [];
+  const failures: Ledger['failures'] = [];
+  const balancePoints: Ledger['balancePoints'] = [];
+  const cardEvents: Ledger['cardEvents'] = [];
   const seen = new Set<string>();
 
   const account = (institution: string, kind: Account['kind'], last4: string): Account => {
@@ -50,7 +59,13 @@ export function buildLedger(
   };
 
   for (const sms of sorted) {
-    const p = parseSms(sms);
+    let p: ReturnType<typeof parseSms>;
+    try {
+      p = parseSms(sms);
+    } catch (e) {
+      failures.push({ sms, error: e instanceof Error ? e.message : String(e) });
+      continue;
+    }
     if (!p) {
       if (looksLikeTransactionAlert(sms)) missed.push(sms);
       continue;
@@ -68,12 +83,14 @@ export function buildLedger(
       a.dueDate = p.dueDate;
       a.paidSinceStatement = 0;
       a.asOf = sms.date;
+      cardEvents.push({ key: a.key, date: sms.date, kind: 'statement', amount: p.amountDue });
       continue;
     }
     if (p.type === 'balance') {
       const a = account(p.institution, 'bank', p.last4);
       a.balance = p.balance;
       a.asOf = sms.date;
+      balancePoints.push({ key: a.key, date: sms.date, balance: p.balance });
       continue;
     }
 
@@ -86,14 +103,16 @@ export function buildLedger(
     if (p.balance != null) {
       a.balance = p.balance;
       a.asOf = sms.date;
+      if (a.kind === 'bank') balancePoints.push({ key: a.key, date: sms.date, balance: p.balance });
     }
     if (p.availableLimit != null) {
       a.availableLimit = p.availableLimit;
       a.asOf = sms.date;
     }
     // Payments and refunds credited to a card after its statement reduce what is still due.
-    if (a.kind === 'credit_card' && p.direction === 'credit' && a.statementDate != null) {
-      a.paidSinceStatement += p.amount;
+    if (a.kind === 'credit_card' && p.direction === 'credit') {
+      if (a.statementDate != null) a.paidSinceStatement += p.amount;
+      cardEvents.push({ key: a.key, date: sms.date, kind: 'payment', amount: p.amount });
     }
 
     txns.push({
@@ -127,6 +146,9 @@ export function buildLedger(
     accounts: [...accounts.values()].sort((x, y) => x.kind.localeCompare(y.kind) || x.institution.localeCompare(y.institution)),
     mfOrders,
     missed: missed.reverse(),
+    failures,
+    balancePoints,
+    cardEvents,
   };
 }
 

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Animated, Linking, ScrollView, Share, Switch, View, type LayoutChangeEvent } from 'react-native';
 
 import { FadeIn, PressScale, tap } from '../components/anim';
+import { canUseDeviceLock, verifyOwner } from '../components/guards';
+import { clearErrors, formatErrors, getErrors, type LoggedError } from '../errorLog';
 import Icon, { type IconName } from '../components/Icon';
 import { ShieldArt } from '../components/Illustrations';
 import { Button, Card, IconBubble, Label, Pill, Row, Section, Sheet, T } from '../components/ui';
@@ -113,6 +115,23 @@ export default function SettingsScreen() {
   const a = d.assumptions;
   const al = d.alertPrefs;
   const [showMissed, setShowMissed] = useState(false);
+  const [errors, setErrors] = useState<LoggedError[]>([]);
+  const [lockMsg, setLockMsg] = useState<string | null>(null);
+  useEffect(() => {
+    getErrors().then(setErrors);
+  }, [d.lastSync]);
+  const toggleLock = async (on: boolean) => {
+    tap();
+    setLockMsg(null);
+    if (on) {
+      if (!(await canUseDeviceLock())) {
+        setLockMsg('Set up a fingerprint, face unlock or screen-lock PIN on your phone first.');
+        return;
+      }
+      if (!(await verifyOwner('Confirm to turn on app lock'))) return;
+    }
+    d.setAppLock(on);
+  };
   const missed = d.ledger.missed;
   const setAl = (p: Partial<AlertPrefs>) => d.setAlertPrefs({ ...al, ...p });
   const set = (patch: Partial<Assumptions>) => d.setAssumptions({ ...a, ...patch });
@@ -261,6 +280,59 @@ export default function SettingsScreen() {
         </Card>
       </FadeIn>
 
+      <Section title="Security" />
+      <FadeIn index={4}>
+        <Card>
+          <SettingRow
+            icon="lock"
+            color={C.violet}
+            title="App lock"
+            sub="Fingerprint, face or PIN when opening, and after 30 s away"
+            last
+            right={<Switch value={d.appLock} onValueChange={toggleLock} {...sw} />}
+          />
+          {lockMsg ? (
+            <T size={12.5} color={C.amber} style={{ marginTop: 6 }}>
+              {lockMsg}
+            </T>
+          ) : null}
+        </Card>
+      </FadeIn>
+
+      <Section title="Problem log" />
+      <FadeIn index={4}>
+        <Card>
+          <Row>
+            <IconBubble icon={errors.length ? 'alert' : 'check'} color={errors.length ? C.amber : C.green} size={40} />
+            <T size={13.5} color={C.sub} style={{ flex: 1, marginLeft: 12 }}>
+              {errors.length
+                ? `${errors.length} problem${errors.length > 1 ? 's' : ''} recorded on this phone (last: ${new Date(errors[0].at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}). Sharing the log helps get them fixed.`
+                : 'No problems recorded. If something ever breaks, details are saved here (on this phone only).'}
+            </T>
+          </Row>
+          {errors.length ? (
+            <Row style={{ gap: 10 }}>
+              <Button
+                label="Clear"
+                icon="x"
+                kind="ghost"
+                style={{ flex: 1 }}
+                onPress={async () => {
+                  await clearErrors();
+                  setErrors([]);
+                }}
+              />
+              <Button
+                label="Share"
+                icon="share"
+                style={{ flex: 1 }}
+                onPress={() => Share.share({ title: 'Paisa Watch problem log', message: 'Paisa Watch problem log (numbers masked):\n\n' + formatErrors(errors) })}
+              />
+            </Row>
+          ) : null}
+        </Card>
+      </FadeIn>
+
       <Section title="Privacy" />
       <FadeIn index={4}>
         <Card>
@@ -286,7 +358,7 @@ export default function SettingsScreen() {
       </FadeIn>
 
       <T size={11} color={C.faint} style={{ textAlign: 'center', marginTop: 8, fontFamily: F.medium }}>
-        Paisa Watch 2.0
+        Paisa Watch 3.0
       </T>
 
       <Sheet visible={showMissed} onClose={() => setShowMissed(false)} title={`Unread alerts (${missed.length})`}>

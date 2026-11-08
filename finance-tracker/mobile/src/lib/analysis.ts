@@ -154,6 +154,7 @@ export function wasteInsights(all: Transaction[], now = Date.now(), windowDays =
       severity: 'high',
       amount: sum(fees),
       monthlySaving: sum(fees) / months,
+      savingKey: 'Fees & Charges',
       transactionIds: fees.map((t) => t.id),
     });
   }
@@ -178,6 +179,7 @@ export function wasteInsights(all: Transaction[], now = Date.now(), windowDays =
       severity: monthly > 2000 || streaming.length >= 3 ? 'medium' : 'low',
       amount: monthly * months,
       monthlySaving: streaming.length >= 2 ? streaming.slice(1).reduce((s, r) => s + r.monthlyCost, 0) : monthly * 0.25,
+      savingKey: 'Subscriptions',
       transactionIds: rec.flatMap((r) => r.ids),
     });
   }
@@ -197,6 +199,7 @@ export function wasteInsights(all: Transaction[], now = Date.now(), windowDays =
       severity: share > 0.12 ? 'high' : share > 0.06 ? 'medium' : 'low',
       amount: total,
       monthlySaving: (total / months) * 0.5 * 0.6,
+      savingKey: 'Food Delivery',
       transactionIds: food.map((t) => t.id),
     });
   }
@@ -211,6 +214,7 @@ export function wasteInsights(all: Transaction[], now = Date.now(), windowDays =
       severity: 'medium',
       amount: sum(dining),
       monthlySaving: (sum(dining) / months) * 0.3,
+      savingKey: 'Dining Out',
       transactionIds: dining.map((t) => t.id),
     });
   }
@@ -225,21 +229,8 @@ export function wasteInsights(all: Transaction[], now = Date.now(), windowDays =
       severity: sum(cabs) / totalSpend > 0.1 ? 'medium' : 'low',
       amount: sum(cabs),
       monthlySaving: (sum(cabs) / months) * 0.35,
+      savingKey: 'Cabs',
       transactionIds: cabs.map((t) => t.id),
-    });
-  }
-
-  // 6. Small impulse purchases.
-  const small = spend.filter((t) => DISCRETIONARY.has(t.category) && t.amount < 500);
-  if (small.length >= 20) {
-    insights.push({
-      id: 'impulse',
-      title: `${small.length} small purchases added up to ${inr(sum(small))}`,
-      detail: `Purchases under ₹500 in discretionary categories (${Math.round(small.length / months)} a month). Individually tiny, together ${inr(sum(small) / months)}/month. A 24-hour rule before non-essential buys helps.`,
-      severity: 'low',
-      amount: sum(small),
-      monthlySaving: (sum(small) / months) * 0.4,
-      transactionIds: small.map((t) => t.id),
     });
   }
 
@@ -253,6 +244,7 @@ export function wasteInsights(all: Transaction[], now = Date.now(), windowDays =
       severity: 'high',
       amount: sum(betting),
       monthlySaving: sum(betting) / months,
+      savingKey: 'betting',
       transactionIds: betting.map((t) => t.id),
     });
   }
@@ -267,6 +259,7 @@ export function wasteInsights(all: Transaction[], now = Date.now(), windowDays =
       severity: 'medium',
       amount: sum(shop),
       monthlySaving: (sum(shop) / months) * 0.25,
+      savingKey: 'Shopping',
       transactionIds: shop.map((t) => t.id),
     });
   }
@@ -300,10 +293,39 @@ export function wasteInsights(all: Transaction[], now = Date.now(), windowDays =
         severity: 'medium',
         amount: recent - base,
         monthlySaving: recent - base,
+        savingKey: c,
       });
     }
   }
 
+  // 11. Small impulse purchases (runs last so it can skip categories flagged above).
+  // Categories that already have their own insight are left out, so the same money isn't counted twice.
+  const flagged = new Set(insights.map((i) => i.savingKey));
+  const small = spend.filter((t) => DISCRETIONARY.has(t.category) && !flagged.has(t.category) && t.amount < 500);
+  if (small.length >= 20) {
+    insights.push({
+      id: 'impulse',
+      title: `${small.length} small purchases added up to ${inr(sum(small))}`,
+      detail: `Purchases under ₹500 in discretionary categories (${Math.round(small.length / months)} a month). Individually tiny, together ${inr(sum(small) / months)}/month. A 24-hour rule before non-essential buys helps.`,
+      severity: 'low',
+      amount: sum(small),
+      monthlySaving: (sum(small) / months) * 0.4,
+      savingKey: 'impulse',
+      transactionIds: small.map((t) => t.id),
+    });
+  }
+
   const order = { high: 0, medium: 1, low: 2 };
   return insights.sort((a, b) => order[a.severity] - order[b.severity] || (b.monthlySaving ?? 0) - (a.monthlySaving ?? 0));
+}
+
+/** Total monthly saving across insights, counting money that several insights describe only once. */
+export function totalMonthlySaving(insights: Insight[]): number {
+  const best = new Map<string, number>();
+  for (const i of insights) {
+    if (!i.monthlySaving) continue;
+    const k = i.savingKey ?? i.id;
+    best.set(k, Math.max(best.get(k) ?? 0, i.monthlySaving));
+  }
+  return [...best.values()].reduce((s, v) => s + v, 0);
 }

@@ -75,5 +75,7 @@ export interface Insight {
   amount?: number;
   /** Estimated saving per month if acted on. */
   monthlySaving?: number;
+  /** Insights sharing a key describe the same money; only the largest saving per key is totalled. */
+  savingKey?: string;
   transactionIds?: string[];
 }

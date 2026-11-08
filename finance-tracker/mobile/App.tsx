@@ -10,10 +10,12 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, Easing, Platform, UIManager, View, type LayoutChangeEvent } from 'react-native';
+import { Animated, AppState, Easing, Platform, UIManager, View, type LayoutChangeEvent } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FadeIn, PressScale, Pulse } from './src/components/anim';
+import { ErrorBoundary, LockScreen } from './src/components/guards';
+import { installGlobalErrorHandler } from './src/errorLog';
 import Icon, { type IconName } from './src/components/Icon';
 import { T } from './src/components/ui';
 import HomeScreen from './src/screens/HomeScreen';
@@ -29,6 +31,9 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 SplashScreen.setOptions?.({ duration: 400, fade: true });
 SystemUI.setBackgroundColorAsync(C.bg).catch(() => {});
 if (Platform.OS === 'android') UIManager.setLayoutAnimationEnabledExperimental?.(true);
+installGlobalErrorHandler();
+
+const RELOCK_AFTER_MS = 30_000;
 
 const TABS: { key: Tab; label: string; icon: IconName; title: string }[] = [
   { key: 'home', label: 'Home', icon: 'home', title: 'Overview' },
@@ -138,6 +143,26 @@ function Shell() {
   const meta = TABS.find((t) => t.key === tab)!;
   const highLeaks = d.waste.filter((i) => i.severity === 'high').length;
 
+  // App lock: lock on start, and again after 30 s in the background.
+  const [locked, setLocked] = useState(true);
+  const [lockChecked, setLockChecked] = useState(false);
+  const leftAt = useRef(0);
+  useEffect(() => {
+    if (d.loading && !lockChecked) return;
+    if (!lockChecked) {
+      setLockChecked(true);
+      setLocked(d.appLock);
+    }
+  }, [d.loading, d.appLock, lockChecked]);
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (s) => {
+      if (s === 'background') leftAt.current = Date.now();
+      if (s === 'active' && d.appLock && leftAt.current && Date.now() - leftAt.current > RELOCK_AFTER_MS) setLocked(true);
+    });
+    return () => sub.remove();
+  }, [d.appLock]);
+  const showLock = d.appLock && locked && lockChecked;
+
   if (!d.loading && d.source === 'none') return <OnboardingScreen />;
 
   return (
@@ -165,6 +190,7 @@ function Shell() {
         {tab === 'settings' && <SettingsScreen />}
       </FadeIn>
       <TabBar tab={tab} onChange={setTab} badge={highLeaks} />
+      {showLock ? <LockScreen onUnlock={() => setLocked(false)} /> : null}
     </View>
   );
 }
@@ -179,9 +205,11 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <DataProvider>
-        <Shell />
-      </DataProvider>
+      <ErrorBoundary>
+        <DataProvider>
+          <Shell />
+        </DataProvider>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }

@@ -163,3 +163,91 @@ export function Progress({ value, color, height = 8, delay = 0 }: { value: numbe
     </View>
   );
 }
+
+/** Circular progress ring (budgets). Turns amber past 80% and red past 100%. */
+export function Ring({ pct, size = 64, stroke = 7, children }: { pct: number; size?: number; stroke?: number; children?: ReactNode }) {
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+  const shown = Math.max(0, Math.min(1, pct));
+  const color = pct >= 1 ? C.red : pct >= 0.8 ? C.amber : C.green;
+  const p = useProgress([shown], 1000, 200);
+  const offset = p.interpolate({ inputRange: [0, 1], outputRange: [circ, circ * (1 - shown)] });
+  return (
+    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+      <Svg width={size} height={size} style={{ position: 'absolute', transform: [{ rotate: '-90deg' }] }}>
+        <Circle cx={size / 2} cy={size / 2} r={r} stroke={C.cardHi} strokeWidth={stroke} fill="none" />
+        <AnimatedCircle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke={color}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          fill="none"
+          strokeDasharray={`${circ} ${circ}`}
+          strokeDashoffset={offset}
+        />
+      </Svg>
+      {children}
+    </View>
+  );
+}
+
+/** Smooth area chart whose line draws in from the left, with a dot on the latest value. */
+export function LineChart({
+  values,
+  width,
+  height = 120,
+  color = C.green,
+}: {
+  values: number[];
+  width: number;
+  height?: number;
+  color?: string;
+}) {
+  const p = useProgress([values.join(',')], 1300, 200);
+  if (values.length < 2 || width <= 0) return <View style={{ height }} />;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const span = max - min || Math.abs(max) || 1;
+  const pad = 8;
+  const pts = values.map((v, i) => [
+    pad + (i / (values.length - 1)) * (width - pad * 2),
+    pad + (1 - (v - min) / span) * (height - pad * 2),
+  ]);
+  // Catmull-Rom → cubic Bézier for a smooth curve through every point.
+  let d = `M ${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 0; i < pts.length - 1; i++) {
+    const p0 = pts[i - 1] ?? pts[i];
+    const p1 = pts[i];
+    const p2 = pts[i + 1];
+    const p3 = pts[i + 2] ?? p2;
+    const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C ${c1[0]} ${c1[1]}, ${c2[0]} ${c2[1]}, ${p2[0]} ${p2[1]}`;
+  }
+  const area = `${d} L ${pts[pts.length - 1][0]} ${height} L ${pts[0][0]} ${height} Z`;
+  const len = width * 2.5; // generous upper bound on the curve length
+  const last = pts[pts.length - 1];
+  return (
+    <Svg width={width} height={height}>
+      <Defs>
+        <LinearGradient id="area" x1="0" y1="0" x2="0" y2="1">
+          <Stop offset="0" stopColor={color} stopOpacity="0.35" />
+          <Stop offset="1" stopColor={color} stopOpacity="0" />
+        </LinearGradient>
+      </Defs>
+      <AnimatedPath d={area} fill="url(#area)" opacity={p} />
+      <AnimatedPath
+        d={d}
+        stroke={color}
+        strokeWidth={3}
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray={`${len} ${len}`}
+        strokeDashoffset={p.interpolate({ inputRange: [0, 1], outputRange: [len, 0] })}
+      />
+      <AnimatedCircle cx={last[0]} cy={last[1]} r={5} fill={color} stroke={C.card} strokeWidth={2.5} opacity={p} />
+    </Svg>
+  );
+}

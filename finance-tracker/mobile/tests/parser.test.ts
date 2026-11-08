@@ -198,3 +198,84 @@ test('money health score is 0-100 and penalises fees and regular plans', () => {
   assert.ok(h.parts.find((p) => p.key === 'costs')!.score < 10);
   assert.equal(moneyHealth([], [], [], now), null);
 });
+
+import { totalMonthlySaving } from '../src/lib/analysis';
+
+test('total saving counts overlapping insights once', () => {
+  const now = Date.now();
+  const w = wasteInsights(buildLedger(demoMessages(now)).transactions, now);
+  const naive = w.reduce((s, i) => s + (i.monthlySaving ?? 0), 0);
+  const total = totalMonthlySaving(w);
+  assert.ok(total > 0 && total <= naive);
+  const byKey = new Map<string, number>();
+  for (const i of w) byKey.set(i.savingKey ?? i.id, (byKey.get(i.savingKey ?? i.id) ?? 0) + 1);
+  assert.ok([...byKey.values()].some((n) => n > 1) ? total < naive : total === naive);
+  assert.equal(totalMonthlySaving([
+    { id: 'a', title: '', detail: '', severity: 'low', monthlySaving: 100, savingKey: 'Dining Out' },
+    { id: 'b', title: '', detail: '', severity: 'low', monthlySaving: 300, savingKey: 'Dining Out' },
+    { id: 'c', title: '', detail: '', severity: 'low', monthlySaving: 50 },
+  ]), 350);
+});
+
+test('health score without income leaves income parts unscored instead of zero', () => {
+  const now = Date.now();
+  const l = buildLedger(demoMessages(now));
+  const noIncome = l.transactions.filter((t) => t.direction !== 'credit');
+  const h = moneyHealth(noIncome, l.accounts, [], now)!;
+  assert.ok(h.partial && /savings rate/.test(h.partial));
+  assert.ok(h.parts.filter((p) => p.unknown).length === 3);
+  assert.ok(h.score > 0 && h.score <= 100);
+});
+
+test('a message that breaks the parser is skipped and reported, not fatal', () => {
+  const bad = { id: 'x', address: 'AX-HDFCBK', body: null as unknown as string, date: Date.now() };
+  const good = { id: 'y', address: 'AX-HDFCBK', body: 'Sent Rs.250.00 From HDFC Bank A/C *1234 To swiggy@icici On 05-11-26 Ref 1. Avl Bal Rs.100', date: Date.now() };
+  const l = buildLedger([bad, good]);
+  assert.equal(l.failures.length, 1);
+  assert.equal(l.transactions.length, 1);
+});
+
+import { budgetAlerts, budgetStatus, suggestBudgets } from '../src/lib/budgets';
+import { monthForecast } from '../src/lib/forecast';
+import { netWorthHistory } from '../src/lib/history';
+
+test('budgets: suggestions, status, alerts once per threshold', () => {
+  const now = Date.now();
+  const l = buildLedger(demoMessages(now));
+  const sug = suggestBudgets(l.transactions, now);
+  assert.ok(sug['Food Delivery'] > 0 && sug['Food Delivery'] % 500 === 0, JSON.stringify(sug));
+  assert.ok(!('Card Bill Payment' in sug) && !('Investments' in sug));
+  const st = budgetStatus(l.transactions, { 'Rent & Housing': 30000, Groceries: 1e9 }, now);
+  const rent = st.find((s) => s.category === 'Rent & Housing')!;
+  const day = new Date(now).getDate();
+  if (day >= 4) {
+    assert.ok(rent.pct >= 1);
+    const a = budgetAlerts(st, [], now);
+    assert.equal(a.length, 1);
+    assert.match(a[0].title, /used up/);
+    assert.equal(budgetAlerts(st, [a[0].key], now).length, 0);
+  }
+});
+
+test('forecast: projected >= spent so far, upcoming recurring within month', () => {
+  const now = new Date(2026, 10, 8, 12).getTime();
+  const f = monthForecast(buildLedger(demoMessages(now)).transactions, now);
+  assert.ok(f.projectedSpend >= f.spentSoFar);
+  assert.ok(f.dailyRate > 0);
+  assert.equal(f.expectedIncome, 145000);
+  assert.ok(f.upcoming.every((u) => u.date > now && u.date <= f.monthEnd));
+  const names = f.upcoming.map((u) => u.merchant);
+  assert.ok(names.some((m) => /spotify/i.test(m)), JSON.stringify(names)); // charged 9 Oct -> due 9 Nov
+  assert.ok(!names.some((m) => /netflix/i.test(m))); // already charged 6 Nov
+  assert.equal(new Date(f.upcoming.find((u) => /spotify/i.test(u.merchant))!.date).getDate(), 9);
+});
+
+test('net worth history: one point per month end plus today', () => {
+  const now = Date.now();
+  const l = buildLedger(demoMessages(now));
+  const h = netWorthHistory(l, buildHoldings(l.mfOrders), 12, now);
+  assert.ok(h.length >= 6 && h.length <= 12, String(h.length));
+  for (let i = 1; i < h.length; i++) assert.ok(h[i].date > h[i - 1].date);
+  assert.ok(h.every((p) => Number.isFinite(p.net)));
+  assert.ok(h[h.length - 1].investments > h[0].investments);
+});

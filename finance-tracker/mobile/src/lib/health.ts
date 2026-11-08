@@ -9,12 +9,16 @@ export interface HealthPart {
   score: number; // 0..max
   max: number;
   note: string;
+  /** Not scored because the data it needs (e.g. income) wasn't found in your SMS. */
+  unknown?: boolean;
 }
 
 export interface Health {
   score: number; // 0..100
   grade: 'Excellent' | 'Good' | 'Fair' | 'Needs work';
   parts: HealthPart[];
+  /** Set when some parts couldn't be scored; the score is scaled from the parts that could. */
+  partial?: string;
 }
 
 const clamp = (v: number, lo = 0, hi = 1) => Math.max(lo, Math.min(hi, v));
@@ -45,7 +49,8 @@ export function moneyHealth(txns: Transaction[], accounts: Account[], holdings: 
       label: 'Savings rate',
       max: 30,
       score: Math.round(30 * clamp(savingsRate / 0.3)),
-      note: income > 0 ? `${Math.round(savingsRate * 100)}% of income kept (aim 30%)` : 'No income detected yet',
+      note: income > 0 ? `${Math.round(savingsRate * 100)}% of income kept (aim 30%)` : 'Salary/income alerts not found in your SMS',
+      unknown: income <= 0,
     },
     {
       key: 'fees',
@@ -66,17 +71,24 @@ export function moneyHealth(txns: Transaction[], accounts: Account[], holdings: 
       label: 'Investing habit',
       max: 20,
       score: Math.round(20 * clamp(investRate / 0.2)),
-      note: income > 0 ? `${Math.round(investRate * 100)}% of income invested (aim 20%)` : 'No income detected yet',
+      note: income > 0 ? `${Math.round(investRate * 100)}% of income invested (aim 20%)` : 'Salary/income alerts not found in your SMS',
+      unknown: income <= 0,
     },
     {
       key: 'costs',
       label: 'Fund costs',
       max: 10,
       score: Math.round(10 * clamp(1 - regularShare)),
-      note: mfValue > 0 ? (regularShare > 0 ? `${Math.round(regularShare * 100)}% in Regular plans` : 'All in Direct plans') : 'No funds tracked yet',
+      note: mfValue > 0 ? (regularShare > 0 ? `${Math.round(regularShare * 100)}% in Regular plans` : 'All in Direct plans') : 'No mutual funds found yet',
+      unknown: mfValue <= 0,
     },
   ];
-  const score = parts.reduce((s, p) => s + p.score, 0);
+  // Parts we can't measure are left out and the rest scaled to 100, instead of counting as zero.
+  const known = parts.filter((p) => !p.unknown);
+  const knownMax = known.reduce((s, p) => s + p.max, 0);
+  for (const p of parts) if (p.unknown) p.score = 0;
+  const score = knownMax > 0 ? Math.round((known.reduce((s, p) => s + p.score, 0) / knownMax) * 100) : 0;
+  const missing = parts.filter((p) => p.unknown).map((p) => p.label.toLowerCase());
   const grade = score >= 80 ? 'Excellent' : score >= 60 ? 'Good' : score >= 40 ? 'Fair' : 'Needs work';
-  return { score, grade, parts };
+  return { score, grade, parts, partial: missing.length ? `Not scored yet: ${missing.join(', ')}` : undefined };
 }

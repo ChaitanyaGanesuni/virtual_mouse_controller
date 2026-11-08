@@ -6,8 +6,11 @@ import { AnimatedNumber, FadeIn, PressScale, Skeleton } from '../components/anim
 import { Bars, Gauge, Progress } from '../components/charts';
 import Icon from '../components/Icon';
 import { Card, GradientCard, InsightCard, Label, Pill, Row, Section, Stat, T } from '../components/ui';
-import { inr, isSpend, monthlySummary } from '../lib/analysis';
+import { inr, isSpend, monthlySummary, totalMonthlySaving } from '../lib/analysis';
+import { monthForecast } from '../lib/forecast';
 import { moneyHealth } from '../lib/health';
+import { netWorthHistory } from '../lib/history';
+import { BudgetsCard, ForecastCard, NetWorthTrend } from '../components/planning';
 import type { Account } from '../lib/types';
 import { useData } from '../store';
 import { C, F, GRADIENTS } from '../theme';
@@ -79,8 +82,10 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
   const months = monthlySummary(transactions);
   const now = months[months.length - 1];
   const prev = months[months.length - 2];
-  const saving = d.waste.reduce((s, i) => s + (i.monthlySaving ?? 0), 0);
+  const saving = totalMonthlySaving(d.waste);
   const health = moneyHealth(transactions, accounts, d.holdings);
+  const forecast = monthForecast(transactions);
+  const history = netWorthHistory(d.ledger, d.holdings);
   const healthColor = !health ? C.sub : health.score >= 80 ? C.green : health.score >= 60 ? C.teal : health.score >= 40 ? C.amber : C.red;
   // Compare with last month up to the same day, so early-month rent doesn't look like a spike.
   const today = new Date();
@@ -151,6 +156,11 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
                 </T>
               </View>
             </View>
+            {health.partial ? (
+              <T size={11.5} color={C.amber} style={{ textAlign: 'center', marginTop: 6 }}>
+                {health.partial}
+              </T>
+            ) : null}
             {showHealth ? (
               <View style={{ marginTop: 16 }}>
                 {health.parts.map((p, i) => (
@@ -160,10 +170,14 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
                         {p.label}
                       </T>
                       <T size={12} color={C.sub}>
-                        {p.score}/{p.max}
+                        {p.unknown ? 'not scored' : `${p.score}/${p.max}`}
                       </T>
                     </Row>
-                    <Progress value={p.score / p.max} color={p.score / p.max > 0.66 ? C.green : p.score / p.max > 0.33 ? C.amber : C.red} delay={i * 80} />
+                    <Progress
+                      value={p.unknown ? 0 : p.score / p.max}
+                      color={p.score / p.max > 0.66 ? C.green : p.score / p.max > 0.33 ? C.amber : C.red}
+                      delay={i * 80}
+                    />
                     <T size={12} color={C.sub} style={{ marginTop: 4 }}>
                       {p.note}
                     </T>
@@ -204,6 +218,9 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
         </Card>
       </FadeIn>
 
+      <ForecastCard f={forecast} index={3} />
+      <BudgetsCard txns={transactions} budgets={d.budgets} onSave={d.setBudgets} index={3} />
+
       {saving > 0 ? (
         <FadeIn index={3}>
           <PressScale onPress={() => go('insights')}>
@@ -240,6 +257,8 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
           </ScrollView>
         </>
       ) : null}
+
+      <NetWorthTrend points={history} index={4} />
 
       <Section title="Last 6 months" action="Details" onAction={() => go('spending')} />
       <FadeIn index={4}>

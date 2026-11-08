@@ -16,6 +16,15 @@ credit-card issuers, UPI apps and mutual-fund registrars (CAMS / KFintech) alrea
   re-armed after a phone restart and stop once the bill is paid.
 - **Unread alerts**: bank messages that look like transactions but couldn't be read are listed in Settings, and can
   be shared with long numbers masked so support can be added.
+- **Budgets**: a monthly limit per category (smart suggestions from your last 3 months) with progress rings,
+  plus an overall limit tracked in real time. Alerts fire at 80% and 100%.
+- **Month-end forecast**: likely spend by month end (spent so far + bills still due + your usual daily rate),
+  and how much you'll have left after spending and investing.
+- **Net-worth trend**: month-end net worth rebuilt from SMS balances, card statements and fund purchases.
+- **Money Health score** (0–100): savings rate, fees, emergency cushion, investing habit and fund costs.
+  Parts that can't be measured yet (e.g. no salary SMS) are left out instead of counted as zero.
+- **App lock**: fingerprint, face or screen-lock PIN on open and after 30 seconds away.
+- **Problem log**: errors are recorded on the phone only and can be shared (numbers masked).
 - **Investments**: mutual-fund holdings built from allotment SMS, valued at live NAVs (mfapi.in / AMFI), with gain,
   XIRR and asset allocation.
 - **How to invest better**: Regular-to-Direct plan switches (with the 10-year cost), idle cash beyond your
@@ -78,6 +87,10 @@ Project layout:
 | `mobile/src/lib/ledger.ts` | Builds transactions, accounts and balances. Pairs self-transfers and card bill payments. |
 | `mobile/src/lib/reminders.ts` | Plans card-bill reminders from statement due dates. |
 | `mobile/src/lib/dates.ts` | Parses the date formats Indian banks use. |
+| `mobile/src/lib/budgets.ts` | Budget suggestions, status and 80%/100% alerts. |
+| `mobile/src/lib/forecast.ts` | Month-end spending and cash-left projection. |
+| `mobile/src/lib/history.ts` | Month-end net-worth history rebuilt from SMS. |
+| `mobile/src/lib/health.ts` | Money Health score. |
 | `mobile/src/lib/analysis.ts` | Monthly summaries, recurring-payment detection, waste insights. |
 | `mobile/src/lib/investments.ts` | Holdings, live NAVs, XIRR, investment insights. |
 | `mobile/src/screens/*` | Home, Spending, Leaks, Invest, Settings. |

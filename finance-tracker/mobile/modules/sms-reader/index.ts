@@ -14,6 +14,8 @@ interface SmsReaderNative {
   setAlertPrefs(mode: AlertMode, largeAmount: number, recurring: string[]): void;
   scheduleReminders(json: string): void;
   canNotify(): boolean;
+  setBudgetState(monthKey: string, spent: number, limit: number): void;
+  notify(id: number, title: string, text: string): void;
 }
 
 const native = requireOptionalNativeModule<SmsReaderNative>('SmsReader');
@@ -36,4 +38,13 @@ export function scheduleReminders(reminders: Reminder[]): void {
 
 export function canNotify(): boolean {
   return native?.canNotify() ?? false;
+}
+
+/** Seeds the background receiver's running total for real-time overall-budget alerts. */
+export function setBudgetState(monthKey: string, spent: number, limit: number): void {
+  native?.setBudgetState(monthKey, spent, limit);
+}
+
+export function notifyNow(id: number, title: string, text: string): void {
+  native?.notify(id, title, text);
 }
