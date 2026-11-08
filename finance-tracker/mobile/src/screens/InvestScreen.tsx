@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { Animated, ScrollView, View } from 'react-native';
+import { useScreenScroll } from '../themeContext';
 
 import Segmented from '../components/Segmented';
 import LoansSection from './sections/LoansSection';
@@ -16,12 +17,12 @@ import { useData } from '../store';
 import { C, F, GRADIENTS } from '../theme';
 
 const DAY = 86_400_000;
-const ASSET = {
+const assetMeta = () => ({
   equity: { label: 'Equity', color: C.blue },
   debt: { label: 'Debt', color: C.green },
   hybrid: { label: 'Hybrid', color: C.violet },
   gold: { label: 'Gold', color: C.amber },
-};
+});
 
 function PortfolioContent() {
   const d = useData();
@@ -68,15 +69,15 @@ function PortfolioContent() {
               <Donut
                 size={130}
                 thickness={16}
-                data={allocParts.map((k) => ({ value: alloc[k], color: ASSET[k].color }))}
+                data={allocParts.map((k) => ({ value: alloc[k], color: assetMeta()[k].color }))}
                 center={<Icon name="pie" size={22} color={C.sub} />}
               />
               <View style={{ flex: 1, marginLeft: 18 }}>
                 {allocParts.map((k) => (
                   <Row key={k} style={{ marginVertical: 5 }}>
-                    <View style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: ASSET[k].color }} />
+                    <View style={{ width: 10, height: 10, borderRadius: 3, backgroundColor: assetMeta()[k].color }} />
                     <T size={13.5} style={{ flex: 1, marginLeft: 8 }}>
-                      {ASSET[k].label}
+                      {assetMeta()[k].label}
                     </T>
                     <T size={13.5} weight="bold">
                       {Math.round((alloc[k] / value) * 100)}%
@@ -116,13 +117,13 @@ function PortfolioContent() {
           <FadeIn key={x.scheme + x.folio} index={3 + i}>
             <Card>
               <Row style={{ alignItems: 'flex-start' }}>
-                <View style={{ width: 4, alignSelf: 'stretch', borderRadius: 2, backgroundColor: ASSET[x.assetClass].color, marginRight: 12 }} />
+                <View style={{ width: 4, alignSelf: 'stretch', borderRadius: 2, backgroundColor: assetMeta()[x.assetClass].color, marginRight: 12 }} />
                 <View style={{ flex: 1 }}>
                   <T size={14.5} weight="semibold">
                     {x.scheme}
                   </T>
                   <Row style={{ marginTop: 6, flexWrap: 'wrap', gap: 6 }}>
-                    <Pill text={ASSET[x.assetClass].label} color={ASSET[x.assetClass].color} />
+                    <Pill text={assetMeta()[x.assetClass].label} color={assetMeta()[x.assetClass].color} />
                     {x.plan === 'regular' ? <Pill text="Regular plan · high fees" color={C.red} icon="alert" /> : null}
                     {x.plan === 'direct' ? <Pill text="Direct" color={C.green} icon="check" /> : null}
                   </Row>
@@ -187,9 +188,10 @@ function PortfolioContent() {
 export type InvestView = 'portfolio' | 'loans' | 'tax';
 
 export default function InvestScreen({ initial = 'portfolio' }: { initial?: InvestView }) {
+  const scroll = useScreenScroll();
   const [view, setView] = useState<InvestView>(initial);
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+    <Animated.ScrollView {...scroll} contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
       <View style={{ marginTop: -10, marginBottom: 12 }}>
         <Segmented
           value={view}
@@ -204,6 +206,6 @@ export default function InvestScreen({ initial = 'portfolio' }: { initial?: Inve
       <FadeIn key={view} from={10}>
         {view === 'portfolio' ? <PortfolioContent /> : view === 'loans' ? <LoansSection /> : <TaxSection />}
       </FadeIn>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }

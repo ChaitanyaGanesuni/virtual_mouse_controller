@@ -3,7 +3,8 @@ import Segmented from '../components/Segmented';
 import { PriceChangesSection } from '../components/bills';
 import GuardSection from './sections/GuardSection';
 import SubscriptionsSection from './sections/SubscriptionsSection';
-import { LayoutAnimation, ScrollView, View } from 'react-native';
+import { Animated, LayoutAnimation, ScrollView, View } from 'react-native';
+import { useScreenScroll } from '../themeContext';
 
 import { AnimatedNumber, FadeIn } from '../components/anim';
 import { CheckArt, LeakArt } from '../components/Illustrations';
@@ -11,7 +12,7 @@ import { Card, CategoryBubble, Chip, Empty, GradientCard, InsightCard, Label, Ro
 import { findRecurring, inr, totalMonthlySaving } from '../lib/analysis';
 import type { Severity } from '../lib/types';
 import { useData } from '../store';
-import { C, F, GRADIENTS, SEVERITY } from '../theme';
+import { C, F, GRADIENTS, severity } from '../theme';
 
 function LeaksContent() {
   const d = useData();
@@ -57,8 +58,8 @@ function LeaksContent() {
             counts[sv] ? (
               <Chip
                 key={sv}
-                icon={SEVERITY[sv].icon}
-                label={`${SEVERITY[sv].label} ${counts[sv]}`}
+                icon={severity()[sv].icon}
+                label={`${severity()[sv].label} ${counts[sv]}`}
                 active={filter === sv}
                 onPress={() => {
                   LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
@@ -129,10 +130,11 @@ export type LeaksView = 'leaks' | 'subs' | 'guard';
 
 export default function InsightsScreen({ initial = 'leaks' }: { initial?: LeaksView }) {
   const d = useData();
+  const scroll = useScreenScroll();
   const [view, setView] = useState<LeaksView>(initial);
   const alerts = d.signals.length + d.failedPayments.filter((f) => f.status !== 'refunded').length;
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+    <Animated.ScrollView {...scroll} contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
       <View style={{ marginTop: -10, marginBottom: 12 }}>
         <Segmented
           value={view}
@@ -147,6 +149,6 @@ export default function InsightsScreen({ initial = 'leaks' }: { initial?: LeaksV
       <FadeIn key={view} from={10}>
         {view === 'leaks' ? <LeaksContent /> : view === 'subs' ? <SubscriptionsSection /> : <GuardSection />}
       </FadeIn>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }

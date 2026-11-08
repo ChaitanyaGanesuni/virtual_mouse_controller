@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { LayoutAnimation, ScrollView, SectionList, TextInput, View } from 'react-native';
+import { Animated, LayoutAnimation, ScrollView, SectionList, TextInput, View } from 'react-native';
+import { useScreenScroll } from '../themeContext';
 
 import { AnimatedNumber, FadeIn, PressScale } from '../components/anim';
 import { Donut } from '../components/charts';
@@ -49,8 +50,11 @@ function TxnRow({ t, onPress }: { t: Transaction; onPress: () => void }) {
   );
 }
 
+const AnimatedSectionList = Animated.createAnimatedComponent(SectionList<Transaction, { title: string; total: number }>);
+
 export default function SpendingScreen() {
   const d = useData();
+  const scroll = useScreenScroll();
   const txns = d.ledger.transactions;
   const monthKeys = useMemo(() => {
     const now = new Date();
@@ -229,7 +233,8 @@ export default function SpendingScreen() {
 
   return (
     <>
-      <SectionList
+      <AnimatedSectionList
+        {...scroll}
         sections={sections}
         keyExtractor={(t) => t.id}
         ListHeaderComponent={header}

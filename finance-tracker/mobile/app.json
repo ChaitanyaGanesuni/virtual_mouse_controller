@@ -2,13 +2,13 @@
   "expo": {
     "name": "Paisa Watch",
     "slug": "paisa-watch",
-    "version": "5.0.0",
+    "version": "6.0.0",
     "orientation": "portrait",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "backgroundColor": "#090D14",
     "android": {
       "package": "com.paisawatch.app",
-      "versionCode": 6,
+      "versionCode": 7,
       "permissions": [
         "android.permission.READ_SMS",
         "android.permission.RECEIVE_SMS",

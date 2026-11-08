@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { LayoutAnimation, RefreshControl, ScrollView, View } from 'react-native';
+import { Animated, LayoutAnimation, RefreshControl, ScrollView, View } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
+import { useScreenScroll } from '../themeContext';
 
 import { AnimatedNumber, FadeIn, PressScale, Skeleton } from '../components/anim';
 import { Bars, Gauge, Progress } from '../components/charts';
@@ -9,8 +10,9 @@ import { Card, GradientCard, InsightCard, Label, Pill, Row, Section, Stat, T } f
 import { inr, isSpend, monthlySummary, totalMonthlySaving } from '../lib/analysis';
 import { monthForecast } from '../lib/forecast';
 import { moneyHealth } from '../lib/health';
-import { BudgetsCard, ForecastCard, NetWorthTrend } from '../components/planning';
-import { DigestCard, GoalsCard, GuardBanner } from '../components/weekly';
+import { BudgetsCard, NetWorthTrend } from '../components/planning';
+import { DigestCard, GoalsCard } from '../components/weekly';
+import { AttentionFeed, HealthSheet, HeroCard, MonthCard, QuickTiles } from '../components/homeKit';
 import { BillsCard } from '../components/bills';
 import { YearReviewCard } from '../components/YearReview';
 import type { Account } from '../lib/types';
@@ -76,6 +78,7 @@ function AccountCard({ a, index }: { a: Account; index: number }) {
 
 export default function HomeScreen({ go }: { go: (tab: string) => void }) {
   const d = useData();
+  const scroll = useScreenScroll();
   const [showHealth, setShowHealth] = useState(false);
   const { accounts, transactions } = d.ledger;
   const cash = accounts.filter((a) => a.kind === 'bank').reduce((s, a) => s + (a.balance ?? 0), 0);
@@ -109,151 +112,28 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
   }
 
   return (
-    <ScrollView
+    <Animated.ScrollView
+      {...scroll}
       contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
-      refreshControl={<RefreshControl refreshing={d.loading} onRefresh={() => d.refresh()} tintColor={C.green} colors={[C.green]} progressBackgroundColor={C.card} />}
+      refreshControl={<RefreshControl refreshing={d.loading} onRefresh={() => d.refresh()} tintColor={C.accent} colors={[C.accent]} progressBackgroundColor={C.card} />}
     >
       {d.demoMode ? (
         <FadeIn>
-          <Row style={{ backgroundColor: C.amber + '1A', padding: 10, borderRadius: 12, marginBottom: 12 }}>
-            <Icon name="sparkle" size={16} color={C.amber} />
-            <T size={13} color={C.amber} weight="medium" style={{ marginLeft: 8, flex: 1 }}>
-              You're viewing sample data. Turn it off in Settings.
+          <Row style={{ alignSelf: 'flex-start', backgroundColor: C.amber + '1A', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 99, marginBottom: 12 }}>
+            <Icon name="sparkle" size={13} color={C.amber} />
+            <T size={12} color={C.amber} weight="semibold" style={{ marginLeft: 6 }}>
+              Sample data · switch off in Settings
             </T>
           </Row>
         </FadeIn>
       ) : null}
 
-      <GuardBanner go={go} />
-
-      <FadeIn index={0}>
-        <GradientCard colors={GRADIENTS.hero}>
-          <Label color="rgba(255,255,255,0.75)">Net worth</Label>
-          <AnimatedNumber value={net} format={inr} style={{ fontFamily: F.black, fontSize: 38, color: '#fff', marginTop: 6, letterSpacing: -0.5 }} />
-          <Row style={{ marginTop: 18 }}>
-            <Stat label="Bank" icon="bank" value={short(cash)} color="#fff" />
-            <Stat label="Invested" icon="trend" value={short(invested)} color="#fff" />
-            <Stat label="Card dues" icon="card" value={short(cardDue)} color={cardDue > 0 ? '#FECACA' : '#fff'} />
-          </Row>
-        </GradientCard>
-      </FadeIn>
-
-      {health ? (
-        <FadeIn index={1}>
-          <PressScale
-            scaleTo={0.985}
-            onPress={() => {
-              LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-              setShowHealth(!showHealth);
-            }}
-            style={{ backgroundColor: C.card, borderRadius: 22, padding: 18, marginBottom: 12, borderWidth: 0.5, borderColor: C.border }}
-          >
-            <Row style={{ justifyContent: 'space-between' }}>
-              <Label>Money health</Label>
-              <Pill text={health.grade} color={healthColor} />
-            </Row>
-            <View style={{ alignItems: 'center', marginTop: 10 }}>
-              <Gauge value={health.score} color="gradient" size={230} />
-              <View style={{ position: 'absolute', bottom: 0, alignItems: 'center' }}>
-                <AnimatedNumber value={health.score} format={(n) => String(Math.round(n))} style={{ fontFamily: F.black, fontSize: 44, color: healthColor }} />
-                <T size={12} color={C.sub}>
-                  out of 100
-                </T>
-              </View>
-            </View>
-            {health.partial ? (
-              <T size={11.5} color={C.amber} style={{ textAlign: 'center', marginTop: 6 }}>
-                {health.partial}
-              </T>
-            ) : null}
-            {showHealth ? (
-              <View style={{ marginTop: 16 }}>
-                {health.parts.map((p, i) => (
-                  <View key={p.key} style={{ marginBottom: 12 }}>
-                    <Row style={{ justifyContent: 'space-between', marginBottom: 6 }}>
-                      <T size={13} weight="semibold">
-                        {p.label}
-                      </T>
-                      <T size={12} color={C.sub}>
-                        {p.unknown ? 'not scored' : `${p.score}/${p.max}`}
-                      </T>
-                    </Row>
-                    <Progress
-                      value={p.unknown ? 0 : p.score / p.max}
-                      color={p.score / p.max > 0.66 ? C.green : p.score / p.max > 0.33 ? C.amber : C.red}
-                      delay={i * 80}
-                    />
-                    <T size={12} color={C.sub} style={{ marginTop: 4 }}>
-                      {p.note}
-                    </T>
-                  </View>
-                ))}
-              </View>
-            ) : (
-              <T size={12} color={C.faint} style={{ textAlign: 'center', marginTop: 8 }}>
-                Tap to see what makes up your score
-              </T>
-            )}
-          </PressScale>
-        </FadeIn>
-      ) : null}
-
-      <FadeIn index={2}>
-        <Card>
-          <Row style={{ justifyContent: 'space-between' }}>
-            <Label>{MONTHS[new Date().getMonth()]} so far</Label>
-            {vsLast != null && Number.isFinite(vsLast) ? (
-              <Pill
-                text={`${vsLast > 0 ? '+' : ''}${Math.round(vsLast * 100)}% vs same day last month`}
-                color={vsLast > 0.05 ? C.red : C.green}
-                icon={vsLast > 0 ? 'arrowUp' : 'arrowDown'}
-              />
-            ) : null}
-          </Row>
-          <AnimatedNumber value={now.spend} format={inr} style={{ fontFamily: F.black, fontSize: 30, color: C.text, marginTop: 6 }} />
-          <T size={12} color={C.sub} style={{ marginBottom: 10 }}>
-            spent{now.income > 0 ? ` of ${inr(now.income)} income` : ''}
-          </T>
-          <Progress value={now.income > 0 ? now.spend / now.income : 0} color={now.income > 0 && now.spend > now.income * 0.8 ? C.red : C.green} height={10} />
-          <Row style={{ marginTop: 16 }}>
-            <Stat label="Income" icon="arrowDown" value={inr(now.income)} color={C.green} />
-            <Stat label="Invested" icon="trend" value={inr(now.invested)} color={C.indigo} />
-            <Stat label="Kept" icon="wallet" value={inr(Math.max(0, now.income - now.spend - now.invested))} />
-          </Row>
-        </Card>
-      </FadeIn>
-
-      <ForecastCard f={forecast} index={3} />
-      <BillsCard index={3} />
-      <BudgetsCard txns={transactions} budgets={d.budgets} onSave={d.setBudgets} index={3} />
-      <GoalsCard index={3} />
-      <DigestCard dg={d.digest} index={3} />
-
-      {saving > 0 ? (
-        <FadeIn index={3}>
-          <PressScale onPress={() => go('insights')}>
-            <GradientCard colors={GRADIENTS.save}>
-              <Row>
-                <View style={{ flex: 1 }}>
-                  <Label color="#A7F3D0">You could save</Label>
-                  <Row style={{ alignItems: 'flex-end' }}>
-                    <AnimatedNumber value={saving} format={inr} style={{ fontFamily: F.black, fontSize: 30, color: '#fff', marginTop: 4 }} />
-                    <T size={14} color="#A7F3D0" weight="semibold" style={{ marginLeft: 4, marginBottom: 5 }}>
-                      /month
-                    </T>
-                  </Row>
-                  <T size={12.5} color="#D1FAE5">
-                    {d.waste.length} money leaks found · {inr(saving * 12)} a year
-                  </T>
-                </View>
-                <View style={{ width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' }}>
-                  <Icon name="chevronRight" size={24} color="#fff" />
-                </View>
-              </Row>
-            </GradientCard>
-          </PressScale>
-        </FadeIn>
-      ) : null}
+      <HeroCard net={net} cash={cash} invested={invested} dues={cardDue} />
+      <QuickTiles health={health} spent={now.spend} vsLast={vsLast} saving={saving} forecast={forecast} go={go} onHealth={() => setShowHealth(true)} />
+      <AttentionFeed go={go} />
+      <MonthCard f={forecast} vsLast={vsLast} index={6} />
+      <BillsCard index={6} />
+      <BudgetsCard txns={transactions} budgets={d.budgets} onSave={d.setBudgets} index={6} />
 
       {accounts.length ? (
         <>
@@ -266,7 +146,9 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
         </>
       ) : null}
 
-      <NetWorthTrend points={history} index={4} />
+      <GoalsCard index={7} />
+      <NetWorthTrend points={history} index={7} />
+      <DigestCard dg={d.digest} index={7} />
 
       <Section title="Last 6 months" action="Details" onAction={() => go('spending')} />
       <FadeIn index={4}>
@@ -277,7 +159,7 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
               value: m.spend,
               note: short(m.spend),
               highlight: i === months.length - 1,
-              color: m.income > 0 && m.spend > m.income ? C.red : C.green,
+              color: m.income > 0 && m.spend > m.income ? C.red : C.accent,
             }))}
           />
         </Card>
@@ -303,6 +185,7 @@ export default function HomeScreen({ go }: { go: (tab: string) => void }) {
           {d.lastSync ? ` · ${new Date(d.lastSync).toLocaleTimeString('en-IN', { hour: 'numeric', minute: '2-digit' })}` : ''}
         </T>
       </Row>
-    </ScrollView>
+      {health ? <HealthSheet health={health} visible={showHealth} onClose={() => setShowHealth(false)} /> : null}
+    </Animated.ScrollView>
   );
 }

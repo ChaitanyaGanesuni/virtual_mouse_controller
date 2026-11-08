@@ -188,7 +188,7 @@ function Step({ value, step, onChange }: { value: number; step: number; onChange
       onPress={() => onChange(Math.max(0, v))}
       style={{ width: 32, height: 32, borderRadius: 11, backgroundColor: C.cardHi, alignItems: 'center', justifyContent: 'center' }}
     >
-      <T size={18} weight="bold" color={C.green}>
+      <T size={18} weight="bold" color={C.accent}>
         {label}
       </T>
     </PressScale>

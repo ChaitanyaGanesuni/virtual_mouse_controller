@@ -1,5 +1,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Linking, ScrollView, Share, Switch, View } from 'react-native';
+import { Animated, Linking, ScrollView, Share, Switch, View } from 'react-native';
+import { useScreenScroll, useTheme } from '../themeContext';
+import Svg, { Circle, Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 
 import { FadeIn, PressScale, tap } from '../components/anim';
 import { canUseDeviceLock, verifyOwner } from '../components/guards';
@@ -14,7 +16,7 @@ import type { Assumptions } from '../lib/investments';
 import { maskSms } from '../lib/smsParser';
 import type { AlertPrefs } from '../store';
 import { useData } from '../store';
-import { C, F } from '../theme';
+import { ACCENTS, C, F, type Accent } from '../theme';
 
 function SettingRow({ icon, color, title, sub, right, last }: {
   icon: IconName;
@@ -55,7 +57,7 @@ function Stepper({ value, step, min, max, fmt, onChange }: {
       onPress={() => onChange(Math.min(max, Math.max(min, Math.round(v * 1000) / 1000)))}
       style={{ width: 32, height: 32, borderRadius: 11, backgroundColor: C.cardHi, alignItems: 'center', justifyContent: 'center' }}
     >
-      <T size={18} weight="bold" color={C.green}>
+      <T size={18} weight="bold" color={C.accent}>
         {icon}
       </T>
     </PressScale>
@@ -71,10 +73,12 @@ function Stepper({ value, step, min, max, fmt, onChange }: {
   );
 }
 
-const sw = { trackColor: { false: C.cardHi, true: C.greenDeep }, thumbColor: '#fff' } as const;
+const swProps = () => ({ trackColor: { false: C.borderHi, true: C.accent }, thumbColor: '#fff' });
 
 export default function SettingsScreen() {
   const d = useData();
+  const scroll = useScreenScroll();
+  const themeCtx = useTheme();
   const a = d.assumptions;
   const al = d.alertPrefs;
   const [showMissed, setShowMissed] = useState(false);
@@ -116,7 +120,63 @@ export default function SettingsScreen() {
     });
 
   return (
-    <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+    <Animated.ScrollView {...scroll} contentContainerStyle={{ padding: 16, paddingBottom: 120 }}>
+      <Section title="Appearance" />
+      <FadeIn index={0}>
+        <Card>
+          <Label>Theme</Label>
+          <Segmented
+            value={themeCtx.prefs.mode}
+            onChange={(mode) => themeCtx.setPrefs({ ...themeCtx.prefs, mode })}
+            options={[
+              { value: 'system', label: 'Auto' },
+              { value: 'light', label: 'Light' },
+              { value: 'dark', label: 'Dark' },
+            ]}
+          />
+          <T size={12} color={C.sub} style={{ marginTop: 8 }}>
+            Auto follows your phone's dark mode.
+          </T>
+          <View style={{ marginTop: 16 }}>
+            <Label>Accent colour</Label>
+          </View>
+          <Row style={{ marginTop: 12, justifyContent: 'space-between' }}>
+            {(Object.keys(ACCENTS) as Accent[]).map((k) => {
+              const on = themeCtx.prefs.accent === k;
+              return (
+                <PressScale key={k} onPress={() => themeCtx.setPrefs({ ...themeCtx.prefs, accent: k })} style={{ alignItems: 'center', width: 58 }}>
+                  <View
+                    style={{
+                      width: 48,
+                      height: 48,
+                      borderRadius: 24,
+                      padding: 3,
+                      borderWidth: 2.5,
+                      borderColor: on ? C.text : 'transparent',
+                    }}
+                  >
+                    <Svg width="100%" height="100%" viewBox="0 0 40 40">
+                      <Defs>
+                        <LinearGradient id={`sw-${k}`} x1="0" y1="0" x2="1" y2="1">
+                          {ACCENTS[k].hero.map((c, n) => (
+                            <Stop key={c + n} offset={String(n / (ACCENTS[k].hero.length - 1))} stopColor={c} />
+                          ))}
+                        </LinearGradient>
+                      </Defs>
+                      <Circle cx={20} cy={20} r={20} fill={`url(#sw-${k})`} />
+                      {on ? <Path d="M12 20.5l5 5L28 14.5" stroke="#fff" strokeWidth={3.2} fill="none" strokeLinecap="round" strokeLinejoin="round" /> : null}
+                    </Svg>
+                  </View>
+                  <T size={11} weight={on ? 'bold' : 'medium'} color={on ? C.text : C.sub} style={{ marginTop: 5 }}>
+                    {ACCENTS[k].label}
+                  </T>
+                </PressScale>
+              );
+            })}
+          </Row>
+        </Card>
+      </FadeIn>
+
       <FadeIn index={0}>
         <Card>
           <Row>
@@ -150,7 +210,7 @@ export default function SettingsScreen() {
               title="Use sample data"
               sub="Explore the app with realistic demo transactions"
               last
-              right={<Switch value={d.demoMode} onValueChange={(v) => { tap(); d.setDemoMode(v); }} {...sw} />}
+              right={<Switch value={d.demoMode} onValueChange={(v) => { tap(); d.setDemoMode(v); }} {...swProps()} />}
             />
           </View>
         </Card>
@@ -201,7 +261,7 @@ export default function SettingsScreen() {
             color={C.blue}
             title="Card bill reminders"
             sub="3 days before, day before, due day"
-            right={<Switch value={al.billReminders} onValueChange={(v) => { tap(); setAl({ billReminders: v }); }} {...sw} />}
+            right={<Switch value={al.billReminders} onValueChange={(v) => { tap(); setAl({ billReminders: v }); }} {...swProps()} />}
           />
           <SettingRow
             icon="message"
@@ -209,7 +269,7 @@ export default function SettingsScreen() {
             title="Weekly check-in"
             sub="Sunday 7 pm: your week, bills ahead, one tip"
             last
-            right={<Switch value={d.extras.digest} onValueChange={(v) => { tap(); d.setExtra('digest', v); }} {...sw} />}
+            right={<Switch value={d.extras.digest} onValueChange={(v) => { tap(); d.setExtra('digest', v); }} {...swProps()} />}
           />
         </Card>
       </FadeIn>
@@ -259,7 +319,7 @@ export default function SettingsScreen() {
             color={C.violet}
             title="App lock"
             sub="Fingerprint, face or PIN when opening, and after 30 s away"
-            right={<Switch value={d.appLock} onValueChange={toggleLock} {...sw} />}
+            right={<Switch value={d.appLock} onValueChange={toggleLock} {...swProps()} />}
           />
           <SettingRow
             icon="eye"
@@ -267,7 +327,7 @@ export default function SettingsScreen() {
             title="Hide in recent apps"
             sub={d.appLock ? 'Blank preview in the app switcher; also blocks screenshots' : 'Works together with app lock'}
             last
-            right={<Switch disabled={!d.appLock} value={d.appLock && d.extras.secure} onValueChange={(v) => { tap(); d.setExtra('secure', v); }} {...sw} />}
+            right={<Switch disabled={!d.appLock} value={d.appLock && d.extras.secure} onValueChange={(v) => { tap(); d.setExtra('secure', v); }} {...swProps()} />}
           />
           {lockMsg ? (
             <T size={12.5} color={C.amber} style={{ marginTop: 6 }}>
@@ -384,7 +444,7 @@ export default function SettingsScreen() {
       </FadeIn>
 
       <T size={11} color={C.faint} style={{ textAlign: 'center', marginTop: 8, fontFamily: F.medium }}>
-        Paisa Watch 5.0
+        Paisa Watch 6.0
       </T>
 
       <Sheet visible={showMissed} onClose={() => setShowMissed(false)} title={`Unread alerts (${missed.length})`}>
@@ -402,6 +462,6 @@ export default function SettingsScreen() {
           <Button label="Share all (numbers masked)" icon="share" onPress={shareMissed} />
         </ScrollView>
       </Sheet>
-    </ScrollView>
+    </Animated.ScrollView>
   );
 }

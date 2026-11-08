@@ -19,6 +19,7 @@ export const BACKUP_KEYS = [
   'guardDismissed.v1',
   'loans.v1',
   'changesSeen.v1',
+  'theme.v1',
 ];
 
 interface BackupFile {

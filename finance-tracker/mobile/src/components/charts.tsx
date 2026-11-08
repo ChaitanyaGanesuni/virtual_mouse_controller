@@ -165,11 +165,11 @@ export function Progress({ value, color, height = 8, delay = 0 }: { value: numbe
 }
 
 /** Circular progress ring (budgets). Turns amber past 80% and red past 100%. */
-export function Ring({ pct, size = 64, stroke = 7, children }: { pct: number; size?: number; stroke?: number; children?: ReactNode }) {
+export function Ring({ pct, size = 64, stroke = 7, children, color: fixed }: { pct: number; size?: number; stroke?: number; children?: ReactNode; color?: string }) {
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const shown = Math.max(0, Math.min(1, pct));
-  const color = pct >= 1 ? C.red : pct >= 0.8 ? C.amber : C.green;
+  const color = fixed ?? (pct >= 1 ? C.red : pct >= 0.8 ? C.amber : C.green);
   const p = useProgress([shown], 1000, 200);
   const offset = p.interpolate({ inputRange: [0, 1], outputRange: [circ, circ * (1 - shown)] });
   return (

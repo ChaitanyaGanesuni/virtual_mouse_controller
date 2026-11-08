@@ -1,4 +1,6 @@
 import * as Haptics from 'expo-haptics';
+
+import { C } from '../theme';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View, type StyleProp, type TextStyle, type ViewStyle } from 'react-native';
 
@@ -100,7 +102,7 @@ export function AnimatedNumber({
     Animated.timing(anim, { toValue: value, duration, easing: Easing.out(Easing.exp), useNativeDriver: false }).start();
     return () => anim.removeListener(id);
   }, [anim, value, duration]);
-  return <Text style={style}>{format(shown)}</Text>;
+  return <Text style={[{ fontVariant: ['tabular-nums'] }, style]}>{format(shown)}</Text>;
 }
 
 /** Grey placeholder block with a moving sheen, shown while the first scan runs. */
@@ -119,7 +121,7 @@ export function Skeleton({ height, width = '100%', radius = 14, style }: {
     return () => loop.stop();
   }, [v]);
   return (
-    <View style={[{ height, width, borderRadius: radius, backgroundColor: '#151F2D', overflow: 'hidden' }, style]}>
+    <View style={[{ height, width, borderRadius: radius, backgroundColor: C.cardHi, overflow: 'hidden' }, style]}>
       <Animated.View
         style={{
           position: 'absolute',

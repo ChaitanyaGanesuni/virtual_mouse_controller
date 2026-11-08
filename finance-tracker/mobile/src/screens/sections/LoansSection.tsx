@@ -75,7 +75,7 @@ function LoanEditor({ loan, onClose }: { loan: Loan | null; onClose: () => void 
         <Label>Interest rate (per year)</Label>
         <Row style={{ marginTop: 8 }}>
           <PressScale onPress={() => setRate(Math.max(1, Math.round((rate - 0.25) * 100) / 100))} style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: C.cardHi, alignItems: 'center', justifyContent: 'center' }}>
-            <T size={20} weight="bold" color={C.green}>
+            <T size={20} weight="bold" color={C.accent}>
               −
             </T>
           </PressScale>
@@ -83,7 +83,7 @@ function LoanEditor({ loan, onClose }: { loan: Loan | null; onClose: () => void 
             {rate.toFixed(2)}%
           </T>
           <PressScale onPress={() => setRate(Math.min(40, Math.round((rate + 0.25) * 100) / 100))} style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: C.cardHi, alignItems: 'center', justifyContent: 'center' }}>
-            <T size={20} weight="bold" color={C.green}>
+            <T size={20} weight="bold" color={C.accent}>
               +
             </T>
           </PressScale>

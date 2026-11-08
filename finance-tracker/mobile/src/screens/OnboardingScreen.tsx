@@ -108,7 +108,7 @@ export default function OnboardingScreen() {
                   width: 26,
                   marginHorizontal: 4,
                   borderRadius: 4,
-                  backgroundColor: C.green,
+                  backgroundColor: C.accent,
                   opacity: x.interpolate({ inputRange: range, outputRange: [0.25, 1, 0.25], extrapolate: 'clamp' }),
                   transform: [{ scaleX: x.interpolate({ inputRange: range, outputRange: [0.35, 1, 0.35], extrapolate: 'clamp' }) }],
                 }}

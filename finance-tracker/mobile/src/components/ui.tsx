@@ -17,7 +17,7 @@ import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 
 import { inr } from '../lib/analysis';
 import type { Insight } from '../lib/types';
-import { C, F, R, SEVERITY, catMeta } from '../theme';
+import { C, F, R, catMeta, severity, theme } from '../theme';
 import { PressScale } from './anim';
 import Icon, { type IconName } from './Icon';
 
@@ -62,12 +62,29 @@ export function GradientCard({
   colors,
   children,
   style,
+  shine,
 }: {
   colors: readonly string[];
   children: ReactNode;
   style?: StyleProp<ViewStyle>;
+  /** A soft light sweep that crosses the card every few seconds. */
+  shine?: boolean;
 }) {
   const id = useRef(`g${Math.random().toString(36).slice(2, 8)}`).current;
+  const sweep = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (!shine) return;
+    const loop = Animated.loop(
+      Animated.sequence([
+        Animated.delay(1400),
+        Animated.timing(sweep, { toValue: 1, duration: 1500, easing: Easing.inOut(Easing.cubic), useNativeDriver: true }),
+        Animated.timing(sweep, { toValue: 0, duration: 0, useNativeDriver: true }),
+        Animated.delay(4200),
+      ]),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [shine, sweep]);
   return (
     <View style={[{ borderRadius: R.xl, overflow: 'hidden', marginBottom: 14 }, style]}>
       <Svg style={StyleSheet.absoluteFill} width="100%" height="100%" preserveAspectRatio="none">
@@ -82,6 +99,19 @@ export function GradientCard({
       </Svg>
       <View style={s.orb} />
       <View style={[s.orb, { right: undefined, left: -60, top: undefined, bottom: -90, opacity: 0.06 }]} />
+      {shine ? (
+        <Animated.View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            top: -40,
+            bottom: -40,
+            width: 90,
+            backgroundColor: 'rgba(255,255,255,0.14)',
+            transform: [{ translateX: sweep.interpolate({ inputRange: [0, 1], outputRange: [-160, 520] }) }, { rotate: '18deg' }],
+          }}
+        />
+      ) : null}
       <View style={{ padding: 20 }}>{children}</View>
     </View>
   );
@@ -95,10 +125,10 @@ export function Section({ title, action, onAction }: { title: string; action?: s
       </T>
       {action ? (
         <PressScale onPress={onAction} style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <T size={13} weight="semibold" color={C.green}>
+          <T size={13} weight="semibold" color={C.accent}>
             {action}
           </T>
-          <Icon name="chevronRight" size={16} color={C.green} />
+          <Icon name="chevronRight" size={16} color={C.accent} />
         </PressScale>
       ) : null}
     </View>
@@ -147,8 +177,8 @@ export function Pill({ text, color, icon }: { text: string; color: string; icon?
 export function Chip({ label, active, onPress, icon }: { label: string; active?: boolean; onPress: () => void; icon?: IconName }) {
   return (
     <PressScale onPress={onPress} style={[s.chip, active ? s.chipOn : null]}>
-      {icon ? <Icon name={icon} size={14} color={active ? C.bg : C.sub} /> : null}
-      <Text style={{ color: active ? C.bg : C.text, fontFamily: F.semibold, fontSize: 13, marginLeft: icon ? 6 : 0 }}>{label}</Text>
+      {icon ? <Icon name={icon} size={14} color={active ? C.onAccent : C.sub} /> : null}
+      <Text style={{ color: active ? C.onAccent : C.text, fontFamily: F.semibold, fontSize: 13, marginLeft: icon ? 6 : 0 }}>{label}</Text>
     </PressScale>
   );
 }
@@ -169,7 +199,7 @@ export function Button({
   style?: StyleProp<ViewStyle>;
 }) {
   const primary = kind === 'primary';
-  const fg = primary ? '#04261B' : kind === 'danger' ? C.red : C.text;
+  const fg = primary ? C.onAccent : kind === 'danger' ? C.red : C.text;
   return (
     <PressScale onPress={onPress} style={[s.btn, primary ? s.btnPrimary : s.btnGhost, style]}>
       {icon ? <Icon name={icon} size={18} color={fg} /> : null}
@@ -215,7 +245,7 @@ export function Empty({ title, text, art }: { title: string; text: string; art?:
 
 export function InsightCard({ i, startOpen = false }: { i: Insight; startOpen?: boolean }) {
   const [open, setOpen] = useState(startOpen);
-  const sev = SEVERITY[i.severity];
+  const sev = severity()[i.severity];
   const rot = useRef(new Animated.Value(startOpen ? 1 : 0)).current;
   const toggle = () => {
     LayoutAnimation.configureNext(LayoutAnimation.create(260, 'easeInEaseOut', 'opacity'));
@@ -296,13 +326,20 @@ export function Sheet({ visible, onClose, children, title }: { visible: boolean;
 
 // ---------------------------------------------------------------- styles
 
-export const s = StyleSheet.create({
+const makeStyles = () => {
+  const light = theme.mode === 'light';
+  return StyleSheet.create({
   card: {
     backgroundColor: C.card,
     borderRadius: R.lg,
     marginBottom: 12,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: light ? 0 : StyleSheet.hairlineWidth,
     borderColor: C.border,
+    shadowColor: C.shadow,
+    shadowOpacity: light ? 0.07 : 0,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: light ? 2 : 0,
   },
   orb: {
     position: 'absolute',
@@ -328,10 +365,17 @@ export const s = StyleSheet.create({
     marginRight: 8,
     marginBottom: 8,
   },
-  chipOn: { backgroundColor: C.green, borderColor: C.green },
+  chipOn: { backgroundColor: C.accent, borderColor: C.accent },
   btn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: R.md, paddingVertical: 15, marginTop: 10 },
-  btnPrimary: { backgroundColor: C.green },
-  btnGhost: { backgroundColor: C.cardHi, borderWidth: StyleSheet.hairlineWidth, borderColor: C.borderHi },
+  btnPrimary: {
+    backgroundColor: C.accent,
+    shadowColor: C.accent,
+    shadowOpacity: light ? 0.35 : 0.3,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 4,
+  },
+  btnGhost: { backgroundColor: C.cardHi, borderWidth: light ? 0 : StyleSheet.hairlineWidth, borderColor: C.borderHi },
   sheet: {
     position: 'absolute',
     left: 0,
@@ -348,3 +392,11 @@ export const s = StyleSheet.create({
   },
   grabber: { alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: C.borderHi, marginBottom: 14 },
 });
+};
+
+/** Shared styles; rebuilt by `rebuildStyles()` when the theme changes. */
+export let s = makeStyles();
+export function rebuildStyles(): void {
+  s = makeStyles();
+}
+

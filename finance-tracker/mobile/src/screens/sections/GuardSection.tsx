@@ -9,12 +9,12 @@ import { CYBERCRIME_HELPLINE, type FailedPayment, type Signal } from '../../lib/
 import { useData } from '../../store';
 import { C } from '../../theme';
 
-const KIND: Record<Signal['kind'], { icon: IconName; color: string }> = {
+const kindMeta = (): Record<Signal['kind'], { icon: IconName; color: string }> => ({
   duplicate: { icon: 'repeat', color: C.amber },
   'new-merchant': { icon: 'eye', color: C.blue },
   foreign: { icon: 'plane', color: C.red },
   'odd-hour': { icon: 'alert', color: C.orange },
-};
+});
 
 const fmtDate = (t: number) => new Date(t).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 const call = (n: string) => Linking.openURL(`tel:${n}`).catch(() => {});
@@ -31,7 +31,7 @@ function ActionChip({ label, icon, color, onPress }: { label: string; icon: Icon
 }
 
 function SignalCard({ s, onDismiss, index }: { s: Signal; onDismiss: () => void; index: number }) {
-  const k = KIND[s.kind];
+  const k = kindMeta()[s.kind];
   return (
     <FadeIn index={index}>
       <Card>
@@ -61,14 +61,14 @@ function SignalCard({ s, onDismiss, index }: { s: Signal; onDismiss: () => void;
   );
 }
 
-const STATUS = {
+const statusMeta = () => ({
   refunded: { label: 'Refunded', color: C.green, icon: 'check' as IconName },
   waiting: { label: 'Waiting for refund', color: C.amber, icon: 'calendar' as IconName },
   overdue: { label: 'Refund overdue', color: C.red, icon: 'alert' as IconName },
-};
+});
 
 function FailedCard({ f, index }: { f: FailedPayment; index: number }) {
-  const st = STATUS[f.status];
+  const st = statusMeta()[f.status];
   return (
     <FadeIn index={index}>
       <Card>

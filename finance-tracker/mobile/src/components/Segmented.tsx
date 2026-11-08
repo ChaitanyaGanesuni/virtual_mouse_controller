@@ -17,7 +17,7 @@ export default function Segmented<V extends string>({ options, value, onChange }
   return (
     <View
       onLayout={(e: LayoutChangeEvent) => setW(e.nativeEvent.layout.width)}
-      style={{ flexDirection: 'row', backgroundColor: C.bg2, borderRadius: 14, padding: 4, marginTop: 10 }}
+      style={{ flexDirection: 'row', backgroundColor: C.cardHi, borderRadius: 14, padding: 4, marginTop: 10 }}
     >
       {w > 0 ? (
         <Animated.View
@@ -28,14 +28,14 @@ export default function Segmented<V extends string>({ options, value, onChange }
             left: 4,
             width: seg - 8 / options.length,
             borderRadius: 11,
-            backgroundColor: C.green,
+            backgroundColor: C.accent,
             transform: [{ translateX: x.interpolate({ inputRange: [0, options.length - 1], outputRange: [0, seg * (options.length - 1) - 8 / options.length * (options.length - 1)] }) }],
           }}
         />
       ) : null}
       {options.map((o) => (
         <PressScale key={o.value} haptic onPress={() => onChange(o.value)} style={{ flex: 1, paddingVertical: 9, alignItems: 'center' }}>
-          <T size={13} weight="bold" color={o.value === value ? '#04261B' : C.sub}>
+          <T size={13} weight="bold" color={o.value === value ? C.onAccent : C.sub}>
             {o.label}
           </T>
         </PressScale>

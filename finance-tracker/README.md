@@ -52,6 +52,10 @@ credit-card issuers, UPI apps and mutual-fund registrars (CAMS / KFintech) alrea
   emergency fund, card debt to clear first, savings rate, allocation drift from your target, concentration, too many
   overlapping funds, and long-term underperformers.
 
+**Design:** light and dark themes (or follow the phone), five accent colours (Emerald, Indigo, Violet, Sunset, Ocean),
+a "Needs your attention" feed on Home, collapsing large titles, directional screen transitions, springy tab bar,
+self-drawing charts and check marks, and amounts that count up without jitter.
+
 Everything runs on the phone. There is no server and no account. The only network call fetches public NAVs.
 
 ## Install
