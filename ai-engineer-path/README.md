@@ -21,5 +21,5 @@ Narration is available in English, Telugu and Hindi (browser speech). Progress i
 ## Status
 
 - Roadmap: all 20 stages and 552 concepts listed, with strict unlock order.
-- Lessons built: Stage 1, concepts 1–15 (Python Fundamentals, Variables and Data Types, Operators and Expressions, Conditional Statements, Loops and Iterations, Lists/Tuples/Sets/Dictionaries, Functions and Lambda Expressions, Object-Oriented Programming, Classes/Objects/Inheritance, Polymorphism and Encapsulation, Exception Handling, File Handling, Modules and Packages, List and Dictionary Comprehensions, Iterators and Generators).
+- Lessons built: Stage 1, concepts 1–20 (Python Fundamentals, Variables and Data Types, Operators and Expressions, Conditional Statements, Loops and Iterations, Lists/Tuples/Sets/Dictionaries, Functions and Lambda Expressions, Object-Oriented Programming, Classes/Objects/Inheritance, Polymorphism and Encapsulation, Exception Handling, File Handling, Modules and Packages, List and Dictionary Comprehensions, Iterators and Generators, Decorators, Context Managers, Functional Programming, Multithreading, Multiprocessing).
 - Related artifacts: `../slm-learning-lab` (deep visual lab for the SLM stages) and `../slm-from-zero` (a 15-chapter no-code tour).
